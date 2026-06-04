@@ -13,17 +13,25 @@ import { SupportPage } from './pages/SupportPage'
 
 export default function App() {
   const { user, profile, loading, refreshProfile } = useAuth()
-  const { page, authOpen } = useApp()
-  const [workerReady, setWorkerReady] = useState<boolean | null>(null)
+  const { page, navigate, authOpen } = useApp()
+  const [workerApproved, setWorkerApproved] = useState<boolean | null>(null)
+  const [workerExists, setWorkerExists] = useState<boolean | null>(null)
   const [checking, setChecking] = useState(false)
 
   useEffect(() => {
-    if (!user || !profile) { setWorkerReady(null); return }
-    if (profile.role !== 'worker') { setWorkerReady(true); return }
-    setChecking(true)
-    supabase.from('worker_profiles').select('id').eq('user_id', user.id).maybeSingle()
-      .then(({ data }) => { setWorkerReady(!!data); setChecking(false) })
-      .catch(() => { setWorkerReady(false); setChecking(false) })
+    if (!user || !profile) { setWorkerApproved(null); setWorkerExists(null); return }
+    if (profile.role === 'admin') { navigate('admin'); return }
+    if (profile.role === 'worker') {
+      setChecking(true)
+      supabase.from('worker_profiles').select('id, is_approved').eq('user_id', user.id).maybeSingle()
+        .then(({ data }) => {
+          setWorkerExists(!!data)
+          setWorkerApproved(data?.is_approved || false)
+          if (data?.is_approved) navigate('worker')
+          setChecking(false)
+        })
+        .catch(() => { setWorkerExists(false); setWorkerApproved(false); setChecking(false) })
+    }
   }, [user?.id, profile?.role])
 
   if (loading || (profile?.role === 'worker' && checking)) {
@@ -43,7 +51,7 @@ export default function App() {
 
   if (page === 'support') return <><Navbar /><SupportPage /></>
 
-  // Admin — لوحة الإدارة دائماً إلا لو طلب صفحة ثانية
+  // Admin
   if (profile.role === 'admin') {
     if (page === 'dashboard') return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
     return <><Navbar /><AdminPanel /></>
@@ -51,8 +59,32 @@ export default function App() {
 
   // Worker
   if (profile.role === 'worker') {
-    if (!workerReady) return (
-      <><Navbar /><WorkerRegister onSuccess={async () => { await refreshProfile(); setWorkerReady(true) }} /></>
+    if (!workerExists) return (
+      <><Navbar /><WorkerRegister onSuccess={async () => {
+        await refreshProfile()
+        setWorkerExists(true)
+        setWorkerApproved(false)
+      }} /></>
+    )
+    if (!workerApproved) return (
+      <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center px-4">
+        <div className="max-w-sm text-center bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-10">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
+            <span className="text-3xl">⏳</span>
+          </div>
+          <h2 className="text-xl font-bold mb-3">طلبك قيد المراجعة</h2>
+          <p className="text-zinc-500 text-sm leading-relaxed mb-5">فريق أمرني راح يراجع بياناتك ويوافق عليك قريباً.</p>
+          <button onClick={async () => {
+            setChecking(true)
+            const { data } = await supabase.from('worker_profiles').select('is_approved').eq('user_id', user.id).single()
+            setWorkerApproved(data?.is_approved || false)
+            if (data?.is_approved) navigate('worker')
+            setChecking(false)
+          }} className="text-sm text-amber-400 border border-amber-500/30 px-4 py-2 rounded-lg hover:bg-amber-500/10 transition-colors">
+            {checking ? 'جاري التحقق...' : 'تحقق من الحالة'}
+          </button>
+        </div>
+      </div>
     )
     if (page === 'dashboard') return <><Navbar /><UserDashboard /></>
     return <><Navbar /><WorkerDashboard /></>
