@@ -13,7 +13,7 @@ import { SupportPage } from './pages/SupportPage'
 
 export default function App() {
   const { user, profile, loading, refreshProfile } = useAuth()
-  const { page, authOpen, navigate } = useApp()
+  const { page, authOpen } = useApp()
   const [workerReady, setWorkerReady] = useState<boolean | null>(null)
   const [checking, setChecking] = useState(false)
 
@@ -26,7 +26,6 @@ export default function App() {
       .catch(() => { setWorkerReady(false); setChecking(false) })
   }, [user?.id, profile?.role])
 
-  // Loading spinner
   if (loading || (profile?.role === 'worker' && checking)) {
     return (
       <div className="min-h-screen bg-[#080808] flex items-center justify-center">
@@ -38,52 +37,27 @@ export default function App() {
     )
   }
 
-  // Not logged in
-  if (!user || !profile) {
-    return (
-      <>
-        <Navbar />
-        <LandingPage />
-        {authOpen && <AuthModal />}
-      </>
-    )
-  }
+  if (!user || !profile) return (
+    <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
+  )
 
-  // Support page - any role
-  if (page === 'support') {
-    return <><Navbar /><SupportPage /></>
-  }
+  if (page === 'support') return <><Navbar /><SupportPage /></>
 
-  // Admin
+  // Admin — لوحة الإدارة دائماً إلا لو طلب صفحة ثانية
   if (profile.role === 'admin') {
-    if (page === 'admin' || page === 'landing') return <><Navbar /><AdminPanel /></>
-    return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
+    if (page === 'dashboard') return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
+    return <><Navbar /><AdminPanel /></>
   }
 
-  // Worker - needs registration first
+  // Worker
   if (profile.role === 'worker') {
-    if (!workerReady) {
-      return (
-        <>
-          <Navbar />
-          <WorkerRegister onSuccess={async () => {
-            await refreshProfile()
-            setWorkerReady(true)
-            navigate('worker')
-          }} />
-        </>
-      )
-    }
+    if (!workerReady) return (
+      <><Navbar /><WorkerRegister onSuccess={async () => { await refreshProfile(); setWorkerReady(true) }} /></>
+    )
     if (page === 'dashboard') return <><Navbar /><UserDashboard /></>
     return <><Navbar /><WorkerDashboard /></>
   }
 
   // Client
-  return (
-    <>
-      <Navbar />
-      <UserDashboard />
-      {authOpen && <AuthModal />}
-    </>
-  )
+  return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
 }
