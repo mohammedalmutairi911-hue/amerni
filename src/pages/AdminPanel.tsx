@@ -21,7 +21,7 @@ export function AdminPanel() {
   const fetchAll = async () => {
     setLoading(true)
     const [{ data: w }, { data: t }, { data: u }] = await Promise.all([
-      supabase.from('worker_profiles').select('*, profiles(*)').order('created_at', { ascending: false }),
+      supabase.from('worker_profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('tasks').select('*, profiles(full_name)').order('created_at', { ascending: false }),
       supabase.from('profiles').select('*').order('created_at', { ascending: false })
     ])
