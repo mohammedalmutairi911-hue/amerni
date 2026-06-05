@@ -46,7 +46,27 @@ export function UserDashboard() {
   const [form, setForm] = useState({ title: '', description: '', category: CATEGORIES[0], city: 'الرياض', use_ai: false, budget: '' })
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
 
-  useEffect(() => { if (user) fetchTasks() }, [user?.id])
+  useEffect(() => {
+    if (!user) return
+    // حفظ الطلب المعلق من الصفحة الرئيسية
+    const pending = sessionStorage.getItem('pending_task')
+    if (pending) {
+      sessionStorage.removeItem('pending_task')
+      try {
+        const { title, city } = JSON.parse(pending)
+        if (title) {
+          supabase.from('tasks').insert({
+            client_id: user.id, user_id: user.id,
+            title, description: title,
+            category: 'أخرى', city: city || 'الرياض',
+            use_ai: false, status: 'open'
+          }).then(() => fetchTasks())
+          return
+        }
+      } catch {}
+    }
+    fetchTasks()
+  }, [user?.id])
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [msgs])
 
   const fetchTasks = async () => {
