@@ -97,20 +97,9 @@ export function LandingPage() {
       if (err) { setError('البريد أو كلمة المرور خاطئة'); setLoading(false); return }
     }
 
-    // انتظر ثانية عشان يكتمل التسجيل
-    await new Promise(r => setTimeout(r, 1000))
-    
+    // خزّن الطلب مؤقتاً عشان UserDashboard يحفظه
     if (taskInput.trim()) {
-      const { data: { user: u } } = await supabase.auth.getUser()
-      if (u) {
-        const { error: taskErr } = await supabase.from('tasks').insert({
-          client_id: u.id, user_id: u.id,
-          title: taskInput.trim(), description: taskInput.trim(),
-          category: 'أخرى', city,
-          use_ai: false, status: 'open'
-        })
-        console.log('Task insert error:', taskErr)
-      }
+      sessionStorage.setItem('pending_task', JSON.stringify({ title: taskInput.trim(), city }))
     }
 
     setLoading(false)
