@@ -72,35 +72,38 @@ export function LandingPage() {
     navigate('dashboard')
   }
 
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [city, setCity] = useState('الرياض')
+
   const handleAuth = async () => {
     setError('')
-    if (!phone.trim()) { setError('أدخل رقم الجوال'); return }
-    if (password.length < 6) { setError('كلمة المرور 6 أحرف على الأقل'); return }
+    if (isNew) {
+      if (!name.trim()) { setError('أدخل اسمك'); return }
+      if (!phone.trim() || phone.length < 9) { setError('أدخل رقم الجوال'); return }
+      if (!email.trim() || !email.includes('@')) { setError('أدخل بريد إلكتروني صحيح'); return }
+      if (password.length < 6) { setError('كلمة المرور 6 أحرف على الأقل'); return }
+    } else {
+      if (!email.trim()) { setError('أدخل بريدك الإلكتروني'); return }
+      if (!password) { setError('أدخل كلمة المرور'); return }
+    }
     setLoading(true)
 
-    const email = `${phone.replace(/\s/g, '')}@amerni.sa`
-
     if (isNew) {
-      const { error: err } = await signUp(email, password, phone, 'client')
-      if (err) {
-        // Try sign in if already exists
-        const { error: signInErr } = await signIn(email, password)
-        if (signInErr) { setError('رقم الجوال مسجل مسبقاً — تحقق من كلمة المرور'); setLoading(false); return }
-      }
+      const { error: err } = await signUp(email.trim(), password, name.trim(), 'client')
+      if (err) { setError('البريد مسجل مسبقاً — جرب "عندي حساب"'); setLoading(false); return }
     } else {
-      const email2 = `${phone.replace(/\s/g, '')}@amerni.sa`
-      const { error: err } = await signIn(email2, password)
-      if (err) { setError('رقم الجوال أو كلمة المرور خاطئة'); setLoading(false); return }
+      const { error: err } = await signIn(email.trim(), password)
+      if (err) { setError('البريد أو كلمة المرور خاطئة'); setLoading(false); return }
     }
 
-    // Save task if exists
     if (taskInput.trim()) {
       const { data: { user: u } } = await supabase.auth.getUser()
       if (u) {
         await supabase.from('tasks').insert({
           client_id: u.id, user_id: u.id,
           title: taskInput.trim(), description: taskInput.trim(),
-          category: 'أخرى', city: 'الرياض',
+          category: 'أخرى', city,
           use_ai: false, status: 'open'
         })
       }
@@ -165,21 +168,30 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Auth modal */}
+      {/* Auth modal — task + register combined */}
       {showAuth && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-[#111] border border-zinc-800 rounded-2xl p-6">
-            <h2 className="text-lg font-bold mb-1">
-              {taskInput.trim() ? `سجّل عشان ننشر طلبك` : 'أهلاً بك في أمرني'}
-            </h2>
+          <div className="w-full max-w-md bg-[#111] border border-zinc-800 rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+
+            {/* Header */}
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h2 className="text-lg font-bold">{isNew ? 'سجّل وانشر طلبك' : 'أهلاً بعودتك'}</h2>
+                <p className="text-xs text-zinc-500 mt-0.5">{isNew ? 'خطوة وحدة وطلبك ينشر فوراً' : 'ادخل عشان تتابع طلباتك'}</p>
+              </div>
+              <button onClick={() => setShowAuth(false)} className="text-zinc-500 hover:text-white p-1"><X size={18} /></button>
+            </div>
+
+            {/* Task preview */}
             {taskInput.trim() && (
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-2.5 mb-4 text-sm text-amber-300 truncate">
-                "{taskInput}"
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 mb-5">
+                <p className="text-xs text-zinc-500 mb-1">طلبك</p>
+                <p className="text-sm text-amber-300 font-medium">"{taskInput}"</p>
               </div>
             )}
 
-            {/* Toggle new/existing */}
-            <div className="flex gap-1 bg-zinc-900 rounded-xl p-1 mb-4">
+            {/* Toggle */}
+            <div className="flex gap-1 bg-zinc-900 rounded-xl p-1 mb-5">
               {[{ v: true, l: 'حساب جديد' }, { v: false, l: 'عندي حساب' }].map(({ v, l }) => (
                 <button key={l} onClick={() => { setIsNew(v); setError('') }}
                   className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${isNew === v ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white'}`}>
@@ -189,32 +201,56 @@ export function LandingPage() {
             </div>
 
             <div className="space-y-3">
-              <div>
-                <label className="block text-xs text-zinc-500 mb-1.5">رقم الجوال</label>
-                <div className="flex gap-2">
-                  <span className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2.5 text-sm text-zinc-400 flex-shrink-0">🇸🇦 +966</span>
-                  <input type="tel" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
-                    placeholder="05XXXXXXXX" maxLength={10}
-                    className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors" />
+              {isNew && (
+                <div>
+                  <label className="block text-xs text-zinc-500 mb-1.5">الاسم الكامل *</label>
+                  <input value={name} onChange={e => setName(e.target.value)} placeholder="محمد العتيبي"
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors" />
                 </div>
-              </div>
+              )}
+
+              {isNew && (
+                <div>
+                  <label className="block text-xs text-zinc-500 mb-1.5">رقم الجوال *</label>
+                  <div className="flex gap-2">
+                    <span className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2.5 text-sm text-zinc-400 flex-shrink-0">🇸🇦 +966</span>
+                    <input type="tel" value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
+                      placeholder="05XXXXXXXX" maxLength={10}
+                      className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors" />
+                  </div>
+                </div>
+              )}
+
               <div>
-                <label className="block text-xs text-zinc-500 mb-1.5">كلمة المرور</label>
+                <label className="block text-xs text-zinc-500 mb-1.5">البريد الإلكتروني *</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="example@gmail.com"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors" />
+              </div>
+
+              {isNew && (
+                <div>
+                  <label className="block text-xs text-zinc-500 mb-1.5">مدينتك</label>
+                  <select value={city} onChange={e => setCity(e.target.value)}
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none">
+                    {['الرياض','جدة','مكة','المدينة','الدمام','الخبر','تبوك','أبها','حائل','جازان'].map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs text-zinc-500 mb-1.5">كلمة المرور *</label>
                 <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && handleAuth()}
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors" />
+                {isNew && <p className="text-xs text-zinc-600 mt-1">6 أحرف على الأقل</p>}
               </div>
 
               {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-lg">{error}</p>}
 
               <button onClick={handleAuth} disabled={loading}
-                className="w-full bg-amber-500 text-black font-bold py-3 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                className="w-full bg-amber-500 text-black font-bold py-3 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-base">
                 {loading && <Loader2 size={15} className="animate-spin" />}
-                {isNew ? 'سجّل وانشر الطلب' : 'دخول'}
-              </button>
-
-              <button onClick={() => setShowAuth(false)} className="w-full text-zinc-500 text-sm py-1.5 hover:text-zinc-300 transition-colors">
-                إلغاء
+                {isNew ? (taskInput.trim() ? '✅ سجّل وانشر الطلب' : 'إنشاء حساب') : 'دخول'}
               </button>
             </div>
           </div>
