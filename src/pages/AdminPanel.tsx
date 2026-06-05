@@ -34,15 +34,14 @@ export function AdminPanel() {
   const refresh = async () => { setRefreshing(true); await fetchAll(); setRefreshing(false) }
 
   const approveWorker = async (userId: string) => {
-    await supabase.from('worker_profiles').update({ is_approved: true }).eq('user_id', userId)
-    setWorkers(p => p.map(w => w.user_id === userId ? { ...w, is_approved: true } : w))
-    // Notify worker
-    await supabase.from('notifications').insert({ user_id: userId, title: '🎉 تم قبولك كعامل!', body: 'يمكنك الآن قبول الطلبات والبدء بالعمل.' })
+    const { error } = await supabase.from('worker_profiles').update({ is_approved: true }).eq('user_id', userId)
+    console.log('approve error:', error)
+    await fetchAll()
   }
 
   const rejectWorker = async (userId: string) => {
     await supabase.from('worker_profiles').update({ is_approved: false }).eq('user_id', userId)
-    setWorkers(p => p.map(w => w.user_id === userId ? { ...w, is_approved: false } : w))
+    await fetchAll()
   }
 
   const updateTaskStatus = async (taskId: string, status: string) => {
@@ -156,25 +155,51 @@ export function AdminPanel() {
                   <h3 className="font-semibold text-amber-300">عمال بانتظار الموافقة ({stats.pending})</h3>
                 </div>
                 <div className="space-y-2">
-                  {workers.filter(w => !w.is_approved).slice(0, 5).map(w => (
-                    <div key={w.id} className="flex items-center justify-between bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4">
-                      <div className="flex items-center gap-3">
-                        <img src={getAvatar(w.full_name)} className="w-9 h-9 rounded-xl" alt="" />
-                        <div>
-                          <p className="text-sm font-medium">{w.full_name}</p>
-                          <p className="text-xs text-zinc-500">{w.city} · {w.skills?.join('، ')}</p>
+                  {workers.filter(w => !w.is_approved).map(w => (
+                    <div key={w.id} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <img src={getAvatar(w.full_name)} className="w-10 h-10 rounded-xl" alt="" />
+                          <div>
+                            <p className="font-medium">{w.full_name}</p>
+                            <p className="text-xs text-zinc-500">{w.city} · {w.nationality}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => approveWorker(w.user_id)}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs rounded-lg hover:bg-emerald-500/20">
+                            <CheckCircle size={12} /> موافقة
+                          </button>
+                          <button onClick={() => rejectWorker(w.user_id)}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-lg hover:bg-red-500/20">
+                            <XCircle size={12} /> رفض
+                          </button>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => approveWorker(w.user_id)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs rounded-lg hover:bg-emerald-500/20">
-                          <CheckCircle size={12} /> موافقة
-                        </button>
-                        <button onClick={() => rejectWorker(w.user_id)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-lg hover:bg-red-500/20">
-                          <XCircle size={12} /> رفض
-                        </button>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="bg-zinc-900 rounded-lg p-2.5">
+                          <span className="text-zinc-500">الجوال</span>
+                          <p className="text-white mt-0.5">{w.phone || '—'}</p>
+                        </div>
+                        <div className="bg-zinc-900 rounded-lg p-2.5">
+                          <span className="text-zinc-500">رقم الهوية</span>
+                          <p className="text-white mt-0.5">{w.id_number || '—'}</p>
+                        </div>
+                        <div className="bg-zinc-900 rounded-lg p-2.5">
+                          <span className="text-zinc-500">النبذة</span>
+                          <p className="text-white mt-0.5 line-clamp-2">{w.bio || '—'}</p>
+                        </div>
+                        <div className="bg-zinc-900 rounded-lg p-2.5">
+                          <span className="text-zinc-500">المهارات</span>
+                          <p className="text-white mt-0.5">{(w.skills || []).join('، ') || '—'}</p>
+                        </div>
                       </div>
+                      {w.id_image_url && (
+                        <div>
+                          <p className="text-xs text-zinc-500 mb-1.5">صورة الهوية</p>
+                          <img src={w.id_image_url} alt="ID" className="w-full max-h-40 object-cover rounded-xl border border-zinc-700" />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
