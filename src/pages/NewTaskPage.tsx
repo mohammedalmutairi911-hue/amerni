@@ -45,12 +45,30 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   const setA = (k: string, v: string) => setAuth(a => ({ ...a, [k]: v }))
   const setT = (k: string, v: any) => setTask(t => ({ ...t, [k]: v }))
 
+  // AI category auto-detection
+  const detectCategory = (title: string): string => {
+    const t = title.toLowerCase()
+    if (/توصيل|يجيب|يوصل|مشوار|سوق|شراء|طلب/.test(t)) return 'توصيل ومشاوير'
+    if (/صور|تصوير|فيديو|محتوى/.test(t)) return 'تصوير ومحتوى'
+    if (/تحقق|يتأكد|يشوف|يمر|يتفقد/.test(t)) return 'تحقق ومتابعة'
+    if (/ترجمة|معاملة|ورقة|طباعة|إداري/.test(t)) return 'مساعدة إدارية'
+    if (/تسوق|شراء|منتج/.test(t)) return 'تسوق'
+    if (/شرح|تعليم|دراسة|درس/.test(t)) return 'تعليم وشرح'
+    if (/صيانة|تركيب|إصلاح/.test(t)) return 'صيانة وتركيب'
+    return 'أخرى'
+  }
+
   const saveTask = async (uid: string) => {
+    // Auto-detect category if not selected
+    const finalCategory = task.category && task.category !== 'أخرى' 
+      ? task.category 
+      : detectCategory(task.title)
+    
     const { data, error } = await supabase.from('tasks').insert({
       client_id: uid, user_id: uid,
       title: task.title.trim(),
       description: task.description.trim() || task.title.trim(),
-      category: task.category || 'أخرى',
+      category: finalCategory,
       city: task.city,
       use_ai: task.use_ai,
       status: 'open',
@@ -58,8 +76,38 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     }).select().single()
     if (error) {
       console.error('Task save error:', error)
-      setError('حدث خطأ في حفظ الطلب: ' + error.message)
+      setError('حدث خطأ: ' + error.message)
       return false
+    }
+    
+    // Auto-notify matching workers
+    if (data) {
+      const { data: workers } = await supabase
+        .from('worker_profiles')
+        .select('user_id')
+        .eq('is_approved', true)
+        .eq('is_online', true)
+        .contains('skills', [finalCategory])
+        .eq('city', task.city)
+      
+      if (workers && workers.length > 0) {
+        await supabase.from('notifications').insert(
+          workers.map(w => ({
+            user_id: w.user_id,
+            title: 'طلب جديد يناسبك! ⚡',
+            body: task.title.trim(),
+            task_id: data.id
+          }))
+        )
+      }
+    }
+    // Track "أخرى" requests for future auto-categories
+    if (finalCategory === 'أخرى') {
+      const keywords = task.title.trim().split(' ').slice(0, 2).join(' ')
+      supabase.from('category_requests').upsert(
+        { category: keywords, count: 1 },
+        { onConflict: 'category' }
+      ).then(() => {})
     }
     return true
   }
@@ -87,8 +135,9 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   const handleAuth = async () => {
     setError('')
     if (isNew) {
-      if (!auth.name.trim()) { setError('أدخل اسمك'); return }
-      if (!auth.phone || auth.phone.length < 9) { setError('أدخل رقم الجوال'); return }
+      if (!auth.name.trim()) { setError('أدخل اسمك الكامل'); return }
+      const phone = auth.phone.replace(/\s/g, '')
+      if (!phone.startsWith('05') || phone.length !== 10) { setError('رقم الجوال يجب أن يبدأ بـ 05 ويكون 10 أرقام'); return }
       if (!auth.email.includes('@')) { setError('أدخل بريد إلكتروني صحيح'); return }
       if (auth.password.length < 6) { setError('كلمة المرور 6 أحرف على الأقل'); return }
     } else {
