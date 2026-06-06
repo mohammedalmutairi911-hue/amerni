@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ArrowLeft, ArrowRight, Sparkles, MapPin, DollarSign, Bot, CheckCircle, Loader2, Eye, EyeOff, Tag } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { filterContent } from '../lib/contentFilter'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 
@@ -96,6 +97,14 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   const handleNext = () => {
     setError('')
     if (!task.title.trim()) { setError('اكتب طلبك أولاً'); return }
+    
+    // فلتر المحتوى المحظور
+    const filterResult = filterContent(task.title + ' ' + task.description)
+    if (filterResult.blocked) {
+      setError('⛔ ' + filterResult.reason + ' — هذا الطلب مخالف لسياسة المنصة والأنظمة السعودية')
+      return
+    }
+    
     if (!task.category) { setError('حدد تصنيف الطلب'); return }
     if (task.category === 'أخرى' && !task.customCategory.trim()) { setError('اكتب التصنيف في خانة أخرى'); return }
     if (user) {
