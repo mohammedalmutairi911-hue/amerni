@@ -50,7 +50,10 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     if (detected) setT('category', detected)
   }
 
-  const getFinalCategory = () => task.category || task.customCategory || 'أخرى'
+  const getFinalCategory = () => {
+    if (task.category === 'أخرى') return task.customCategory || 'أخرى'
+    return task.category || 'أخرى'
+  }
 
   const saveTask = async (uid: string): Promise<boolean> => {
     const finalCategory = getFinalCategory()
@@ -93,7 +96,8 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   const handleNext = () => {
     setError('')
     if (!task.title.trim()) { setError('اكتب طلبك أولاً'); return }
-    if (!task.category && !task.customCategory) { setError('حدد تصنيف الطلب'); return }
+    if (!task.category) { setError('حدد تصنيف الطلب'); return }
+    if (task.category === 'أخرى' && !task.customCategory.trim()) { setError('اكتب التصنيف في خانة أخرى'); return }
     if (user) {
       setLoading(true)
       saveTask(user.id).then(ok => {
@@ -172,35 +176,39 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                 className="w-full bg-[#111] border-2 border-zinc-800 focus:border-amber-500 rounded-2xl px-4 py-3.5 text-white text-sm outline-none transition-colors resize-none placeholder-zinc-600" />
             </div>
 
-            {/* Category - FREE TEXT with suggestions */}
+            {/* Category - buttons + free text for أخرى */}
             <div>
               <label className="block text-xs text-zinc-400 mb-2 font-medium flex items-center gap-1.5">
                 <Tag size={12} className="text-amber-500" /> التصنيف *
-                {task.category && <span className="text-amber-400 text-xs">— تم اكتشافه تلقائياً ✨</span>}
+                {task.category && task.category !== 'أخرى' && !task.customCategory && (
+                  <span className="text-amber-400 text-xs">— تم اكتشافه تلقائياً ✨</span>
+                )}
               </label>
-              <input
-                value={task.category || task.customCategory}
-                onChange={e => {
-                  const v = e.target.value
-                  const matched = SUGGESTED_CATS.find(c => c === v)
-                  if (matched) { setT('category', v); setT('customCategory', '') }
-                  else { setT('category', ''); setT('customCategory', v) }
-                }}
-                placeholder="مثال: توصيل، تصوير، أي شيء تبيه..."
-                className="w-full bg-[#111] border-2 border-zinc-800 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition-colors mb-2" />
-              {/* Suggested categories */}
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2 mb-3">
                 {SUGGESTED_CATS.map(cat => (
-                  <button key={cat} type="button" onClick={() => { setT('category', cat); setT('customCategory', '') }}
-                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                  <button key={cat} type="button"
+                    onClick={() => { setT('category', cat); if (cat !== 'أخرى') setT('customCategory', '') }}
+                    className={`text-right px-4 py-3 rounded-xl border transition-all ${
                       task.category === cat
-                        ? 'border-amber-500 bg-amber-500/15 text-amber-300 font-medium'
-                        : 'border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+                        ? 'border-amber-500 bg-amber-500/10'
+                        : 'border-zinc-800 bg-[#111] hover:border-zinc-700'
                     }`}>
-                    {cat}
+                    <p className={`text-sm font-medium ${task.category === cat ? 'text-amber-300' : 'text-white'}`}>{cat}</p>
                   </button>
                 ))}
               </div>
+              {/* Free text when أخرى selected */}
+              {task.category === 'أخرى' && (
+                <div className="mt-2">
+                  <input
+                    value={task.customCategory}
+                    onChange={e => setT('customCategory', e.target.value)}
+                    placeholder="اكتب التصنيف هنا..."
+                    autoFocus
+                    className="w-full bg-[#111] border-2 border-amber-500/50 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition-colors"
+                  />
+                </div>
+              )}
             </div>
 
             {/* City & Budget */}
