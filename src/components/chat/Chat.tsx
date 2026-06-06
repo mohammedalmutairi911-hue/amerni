@@ -66,7 +66,7 @@ export function Chat({ taskId, taskTitle }: Props) {
       setBlocked('⛔ لا يمكن مشاركة بيانات التواصل — التواصل داخل المنصة فقط')
       setTimeout(() => setBlocked(''), 4000)
       // Save as blocked
-      await supabase.from('blocked_messages').insert({ task_id: taskId, sender_id: user.id, content: text, reason: 'contact_info' }).catch(() => {})
+      supabase.from('blocked_messages').insert({ task_id: taskId, sender_id: user.id, content: text, reason: 'contact_info' })
       return
     }
 
