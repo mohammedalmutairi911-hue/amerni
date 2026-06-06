@@ -38,7 +38,7 @@ export function WorkerRegister({ onSuccess }: Props) {
   }
 
   const verifyId = async () => {
-    if (!form.id_number || form.id_number.length < 10) { setError('رقم الهوية يجب أن يكون 10 أرقام'); return }
+    if (!form.id_number || form.id_number.length !== 10 || !/^\d{10}$/.test(form.id_number)) { setError('رقم الهوية يجب أن يكون 10 أرقام فقط'); return }
     setVerifying(true); setError('')
     await new Promise(r => setTimeout(r, 2000))
     setVerified(true)
