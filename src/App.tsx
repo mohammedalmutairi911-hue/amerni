@@ -20,7 +20,7 @@ export default function App() {
 
   useEffect(() => {
     if (!user || !profile) { setWorkerApproved(null); setWorkerExists(null); return }
-    if (profile.role === 'admin') { navigate('admin'); return }
+    if (profile.role === 'admin') { return }
     if (profile.role === 'worker') {
       setChecking(true)
       supabase.from('worker_profiles').select('id, is_approved').eq('user_id', user.id).maybeSingle()
@@ -51,9 +51,10 @@ export default function App() {
 
   if (page === 'support') return <><Navbar /><SupportPage /></>
 
-  // Admin
+  // Admin - يروح للوحة الإدارة دائماً إلا لو ضغط على صفحة ثانية
   if (profile.role === 'admin') {
     if (page === 'dashboard') return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
+    if (page === 'support') return <><Navbar /><SupportPage /></>
     return <><Navbar /><AdminPanel /></>
   }
 
