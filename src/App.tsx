@@ -12,6 +12,7 @@ import { AdminPanel } from './pages/AdminPanel'
 import { SupportPage } from './pages/SupportPage'
 import { BrowseWorkers } from './pages/BrowseWorkers'
 import { BountiesPage } from './pages/BountiesPage'
+import { ReferralPage } from './pages/ReferralPage'
 
 export default function App() {
   const { user, profile, loading, refreshProfile } = useAuth()
@@ -54,6 +55,7 @@ export default function App() {
   if (page === 'support') return <><Navbar /><SupportPage /></>
   if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
   if (page === 'bounties') return <><Navbar /><BountiesPage /></>
+  if (page === 'referral') return <><Navbar /><ReferralPage /></>
 
   // Admin - يروح للوحة الإدارة دائماً إلا لو ضغط على صفحة ثانية
   if (profile.role === 'admin') {
@@ -61,6 +63,7 @@ export default function App() {
     if (page === 'support') return <><Navbar /><SupportPage /></>
   if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
   if (page === 'bounties') return <><Navbar /><BountiesPage /></>
+  if (page === 'referral') return <><Navbar /><ReferralPage /></>
     return <><Navbar /><AdminPanel /></>
   }
 
