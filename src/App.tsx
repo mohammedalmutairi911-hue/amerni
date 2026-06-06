@@ -10,6 +10,8 @@ import { WorkerDashboard } from './pages/WorkerDashboard'
 import { WorkerRegister } from './pages/WorkerRegister'
 import { AdminPanel } from './pages/AdminPanel'
 import { SupportPage } from './pages/SupportPage'
+import { BrowseWorkers } from './pages/BrowseWorkers'
+import { BountiesPage } from './pages/BountiesPage'
 
 export default function App() {
   const { user, profile, loading, refreshProfile } = useAuth()
@@ -50,11 +52,15 @@ export default function App() {
   )
 
   if (page === 'support') return <><Navbar /><SupportPage /></>
+  if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
+  if (page === 'bounties') return <><Navbar /><BountiesPage /></>
 
   // Admin - يروح للوحة الإدارة دائماً إلا لو ضغط على صفحة ثانية
   if (profile.role === 'admin') {
     if (page === 'dashboard') return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
     if (page === 'support') return <><Navbar /><SupportPage /></>
+  if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
+  if (page === 'bounties') return <><Navbar /><BountiesPage /></>
     return <><Navbar /><AdminPanel /></>
   }
 
