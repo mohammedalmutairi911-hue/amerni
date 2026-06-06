@@ -156,48 +156,71 @@ export function AdminPanel() {
                 </div>
                 <div className="space-y-2">
                   {workers.filter(w => !w.is_approved).map(w => (
-                    <div key={w.id} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4 space-y-3">
-                      <div className="flex items-start justify-between gap-3">
+                    <div key={w.id} className="bg-[#0d0d0d] border border-amber-800/30 rounded-2xl p-5 space-y-4">
+                      {/* Header */}
+                      <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <img src={getAvatar(w.full_name)} className="w-10 h-10 rounded-xl" alt="" />
+                          <img src={getAvatar(w.full_name)} className="w-12 h-12 rounded-2xl" alt="" />
                           <div>
-                            <p className="font-medium">{w.full_name}</p>
-                            <p className="text-xs text-zinc-500">{w.city} · {w.nationality}</p>
+                            <p className="font-bold text-white">{w.full_name}</p>
+                            <p className="text-xs text-zinc-500 mt-0.5">{w.city} · {w.nationality}</p>
                           </div>
                         </div>
                         <div className="flex gap-2">
                           <button onClick={() => approveWorker(w.user_id)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs rounded-lg hover:bg-emerald-500/20">
-                            <CheckCircle size={12} /> موافقة
+                            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-semibold rounded-xl hover:bg-emerald-500/20 transition-colors">
+                            <CheckCircle size={14} /> موافقة
                           </button>
                           <button onClick={() => rejectWorker(w.user_id)}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-lg hover:bg-red-500/20">
-                            <XCircle size={12} /> رفض
+                            className="flex items-center gap-1.5 px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-semibold rounded-xl hover:bg-red-500/20 transition-colors">
+                            <XCircle size={14} /> رفض
                           </button>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="bg-zinc-900 rounded-lg p-2.5">
-                          <span className="text-zinc-500">الجوال</span>
-                          <p className="text-white mt-0.5">{w.phone || '—'}</p>
-                        </div>
-                        <div className="bg-zinc-900 rounded-lg p-2.5">
-                          <span className="text-zinc-500">رقم الهوية</span>
-                          <p className="text-white mt-0.5">{w.id_number || '—'}</p>
-                        </div>
-                        <div className="bg-zinc-900 rounded-lg p-2.5">
-                          <span className="text-zinc-500">النبذة</span>
-                          <p className="text-white mt-0.5 line-clamp-2">{w.bio || '—'}</p>
-                        </div>
-                        <div className="bg-zinc-900 rounded-lg p-2.5">
-                          <span className="text-zinc-500">المهارات</span>
-                          <p className="text-white mt-0.5">{(w.skills || []).join('، ') || '—'}</p>
-                        </div>
+
+                      {/* Details grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        {[
+                          { label: 'الجوال', value: w.phone },
+                          { label: 'رقم الهوية', value: w.id_number },
+                          { label: 'الجنسية', value: w.nationality },
+                          { label: 'التحقق', value: w.id_verified ? '✅ موثق' : '⏳ لم يتحقق' },
+                        ].map(({ label, value }) => (
+                          <div key={label} className="bg-zinc-900 rounded-xl p-3">
+                            <p className="text-zinc-500 mb-1">{label}</p>
+                            <p className="text-white font-medium">{value || '—'}</p>
+                          </div>
+                        ))}
                       </div>
+
+                      {/* Skills */}
+                      {(w.skills || []).length > 0 && (
+                        <div>
+                          <p className="text-xs text-zinc-500 mb-2">المهارات</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {w.skills.map(s => (
+                              <span key={s} className="text-xs bg-zinc-800 text-zinc-300 px-2.5 py-1 rounded-full border border-zinc-700">{s}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Bio */}
+                      {w.bio && (
+                        <div className="bg-zinc-900 rounded-xl p-3">
+                          <p className="text-xs text-zinc-500 mb-1">النبذة</p>
+                          <p className="text-sm text-zinc-300">{w.bio}</p>
+                        </div>
+                      )}
+
+                      {/* ID Image */}
                       {w.id_image_url && (
                         <div>
-                          <p className="text-xs text-zinc-500 mb-1.5">صورة الهوية</p>
-                          <img src={w.id_image_url} alt="ID" className="w-full max-h-40 object-cover rounded-xl border border-zinc-700" />
+                          <p className="text-xs text-zinc-500 mb-2">📷 صورة الهوية</p>
+                          <a href={w.id_image_url} target="_blank" rel="noreferrer">
+                            <img src={w.id_image_url} alt="ID" className="w-full max-h-48 object-contain rounded-xl border border-zinc-700 hover:border-amber-500/50 transition-colors" />
+                          </a>
+                          <p className="text-xs text-zinc-600 mt-1">اضغط على الصورة لتكبيرها</p>
                         </div>
                       )}
                     </div>
