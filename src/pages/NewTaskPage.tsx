@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 
-const SUGGESTED_CATS = ['توصيل ومشاوير', 'تصوير ومحتوى', 'تحقق ومتابعة', 'مساعدة إدارية', 'تسوق', 'تعليم وشرح', 'صيانة وتركيب']
+const SUGGESTED_CATS = ['توصيل ومشاوير', 'تصوير ومحتوى', 'تحقق ومتابعة', 'مساعدة إدارية', 'تسوق', 'تعليم وشرح', 'صيانة وتركيب', 'أخرى']
 const CITIES = ['الرياض', 'جدة', 'مكة', 'المدينة', 'الدمام', 'الخبر', 'تبوك', 'أبها', 'حائل', 'جازان', 'القصيم', 'نجران']
 
 const detectCategory = (title: string): string => {
