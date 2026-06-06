@@ -27,6 +27,8 @@ export function WorkerDashboard() {
   const [loading, setLoading] = useState(true)
   const [accepting, setAccepting] = useState<string | null>(null)
   const [toggling, setToggling] = useState(false)
+  const [pendingTask, setPendingTask] = useState<Task | null>(null)
+  const [showCommission, setShowCommission] = useState(false)
 
   useEffect(() => { if (user) fetchAll() }, [user?.id])
 
@@ -52,11 +54,19 @@ export function WorkerDashboard() {
   }
 
   const acceptTask = async (task: Task) => {
-    setAccepting(task.id)
-    await supabase.from('tasks').update({ worker_id: user!.id, status: 'in_progress' }).eq('id', task.id)
+    setPendingTask(task)
+    setShowCommission(true)
+  }
+
+  const confirmAcceptTask = async () => {
+    if (!pendingTask) return
+    setAccepting(pendingTask.id)
+    setShowCommission(false)
+    await supabase.from('tasks').update({ worker_id: user!.id, status: 'in_progress' }).eq('id', pendingTask.id)
     await fetchFeedTasks()
     await fetchMyTasks()
     setAccepting(null)
+    setPendingTask(null)
     setTab('my-tasks')
   }
 
@@ -101,6 +111,48 @@ export function WorkerDashboard() {
   const activeTasks = myTasks.filter(t => t.status === 'in_progress')
   const totalEarnings = completedTasks.reduce((s, t) => s + (t.price_final || t.price_suggested || 0), 0)
   const thisMonth = completedTasks.filter(t => new Date(t.created_at).getMonth() === new Date().getMonth()).length
+
+  // Commission modal
+  if (showCommission && pendingTask) return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <div className="w-full max-w-sm bg-[#111] border border-zinc-800 rounded-2xl p-6">
+        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
+          <span className="text-2xl">📋</span>
+        </div>
+        <h2 className="text-lg font-bold text-center mb-2">شروط قبول الطلب</h2>
+        <p className="text-zinc-400 text-sm text-center mb-5">قبل ما تقبل الطلب، يرجى الموافقة على الشروط التالية:</p>
+        
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-4 space-y-2">
+          <p className="text-sm text-white font-semibold">الطلب: {pendingTask.title}</p>
+          {pendingTask.price_suggested && (
+            <p className="text-sm text-amber-400">القيمة المتوقعة: {pendingTask.price_suggested} ريال</p>
+          )}
+        </div>
+
+        <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 mb-5">
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            ✅ أوافق على أن <span className="text-amber-400 font-bold">2%</span> من قيمة العمل تُحوَّل تلقائياً لحساب منصة <span className="text-amber-400 font-bold">أمرني</span> كعمولة خدمة، وذلك عند إتمام الطلب بنجاح.
+          </p>
+          {pendingTask.price_suggested && (
+            <p className="text-xs text-zinc-500 mt-2">
+              العمولة المتوقعة: {(pendingTask.price_suggested * 0.02).toFixed(2)} ريال
+            </p>
+          )}
+        </div>
+
+        <div className="flex gap-3">
+          <button onClick={() => { setShowCommission(false); setPendingTask(null) }}
+            className="flex-1 border border-zinc-700 text-zinc-300 py-2.5 rounded-xl text-sm hover:border-zinc-600 transition-colors">
+            إلغاء
+          </button>
+          <button onClick={confirmAcceptTask}
+            className="flex-1 bg-amber-500 text-black font-bold py-2.5 rounded-xl text-sm hover:bg-amber-400 transition-colors">
+            أوافق وأقبل الطلب
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 
   const TABS = [
     { id: 'overview', icon: BarChart2, label: 'نظرة عامة' },
