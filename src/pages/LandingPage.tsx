@@ -119,6 +119,10 @@ export function LandingPage() {
     { id: 'support', label: 'الدعم' },
   ]
 
+  const handleBrowse = () => navigate('browse')
+  const handleBounties = () => navigate('bounties')
+  const handleEarn = () => navigate('earn')
+
   return (
     <div className="min-h-screen bg-[#080808] text-white flex flex-col">
       {/* Navbar */}
@@ -195,7 +199,18 @@ export function LandingPage() {
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-zinc-600 mb-16">اكتب أي شيء واضغط اطلب — مجاني تماماً</p>
+                <p className="text-xs text-zinc-600 mb-10">اكتب أي شيء واضغط اطلب — مجاني تماماً</p>
+
+                {/* Quick categories */}
+                <div className="flex flex-wrap justify-center gap-2 mb-10">
+                  {['توصيل 🚗','تصوير 📸','تحقق 🔍','تسوق 🛍️','تعليم 📚','أخرى ✨'].map(cat => (
+                    <button key={cat} onClick={() => { setTaskInput(cat.split(' ')[0]); setShowNewTask(true) }}
+                      className="px-4 py-2 bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 rounded-full text-sm text-zinc-400 hover:text-white transition-all">
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="flex justify-center gap-10 text-center">
                   {[['١٠٬٠٠٠+', 'طلب اتنجز'], ['٢٤٠٠+', 'عامل موثوق'], ['٩٨٪', 'نسبة الرضا']].map(([v, l]) => (
                     <div key={l}>
