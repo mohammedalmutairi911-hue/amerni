@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Send, Loader2, Shield } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { filterContent } from '../../lib/contentFilter'
 import { useAuth } from '../../contexts/AuthContext'
 
 const BLOCKED_PATTERNS = [
@@ -60,7 +61,7 @@ export function Chat({ taskId, taskTitle }: Props) {
     if (!text || !user || sending) return
     setInput('')
 
-    // Check blocked patterns
+    // Check contact info patterns
     const isBlocked = BLOCKED_PATTERNS.some(p => p.test(text))
     if (isBlocked) {
       setBlocked('⛔ لا يمكن مشاركة بيانات التواصل — التواصل داخل المنصة فقط')
@@ -70,6 +71,14 @@ export function Chat({ taskId, taskTitle }: Props) {
       return
     }
 
+    // فلتر المحتوى المحظور
+    const contentCheck = filterContent(text)
+    if (contentCheck.blocked) {
+      setBlocked('⛔ ' + contentCheck.reason + ' — هذه الرسالة تخالف سياسة المنصة')
+      setTimeout(() => setBlocked(''), 5000)
+      return
+    }
+    
     setSending(true)
     await supabase.from('task_messages').insert({
       task_id: taskId, sender_id: user.id, content: text, is_blocked: false
