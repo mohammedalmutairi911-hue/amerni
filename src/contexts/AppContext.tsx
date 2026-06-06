@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react'
 
-export type Page = 'landing' | 'dashboard' | 'worker' | 'admin' | 'support'
+export type Page = 'landing' | 'dashboard' | 'worker' | 'admin' | 'support' | 'browse' | 'bounties' | 'earn'
 
 interface AppCtx {
   page: Page
