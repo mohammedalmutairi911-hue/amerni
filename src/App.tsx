@@ -23,17 +23,23 @@ export default function App() {
 
   useEffect(() => {
     if (!user || !profile) { setWorkerApproved(null); setWorkerExists(null); return }
-    if (profile.role === 'admin') { return }
+    
+    // أدمن — روح للوحة الإدارة تلقائياً
+    if (profile.role === 'admin' && page === 'landing') {
+      navigate('admin')
+      return
+    }
+    
+    // عامل — تحقق من البروفايل
     if (profile.role === 'worker') {
       setChecking(true)
       supabase.from('worker_profiles').select('id, is_approved').eq('user_id', user.id).maybeSingle()
         .then(({ data }) => {
           setWorkerExists(!!data)
           setWorkerApproved(data?.is_approved || false)
-          if (data?.is_approved) navigate('worker')
+          if (data?.is_approved && page === 'landing') navigate('worker')
           setChecking(false)
         })
-        .catch(() => { setWorkerExists(false); setWorkerApproved(false); setChecking(false) })
     }
   }, [user?.id, profile?.role])
 
@@ -48,26 +54,21 @@ export default function App() {
     )
   }
 
-  if (!user || !profile) return (
-    <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
-  )
+  if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
 
+  // صفحات مشتركة
   if (page === 'support') return <><Navbar /><SupportPage /></>
   if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
   if (page === 'bounties') return <><Navbar /><BountiesPage /></>
   if (page === 'referral') return <><Navbar /><ReferralPage /></>
 
-  // Admin - يروح للوحة الإدارة دائماً إلا لو ضغط على صفحة ثانية
+  // أدمن
   if (profile.role === 'admin') {
-    if (page === 'dashboard') return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
-    if (page === 'support') return <><Navbar /><SupportPage /></>
-  if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
-  if (page === 'bounties') return <><Navbar /><BountiesPage /></>
-  if (page === 'referral') return <><Navbar /><ReferralPage /></>
+    if (page === 'dashboard') return <><Navbar /><UserDashboard /></>
     return <><Navbar /><AdminPanel /></>
   }
 
-  // Worker
+  // عامل
   if (profile.role === 'worker') {
     if (!workerExists) return (
       <><Navbar /><WorkerRegister onSuccess={async () => {
@@ -79,18 +80,16 @@ export default function App() {
     if (!workerApproved) return (
       <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center px-4">
         <div className="max-w-sm text-center bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-10">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
-            <span className="text-3xl">⏳</span>
-          </div>
+          <div className="text-5xl mb-5">⏳</div>
           <h2 className="text-xl font-bold mb-3">طلبك قيد المراجعة</h2>
-          <p className="text-zinc-500 text-sm leading-relaxed mb-5">فريق أمرني راح يراجع بياناتك ويوافق عليك قريباً.</p>
+          <p className="text-zinc-500 text-sm leading-relaxed mb-6">فريق أمرني راح يراجع بياناتك ويوافق عليك قريباً.</p>
           <button onClick={async () => {
             setChecking(true)
             const { data } = await supabase.from('worker_profiles').select('is_approved').eq('user_id', user.id).single()
             setWorkerApproved(data?.is_approved || false)
             if (data?.is_approved) navigate('worker')
             setChecking(false)
-          }} className="text-sm text-amber-400 border border-amber-500/30 px-4 py-2 rounded-lg hover:bg-amber-500/10 transition-colors">
+          }} className="text-sm text-amber-400 border border-amber-500/30 px-5 py-2 rounded-xl hover:bg-amber-500/10 transition-colors">
             {checking ? 'جاري التحقق...' : 'تحقق من الحالة'}
           </button>
         </div>
@@ -100,6 +99,7 @@ export default function App() {
     return <><Navbar /><WorkerDashboard /></>
   }
 
-  // Client
+  // عميل
+  if (page === 'landing') return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
   return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
 }
