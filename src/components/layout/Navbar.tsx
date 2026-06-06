@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown } from 'lucide-react'
+import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown, Users } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
 import { getAvatar } from '../../lib/supabase'
@@ -61,10 +61,16 @@ export function Navbar() {
                   </div>
                   <div className="p-1">
                     {(profile.role === 'client' || profile.role === 'admin') && (
-                      <button onClick={() => { navigate('dashboard'); setDropOpen(false) }}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors">
-                        <LayoutDashboard size={15} /> طلباتي
-                      </button>
+                      <>
+                        <button onClick={() => { navigate('dashboard'); setDropOpen(false) }}
+                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors">
+                          <LayoutDashboard size={15} /> طلباتي
+                        </button>
+                        <button onClick={() => { navigate('browse'); setDropOpen(false) }}
+                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors">
+                          <Users size={15} /> تصفح العمال
+                        </button>
+                      </>
                     )}
                     {profile.role === 'worker' && (
                       <button onClick={() => { navigate('worker'); setDropOpen(false) }}
