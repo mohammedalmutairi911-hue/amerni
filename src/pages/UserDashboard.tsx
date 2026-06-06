@@ -88,7 +88,7 @@ export function UserDashboard() {
 
   const submitRating = async () => {
     if (!rating || !selectedTask?.worker_id) return
-    await supabase.from('ratings').insert({ task_id: selectedTask.id, worker_id: selectedTask.worker_id, rater_id: user!.id, stars: rating }).catch(() => {})
+    await supabase.from('ratings').insert({ task_id: selectedTask.id, worker_id: selectedTask.worker_id, rater_id: user!.id, stars: rating })
     setRatingDone(true)
   }
 
