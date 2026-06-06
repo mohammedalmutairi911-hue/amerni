@@ -131,22 +131,31 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       if (!auth.password) { setError('أدخل كلمة المرور'); return }
     }
     setLoading(true)
-    let uid = ''
     if (isNew) {
       const { error: err } = await signUp(auth.email.trim(), auth.password, auth.name.trim(), 'client')
       if (err) { setError('البريد مسجل — جرب "عندي حساب"'); setLoading(false); return }
-      await new Promise(r => setTimeout(r, 1000))
     } else {
       const { error: err } = await signIn(auth.email.trim(), auth.password)
       if (err) { setError('بريد أو كلمة مرور خاطئة'); setLoading(false); return }
-      await new Promise(r => setTimeout(r, 500))
     }
-    const { data: { user: u } } = await supabase.auth.getUser()
-    uid = u?.id || ''
-    if (uid && task.title.trim()) {
+    
+    // انتظر حتى يكتمل التسجيل ويكون الـ session جاهز
+    let uid = ''
+    let attempts = 0
+    while (!uid && attempts < 10) {
+      await new Promise(r => setTimeout(r, 500))
+      const { data: { user: u } } = await supabase.auth.getUser()
+      uid = u?.id || ''
+      attempts++
+    }
+    
+    if (!uid) { setError('حدث خطأ في التسجيل، حاول مرة ثانية'); setLoading(false); return }
+    
+    if (task.title.trim()) {
       const ok = await saveTask(uid)
       if (!ok) { setLoading(false); return }
     }
+    
     setLoading(false)
     navigate('dashboard')
     onClose()
