@@ -46,7 +46,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   const setT = (k: string, v: any) => setTask(t => ({ ...t, [k]: v }))
 
   const saveTask = async (uid: string) => {
-    await supabase.from('tasks').insert({
+    const { data, error } = await supabase.from('tasks').insert({
       client_id: uid, user_id: uid,
       title: task.title.trim(),
       description: task.description.trim() || task.title.trim(),
@@ -55,14 +55,19 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       use_ai: task.use_ai,
       status: 'open',
       price_suggested: task.budget ? Number(task.budget) : null
-    })
+    }).select().single()
+    if (error) {
+      console.error('Task save error:', error)
+      setError('حدث خطأ في حفظ الطلب: ' + error.message)
+      return false
+    }
+    return true
   }
 
   const handleNext = () => {
     if (!task.title.trim()) { setError('اكتب طلبك أولاً'); return }
     setError('')
     if (user) {
-      // مسجل — احفظ مباشرة
       handleSaveLoggedIn()
     } else {
       setStep('auth')
@@ -71,10 +76,12 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
 
   const handleSaveLoggedIn = async () => {
     setLoading(true)
-    await saveTask(user!.id)
+    const ok = await saveTask(user!.id)
     setLoading(false)
-    navigate('dashboard')
-    onClose()
+    if (ok !== false) {
+      navigate('dashboard')
+      onClose()
+    }
   }
 
   const handleAuth = async () => {
@@ -106,7 +113,10 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       uid = u?.id || ''
     }
 
-    if (uid && task.title.trim()) await saveTask(uid)
+    if (uid && task.title.trim()) {
+      const ok = await saveTask(uid)
+      if (ok === false) { setLoading(false); return }
+    }
     setLoading(false)
     navigate('dashboard')
     onClose()
