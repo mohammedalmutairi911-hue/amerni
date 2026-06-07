@@ -35,7 +35,7 @@ const SUPPORT_SYSTEM = `أنت مساعد خدمة عملاء لمنصة "أمر
 مهمتك مساعدة العملاء والعمال بأسلوب ودي وسعودي.
 إذا ذكر المستخدم مشكلة في طلب، اطلب منه رقم الطلب.
 المنصة تتيح: طلب خدمات يومية، عمال موثوقين، دفع آمن.
-للتواصل المباشر: support@amerni.sa`
+للتواصل المباشر: support@amerniksa.com`
 
 interface SupportMsg { role: 'user' | 'assistant'; content: string }
 
@@ -99,10 +99,10 @@ export function LandingPage() {
         })
       })
       const data = await res.json()
-      const reply = data.content?.[0]?.text || 'عذراً، حدث خطأ. تواصل معنا على support@amerni.sa'
+      const reply = data.content?.[0]?.text || 'عذراً، حدث خطأ. تواصل معنا على support@amerniksa.com'
       setSupportMsgs(p => [...p, { role: 'assistant', content: reply }])
     } catch {
-      setSupportMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت. تواصل معنا على support@amerni.sa' }])
+      setSupportMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت. تواصل معنا على support@amerniksa.com' }])
     }
     setSupportLoading(false)
   }
@@ -410,7 +410,7 @@ export function LandingPage() {
                 <div className="space-y-5">
                   <h3 className="font-bold text-lg mb-4">معلومات التواصل</h3>
                   {[
-                    { icon: Mail, label: 'البريد الإلكتروني', value: 'support@amerni.sa', color: 'text-amber-400' },
+                    { icon: Mail, label: 'البريد الإلكتروني', value: 'support@amerniksa.com', color: 'text-amber-400' },
                     { icon: Phone, label: 'واتساب', value: '+966 5X XXX XXXX', color: 'text-emerald-400' },
                     { icon: MessageCircle, label: 'الدعم المباشر', value: 'متاح ٢٤/٧ عبر الدردشة', color: 'text-blue-400' },
                   ].map(({ icon: Icon, label, value, color }) => (
@@ -570,7 +570,7 @@ export function LandingPage() {
               </div>
 
               <div className="mt-5 text-center text-sm text-zinc-500">
-                للتواصل المباشر: <a href="mailto:support@amerni.sa" className="text-amber-400 hover:underline">support@amerni.sa</a>
+                للتواصل المباشر: <a href="mailto:support@amerniksa.com" className="text-amber-400 hover:underline">support@amerniksa.com</a>
               </div>
             </div>
           </section>
@@ -601,7 +601,7 @@ export function LandingPage() {
                 },
                 {
                   title: '٤. حقوق المستخدم',
-                  body: 'يحق لك طلب حذف حسابك وجميع بياناتك في أي وقت عبر التواصل مع support@amerni.ai. سنُنفذ الطلب خلال 30 يوماً.'
+                  body: 'يحق لك طلب حذف حسابك وجميع بياناتك في أي وقت عبر التواصل مع support@amerniksa.com. سنُنفذ الطلب خلال 30 يوماً.'
                 },
                 {
                   title: '٥. ملفات تعريف الارتباط',
@@ -680,7 +680,7 @@ export function LandingPage() {
               ))}
               <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-6">
                 <p className="text-amber-400 font-semibold mb-2">بالتسجيل في أمرني أنت توافق على جميع هذه الشروط</p>
-                <p className="text-zinc-500 text-sm">للاستفسار: <a href="mailto:support@amerni.ai" className="text-amber-400 hover:underline">support@amerni.ai</a></p>
+                <p className="text-zinc-500 text-sm">للاستفسار: <a href="mailto:support@amerniksa.com" className="text-amber-400 hover:underline">support@amerniksa.com</a></p>
               </div>
             </div>
           </div>
