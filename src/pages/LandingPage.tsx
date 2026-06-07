@@ -357,8 +357,7 @@ export function LandingPage() {
                 <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-8">
                   <h3 className="text-xl font-bold text-white mb-4">من نحن؟</h3>
                   <p className="text-zinc-400 leading-loose">
-                    أمرني منصة سعودية هدفها الأول خدمتك — نربطك مع أفضل الأشخاص والخبراء اللي يقدرون ينجزون طلبك بأمان وسرعة. 
-                    بدأت الفكرة من مشكلة حقيقية: كيف أجد شخصاً موثوقاً ينجز لي مهمة بسيطة دون خوف أو تعقيد؟
+                    نحن مؤسسة حلول الغد للخدمات الإلكترونية — نقدم منصة أمرني السعودية التي تربطك مع أفضل الأشخاص والخبراء لإنجاز طلبك بأمان وسرعة. بدأت الفكرة من مشكلة حقيقية: كيف أجد شخصاً موثوقاً ينجز لي مهمة بسيطة دون خوف أو تعقيد؟
                   </p>
                 </div>
 
@@ -392,6 +391,24 @@ export function LandingPage() {
                   <p className="text-amber-300 text-lg font-semibold mb-2">"أمرني وإحنا ننجز"</p>
                   <p className="text-zinc-500 text-sm">شعارنا يقول كل شيء — أنت تطلب وإحنا نوصلك لمن ينجز</p>
                 </div>
+
+                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+                  <h3 className="font-bold text-white mb-4">عن المؤسسة</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
+                      <span className="text-zinc-500">اسم المؤسسة</span>
+                      <span className="text-white font-medium">مؤسسة حلول الغد للخدمات الإلكترونية</span>
+                    </div>
+                    <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
+                      <span className="text-zinc-500">البنك</span>
+                      <span className="text-white font-medium">بنك البلاد</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-500">رقم الآيبان</span>
+                      <span className="text-amber-400 font-mono text-xs">SA54150009001465965400007</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -413,6 +430,7 @@ export function LandingPage() {
                     { icon: Mail, label: 'البريد الإلكتروني', value: 'support@amerniksa.com', color: 'text-amber-400' },
                     { icon: Phone, label: 'واتساب', value: '+966 5X XXX XXXX', color: 'text-emerald-400' },
                     { icon: MessageCircle, label: 'الدعم المباشر', value: 'متاح ٢٤/٧ عبر الدردشة', color: 'text-blue-400' },
+                    { icon: Shield, label: 'الآيبان — بنك البلاد', value: 'SA54150009001465965400007', color: 'text-zinc-300' },
                   ].map(({ icon: Icon, label, value, color }) => (
                     <div key={label} className="flex items-center gap-4 bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4">
                       <div className={`w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center flex-shrink-0`}>
