@@ -28,6 +28,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   const [step, setStep] = useState<'details' | 'auth'>('details')
   const [isNew, setIsNew] = useState(true)
   const [showPass, setShowPass] = useState(false)
+  const [agreedTerms, setAgreedTerms] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -122,6 +123,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     setError('')
     if (isNew) {
       if (!auth.name.trim()) { setError('أدخل اسمك الكامل'); return }
+      if (!agreedTerms) { setError('يجب الموافقة على الشروط والأحكام للمتابعة'); return }
       const phone = auth.phone.replace(/\s/g, '')
       if (!phone.startsWith('05') || phone.length !== 10) { setError('الجوال يجب أن يبدأ بـ 05 ويكون 10 أرقام'); return }
       if (!auth.email.includes('@')) { setError('أدخل بريد إلكتروني صحيح'); return }
@@ -375,6 +377,19 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                   </button>
                 </div>
               </div>
+
+              {isNew && (
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+                  <div className="flex items-start gap-3 cursor-pointer" onClick={() => setAgreedTerms(!agreedTerms)}>
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${agreedTerms ? 'bg-amber-500 border-amber-500' : 'border-zinc-600'}`}>
+                      {agreedTerms && <span className="text-black text-xs font-bold">✓</span>}
+                    </div>
+                    <p className="text-xs text-zinc-400 leading-relaxed">
+                      أوافق على الشروط والأحكام وسياسة الخصوصية — أقرّ بأن المنصة وسيط فقط وغير مسؤولة عن أي نزاع ينشأ بين الطرفين
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
 
