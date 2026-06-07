@@ -53,7 +53,7 @@ export function SupportPage() {
         setMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت. سيتواصل معك الفريق قريباً.' }])
       }
     } catch {
-      setMsgs(p => [...p, { role: 'assistant', content: 'عذراً، ما قدرت أتصل بالسيرفر. تواصل معنا على support@amerni.sa' }])
+      setMsgs(p => [...p, { role: 'assistant', content: 'عذراً، ما قدرت أتصل بالسيرفر. تواصل معنا على support@amerniksa.com' }])
     }
     setLoading(false)
   }
