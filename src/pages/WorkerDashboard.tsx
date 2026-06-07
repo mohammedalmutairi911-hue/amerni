@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Briefcase, TrendingUp, Star, Wifi, WifiOff, Clock, CheckCircle, Zap, Loader2, Calendar, User, MessageSquare, Upload, ArrowRight, DollarSign, BarChart2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { requestNotificationPermission, sendLocalNotification, registerServiceWorker } from '../lib/notifications'
 import { useAuth } from '../contexts/AuthContext'
 import { Task, WorkerProfile } from '../types'
 import { Chat } from '../components/chat/Chat'
@@ -30,7 +31,14 @@ export function WorkerDashboard() {
   const [pendingTask, setPendingTask] = useState<Task | null>(null)
   const [showCommission, setShowCommission] = useState(false)
 
-  useEffect(() => { if (user) fetchAll() }, [user?.id])
+  useEffect(() => {
+    if (user) {
+      fetchAll()
+      registerServiceWorker()
+      // اطلب إذن الإشعارات بعد ثانيتين
+      setTimeout(() => requestNotificationPermission(), 2000)
+    }
+  }, [user?.id])
 
   const fetchAll = async () => {
     setLoading(true)
@@ -45,8 +53,26 @@ export function WorkerDashboard() {
 
   const fetchFeedTasks = async () => {
     const { data } = await supabase.from('tasks').select('*, profiles(full_name)').eq('status', 'open').order('created_at', { ascending: false }).limit(20)
-    setFeedTasks(data || [])
+    const newTasks = data || []
+    // أرسل إشعار لو جاء طلب جديد
+    if (feedTasks.length > 0 && newTasks.length > feedTasks.length) {
+      sendLocalNotification('أمرني ⚡ طلب جديد!', newTasks[0]?.title || 'جاك طلب جديد يناسب مهاراتك')
+    }
+    setFeedTasks(newTasks)
   }
+
+  useEffect(() => {
+    if (!user || !workerProfile?.is_approved) return
+    // Subscribe to new open tasks realtime
+    const ch = supabase.channel('new-tasks')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'tasks', filter: 'status=eq.open' },
+        (payload: any) => {
+          sendLocalNotification('أمرني ⚡ طلب جديد!', payload.new?.title || 'جاك طلب جديد')
+          fetchFeedTasks()
+        })
+      .subscribe()
+    return () => { supabase.removeChannel(ch) }
+  }, [user?.id, workerProfile?.is_approved])
 
   const fetchMyTasks = async () => {
     const { data } = await supabase.from('tasks').select('*, profiles(full_name)').eq('worker_id', user!.id).order('created_at', { ascending: false })
