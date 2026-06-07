@@ -26,6 +26,11 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   const { user, signUp, signIn, signInWithGoogle } = useAuth()
   const { navigate } = useApp()
   const [step, setStep] = useState<'details' | 'auth'>('details')
+  
+  const goToAuth = () => {
+    setStep('auth')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
   const [isNew, setIsNew] = useState(true)
   const [showPass, setShowPass] = useState(false)
   const [agreedTerms, setAgreedTerms] = useState(false)
@@ -115,7 +120,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
         if (ok) { navigate('dashboard'); onClose() }
       })
     } else {
-      setStep('auth')
+      goToAuth()
     }
   }
 
