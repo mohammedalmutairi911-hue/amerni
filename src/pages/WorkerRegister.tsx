@@ -18,6 +18,7 @@ export function WorkerRegister({ onSuccess }: Props) {
   const [error, setError] = useState('')
   const [verifying, setVerifying] = useState(false)
   const [verified, setVerified] = useState(false)
+  const [agreedTerms, setAgreedTerms] = useState(false)
 
   const [form, setForm] = useState({
     phone: '', city: '', nationality: 'سعودي', bio: '', id_number: '',
@@ -66,6 +67,7 @@ export function WorkerRegister({ onSuccess }: Props) {
 
   const submit = async () => {
     setError('')
+    if (!agreedTerms) { setError('يجب الموافقة على الشروط والأحكام للمتابعة'); return }
     const activeDays = Object.values(form.schedule).filter(d => d.active).length
     if (activeDays === 0) { setError('اختر يوم توفر واحد على الأقل'); return }
     setLoading(true)
@@ -264,6 +266,20 @@ export function WorkerRegister({ onSuccess }: Props) {
                     )}
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Terms agreement - only on step 4 */}
+          {step === 4 && (
+            <div className="mt-4 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+              <div className="flex items-start gap-3 cursor-pointer" onClick={() => setAgreedTerms(!agreedTerms)}>
+                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${agreedTerms ? 'bg-amber-500 border-amber-500' : 'border-zinc-600'}`}>
+                  {agreedTerms && <span className="text-black text-xs font-bold">✓</span>}
+                </div>
+                <div className="text-xs text-zinc-400 leading-relaxed">
+                  أوافق على <span className="text-amber-400 underline cursor-pointer">الشروط والأحكام</span> وأقرّ بأن المنصة غير مسؤولة عن أي نزاع ينشأ بين الطرفين، وأن عمولة 2% ستُخصم من كل طلب مكتمل، وأن بياناتي صحيحة وأتحمل المسؤولية الكاملة عن أي معلومات مزورة.
+                </div>
               </div>
             </div>
           )}
