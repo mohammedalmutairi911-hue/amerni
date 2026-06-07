@@ -250,17 +250,17 @@ export function LandingPage() {
                 <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 text-sm text-amber-400 mb-8">
                   <Sparkles size={13} /> أمرني — اطلب أي شي في السعودية
                 </div>
-                <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight mb-6 leading-[1.05]">
+                <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black tracking-tight mb-4 sm:mb-6 leading-[1.05]">
                   <span className="text-white">اطلب</span>{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-500">أي شيء.</span>
                   <br />
-                  <span className="text-white text-5xl sm:text-6xl">ننجزه لك.</span>
+                  <span className="text-white text-3xl sm:text-5xl lg:text-6xl">ننجزه لك.</span>
                 </h1>
-                <p className="text-zinc-400 text-xl mb-12 max-w-xl mx-auto leading-relaxed">
+                <p className="text-zinc-400 text-base sm:text-xl mb-8 sm:mb-12 max-w-xl mx-auto leading-relaxed px-2">
                   منصة سعودية تربطك بعمال موثوقين لإنجاز أي مهمة يومية — بذكاء وأمان.
                 </p>
                 <div className="relative max-w-xl mx-auto mb-6">
-                  <div className="flex items-center gap-3 bg-[#111] border-2 border-zinc-800 rounded-2xl px-5 py-4 focus-within:border-amber-500 transition-all shadow-2xl">
+                  <div className="flex items-center gap-2 sm:gap-3 bg-[#111] border-2 border-zinc-800 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-amber-500 transition-all shadow-2xl">
                     <Sparkles size={18} className="text-amber-500 flex-shrink-0" />
                     <input
                       value={taskInput} onChange={e => setTaskInput(e.target.value)}
@@ -277,7 +277,7 @@ export function LandingPage() {
                 <p className="text-xs text-zinc-600 mb-10">اكتب أي شيء واضغط اطلب — مجاني تماماً</p>
 
                 {/* Quick categories */}
-                <div className="flex flex-wrap justify-center gap-2 mb-10">
+                <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 sm:mb-10 px-2">
                   {['توصيل 🚗','تصوير 📸','تحقق 🔍','تسوق 🛍️','تعليم 📚','أخرى ✨'].map(cat => (
                     <button key={cat} onClick={() => { setTaskInput(cat.split(' ')[0]); setShowNewTask(true) }}
                       className="px-4 py-2 bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 rounded-full text-sm text-zinc-400 hover:text-white transition-all">
@@ -286,7 +286,7 @@ export function LandingPage() {
                   ))}
                 </div>
 
-                <div className="flex justify-center gap-10 text-center">
+                <div className="flex justify-center gap-6 sm:gap-10 text-center">
                   {[['١٠٬٠٠٠+', 'طلب اتنجز'], ['٢٤٠٠+', 'عامل موثوق'], ['٩٨٪', 'نسبة الرضا']].map(([v, l]) => (
                     <div key={l}>
                       <div className="text-3xl font-black text-amber-400">{v}</div>
@@ -299,7 +299,7 @@ export function LandingPage() {
 
             {/* Quick how it works */}
             <section className="py-20 px-4 bg-zinc-900/10">
-              <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-5">
+              <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
                 {STEPS.map(({ n, icon: Icon, title, desc }) => (
                   <div key={n} className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
                     <div className="text-4xl font-black text-zinc-800 mb-3">{n}</div>
@@ -317,7 +317,7 @@ export function LandingPage() {
 
         {/* HOW IT WORKS */}
         {activeTab === 'how' && (
-          <section className="min-h-[calc(100vh-56px)] py-20 px-4">
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">كيف تشتغل أمرني؟</h2>
@@ -348,13 +348,13 @@ export function LandingPage() {
 
         {/* FEATURES */}
         {activeTab === 'features' && (
-          <section className="min-h-[calc(100vh-56px)] py-20 px-4">
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">مميزات أمرني</h2>
                 <p className="text-zinc-500">مختلفون عن الكل</p>
               </div>
-              <div className="grid sm:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                 {[
                   { icon: Bot, title: 'ذكاء اصطناعي', desc: 'اقتراح سعر مناسب، تحقق من الهوية، حماية المحادثة من تبادل الأرقام الخارجية', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
                   { icon: UserCheck, title: 'عمال موثوقون', desc: 'كل عامل مرّ بفحص هوية صارم وموافقة الأدمن قبل القبول في المنصة', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
@@ -378,13 +378,13 @@ export function LandingPage() {
 
         {/* TRUST */}
         {activeTab === 'trust' && (
-          <section className="min-h-[calc(100vh-56px)] py-20 px-4">
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">الثقة والأمان</h2>
                 <p className="text-zinc-500 max-w-lg mx-auto">في المملكة، الثقة هي الأساس. كل عامل يمر بتحقق من الهوية الوطنية وفحص AI صارم.</p>
               </div>
-              <div className="grid lg:grid-cols-2 gap-10 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
                 <div className="space-y-2.5">
                   {TRUST.map(t => (
                     <div key={t} className="flex items-center gap-4 bg-[#0d0d0d] border border-zinc-800 rounded-xl px-5 py-4 hover:border-zinc-700 transition-all">
@@ -416,7 +416,7 @@ export function LandingPage() {
 
         {/* ABOUT */}
         {activeTab === 'about' && (
-          <section className="min-h-[calc(100vh-56px)] py-20 px-4">
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-16">
                 <div className="w-20 h-20 rounded-3xl bg-amber-500 flex items-center justify-center mx-auto mb-6">
@@ -444,7 +444,7 @@ export function LandingPage() {
 
                 <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-8">
                   <h3 className="text-xl font-bold text-white mb-4">قيمنا</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
                     {[
                       { emoji: '🤝', title: 'الثقة أولاً', desc: 'كل عامل موثق بهويته الوطنية' },
                       { emoji: '⚡', title: 'السرعة', desc: 'طلبك يوصل للعامل في ثوانٍ' },
@@ -489,13 +489,13 @@ export function LandingPage() {
 
         {/* CONTACT */}
         {activeTab === 'contact' && (
-          <section className="min-h-[calc(100vh-56px)] py-20 px-4">
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">تواصل معنا</h2>
                 <p className="text-zinc-500">نحن هنا للمساعدة — تواصل معنا بأي طريقة تناسبك</p>
               </div>
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 {/* Contact info */}
                 <div className="space-y-5">
                   <h3 className="font-bold text-lg mb-4">معلومات التواصل</h3>
@@ -569,7 +569,7 @@ export function LandingPage() {
 
         {/* SUPPORT */}
         {activeTab === 'support' && (
-          <section className="min-h-[calc(100vh-56px)] py-20 px-4">
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-10">
                 <h2 className="text-4xl font-black mb-3">الدعم والمساعدة</h2>
@@ -670,7 +670,7 @@ export function LandingPage() {
 
       {/* PRIVACY */}
       {activeTab === 'privacy' && (
-        <section className="min-h-[calc(100vh-56px)] py-20 px-4">
+        <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black mb-3">سياسة الخصوصية والأمان</h2>
@@ -719,7 +719,7 @@ export function LandingPage() {
 
       {/* TERMS */}
       {activeTab === 'terms' && (
-        <section className="min-h-[calc(100vh-56px)] py-20 px-4">
+        <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black mb-3">الشروط والأحكام</h2>
