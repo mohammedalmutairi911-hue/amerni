@@ -129,13 +129,27 @@ export function WorkerDashboard() {
           )}
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 mb-5">
+        <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 mb-5 space-y-3">
           <p className="text-sm text-zinc-300 leading-relaxed">
-            ✅ أوافق على أن <span className="text-amber-400 font-bold">2%</span> من قيمة العمل تُحوَّل تلقائياً لحساب منصة <span className="text-amber-400 font-bold">أمرني</span> كعمولة خدمة، وذلك عند إتمام الطلب بنجاح.
+            بقبولك هذا الطلب أنت توافق على تحويل عمولة خدمة بنسبة <span className="text-amber-400 font-bold">2%</span> من قيمة العمل عند إتمامه بنجاح إلى الحساب التالي:
           </p>
+          <div className="bg-zinc-800 rounded-xl p-3 space-y-2 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-zinc-500">البنك</span>
+              <span className="text-white font-medium">بنك البلاد</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-zinc-500">اسم المستفيد</span>
+              <span className="text-white font-medium">مؤسسة حلول الغد للخدمات الإلكترونية</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-zinc-500">الآيبان</span>
+              <span className="text-amber-400 font-mono text-xs">SA54150009001465965400007</span>
+            </div>
+          </div>
           {pendingTask.price_suggested && (
-            <p className="text-xs text-zinc-500 mt-2">
-              العمولة المتوقعة: {(pendingTask.price_suggested * 0.02).toFixed(2)} ريال
+            <p className="text-xs text-zinc-500">
+              العمولة المتوقعة على هذا الطلب: <span className="text-amber-400 font-medium">{(pendingTask.price_suggested * 0.02).toFixed(2)} ريال</span>
             </p>
           )}
         </div>
