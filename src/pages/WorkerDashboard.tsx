@@ -130,28 +130,34 @@ export function WorkerDashboard() {
         </div>
 
         <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 mb-5 space-y-3">
-          <p className="text-sm text-zinc-300 leading-relaxed">
-            بقبولك هذا الطلب أنت توافق على تحويل عمولة خدمة بنسبة <span className="text-amber-400 font-bold">2%</span> من قيمة العمل عند إتمامه بنجاح إلى الحساب التالي:
+          <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide mb-1">إقرار وتعهد</p>
+          <p className="text-sm text-zinc-300 leading-loose">
+            أتعهد أنا العامل المسجل في منصة <span className="text-amber-400 font-bold">أمرني</span> بأنني عند إتمام هذا الطلب بنجاح، سأقوم بتحويل عمولة خدمة بنسبة <span className="text-amber-400 font-bold">2%</span> من إجمالي قيمة العمل المتفق عليه إلى حساب المنصة التالي، وذلك خلال مدة أقصاها <span className="text-white font-medium">٧٢ ساعة</span> من إتمام الطلب.
           </p>
-          <div className="bg-zinc-800 rounded-xl p-3 space-y-2 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-zinc-500">البنك</span>
+          <div className="bg-zinc-800 border border-zinc-600 rounded-xl p-3 space-y-2.5 text-sm">
+            <p className="text-xs text-zinc-500 font-medium">معلومات الحساب البنكي</p>
+            <div className="flex items-center justify-between border-b border-zinc-700 pb-2">
+              <span className="text-zinc-400">البنك</span>
               <span className="text-white font-medium">بنك البلاد</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-zinc-500">اسم المستفيد</span>
-              <span className="text-white font-medium">مؤسسة حلول الغد للخدمات الإلكترونية</span>
+            <div className="flex items-center justify-between border-b border-zinc-700 pb-2">
+              <span className="text-zinc-400">اسم المستفيد</span>
+              <span className="text-white font-medium text-xs">مؤسسة حلول الغد للخدمات الإلكترونية</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-zinc-500">الآيبان</span>
+              <span className="text-zinc-400">رقم الآيبان</span>
               <span className="text-amber-400 font-mono text-xs">SA54150009001465965400007</span>
             </div>
           </div>
           {pendingTask.price_suggested && (
-            <p className="text-xs text-zinc-500">
-              العمولة المتوقعة على هذا الطلب: <span className="text-amber-400 font-medium">{(pendingTask.price_suggested * 0.02).toFixed(2)} ريال</span>
-            </p>
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 flex items-center justify-between">
+              <span className="text-xs text-zinc-400">العمولة المستحقة على هذا الطلب</span>
+              <span className="text-amber-400 font-bold">{(pendingTask.price_suggested * 0.02).toFixed(2)} ريال</span>
+            </div>
           )}
+          <p className="text-xs text-zinc-600 leading-relaxed">
+            بالضغط على "أوافق وأقبل الطلب" أقر بقراءة هذا التعهد والموافقة عليه، ويُعدّ هذا الإقرار ملزماً قانونياً وفق أنظمة المملكة العربية السعودية.
+          </p>
         </div>
 
         <div className="flex gap-3">
