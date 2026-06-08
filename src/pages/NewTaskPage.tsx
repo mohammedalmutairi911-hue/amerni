@@ -169,7 +169,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#080808] overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-[#080808] overflow-y-auto" style={{WebkitOverflowScrolling: "touch"}}>
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[#080808]/95 backdrop-blur border-b border-zinc-900 px-4 py-3.5 flex items-center justify-between">
         <button onClick={step === 'auth' ? () => setStep('details') : onClose}
@@ -184,7 +184,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 py-8">
+      <div className="max-w-lg mx-auto px-4 py-4 sm:py-8 pb-20">
         {/* Step 1: Task details */}
         {step === 'details' && (
           <div className="space-y-5">
@@ -197,7 +197,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             <div>
               <label className="block text-xs text-zinc-400 mb-2 font-medium">طلبك *</label>
               <textarea value={task.title} onChange={e => handleTitleChange(e.target.value)}
-                placeholder="مثال: أبي أحد يجيب لي غداء من مطعم في حي النزهة الرياض..." rows={3} autoFocus
+                placeholder="مثال: أبي أحد يجيب لي غداء من مطعم في حي النزهة الرياض..." rows={2} autoFocus
                 className="w-full bg-[#111] border-2 border-zinc-800 focus:border-amber-500 rounded-2xl px-4 py-3.5 text-white text-sm outline-none transition-colors resize-none placeholder-zinc-600" />
             </div>
 
@@ -209,7 +209,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                   <span className="text-amber-400 text-xs">— تم اكتشافه تلقائياً ✨</span>
                 )}
               </label>
-              <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 mb-3">
                 {SUGGESTED_CATS.map(cat => (
                   <button key={cat} type="button"
                     onClick={() => { setT('category', cat); if (cat !== 'أخرى') setT('customCategory', '') }}
@@ -281,7 +281,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
 
             <button onClick={handleNext} disabled={loading}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 rounded-2xl text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
+              className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
               {loading ? <Loader2 size={18} className="animate-spin" /> : null}
               {user ? 'نشر الطلب' : 'التالي — إنشاء حساب'} <ArrowLeft size={16} />
             </button>
@@ -399,7 +399,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
 
               <button onClick={handleAuth} disabled={loading}
-                className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 rounded-2xl text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
+                className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
                 {loading && <Loader2 size={18} className="animate-spin" />}
                 {isNew ? '✅ سجّل وانشر الطلب' : 'دخول ونشر الطلب'}
               </button>
