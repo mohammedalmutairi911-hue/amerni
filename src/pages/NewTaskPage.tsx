@@ -143,15 +143,36 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     }
     setLoading(true)
     if (isNew) {
-      const { error: err } = await signUp(auth.email.trim(), auth.password, auth.name.trim(), 'client')
-      if (err) {
-        // لو البريد مسجل جرب تسجيل الدخول
-        if (err.message?.includes('already') || err.message?.includes('registered') || err.status === 422) {
-          const { error: signInErr } = await signIn(auth.email.trim(), auth.password)
-          if (signInErr) { setError('البريد مسجل مسبقاً — جرب "عندي حساب" أو استخدم إيميل آخر'); setLoading(false); return }
-        } else {
-          setError('حدث خطأ: ' + (err.message || 'حاول مرة ثانية')); setLoading(false); return
+      const { data: signUpData, error: err } = await supabase.auth.signUp({
+        email: auth.email.trim(),
+        password: auth.password,
+        options: {
+          emailRedirectTo: 'https://amerniksa.com',
+          data: { full_name: auth.name.trim(), role: 'client' }
         }
+      })
+      
+      if (err) {
+        setError('حدث خطأ — حاول مرة ثانية'); setLoading(false); return
+      }
+      
+      // لو ما اكتمل التسجيل (يحتاج تأكيد إيميل)
+      if (!signUpData?.session) {
+        setLoading(false)
+        setError('')
+        // احفظ الطلب في localStorage عشان يكمله بعد التأكيد
+        if (task.title.trim()) {
+          localStorage.setItem('pending_task_after_confirm', JSON.stringify({
+            title: task.title.trim(),
+            category: getFinalCategory(),
+            city: task.city,
+            budget: task.budget,
+            use_ai: task.use_ai
+          }))
+        }
+        // بيّن رسالة تأكيد الإيميل
+        setError('__email_confirm__')
+        return
       }
     } else {
       const { error: err } = await signIn(auth.email.trim(), auth.password)
