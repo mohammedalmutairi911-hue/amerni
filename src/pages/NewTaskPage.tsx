@@ -143,68 +143,24 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     }
     setLoading(true)
     if (isNew) {
-      // تسجيل مباشر عبر Supabase
-      const { data: signUpResult, error: signUpErr } = await supabase.auth.signUp({
-        email: auth.email.trim(),
-        password: auth.password,
-        options: { data: { full_name: auth.name.trim(), role: 'client' } }
-      })
-      
-      if (signUpErr) {
-        setError('خطأ: ' + signUpErr.message)
-        setLoading(false)
-        return
-      }
-      
-      // إضافة البروفايل
-      if (signUpResult.user) {
-        await supabase.from('profiles').upsert({
-          id: signUpResult.user.id,
-          email: auth.email.trim(),
-          full_name: auth.name.trim(),
-          role: 'client',
-          phone_verified: false
-        }).catch(() => {})
-        
-        // لو في session = حفظ الطلب مباشرة
-        if (signUpResult.session) {
-          if (task.title.trim()) {
-            const ok = await saveTask(signUpResult.user.id)
-            if (!ok) { setLoading(false); return }
-          }
-          setLoading(false)
-          navigate('dashboard')
-          onClose()
-          return
-        }
-      }
-      
-      // ما في session = يحتاج تأكيد إيميل
-      setLoading(false)
-      setError('__email_confirm__')
-      return
+      const { error: err } = await signUp(auth.email.trim(), auth.password, auth.name.trim(), 'client')
+      if (err) { setError('حاول مرة ثانية أو جرب إيميل آخر'); setLoading(false); return }
+      await new Promise(r => setTimeout(r, 1200))
     } else {
       const { error: err } = await signIn(auth.email.trim(), auth.password)
       if (err) { setError('بريد أو كلمة مرور خاطئة'); setLoading(false); return }
-    }
-    
-    // انتظر حتى يكتمل التسجيل ويكون الـ session جاهز
-    let uid = ''
-    let attempts = 0
-    while (!uid && attempts < 10) {
       await new Promise(r => setTimeout(r, 500))
-      const { data: { user: u } } = await supabase.auth.getUser()
-      uid = u?.id || ''
-      attempts++
     }
-    
-    if (!uid) { setError('حدث خطأ في التسجيل، حاول مرة ثانية'); setLoading(false); return }
-    
+
+    const { data: { user: u } } = await supabase.auth.getUser()
+    const uid = u?.id || ''
+    if (!uid) { setError('حدث خطأ — حاول مرة ثانية'); setLoading(false); return }
+
     if (task.title.trim()) {
       const ok = await saveTask(uid)
       if (!ok) { setLoading(false); return }
     }
-    
+
     setLoading(false)
     navigate('dashboard')
     onClose()
