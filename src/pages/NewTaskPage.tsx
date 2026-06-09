@@ -144,7 +144,15 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     setLoading(true)
     if (isNew) {
       const { error: err } = await signUp(auth.email.trim(), auth.password, auth.name.trim(), 'client')
-      if (err) { setError('البريد مسجل — جرب "عندي حساب"'); setLoading(false); return }
+      if (err) {
+        // لو البريد مسجل جرب تسجيل الدخول
+        if (err.message?.includes('already') || err.message?.includes('registered') || err.status === 422) {
+          const { error: signInErr } = await signIn(auth.email.trim(), auth.password)
+          if (signInErr) { setError('البريد مسجل مسبقاً — جرب "عندي حساب" أو استخدم إيميل آخر'); setLoading(false); return }
+        } else {
+          setError('حدث خطأ: ' + (err.message || 'حاول مرة ثانية')); setLoading(false); return
+        }
+      }
     } else {
       const { error: err } = await signIn(auth.email.trim(), auth.password)
       if (err) { setError('بريد أو كلمة مرور خاطئة'); setLoading(false); return }
