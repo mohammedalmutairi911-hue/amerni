@@ -69,19 +69,12 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
       if (password.length < 6) { setError('كلمة المرور 6 أحرف على الأقل'); return }
       setLoading(true)
       try {
-        const { data, error: err } = await Promise.race([
-          supabase.auth.signUp({
-            email: email.trim(), password,
-            options: { data: { full_name: name.trim(), role: 'client' } }
-          }),
-          new Promise<any>(res => setTimeout(() => res({ data: null, error: { message: 'انتهت المهلة — حاول مرة ثانية' } }), 8000))
-        ])
-        if (err) { setError(err.message); setLoading(false); return }
-        if (data?.user) {
-          await supabase.from('profiles').upsert({ id: data.user.id, email: email.trim(), full_name: name.trim(), role: 'client', phone_verified: false })
-        }
+        const { error: err } = await signUp(email.trim(), password, name.trim(), role)
+        if (err) { setError(err.message || 'حدث خطأ'); setLoading(false); return }
+        await new Promise(r => setTimeout(r, 1000))
+        const { data: { session } } = await supabase.auth.getSession()
         setLoading(false)
-        if (!data?.session) { setError('__email_confirm__'); return }
+        if (!session) { setError('__email_confirm__'); return }
         onSuccess()
       } catch (e: any) {
         setError('حدث خطأ — حاول مرة ثانية')
