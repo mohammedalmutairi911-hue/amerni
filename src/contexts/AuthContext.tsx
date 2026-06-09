@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Profile upsert - non-blocking, ignore errors (RLS might block without session)
       supabase.from('profiles').upsert({
         id: data.user.id, email, full_name: fullName, role, phone_verified: false
-      }).then(() => fetchProfile(data.user.id)).catch(() => {})
+      }, { ignoreDuplicates: true }).then(() => fetchProfile(data.user.id)).catch(() => {})
     }
     return { error }
   }
