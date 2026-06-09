@@ -27,7 +27,7 @@ export function WorkerDashboard() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [loading, setLoading] = useState(true)
   const [accepting, setAccepting] = useState<string | null>(null)
-  const [cityFilter, setCityFilter] = useState<string>('الكل')
+  const [cityFilter, setCityFilter] = useState<string>('smart')
   const [toggling, setToggling] = useState(false)
   const [pendingTask, setPendingTask] = useState<Task | null>(null)
   const [showCommission, setShowCommission] = useState(false)
@@ -355,12 +355,16 @@ export function WorkerDashboard() {
         {/* Feed */}
         {tab === 'feed' && (
           <div className="space-y-3">
-            {/* City filter */}
+            {/* Smart filter */}
             <div className="flex gap-2 overflow-x-auto pb-1">
-              {['الكل', workerProfile?.city || '', 'الرياض', 'جدة', 'الدمام'].filter((v,i,a) => v && a.indexOf(v)===i).map(c => (
-                <button key={c} onClick={() => setCityFilter(c)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${cityFilter === c ? 'bg-amber-500 text-black' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
-                  {c}
+              {[
+                { id: 'smart', label: '⭐ مناسبة لي' },
+                { id: 'city', label: `📍 ${workerProfile?.city || 'مدينتي'}` },
+                { id: 'all', label: '🌐 كل الطلبات' },
+              ].map(f => (
+                <button key={f.id} onClick={() => setCityFilter(f.id)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${cityFilter === f.id ? 'bg-amber-500 text-black' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
+                  {f.label}
                 </button>
               ))}
             </div>
@@ -374,7 +378,19 @@ export function WorkerDashboard() {
                 <Zap size={32} className="mx-auto mb-3 opacity-30" />
                 <p>ما في طلبات متاحة الحين</p>
               </div>
-            ) : feedTasks.filter(t => cityFilter === 'الكل' || t.city === cityFilter).map(task => (
+            ) : feedTasks.filter(t => {
+                if (cityFilter === 'all') return true
+                if (cityFilter === 'city') return t.city === workerProfile?.city
+                if (cityFilter === 'smart') {
+                  const cityMatch = !t.city || t.city === workerProfile?.city
+                  const skillMatch = !workerProfile?.skills?.length || 
+                    workerProfile.skills.some((s: string) => 
+                      t.category?.includes(s) || s.includes(t.category || '')
+                    )
+                  return cityMatch || skillMatch
+                }
+                return true
+              }).map(task => (
               <div key={task.id} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
                 <div className="flex items-start justify-between mb-3 gap-3">
                   <div className="flex-1 min-w-0">
