@@ -290,7 +290,7 @@ export function LandingPage() {
           </div>
           {user ? (
             <button onClick={() => navigate('dashboard')} className="bg-amber-500 text-black font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-amber-400 transition-colors">
-              داشبورد
+              حسابي
             </button>
           ) : (
             <div className="flex items-center gap-2">
