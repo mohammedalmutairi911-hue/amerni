@@ -47,6 +47,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     city: 'الرياض',
     budget: '',
     use_ai: false,
+    deadline: '',
   })
   const [auth, setAuth] = useState({ name: '', phone: '', email: '', password: '' })
   const setT = (k: string, v: any) => setTask(t => ({ ...t, [k]: v }))
@@ -75,6 +76,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       city: task.city,
       use_ai: task.use_ai,
       status: 'open',
+      deadline: task.deadline || null,
       price_suggested: task.budget ? Number(task.budget) : null
     }).select().single()
 
@@ -254,6 +256,19 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                     placeholder="80" className="flex-1 bg-transparent text-sm outline-none text-white" />
                   <span className="text-zinc-500 text-xs">ريال</span>
                 </div>
+              </div>
+            </div>
+
+            {/* Deadline */}
+            <div>
+              <label className="block text-xs text-zinc-400 mb-2 font-medium">⏰ وقت الإنجاز المطلوب</label>
+              <div className="flex gap-2 flex-wrap">
+                {['أسرع وقت ممكن', 'خلال ساعتين', 'اليوم', 'خلال يومين', 'هذا الأسبوع'].map(d => (
+                  <button key={d} type="button" onClick={() => setT('deadline', d)}
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${task.deadline === d ? 'border-amber-500 bg-amber-500/10 text-amber-300' : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'}`}>
+                    {d}
+                  </button>
+                ))}
               </div>
             </div>
 
