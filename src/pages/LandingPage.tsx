@@ -131,12 +131,22 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
           <button onClick={() => setShowReset(false)} className="text-xs text-zinc-600 hover:text-zinc-400">إلغاء</button>
         </div>
       )}
-      {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-xl">{error}</p>}
-      <button onClick={handle} disabled={loading}
-        className="w-full bg-amber-500 text-black font-bold py-3 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-        {loading && <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />}
-        {mode === 'login' ? 'دخول' : 'إنشاء حساب'}
-      </button>
+      {error === '__email_confirm__' ? (
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
+          <div className="text-3xl mb-2">📧</div>
+          <p className="text-emerald-400 font-bold mb-1">تحقق من بريدك</p>
+          <p className="text-zinc-400 text-sm">أرسلنا رابط التأكيد على <span className="text-white">{email}</span></p>
+        </div>
+      ) : (
+        <>
+          {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-xl">{error}</p>}
+          <button onClick={handle} disabled={loading}
+            className="w-full bg-amber-500 text-black font-bold py-3 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            {loading && <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />}
+            {mode === 'login' ? 'دخول' : 'إنشاء حساب'}
+          </button>
+        </>
+      )}
     </div>
   )
 }
