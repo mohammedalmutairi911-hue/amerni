@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Briefcase, TrendingUp, Star, Wifi, WifiOff, Clock, CheckCircle, Zap, Loader2, Calendar, User, MessageSquare, Upload, ArrowRight, DollarSign, BarChart2 } from 'lucide-react'
+import { Briefcase, TrendingUp, Star, Wifi, WifiOff, Clock, CheckCircle, Zap, Loader2, Calendar, User, MessageSquare, Upload, ArrowRight, DollarSign, BarChart2, Share2, Copy } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { requestNotificationPermission, sendLocalNotification, registerServiceWorker } from '../lib/notifications'
 import { useAuth } from '../contexts/AuthContext'
@@ -89,6 +89,17 @@ export function WorkerDashboard() {
     setAccepting(pendingTask.id)
     setShowCommission(false)
     await supabase.from('tasks').update({ worker_id: user!.id, status: 'in_progress' }).eq('id', pendingTask.id)
+    
+    // إشعار العميل بقبول طلبه
+    const clientId = pendingTask.client_id || pendingTask.user_id
+    if (clientId) {
+      await supabase.from('notifications').insert({
+        user_id: clientId,
+        title: '🎉 قبل شخص طلبك!',
+        body: `طلبك "${pendingTask.title}" اتقبل — افتح المحادثة الحين`
+      })
+    }
+    
     await fetchFeedTasks()
     await fetchMyTasks()
     setAccepting(null)
