@@ -13,6 +13,7 @@ import { SupportPage } from './pages/SupportPage'
 import { BrowseWorkers } from './pages/BrowseWorkers'
 import { BountiesPage } from './pages/BountiesPage'
 import { ReferralPage } from './pages/ReferralPage'
+import { WorkerProfilePage } from './pages/WorkerProfile'
 import { InstallPrompt } from './components/InstallPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -55,6 +56,7 @@ export default function App() {
   if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
   if (page === 'bounties') return <><Navbar /><BountiesPage /></>
   if (page === 'referral') return <><Navbar /><ReferralPage /></>
+  if (page === 'worker-profile') return <><Navbar /><WorkerProfilePage workerId={''} /></>
 
   // أدمن
   if (profile.role === 'admin') {
