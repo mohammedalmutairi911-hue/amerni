@@ -81,7 +81,7 @@ export function Navbar() {
                     {profile.role === 'admin' && (
                       <button onClick={() => { navigate('admin'); setDropOpen(false) }}
                         className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors">
-                        <Shield size={15} /> لوحة الإدارة
+                        <Shield size={15} /> الإدارة
                       </button>
                     )}
                     <button onClick={() => { signOut(); setDropOpen(false) }}
