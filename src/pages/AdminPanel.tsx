@@ -16,7 +16,33 @@ export function AdminPanel() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => { fetchAll() }, [])
+  useEffect(() => {
+    fetchAll()
+    
+    // استمع للإشعارات الجديدة realtime
+    const ch = supabase.channel('admin-notifications')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' },
+        (payload: any) => {
+          // إشعار المتصفح
+          if (Notification.permission === 'granted') {
+            new Notification(payload.new.title || 'أمرني', {
+              body: payload.new.body || '',
+              icon: '/icon-192.png',
+              dir: 'rtl',
+              lang: 'ar',
+            })
+          }
+          fetchAll()
+        })
+      .subscribe()
+    
+    // اطلب إذن الإشعارات
+    if (Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+    
+    return () => { supabase.removeChannel(ch) }
+  }, [])
 
   const fetchAll = async () => {
     setLoading(true)
