@@ -49,6 +49,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
   const [error, setError] = useState('')
   const [resetSent, setResetSent] = useState(false)
   const [showReset, setShowReset] = useState(false)
+  const [role, setRole] = useState<'client'|'worker'>('client')
 
   const handleReset = async () => {
     if (!email) { setError('أدخل بريدك الإلكتروني'); return }
@@ -99,6 +100,18 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
 
   return (
     <div className="space-y-3">
+      {mode === 'register' && (
+        <div className="flex gap-1 bg-zinc-900 rounded-xl p-1 mb-1">
+          <button onClick={() => setRole('client')}
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'client' ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white'}`}>
+            🙋 أبي أطلب خدمة
+          </button>
+          <button onClick={() => setRole('worker')}
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'worker' ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white'}`}>
+            🔧 أبي أقدم خدمة
+          </button>
+        </div>
+      )}
       <button onClick={signInWithGoogle}
         className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200">
         <svg width="18" height="18" viewBox="0 0 24 24">
