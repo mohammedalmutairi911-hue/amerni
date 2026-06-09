@@ -33,6 +33,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   }
   const [isNew, setIsNew] = useState(true)
   const [showPass, setShowPass] = useState(false)
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false)
   const [agreedTerms, setAgreedTerms] = useState(false)
   const [showReset, setShowReset] = useState(false)
   const [resetSent, setResetSent] = useState(false)
@@ -447,14 +448,24 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                 </div>
               )}
 
-              {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
-
-              <button onClick={handleAuth} disabled={loading}
-                className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
-                {loading && <Loader2 size={18} className="animate-spin" />}
-                {isNew ? '✅ سجّل وانشر الطلب' : 'دخول ونشر الطلب'}
-              </button>
-              <p className="text-xs text-zinc-600 text-center">بالتسجيل أنت توافق على شروط الاستخدام</p>
+              {showEmailConfirm ? (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
+                  <div className="text-3xl mb-2">📧</div>
+                  <p className="text-emerald-400 font-bold text-base mb-1">تحقق من بريدك</p>
+                  <p className="text-zinc-400 text-sm">أرسلنا رابط التأكيد على <span className="text-white font-medium">{auth.email}</span></p>
+                  <p className="text-zinc-500 text-xs mt-2">بعد التأكيد ادخل وطلبك سينشر</p>
+                </div>
+              ) : (
+                <>
+                  {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
+                  <button onClick={handleAuth} disabled={loading}
+                    className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
+                    {loading && <Loader2 size={18} className="animate-spin" />}
+                    {isNew ? '✅ سجّل وانشر الطلب' : 'دخول ونشر الطلب'}
+                  </button>
+                  <p className="text-xs text-zinc-600 text-center">بالتسجيل أنت توافق على شروط الاستخدام</p>
+                </>
+              )}
             </div>
           </div>
         )}
