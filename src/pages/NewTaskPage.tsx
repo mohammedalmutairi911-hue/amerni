@@ -143,34 +143,26 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     }
     setLoading(true)
     if (isNew) {
-      const { data: signUpData, error: err } = await supabase.auth.signUp({
-        email: auth.email.trim(),
-        password: auth.password,
-        options: {
-          emailRedirectTo: 'https://amerniksa.com',
-          data: { full_name: auth.name.trim(), role: 'client' }
-        }
-      })
-      
+      const { error: err } = await signUp(auth.email.trim(), auth.password, auth.name.trim(), 'client')
       if (err) {
-        setError('حدث خطأ — حاول مرة ثانية'); setLoading(false); return
+        // لو الخطأ "already registered" جرب تسجيل دخول
+        const { error: signInErr } = await signIn(auth.email.trim(), auth.password)
+        if (!signInErr) {
+          // دخل بنجاح
+        } else {
+          setError('جرب إيميل آخر أو سجّل دخول من "عندي حساب"')
+          setLoading(false)
+          return
+        }
       }
       
-      // لو ما اكتمل التسجيل (يحتاج تأكيد إيميل)
-      if (!signUpData?.session) {
+      // انتظر ثانية وبعدين تحقق من الـ session
+      await new Promise(r => setTimeout(r, 800))
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      // لو ما في session = يحتاج تأكيد إيميل
+      if (!session) {
         setLoading(false)
-        setError('')
-        // احفظ الطلب في localStorage عشان يكمله بعد التأكيد
-        if (task.title.trim()) {
-          localStorage.setItem('pending_task_after_confirm', JSON.stringify({
-            title: task.title.trim(),
-            category: getFinalCategory(),
-            city: task.city,
-            budget: task.budget,
-            use_ai: task.use_ai
-          }))
-        }
-        // بيّن رسالة تأكيد الإيميل
         setError('__email_confirm__')
         return
       }
