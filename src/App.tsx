@@ -13,10 +13,17 @@ import { SupportPage } from './pages/SupportPage'
 import { BrowseWorkers } from './pages/BrowseWorkers'
 import { BountiesPage } from './pages/BountiesPage'
 import { ReferralPage } from './pages/ReferralPage'
-import { WorkerProfilePage } from './pages/WorkerProfile'
+import { WorkerProfile } from './pages/WorkerProfile'
 import { InstallPrompt } from './components/InstallPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
+
+// Handle worker profile URL param
+const urlParams = new URLSearchParams(window.location.search)
+const workerParam = urlParams.get('worker')
+if (workerParam) {
+  ;(window as any).__workerProfileId = workerParam
+}
 
 export default function App() {
   const { user, profile, loading, refreshProfile } = useAuth()
@@ -56,7 +63,8 @@ export default function App() {
   if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
   if (page === 'bounties') return <><Navbar /><BountiesPage /></>
   if (page === 'referral') return <><Navbar /><ReferralPage /></>
-  if (page === 'worker-profile') return <><Navbar /><WorkerProfilePage workerId={''} /></>
+  if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
+  if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={''} /></>
 
   // أدمن
   if (profile.role === 'admin') {
