@@ -144,18 +144,19 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     setLoading(true)
     if (isNew) {
       const { error: err } = await signUp(auth.email.trim(), auth.password, auth.name.trim(), 'client')
-      if (err) { setError('حاول مرة ثانية أو جرب إيميل آخر'); setLoading(false); return }
+      // لو في خطأ — على الأرجح الإيميل مسجل بس ما مُأكَّد
+      if (err) {
+        setLoading(false)
+        setError('__email_confirm__')
+        return
+      }
       await new Promise(r => setTimeout(r, 1000))
-      // تحقق من الـ session
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        // يحتاج تأكيد إيميل — احفظ الطلب مؤقتاً
         if (task.title.trim()) {
           localStorage.setItem('pending_task', JSON.stringify({
-            title: task.title.trim(),
-            category: getFinalCategory(),
-            city: task.city,
-            budget: task.budget,
+            title: task.title.trim(), category: getFinalCategory(),
+            city: task.city, budget: task.budget,
           }))
         }
         setLoading(false)
