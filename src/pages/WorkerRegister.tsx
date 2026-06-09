@@ -112,6 +112,19 @@ export function WorkerRegister({ onSuccess }: Props) {
 
       // Update role to worker
       await supabase.from('profiles').update({ role: 'worker' }).eq('id', user!.id)
+      
+      // إشعار الأدمن بعامل جديد
+      const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
+      if (admins?.length) {
+        await supabase.from('notifications').insert(
+          admins.map(a => ({
+            user_id: a.id,
+            title: 'عامل جديد ينتظر الموافقة 👤',
+            body: `${profile!.full_name} — ${form.city} — ${form.skills.join('، ')}`
+          }))
+        )
+      }
+      
       await refreshProfile()
       onSuccess()
     } catch (e: any) {
