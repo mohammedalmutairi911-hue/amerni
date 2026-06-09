@@ -13,6 +13,7 @@ import { SupportPage } from './pages/SupportPage'
 import { BrowseWorkers } from './pages/BrowseWorkers'
 import { BountiesPage } from './pages/BountiesPage'
 import { ReferralPage } from './pages/ReferralPage'
+import { InstallPrompt } from './components/InstallPrompt'
 
 export default function App() {
   const { user, profile, loading, refreshProfile } = useAuth()
@@ -54,7 +55,7 @@ export default function App() {
     )
   }
 
-  if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
+  if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
 
   // صفحات مشتركة
   if (page === 'support') return <><Navbar /><SupportPage /></>
