@@ -174,7 +174,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
 
 export function LandingPage() {
   const { navigate } = useApp()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [activeTab, setActiveTab] = useState<Tab>('home')
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
