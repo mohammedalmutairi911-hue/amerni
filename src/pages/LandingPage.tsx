@@ -47,6 +47,18 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [resetSent, setResetSent] = useState(false)
+  const [showReset, setShowReset] = useState(false)
+
+  const handleReset = async () => {
+    if (!email) { setError('أدخل بريدك الإلكتروني'); return }
+    setLoading(true)
+    await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: 'https://amerniksa.com'
+    })
+    setResetSent(true)
+    setLoading(false)
+  }
 
   const handle = async () => {
     setError('')
