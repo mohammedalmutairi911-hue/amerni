@@ -163,6 +163,8 @@ export function BrowseWorkers() {
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <p className="font-semibold text-sm truncate">{w.full_name}</p>
                       {w.id_verified && <CheckCircle size={12} className="text-emerald-500 flex-shrink-0" />}
+                      {(w.total_tasks || 0) >= 10 && <span className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded-full">⭐ محترف</span>}
+                      {(w.total_tasks || 0) >= 50 && <span className="text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full">🏆 خبير</span>}
                     </div>
                     <p className="text-xs text-zinc-500 flex items-center gap-1"><MapPin size={10} /> {w.city}</p>
                   </div>
