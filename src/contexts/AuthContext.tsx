@@ -51,6 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string, role: string) => {
     const { data, error } = await supabase.auth.signUp({
+      options: {
+        emailRedirectTo: 'https://amerniksa.com',
+        data: { full_name: fullName, role }
+      },
       email, password,
       options: { data: { full_name: fullName, role } }
     })
