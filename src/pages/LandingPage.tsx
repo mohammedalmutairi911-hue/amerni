@@ -180,7 +180,21 @@ export function LandingPage() {
   const sendContact = async () => {
     if (!contactForm.name || !contactForm.email || !contactForm.message) return
     setContactLoading(true)
-    await new Promise(r => setTimeout(r, 1000))
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer re_XEdF7Kwq_A8TqvJyANz1RyLJFwGoT1oi3'
+        },
+        body: JSON.stringify({
+          from: 'onboarding@resend.dev',
+          to: 'support@amerniksa.com',
+          subject: `رسالة من ${contactForm.name} — أمرني`,
+          html: `<div dir="rtl"><h3>رسالة جديدة من موقع أمرني</h3><p><strong>الاسم:</strong> ${contactForm.name}</p><p><strong>البريد:</strong> ${contactForm.email}</p><p><strong>الرسالة:</strong></p><p>${contactForm.message}</p></div>`
+        })
+      })
+    } catch {}
     setContactSent(true)
     setContactLoading(false)
   }
