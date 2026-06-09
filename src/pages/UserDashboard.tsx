@@ -432,6 +432,30 @@ export function UserDashboard() {
           </div>
         )}
 
+        {/* تاريخ المدفوعات */}
+        {tasks.filter(t => t.status === 'completed' && (t.price_final || t.price_suggested)).length > 0 && (
+          <div className="mt-8 pt-6 border-t border-zinc-900">
+            <h3 className="text-sm font-semibold text-zinc-400 mb-3 flex items-center gap-2">
+              <DollarSign size={14} className="text-emerald-500" /> تاريخ المدفوعات
+            </h3>
+            <div className="space-y-2">
+              {tasks.filter(t => t.status === 'completed' && (t.price_final || t.price_suggested)).map(t => (
+                <div key={t.id} className="flex items-center justify-between bg-[#0d0d0d] border border-zinc-800/50 rounded-xl px-4 py-3">
+                  <div>
+                    <p className="text-sm text-white truncate max-w-[200px]">{t.title}</p>
+                    <p className="text-xs text-zinc-500">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
+                  </div>
+                  <span className="text-emerald-400 font-bold text-sm">{t.price_final || t.price_suggested} ريال</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between px-4 py-2">
+                <span className="text-xs text-zinc-500">الإجمالي</span>
+                <span className="text-emerald-400 font-black">{totalSpent.toLocaleString()} ريال</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Bottom CTAs */}
         <div className="grid grid-cols-2 gap-3 mt-8 pt-6 border-t border-zinc-900">
           <button onClick={() => navigate('browse')}
