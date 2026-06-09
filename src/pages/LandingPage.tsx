@@ -76,7 +76,9 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
           new Promise<any>(res => setTimeout(() => res({ data: null, error: { message: 'انتهت المهلة — حاول مرة ثانية' } }), 8000))
         ])
         if (err) { setError(err.message); setLoading(false); return }
-        if (data?.user) supabase.from('profiles').upsert({ id: data.user.id, email: email.trim(), full_name: name.trim(), role: 'client', phone_verified: false }).catch(() => {})
+        if (data?.user) {
+          await supabase.from('profiles').upsert({ id: data.user.id, email: email.trim(), full_name: name.trim(), role: 'client', phone_verified: false })
+        }
         setLoading(false)
         if (!data?.session) { setError('__email_confirm__'); return }
         onSuccess()
