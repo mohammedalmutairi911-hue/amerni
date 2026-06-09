@@ -34,6 +34,8 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   const [isNew, setIsNew] = useState(true)
   const [showPass, setShowPass] = useState(false)
   const [agreedTerms, setAgreedTerms] = useState(false)
+  const [showReset, setShowReset] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -382,6 +384,20 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                   </button>
                 </div>
               </div>
+
+              {!isNew && (
+                <div className="text-left">
+                  <button onClick={async () => {
+                    if (!auth.email) { setError('أدخل بريدك أولاً'); return }
+                    setShowReset(true)
+                    await supabase.auth.resetPasswordForEmail(auth.email.trim(), { redirectTo: 'https://amerniksa.com' })
+                    setResetSent(true)
+                  }} className="text-xs text-amber-400 hover:underline">
+                    نسيت كلمة المرور؟
+                  </button>
+                  {resetSent && <p className="text-xs text-emerald-400 mt-1">✅ تم إرسال رابط الاستعادة لبريدك</p>}
+                </div>
+              )}
 
               {isNew && (
                 <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
