@@ -76,7 +76,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       city: task.city,
       use_ai: task.use_ai,
       status: 'open',
-      deadline: task.deadline || null,
+      ...(task.deadline ? { deadline: task.deadline } : {}),
       price_suggested: task.budget ? Number(task.budget) : null
     }).select().single()
 
@@ -143,25 +143,32 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     }
     setLoading(true)
     if (isNew) {
-      const { error: err } = await signUp(auth.email.trim(), auth.password, auth.name.trim(), 'client')
-      if (err) {
-        // لو الخطأ "already registered" جرب تسجيل دخول
-        const { error: signInErr } = await signIn(auth.email.trim(), auth.password)
-        if (!signInErr) {
-          // دخل بنجاح
-        } else {
-          setError('جرب إيميل آخر أو سجّل دخول من "عندي حساب"')
-          setLoading(false)
-          return
-        }
+      // تسجيل مباشر عبر Supabase
+      const { data: signUpResult, error: signUpErr } = await supabase.auth.signUp({
+        email: auth.email.trim(),
+        password: auth.password,
+        options: { data: { full_name: auth.name.trim(), role: 'client' } }
+      })
+      
+      if (signUpErr) {
+        setError('خطأ: ' + signUpErr.message)
+        setLoading(false)
+        return
       }
       
-      // انتظر ثانية وبعدين تحقق من الـ session
-      await new Promise(r => setTimeout(r, 800))
-      const { data: { session } } = await supabase.auth.getSession()
+      // إضافة البروفايل
+      if (signUpResult.user) {
+        await supabase.from('profiles').upsert({
+          id: signUpResult.user.id,
+          email: auth.email.trim(),
+          full_name: auth.name.trim(),
+          role: 'client',
+          phone_verified: false
+        }).catch(() => {})
+      }
       
       // لو ما في session = يحتاج تأكيد إيميل
-      if (!session) {
+      if (!signUpResult.session) {
         setLoading(false)
         setError('__email_confirm__')
         return
