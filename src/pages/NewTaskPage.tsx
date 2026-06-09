@@ -147,7 +147,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       // لو في خطأ — على الأرجح الإيميل مسجل بس ما مُأكَّد
       if (err) {
         setLoading(false)
-        setError('__email_confirm__')
+        setShowEmailConfirm(true)
         return
       }
       await new Promise(r => setTimeout(r, 1000))
@@ -160,7 +160,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
           }))
         }
         setLoading(false)
-        setError('__email_confirm__')
+        setShowEmailConfirm(true)
         return
       }
       const uid = session.user.id
