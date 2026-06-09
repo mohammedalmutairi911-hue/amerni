@@ -1,29 +1,20 @@
 import { useState, useEffect } from 'react'
-import { Star, MapPin, CheckCircle, Copy, Share2, MessageSquare } from 'lucide-react'
-import { supabase, getAvatar } from '../lib/supabase'
+import { Star, MapPin, CheckCircle, MessageSquare, ArrowLeft } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
-import { WorkerProfile as WP } from '../types'
+import { getAvatar } from '../lib/supabase'
 
 interface Props { workerId: string }
 
-export function WorkerProfilePage({ workerId }: Props) {
+export function WorkerProfile({ workerId }: Props) {
   const { navigate } = useApp()
-  const [worker, setWorker] = useState<WP | null>(null)
+  const [worker, setWorker] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     supabase.from('worker_profiles').select('*').eq('user_id', workerId).single()
       .then(({ data }) => { setWorker(data); setLoading(false) })
   }, [workerId])
-
-  const shareLink = `${window.location.origin}/worker/${workerId}`
-
-  const copyLink = () => {
-    navigator.clipboard.writeText(shareLink)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
 
   if (loading) return (
     <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center">
@@ -33,52 +24,64 @@ export function WorkerProfilePage({ workerId }: Props) {
 
   if (!worker) return (
     <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center">
-      <p className="text-zinc-500">الصفحة غير موجودة</p>
+      <div className="text-center">
+        <p className="text-zinc-500 mb-4">الصفحة غير موجودة</p>
+        <button onClick={() => navigate('browse')} className="text-amber-400">← تصفح العمال</button>
+      </div>
     </div>
   )
+
+  const shareUrl = `${window.location.origin}?worker=${workerId}`
 
   return (
     <div className="min-h-screen bg-[#080808] pt-14">
       <div className="max-w-lg mx-auto px-4 py-8">
+        <button onClick={() => navigate('browse')} className="flex items-center gap-1.5 text-zinc-400 hover:text-white text-sm mb-6 transition-colors">
+          <ArrowLeft size={14} /> رجوع
+        </button>
+
         {/* Header */}
-        <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6 mb-4">
-          <div className="flex items-start gap-4 mb-5">
-            <div className="relative">
-              <img src={getAvatar(worker.full_name)} className="w-20 h-20 rounded-2xl" alt="" />
-              <div className={`absolute -bottom-1 -left-1 w-4 h-4 rounded-full border-2 border-[#0d0d0d] ${worker.is_online ? 'bg-emerald-500' : 'bg-zinc-600'}`} />
-            </div>
+        <div className="bg-gradient-to-br from-amber-500/10 to-[#0d0d0d] border border-amber-500/20 rounded-2xl p-6 mb-4">
+          <div className="flex items-start gap-4 mb-4">
+            <img src={getAvatar(worker.full_name)} className="w-20 h-20 rounded-2xl" alt="" />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-xl font-bold">{worker.full_name}</h1>
+                <h1 className="text-xl font-black text-white">{worker.full_name}</h1>
                 {worker.id_verified && <CheckCircle size={16} className="text-emerald-500" />}
               </div>
-              <p className="text-zinc-500 text-sm flex items-center gap-1"><MapPin size={12} /> {worker.city}</p>
-              <div className="flex items-center gap-2 mt-2">
+              <p className="text-zinc-500 text-sm flex items-center gap-1 mb-2">
+                <MapPin size={12} /> {worker.city} · {worker.nationality}
+              </p>
+              <div className="flex items-center gap-2">
                 <div className="flex items-center gap-0.5">
                   {[1,2,3,4,5].map(s => <Star key={s} size={14} className={s <= Math.round(worker.rating || 0) ? 'text-amber-400 fill-amber-400' : 'text-zinc-700'} />)}
                 </div>
-                <span className="text-sm text-white">{worker.rating ? worker.rating.toFixed(1) : '—'}</span>
-                <span className="text-xs text-zinc-500">({worker.total_tasks || 0} طلب)</span>
+                <span className="text-sm text-white font-bold">{worker.rating ? worker.rating.toFixed(1) : '—'}</span>
+                <span className="text-xs text-zinc-500">({worker.total_tasks || 0} طلب مكتمل)</span>
               </div>
             </div>
+            <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${worker.is_online ? 'bg-emerald-500' : 'bg-zinc-600'}`} />
           </div>
+          {worker.bio && <p className="text-sm text-zinc-400 leading-relaxed">{worker.bio}</p>}
+        </div>
 
-          {worker.bio && <p className="text-zinc-400 text-sm leading-relaxed border-t border-zinc-800 pt-4 mb-4">{worker.bio}</p>}
-
+        {/* Skills */}
+        <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5 mb-4">
+          <h3 className="font-semibold mb-3 text-sm text-zinc-400">المهارات</h3>
           <div className="flex flex-wrap gap-2">
-            {(worker.skills || []).map(s => (
+            {(worker.skills || []).map((s: string) => (
               <span key={s} className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs px-3 py-1.5 rounded-full">{s}</span>
             ))}
           </div>
         </div>
 
         {/* Schedule */}
-        {worker.schedule && Object.values(worker.schedule).some((d: any) => d.active) && (
-          <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5 mb-4">
-            <h3 className="font-semibold mb-3">أوقات التوفر</h3>
-            <div className="space-y-2">
-              {Object.entries(worker.schedule).filter(([, s]: [string, any]) => s.active).map(([day, s]: [string, any]) => (
-                <div key={day} className="flex items-center justify-between text-sm">
+        {worker.schedule && Object.values(worker.schedule).some((s: any) => s.active) && (
+          <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5 mb-6">
+            <h3 className="font-semibold mb-3 text-sm text-zinc-400">أوقات التوفر</h3>
+            <div className="space-y-1.5">
+              {Object.entries(worker.schedule).filter(([,s]: [string, any]) => s.active).map(([day, s]: [string, any]) => (
+                <div key={day} className="flex justify-between text-sm">
                   <span className="text-zinc-400">{day}</span>
                   <span className="text-amber-400 text-xs">{s.from} — {s.to}</span>
                 </div>
@@ -87,23 +90,16 @@ export function WorkerProfilePage({ workerId }: Props) {
           </div>
         )}
 
-        {/* Actions */}
-        <div className="space-y-3">
-          <button onClick={() => navigate('dashboard')}
-            className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 rounded-2xl text-base transition-colors flex items-center justify-center gap-2">
-            <MessageSquare size={18} /> اطلب من {worker.full_name.split(' ')[0]}
-          </button>
-          <div className="flex gap-3">
-            <button onClick={copyLink}
-              className="flex-1 flex items-center justify-center gap-2 border border-zinc-700 text-zinc-300 hover:border-zinc-600 py-3 rounded-xl text-sm transition-colors">
-              <Copy size={15} /> {copied ? 'تم النسخ!' : 'نسخ الرابط'}
-            </button>
-            <button onClick={() => navigator.share?.({ title: worker.full_name, url: shareLink }) || copyLink()}
-              className="flex-1 flex items-center justify-center gap-2 border border-zinc-700 text-zinc-300 hover:border-zinc-600 py-3 rounded-xl text-sm transition-colors">
-              <Share2 size={15} /> مشاركة
-            </button>
-          </div>
-        </div>
+        {/* CTA */}
+        <button onClick={() => navigate('dashboard')}
+          className="w-full bg-amber-500 text-black font-bold py-4 rounded-2xl text-base hover:bg-amber-400 transition-colors flex items-center justify-center gap-2 mb-3">
+          <MessageSquare size={18} /> اطلب من {worker.full_name.split(' ')[0]}
+        </button>
+
+        <button onClick={() => navigator.share ? navigator.share({ title: worker.full_name, url: shareUrl }) : navigator.clipboard.writeText(shareUrl)}
+          className="w-full border border-zinc-700 text-zinc-400 font-medium py-3 rounded-xl text-sm hover:border-zinc-600 transition-colors">
+          🔗 شارك البروفايل
+        </button>
       </div>
     </div>
   )
