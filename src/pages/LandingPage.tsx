@@ -315,6 +315,16 @@ export function LandingPage() {
         {/* HOME */}
         {activeTab === 'home' && (
           <div>
+            {/* Welcome banner */}
+            {user && profile && (
+              <div className="flex items-center justify-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-2xl px-5 py-3 mb-4">
+                <span className="text-xl">👋</span>
+                <p className="text-amber-300 font-semibold text-sm sm:text-base">
+                  أهلاً {(profile as any).full_name?.split(' ')[0] || 'بك'}!
+                  <span className="text-zinc-400 font-normal mr-2">وش تبي اليوم؟</span>
+                </p>
+              </div>
+            )}
             {/* Hero - full viewport */}
             <section className="relative min-h-[calc(100vh-56px)] flex flex-col items-center justify-center px-4 overflow-hidden">
               <div className="absolute inset-0 pointer-events-none">
