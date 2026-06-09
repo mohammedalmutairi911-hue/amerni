@@ -297,6 +297,32 @@ export function UserDashboard() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6">
+        {/* Payment history */}
+        {completedCount > 0 && (
+          <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5 mb-5">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <DollarSign size={16} className="text-emerald-400" /> تاريخ المدفوعات
+            </h3>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {tasks.filter(t => t.status === 'completed').map(t => (
+                <div key={t.id} className="flex items-center justify-between py-2 border-b border-zinc-800/50 last:border-0">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-white truncate">{t.title}</p>
+                    <p className="text-xs text-zinc-500">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
+                  </div>
+                  <span className="text-emerald-400 font-bold text-sm mr-3">
+                    {t.price_final || t.price_suggested || '—'} ر
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 pt-3 border-t border-zinc-800 flex justify-between items-center">
+              <span className="text-xs text-zinc-500">الإجمالي</span>
+              <span className="text-emerald-400 font-black">{totalSpent.toLocaleString()} ريال</span>
+            </div>
+          </div>
+        )}
+
         {/* Active task highlight */}
         {activeCount > 0 && (
           <div className="mb-5">
