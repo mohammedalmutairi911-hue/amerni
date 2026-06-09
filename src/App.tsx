@@ -14,6 +14,8 @@ import { BrowseWorkers } from './pages/BrowseWorkers'
 import { BountiesPage } from './pages/BountiesPage'
 import { ReferralPage } from './pages/ReferralPage'
 import { InstallPrompt } from './components/InstallPrompt'
+import { PageLoader } from './components/PageLoader'
+import { NotFoundPage } from './pages/NotFoundPage'
 
 export default function App() {
   const { user, profile, loading, refreshProfile } = useAuth()
@@ -44,16 +46,7 @@ export default function App() {
     }
   }, [user?.id, profile?.role])
 
-  if (loading || (profile?.role === 'worker' && checking)) {
-    return (
-      <div className="min-h-screen bg-[#080808] flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-3xl font-black text-amber-400 mb-4">أمرني</div>
-          <div className="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
-        </div>
-      </div>
-    )
-  }
+  if (loading || (profile?.role === 'worker' && checking)) return <PageLoader />
 
   if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
 
