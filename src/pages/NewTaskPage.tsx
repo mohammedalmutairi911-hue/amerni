@@ -157,18 +157,29 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       }
       
       // إضافة البروفايل
-      // Profile upsert بدون await
       if (signUpResult.user) {
-        supabase.from('profiles').upsert({
+        await supabase.from('profiles').upsert({
           id: signUpResult.user.id,
           email: auth.email.trim(),
           full_name: auth.name.trim(),
           role: 'client',
           phone_verified: false
         }).catch(() => {})
+        
+        // لو في session = حفظ الطلب مباشرة
+        if (signUpResult.session) {
+          if (task.title.trim()) {
+            const ok = await saveTask(signUpResult.user.id)
+            if (!ok) { setLoading(false); return }
+          }
+          setLoading(false)
+          navigate('dashboard')
+          onClose()
+          return
+        }
       }
       
-      // يحتاج تأكيد إيميل
+      // ما في session = يحتاج تأكيد إيميل
       setLoading(false)
       setError('__email_confirm__')
       return
