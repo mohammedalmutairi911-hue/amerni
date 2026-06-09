@@ -59,10 +59,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })
     if (!error && data.user) {
-      // Profile upsert - non-blocking, ignore errors (RLS might block without session)
-      supabase.from('profiles').upsert({
-        id: data.user.id, email, full_name: fullName, role, phone_verified: false
-      }, { ignoreDuplicates: true }).then(() => fetchProfile(data.user.id)).catch(() => {})
+      // انتظر شوي وبعدين احفظ البروفايل مع الـ role الصح
+      setTimeout(async () => {
+        await supabase.from('profiles').upsert({
+          id: data.user!.id, email, full_name: fullName, role, phone_verified: false
+        }).catch(() => {})
+        await fetchProfile(data.user!.id)
+      }, 500)
     }
     return { error }
   }
