@@ -27,6 +27,7 @@ export function WorkerDashboard() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [loading, setLoading] = useState(true)
   const [accepting, setAccepting] = useState<string | null>(null)
+  const [cityFilter, setCityFilter] = useState<string>('الكل')
   const [toggling, setToggling] = useState(false)
   const [pendingTask, setPendingTask] = useState<Task | null>(null)
   const [showCommission, setShowCommission] = useState(false)
@@ -354,6 +355,15 @@ export function WorkerDashboard() {
         {/* Feed */}
         {tab === 'feed' && (
           <div className="space-y-3">
+            {/* City filter */}
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {['الكل', workerProfile?.city || '', 'الرياض', 'جدة', 'الدمام'].filter((v,i,a) => v && a.indexOf(v)===i).map(c => (
+                <button key={c} onClick={() => setCityFilter(c)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${cityFilter === c ? 'bg-amber-500 text-black' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
+                  {c}
+                </button>
+              ))}
+            </div>
             {!workerProfile?.is_online && (
               <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-500 mb-2">
                 <WifiOff size={15} /> فعّل الأنلاين من الأعلى عشان تظهر للعملاء
@@ -364,7 +374,7 @@ export function WorkerDashboard() {
                 <Zap size={32} className="mx-auto mb-3 opacity-30" />
                 <p>ما في طلبات متاحة الحين</p>
               </div>
-            ) : feedTasks.map(task => (
+            ) : feedTasks.filter(t => cityFilter === 'الكل' || t.city === cityFilter).map(task => (
               <div key={task.id} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
                 <div className="flex items-start justify-between mb-3 gap-3">
                   <div className="flex-1 min-w-0">
@@ -422,7 +432,11 @@ export function WorkerDashboard() {
                         className="flex-1 flex items-center justify-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 text-sm py-2 rounded-lg transition-colors">
                         <MessageSquare size={14} /> محادثة
                       </button>
-                      <button onClick={() => completeTask(task.id, task.price_suggested || 0)}
+                      <button onClick={() => {
+                          const price = prompt('أدخل السعر النهائي المتفق عليه (ريال):')
+                          if (price && !isNaN(Number(price))) completeTask(task.id, Number(price))
+                          else if (price !== null) completeTask(task.id, task.price_suggested || 0)
+                        }}
                         className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 text-sm py-2 rounded-lg border border-emerald-500/20 transition-colors">
                         <CheckCircle size={14} /> أكملت الطلب
                       </button>
