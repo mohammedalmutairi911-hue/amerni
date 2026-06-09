@@ -53,7 +53,7 @@ export function WorkerRegister({ onSuccess }: Props) {
   const next = () => {
     setError('')
     if (step === 1) {
-      if (!form.phone || !form.city) { setError('أكمل البيانات'); return }
+      if (!form.phone || form.phone.replace(/\s/g,'').length < 9 || !form.city) { setError('أدخل رقم جوال صحيح ومدينتك'); return }
       setStep(2)
     } else if (step === 2) {
       if (!form.id_number || form.id_number.length < 10) { setError('أدخل رقم الهوية كاملاً'); return }
@@ -166,7 +166,7 @@ export function WorkerRegister({ onSuccess }: Props) {
             <div className="space-y-4">
               <h2 className="font-bold text-lg mb-4">بياناتك الشخصية</h2>
               {[
-                { k: 'phone', label: 'رقم الجوال *', ph: '05XXXXXXXX' },
+                { k: 'phone', label: 'رقم الجوال *', ph: '05XXXXXXXX أو رقم دولي' },
                 { k: 'city', label: 'مدينتك *', ph: 'الرياض' },
                 { k: 'nationality', label: 'الجنسية', ph: 'سعودي' },
               ].map(({ k, label, ph }) => (
