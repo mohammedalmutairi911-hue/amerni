@@ -157,6 +157,19 @@ export function UserDashboard() {
           </div>
         </div>
 
+        {/* Disputed */}
+        {selectedTask.status === 'disputed' && (
+          <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 mb-4 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-red-400 text-sm">⚠️</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-red-300">نزاع قيد المراجعة</p>
+              <p className="text-xs text-zinc-500 mt-0.5">فريق أمرني راح يراجع الطلب ويتواصل معك</p>
+            </div>
+          </div>
+        )}
+
         {/* Waiting */}
         {selectedTask.status === 'open' && (
           <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-5 mb-4">
@@ -169,6 +182,25 @@ export function UserDashboard() {
                 <p className="text-xs text-zinc-500 mt-0.5">سيتم إشعارك فور قبول عامل طلبك</p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Dispute button */}
+        {selectedTask.status === 'in_progress' && (
+          <div className="flex justify-end mb-2">
+            <button onClick={async () => {
+              if (confirm('هل تريد رفع نزاع لهذا الطلب؟ سيتم إشعار فريق أمرني للمراجعة.')) {
+                await supabase.from('tasks').update({ status: 'disputed' }).eq('id', selectedTask.id)
+                await supabase.from('notifications').insert({
+                  user_id: selectedTask.worker_id,
+                  title: '⚠️ تم رفع نزاع',
+                  body: `العميل رفع نزاع على طلب: ${selectedTask.title}`
+                })
+                setSelectedTask(p => p ? { ...p, status: 'disputed' } : null)
+              }
+            }} className="text-xs text-red-400 border border-red-900/50 px-3 py-1.5 rounded-lg hover:bg-red-950/30 transition-colors">
+              ⚠️ رفع نزاع
+            </button>
           </div>
         )}
 
@@ -190,7 +222,7 @@ export function UserDashboard() {
           </div>
         )}
 
-        {/* Rating */}
+        {/* Mutual rating — client rates worker */}
         {selectedTask.status === 'completed' && selectedTask.worker_id && !ratingDone && (
           <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5 mb-4">
             <h3 className="font-bold mb-4 flex items-center gap-2"><Star size={16} className="text-amber-400" /> قيّم تجربتك</h3>
