@@ -59,10 +59,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })
     if (!error && data.user) {
-      await supabase.from('profiles').upsert({
+      // Profile upsert - non-blocking, ignore errors (RLS might block without session)
+      supabase.from('profiles').upsert({
         id: data.user.id, email, full_name: fullName, role, phone_verified: false
-      })
-      await fetchProfile(data.user.id)
+      }).then(() => fetchProfile(data.user.id)).catch(() => {})
     }
     return { error }
   }
