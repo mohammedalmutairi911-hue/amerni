@@ -145,7 +145,32 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     if (isNew) {
       const { error: err } = await signUp(auth.email.trim(), auth.password, auth.name.trim(), 'client')
       if (err) { setError('حاول مرة ثانية أو جرب إيميل آخر'); setLoading(false); return }
-      await new Promise(r => setTimeout(r, 1200))
+      await new Promise(r => setTimeout(r, 1000))
+      // تحقق من الـ session
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        // يحتاج تأكيد إيميل — احفظ الطلب مؤقتاً
+        if (task.title.trim()) {
+          localStorage.setItem('pending_task', JSON.stringify({
+            title: task.title.trim(),
+            category: getFinalCategory(),
+            city: task.city,
+            budget: task.budget,
+          }))
+        }
+        setLoading(false)
+        setError('__email_confirm__')
+        return
+      }
+      const uid = session.user.id
+      if (task.title.trim()) {
+        const ok = await saveTask(uid)
+        if (!ok) { setLoading(false); return }
+      }
+      setLoading(false)
+      navigate('dashboard')
+      onClose()
+      return
     } else {
       const { error: err } = await signIn(auth.email.trim(), auth.password)
       if (err) { setError('بريد أو كلمة مرور خاطئة'); setLoading(false); return }
