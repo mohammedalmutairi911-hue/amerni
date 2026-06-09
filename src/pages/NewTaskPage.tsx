@@ -157,8 +157,9 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       }
       
       // إضافة البروفايل
+      // Profile upsert بدون await
       if (signUpResult.user) {
-        await supabase.from('profiles').upsert({
+        supabase.from('profiles').upsert({
           id: signUpResult.user.id,
           email: auth.email.trim(),
           full_name: auth.name.trim(),
@@ -167,12 +168,10 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
         }).catch(() => {})
       }
       
-      // لو ما في session = يحتاج تأكيد إيميل
-      if (!signUpResult.session) {
-        setLoading(false)
-        setError('__email_confirm__')
-        return
-      }
+      // يحتاج تأكيد إيميل
+      setLoading(false)
+      setError('__email_confirm__')
+      return
     } else {
       const { error: err } = await signIn(auth.email.trim(), auth.password)
       if (err) { setError('بريد أو كلمة مرور خاطئة'); setLoading(false); return }
