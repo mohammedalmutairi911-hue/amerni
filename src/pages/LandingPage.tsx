@@ -112,6 +112,25 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
       <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="كلمة المرور"
         onKeyDown={e => e.key === 'Enter' && handle()}
         className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500 transition-colors text-white" />
+      {mode === 'login' && !showReset && (
+        <button onClick={() => setShowReset(true)} className="text-xs text-amber-400 hover:underline text-right w-full">
+          نسيت كلمة المرور؟
+        </button>
+      )}
+      {showReset && (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 space-y-2">
+          <p className="text-xs text-zinc-400">سنرسل لك رابط لتغيير كلمة المرور على بريدك</p>
+          {resetSent ? (
+            <p className="text-emerald-400 text-sm">✅ تم الإرسال — تحقق من بريدك</p>
+          ) : (
+            <button onClick={handleReset} disabled={loading}
+              className="w-full bg-zinc-700 hover:bg-zinc-600 text-white text-sm py-2 rounded-lg transition-colors disabled:opacity-50">
+              {loading ? 'جاري الإرسال...' : 'أرسل رابط الاستعادة'}
+            </button>
+          )}
+          <button onClick={() => setShowReset(false)} className="text-xs text-zinc-600 hover:text-zinc-400">إلغاء</button>
+        </div>
+      )}
       {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-xl">{error}</p>}
       <button onClick={handle} disabled={loading}
         className="w-full bg-amber-500 text-black font-bold py-3 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
