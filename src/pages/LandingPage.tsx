@@ -64,22 +64,33 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
     setError('')
     if (mode === 'register') {
       if (!name.trim()) { setError('أدخل اسمك'); return }
-      const ph = phone.replace(/\s/g, '')
-      if (!ph.startsWith('05') || ph.length !== 10) { setError('الجوال يجب أن يبدأ بـ 05 ويكون 10 أرقام'); return }
       if (!email.includes('@')) { setError('أدخل بريد إلكتروني صحيح'); return }
       if (password.length < 6) { setError('كلمة المرور 6 أحرف على الأقل'); return }
       setLoading(true)
-      const { error: err } = await signUp(email.trim(), password, name.trim(), 'client')
-      if (err) { setError('البريد مسجل — جرب تسجيل الدخول'); setLoading(false); return }
+      try {
+        const { data, error: err } = await supabase.auth.signUp({
+          email: email.trim(), password,
+          options: { data: { full_name: name.trim(), role: 'client' } }
+        })
+        if (err) { setError(err.message || 'حدث خطأ'); setLoading(false); return }
+        // profile
+        if (data.user) supabase.from('profiles').upsert({ id: data.user.id, email: email.trim(), full_name: name.trim(), role: 'client', phone_verified: false }).catch(() => {})
+        setLoading(false)
+        if (!data.session) { setError('__email_confirm__'); return }
+        onSuccess()
+      } catch (e: any) {
+        setError('حدث خطأ — حاول مرة ثانية')
+        setLoading(false)
+      }
     } else {
       if (!email) { setError('أدخل بريدك'); return }
       if (!password) { setError('أدخل كلمة المرور'); return }
       setLoading(true)
       const { error: err } = await signIn(email.trim(), password)
       if (err) { setError('بريد أو كلمة مرور خاطئة'); setLoading(false); return }
+      setLoading(false)
+      onSuccess()
     }
-    setLoading(false)
-    onSuccess()
   }
 
   return (
