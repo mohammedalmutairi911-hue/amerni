@@ -58,6 +58,7 @@ export default function App() {
 
   // أدمن
   if (profile.role === 'admin') {
+    if (page === 'landing') return <><Navbar /><LandingPage /></>
     if (page === 'dashboard') return <><Navbar /><UserDashboard /></>
     return <><Navbar /><AdminPanel /></>
   }
