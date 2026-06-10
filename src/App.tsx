@@ -77,6 +77,7 @@ export default function App() {
     }
   }, [user?.id, profile?.role])
 
+  // Timeout fallback for mobile - if loading too long, show landing page
   if (loading || (profile?.role === 'worker' && checking)) return <PageLoader />
 
   if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>

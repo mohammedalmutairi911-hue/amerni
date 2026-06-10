@@ -34,7 +34,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    // Timeout safety for mobile - max 8 seconds loading
+    const timeout = setTimeout(() => { setLoading(false) }, 8000)
     supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(timeout)
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) fetchProfile(session.user.id).finally(() => setLoading(false))
