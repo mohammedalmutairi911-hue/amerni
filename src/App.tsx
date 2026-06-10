@@ -1,3 +1,4 @@
+import React from 'react'
 import { useState, useEffect } from 'react'
 import { useAuth } from './contexts/AuthContext'
 import { useApp } from './contexts/AppContext'
@@ -23,6 +24,28 @@ const urlParams = new URLSearchParams(window.location.search)
 const workerParam = urlParams.get('worker')
 if (workerParam) {
   ;(window as any).__workerProfileId = workerParam
+}
+
+export class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
+  state = { hasError: false }
+  static getDerivedStateFromError() { return { hasError: true } }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#080808] flex items-center justify-center p-4">
+          <div className="text-center">
+            <div className="text-4xl font-black text-amber-400 mb-4">أمرني</div>
+            <p className="text-zinc-400 mb-4">حدث خطأ — يرجى تحديث الصفحة</p>
+            <button onClick={() => { localStorage.clear(); window.location.reload() }}
+              className="bg-amber-500 text-black font-bold px-6 py-3 rounded-xl">
+              تحديث
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
 }
 
 export default function App() {

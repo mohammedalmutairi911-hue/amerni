@@ -5,12 +5,16 @@ import App from './App'
 import { AuthProvider } from './contexts/AuthContext'
 import { AppProvider } from './contexts/AppContext'
 
+import { ErrorBoundary } from './App'
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <AuthProvider>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppProvider>
+          <App />
+        </AppProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 )
