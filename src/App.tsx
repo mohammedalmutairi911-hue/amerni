@@ -28,14 +28,20 @@ if (workerParam) {
 
 export class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
   state = { hasError: false }
-  static getDerivedStateFromError() { return { hasError: true } }
+  static getDerivedStateFromError(error: Error) { return { hasError: true, error } }
+  componentDidCatch(error: Error) {
+    console.error('ErrorBoundary caught:', error.message, error.stack)
+  }
   render() {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#080808] flex items-center justify-center p-4">
-          <div className="text-center">
+          <div className="text-center max-w-sm">
             <div className="text-4xl font-black text-amber-400 mb-4">أمرني</div>
-            <p className="text-zinc-400 mb-4">حدث خطأ — يرجى تحديث الصفحة</p>
+            <p className="text-zinc-400 mb-2">حدث خطأ</p>
+            <p className="text-red-400 text-xs mb-4 bg-red-950/30 p-2 rounded-lg" dir="ltr">
+              {(this.state as any).error?.message || 'Unknown error'}
+            </p>
             <button onClick={() => window.location.reload()}
               className="bg-amber-500 text-black font-bold px-6 py-3 rounded-xl">
               تحديث
