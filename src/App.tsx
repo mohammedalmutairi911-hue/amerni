@@ -36,7 +36,7 @@ export class ErrorBoundary extends React.Component<{children: React.ReactNode}, 
           <div className="text-center">
             <div className="text-4xl font-black text-amber-400 mb-4">أمرني</div>
             <p className="text-zinc-400 mb-4">حدث خطأ — يرجى تحديث الصفحة</p>
-            <button onClick={() => { localStorage.clear(); window.location.reload() }}
+            <button onClick={() => window.location.reload()}
               className="bg-amber-500 text-black font-bold px-6 py-3 rounded-xl">
               تحديث
             </button>

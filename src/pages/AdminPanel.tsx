@@ -24,22 +24,26 @@ export function AdminPanel() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' },
         (payload: any) => {
           // إشعار المتصفح
-          if (Notification.permission === 'granted') {
-            new Notification(payload.new.title || 'أمرني', {
-              body: payload.new.body || '',
-              icon: '/icon-192.png',
-              dir: 'rtl',
-              lang: 'ar',
-            })
-          }
+          try {
+            if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+              new Notification(payload.new.title || 'أمرني', {
+                body: payload.new.body || '',
+                icon: '/icon-192.png',
+                dir: 'rtl',
+                lang: 'ar',
+              })
+            }
+          } catch {}
           fetchAll()
         })
       .subscribe()
     
     // اطلب إذن الإشعارات
-    if (Notification.permission === 'default') {
-      Notification.requestPermission()
-    }
+    try {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+        Notification.requestPermission()
+      }
+    } catch {}
     
     return () => { supabase.removeChannel(ch) }
   }, [])
