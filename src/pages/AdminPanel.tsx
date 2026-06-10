@@ -205,6 +205,42 @@ export function AdminPanel() {
               ))}
             </div>
 
+            {/* Top cities & categories */}
+            {tasks.length > 0 && (
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+                  <h3 className="font-semibold mb-4 text-sm text-zinc-400">📍 أكثر المدن نشاطاً</h3>
+                  {Object.entries(tasks.reduce((acc: any, t) => { acc[t.city||'غير محدد'] = (acc[t.city||'غير محدد']||0)+1; return acc }, {}))
+                    .sort((a:any,b:any) => b[1]-a[1]).slice(0,5).map(([city, count]: any) => (
+                    <div key={city} className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-zinc-300">{city}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-500 rounded-full" style={{width: `${Math.round(count/tasks.length*100)}%`}} />
+                        </div>
+                        <span className="text-xs text-zinc-500">{count}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+                  <h3 className="font-semibold mb-4 text-sm text-zinc-400">📂 أكثر التصنيفات</h3>
+                  {Object.entries(tasks.reduce((acc: any, t) => { acc[t.category||'أخرى'] = (acc[t.category||'أخرى']||0)+1; return acc }, {}))
+                    .sort((a:any,b:any) => b[1]-a[1]).slice(0,5).map(([cat, count]: any) => (
+                    <div key={cat} className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-zinc-300">{cat}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-emerald-500 rounded-full" style={{width: `${Math.round(count/tasks.length*100)}%`}} />
+                        </div>
+                        <span className="text-xs text-zinc-500">{count}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Pending workers alert */}
             {stats.pending > 0 && (
               <div className="bg-amber-950/20 border border-amber-800/30 rounded-2xl p-5">

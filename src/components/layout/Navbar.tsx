@@ -6,7 +6,7 @@ import { getAvatar } from '../../lib/supabase'
 
 export function Navbar() {
   const { user, profile, signOut } = useAuth()
-  const { navigate, openAuth, page } = useApp()
+  const { navigate, openAuth, page, theme, toggleTheme } = useApp()
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropOpen, setDropOpen] = useState(false)
 
@@ -25,6 +25,10 @@ export function Navbar() {
         </button>
 
         {/* Desktop links - only on landing */}
+        <button onClick={toggleTheme} className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors text-sm">
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+
         {!user && (
           <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
             <button onClick={() => scrollTo('how-it-works')} className="hover:text-white transition-colors">كيف تشتغل</button>
