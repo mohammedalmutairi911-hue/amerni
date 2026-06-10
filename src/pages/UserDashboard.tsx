@@ -85,6 +85,12 @@ export function UserDashboard() {
   const submitRating = async () => {
     if (!rating || !selectedTask?.worker_id) return
     await supabase.from('ratings').insert({ task_id: selectedTask.id, worker_id: selectedTask.worker_id, rater_id: user!.id, stars: rating })
+    // إشعار العامل بالتقييم
+    await supabase.from('notifications').insert({
+      user_id: selectedTask.worker_id,
+      title: `⭐ حصلت على تقييم ${rating} نجوم!`,
+      body: `العميل قيّمك على طلب: ${selectedTask.title}`
+    }).catch(() => {})
     setRatingDone(true)
   }
 

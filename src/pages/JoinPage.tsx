@@ -1,0 +1,45 @@
+import { useApp } from '../contexts/AppContext'
+
+export function JoinPage() {
+  const { navigate, openAuth } = useApp()
+
+  return (
+    <div className="min-h-screen bg-[#080808] flex items-center justify-center px-4" dir="rtl">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-10">
+          <div className="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-black text-3xl font-black">أ</span>
+          </div>
+          <h1 className="text-3xl font-black text-white mb-2">انضم كمُنجز في أمرني</h1>
+          <p className="text-zinc-400">اكسب من وقتك الحر بدون رأس مال</p>
+        </div>
+
+        <div className="space-y-3 mb-8">
+          {[
+            { icon: '💰', title: 'دخل إضافي حقيقي', desc: 'اختار الطلبات اللي تناسبك واكسب بشروطك' },
+            { icon: '⏰', title: 'بوقتك وبشروطك', desc: 'لا التزامات — تشتغل وقت ما تبي' },
+            { icon: '🔒', title: 'أمان كامل', desc: 'فلوسك محمية والتواصل آمن داخل المنصة' },
+            { icon: '🌟', title: 'بدون خبرة لازمة', desc: 'اي مهارة عندك لها سوق في أمرني' },
+          ].map(({ icon, title, desc }) => (
+            <div key={title} className="flex items-start gap-4 bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-4">
+              <span className="text-2xl">{icon}</span>
+              <div>
+                <p className="font-semibold text-white">{title}</p>
+                <p className="text-sm text-zinc-500 mt-0.5">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button onClick={() => { openAuth('register'); navigate('landing') }}
+          className="w-full bg-amber-500 hover:bg-amber-400 text-black font-black py-4 rounded-2xl text-lg transition-colors mb-3">
+          سجّل كمُنجز — مجاناً
+        </button>
+        <button onClick={() => navigate('landing')}
+          className="w-full text-zinc-500 hover:text-zinc-300 py-3 text-sm transition-colors">
+          لديك حساب؟ سجّل دخول
+        </button>
+      </div>
+    </div>
+  )
+}

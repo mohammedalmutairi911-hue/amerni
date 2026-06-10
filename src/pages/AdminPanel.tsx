@@ -65,6 +65,21 @@ export function AdminPanel() {
 
   const refresh = async () => { setRefreshing(true); await fetchAll(); setRefreshing(false) }
 
+  const exportCSV = (type: 'users' | 'tasks' | 'workers') => {
+    let rows: string[] = []
+    if (type === 'users') {
+      rows = ['الاسم,الإيميل,الدور,تاريخ التسجيل', ...users.map(u => `${u.full_name},${u.email},${u.role},${new Date(u.created_at).toLocaleDateString('ar-SA')}`)]
+    } else if (type === 'tasks') {
+      rows = ['العنوان,التصنيف,المدينة,الحالة,التاريخ', ...tasks.map(t => `${t.title},${t.category},${t.city},${t.status},${new Date(t.created_at).toLocaleDateString('ar-SA')}`)]
+    } else {
+      rows = ['الاسم,المدينة,المهارات,الحالة', ...workers.map(w => [w.full_name, w.city, (w.skills||[]).join('|'), w.is_approved ? 'موافق' : 'منتظر'].join(','))]
+    }
+    const blob = new Blob(['﻿' + rows.join('
+')], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a'); a.href = url; a.download = `amerni-${type}-${Date.now()}.csv`; a.click()
+  }
+
   const approveWorker = async (userId: string) => {
     const { error } = await supabase.from('worker_profiles').update({ is_approved: true }).eq('user_id', userId)
     console.log('approve error:', error)
@@ -130,10 +145,22 @@ export function AdminPanel() {
               <p className="text-xs text-zinc-500">أمرني Admin</p>
             </div>
           </div>
-          <button onClick={refresh} disabled={refreshing}
-            className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white border border-zinc-800 px-3 py-1.5 rounded-lg transition-colors">
-            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} /> تحديث
-          </button>
+          <div className="flex gap-2">
+            <button onClick={refresh} disabled={refreshing}
+              className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white border border-zinc-800 px-3 py-1.5 rounded-lg transition-colors">
+              <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} /> تحديث
+            </button>
+            <div className="relative group">
+              <button className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white border border-zinc-800 px-3 py-1.5 rounded-lg transition-colors">
+                📥 تصدير
+              </button>
+              <div className="absolute left-0 top-full mt-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1 hidden group-hover:flex flex-col min-w-[120px] z-10">
+                <button onClick={() => exportCSV('users')} className="text-xs px-3 py-2 hover:bg-zinc-800 rounded-lg text-right">المستخدمون</button>
+                <button onClick={() => exportCSV('tasks')} className="text-xs px-3 py-2 hover:bg-zinc-800 rounded-lg text-right">الطلبات</button>
+                <button onClick={() => exportCSV('workers')} className="text-xs px-3 py-2 hover:bg-zinc-800 rounded-lg text-right">العمال</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

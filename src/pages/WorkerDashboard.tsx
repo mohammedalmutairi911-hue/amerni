@@ -28,6 +28,7 @@ export function WorkerDashboard() {
   const [loading, setLoading] = useState(true)
   const [accepting, setAccepting] = useState<string | null>(null)
   const [cityFilter, setCityFilter] = useState<string>('smart')
+  const [searchQ, setSearchQ] = useState('')
   const [toggling, setToggling] = useState(false)
   const [pendingTask, setPendingTask] = useState<Task | null>(null)
   const [showCommission, setShowCommission] = useState(false)
@@ -355,6 +356,13 @@ export function WorkerDashboard() {
         {/* Feed */}
         {tab === 'feed' && (
           <div className="space-y-3">
+            {/* Search */}
+            <div className="relative mb-1">
+              <input value={searchQ} onChange={e => setSearchQ(e.target.value)}
+                placeholder="🔍 ابحث في الطلبات..."
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500/50" />
+              {searchQ && <button onClick={() => setSearchQ('')} className="absolute left-3 top-2.5 text-zinc-500 hover:text-white">✕</button>}
+            </div>
             {/* Smart filter */}
             <div className="flex gap-2 overflow-x-auto pb-1">
               {[

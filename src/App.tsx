@@ -14,6 +14,7 @@ import { SupportPage } from './pages/SupportPage'
 import { BrowseWorkers } from './pages/BrowseWorkers'
 import { BountiesPage } from './pages/BountiesPage'
 import { ReferralPage } from './pages/ReferralPage'
+import { JoinPage } from './pages/JoinPage'
 import { WorkerProfile } from './pages/WorkerProfile'
 import { InstallPrompt } from './components/InstallPrompt'
 import { PageLoader } from './components/PageLoader'
@@ -93,6 +94,7 @@ export default function App() {
   if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
   if (page === 'bounties') return <><Navbar /><BountiesPage /></>
   if (page === 'referral') return <><Navbar /><ReferralPage /></>
+  if (page === 'join') return <JoinPage />
   if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
 
   // أدمن — دائماً يروح لوحة الإدارة

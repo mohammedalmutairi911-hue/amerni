@@ -11,6 +11,32 @@ const DAYS = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 
 
 interface Props { onSuccess: () => void }
 
+// ضغط الصورة قبل الرفع
+async function compressImage(file: File, maxSizeMB = 1): Promise<File> {
+  return new Promise(resolve => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      let w = img.width, h = img.height
+      const maxPx = 1200
+      if (w > maxPx || h > maxPx) {
+        if (w > h) { h = Math.round(h * maxPx / w); w = maxPx }
+        else { w = Math.round(w * maxPx / h); h = maxPx }
+      }
+      canvas.width = w; canvas.height = h
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+      canvas.toBlob(blob => {
+        URL.revokeObjectURL(url)
+        if (blob && blob.size < file.size) resolve(new File([blob], file.name, { type: 'image/jpeg' }))
+        else resolve(file)
+      }, 'image/jpeg', 0.8)
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file) }
+    img.src = url
+  })
+}
+
 export function WorkerRegister({ onSuccess }: Props) {
   const { user, profile, refreshProfile } = useAuth()
   const [step, setStep] = useState(1)
@@ -30,11 +56,12 @@ export function WorkerRegister({ onSuccess }: Props) {
 
   const set = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
 
-  const handleIdUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleIdUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    setIdImage(file)
-    setIdPreview(URL.createObjectURL(file))
+    const compressed = await compressImage(file)
+    setIdImage(compressed)
+    setIdPreview(URL.createObjectURL(compressed))
     setVerified(false)
   }
 
