@@ -74,8 +74,7 @@ export function AdminPanel() {
     } else {
       rows = ['الاسم,المدينة,المهارات,الحالة', ...workers.map(w => [w.full_name, w.city, (w.skills||[]).join('|'), w.is_approved ? 'موافق' : 'منتظر'].join(','))]
     }
-    const blob = new Blob(['﻿' + rows.join('
-')], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a'); a.href = url; a.download = `amerni-${type}-${Date.now()}.csv`; a.click()
   }
