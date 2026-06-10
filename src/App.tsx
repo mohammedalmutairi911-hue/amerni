@@ -58,8 +58,8 @@ export default function App() {
   useEffect(() => {
     if (!user || !profile) { setWorkerApproved(null); setWorkerExists(null); return }
     
-    // أدمن — روح للوحة الإدارة تلقائياً
-    if (profile.role === 'admin' && page === 'landing') {
+    // أدمن — روح للوحة الإدارة تلقائياً من أي صفحة
+    if (profile.role === 'admin' && page !== 'landing' && page !== 'admin') {
       navigate('admin')
       return
     }
@@ -88,12 +88,10 @@ export default function App() {
   if (page === 'bounties') return <><Navbar /><BountiesPage /></>
   if (page === 'referral') return <><Navbar /><ReferralPage /></>
   if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
-  if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={''} /></>
 
-  // أدمن
+  // أدمن — دائماً يروح لوحة الإدارة
   if (profile.role === 'admin') {
     if (page === 'landing') return <><Navbar /><LandingPage /></>
-    if (page === 'dashboard') return <><Navbar /><UserDashboard /></>
     return <><Navbar /><AdminPanel /></>
   }
 
