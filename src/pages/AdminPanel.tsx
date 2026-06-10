@@ -19,33 +19,35 @@ export function AdminPanel() {
   useEffect(() => {
     fetchAll()
     
-    // استمع للإشعارات الجديدة realtime
-    const ch = supabase.channel('admin-notifications')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' },
-        (payload: any) => {
-          // إشعار المتصفح
-          try {
-            if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-              new Notification(payload.new.title || 'أمرني', {
-                body: payload.new.body || '',
-                icon: '/icon-192.png',
-                dir: 'rtl',
-                lang: 'ar',
-              })
-            }
-          } catch {}
-          fetchAll()
-        })
-      .subscribe()
+    let ch: any = null
+    try {
+      ch = supabase.channel('admin-notifications')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' },
+          (payload: any) => {
+            try {
+              if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                new Notification(payload.new.title || 'أمرني', {
+                  body: payload.new.body || '',
+                  icon: '/icon-192.png',
+                  dir: 'rtl',
+                  lang: 'ar',
+                })
+              }
+            } catch {}
+            fetchAll()
+          })
+        .subscribe()
+    } catch (e) {
+      console.warn('Realtime not available:', e)
+    }
     
-    // اطلب إذن الإشعارات
     try {
       if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
         Notification.requestPermission()
       }
     } catch {}
     
-    return () => { supabase.removeChannel(ch) }
+    return () => { try { if (ch) supabase.removeChannel(ch) } catch {} }
   }, [])
 
   const fetchAll = async () => {
