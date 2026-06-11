@@ -1,4 +1,4 @@
-const CACHE_NAME = 'amerni-v2'
+const CACHE_NAME = 'amerni-v5'
 
 // تنظيف الكاش القديم
 self.addEventListener('activate', event => {
