@@ -24,11 +24,6 @@ export function Navbar() {
           أمرني
         </button>
 
-        {/* Desktop links - only on landing */}
-        <button onClick={toggleTheme} className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors text-sm">
-          {theme === 'dark' ? '☀️' : '🌙'}
-        </button>
-
         {!user && (
           <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
             <button onClick={() => scrollTo('how-it-works')} className="hover:text-white transition-colors">كيف تشتغل</button>
