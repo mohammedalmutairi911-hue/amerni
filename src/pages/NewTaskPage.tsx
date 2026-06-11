@@ -201,10 +201,10 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
           className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors text-sm">
           <ArrowRight size={16} /> {step === 'auth' ? 'رجوع' : 'إلغاء'}
         </button>
-        <span className="text-amber-400 font-black text-lg">أمرني</span>
+        <span className="text-primary-400 font-black text-lg">أمرني</span>
         <div className="flex gap-1.5">
           {['details','auth'].map((s, i) => (
-            <div key={s} className={`h-1 rounded-full transition-all ${step === s ? 'w-6 bg-amber-500' : 'w-3 bg-zinc-700'}`} />
+            <div key={s} className={`h-1 rounded-full transition-all ${step === s ? 'w-6 bg-primary-500' : 'w-3 bg-zinc-700'}`} />
           ))}
         </div>
       </div>
@@ -223,15 +223,15 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               <label className="block text-xs text-zinc-400 mb-2 font-medium">طلبك *</label>
               <textarea value={task.title} onChange={e => handleTitleChange(e.target.value)}
                 placeholder="مثال: أبي أحد يجيب لي غداء من مطعم في حي النزهة الرياض..." rows={2} autoFocus
-                className="w-full bg-[#111] border-2 border-zinc-800 focus:border-amber-500 rounded-2xl px-4 py-3.5 text-white text-sm outline-none transition-colors resize-none placeholder-zinc-600" />
+                className="w-full bg-[#111] border-2 border-zinc-800 focus:border-primary-500 rounded-2xl px-4 py-3.5 text-white text-sm outline-none transition-colors resize-none placeholder-zinc-600" />
             </div>
 
             {/* Category - buttons + free text for أخرى */}
             <div>
               <label className="block text-xs text-zinc-400 mb-2 font-medium flex items-center gap-1.5">
-                <Tag size={12} className="text-amber-500" /> التصنيف *
+                <Tag size={12} className="text-primary-500" /> التصنيف *
                 {task.category && task.category !== 'أخرى' && !task.customCategory && (
-                  <span className="text-amber-400 text-xs">— تم اكتشافه تلقائياً ✨</span>
+                  <span className="text-primary-400 text-xs">— تم اكتشافه تلقائياً ✨</span>
                 )}
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 mb-3">
@@ -240,10 +240,10 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                     onClick={() => { setT('category', cat); if (cat !== 'أخرى') setT('customCategory', '') }}
                     className={`text-right px-4 py-3 rounded-xl border transition-all ${
                       task.category === cat
-                        ? 'border-amber-500 bg-amber-500/10'
+                        ? 'border-primary-500 bg-primary-500/10'
                         : 'border-zinc-800 bg-[#111] hover:border-zinc-700'
                     }`}>
-                    <p className={`text-sm font-medium ${task.category === cat ? 'text-amber-300' : 'text-white'}`}>{cat}</p>
+                    <p className={`text-sm font-medium ${task.category === cat ? 'text-primary-300' : 'text-white'}`}>{cat}</p>
                   </button>
                 ))}
               </div>
@@ -255,7 +255,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                     onChange={e => setT('customCategory', e.target.value)}
                     placeholder="اكتب التصنيف هنا..."
                     autoFocus
-                    className="w-full bg-[#111] border-2 border-amber-500/50 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition-colors"
+                    className="w-full bg-[#111] border-2 border-primary-500/50 focus:border-primary-500 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition-colors"
                   />
                 </div>
               )}
@@ -264,15 +264,15 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             {/* City & Budget */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-zinc-400 mb-2 font-medium flex items-center gap-1"><MapPin size={11} className="text-amber-500" /> المدينة</label>
+                <label className="block text-xs text-zinc-400 mb-2 font-medium flex items-center gap-1"><MapPin size={11} className="text-primary-500" /> المدينة</label>
                 <select value={task.city} onChange={e => setT('city', e.target.value)}
-                  className="w-full bg-[#111] border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-amber-500 transition-colors">
+                  className="w-full bg-[#111] border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-primary-500 transition-colors">
                   {CITIES.map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-zinc-400 mb-2 font-medium flex items-center gap-1"><DollarSign size={11} className="text-amber-500" /> ميزانيتك</label>
-                <div className="flex items-center gap-2 bg-[#111] border border-zinc-800 rounded-xl px-3 py-2.5 focus-within:border-amber-500 transition-colors">
+                <label className="block text-xs text-zinc-400 mb-2 font-medium flex items-center gap-1"><DollarSign size={11} className="text-primary-500" /> ميزانيتك</label>
+                <div className="flex items-center gap-2 bg-[#111] border border-zinc-800 rounded-xl px-3 py-2.5 focus-within:border-primary-500 transition-colors">
                   <input type="number" value={task.budget} onChange={e => setT('budget', e.target.value)}
                     placeholder="80" className="flex-1 bg-transparent text-sm outline-none text-white" />
                   <span className="text-zinc-500 text-xs">ريال</span>
@@ -286,7 +286,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               <div className="flex gap-2 flex-wrap">
                 {['أسرع وقت ممكن', 'خلال ساعتين', 'اليوم', 'خلال يومين', 'هذا الأسبوع'].map(d => (
                   <button key={d} type="button" onClick={() => setT('deadline', d)}
-                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${task.deadline === d ? 'border-amber-500 bg-amber-500/10 text-amber-300' : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'}`}>
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${task.deadline === d ? 'border-primary-500 bg-primary-500/10 text-primary-300' : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'}`}>
                     {d}
                   </button>
                 ))}
@@ -298,7 +298,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               <label className="block text-xs text-zinc-400 mb-2 font-medium">تفاصيل إضافية (اختياري)</label>
               <textarea value={task.description} onChange={e => setT('description', e.target.value)}
                 placeholder="أي تفاصيل تساعد العامل..." rows={2}
-                className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500 transition-colors resize-none placeholder-zinc-600 text-white" />
+                className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors resize-none placeholder-zinc-600 text-white" />
             </div>
 
             {/* AI toggle */}
@@ -319,7 +319,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
 
             <button onClick={handleNext} disabled={loading}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
+              className="w-full bg-primary-500 hover:bg-primary-400 text-white font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
               {loading ? <Loader2 size={18} className="animate-spin" /> : null}
               {user ? 'نشر الطلب' : 'التالي — إنشاء حساب'} <ArrowLeft size={16} />
             </button>
@@ -353,11 +353,11 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             </div>
 
             {/* Task summary */}
-            <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4">
+            <div className="bg-primary-500/10 border border-primary-500/20 rounded-2xl p-4">
               <div className="flex items-start gap-3">
-                <Sparkles size={15} className="text-amber-400 flex-shrink-0 mt-0.5" />
+                <Sparkles size={15} className="text-primary-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs text-amber-400 font-medium mb-1">طلبك</p>
+                  <p className="text-xs text-primary-400 font-medium mb-1">طلبك</p>
                   <p className="text-sm text-white font-medium">{task.title}</p>
                   <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-500 flex-wrap">
                     <span>{getFinalCategory()}</span>
@@ -372,7 +372,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             <div className="flex gap-1 bg-zinc-900 rounded-2xl p-1">
               {[{ v: true, l: 'حساب جديد' }, { v: false, l: 'عندي حساب' }].map(({ v, l }) => (
                 <button key={l} onClick={() => { setIsNew(v); setError('') }}
-                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${isNew === v ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white'}`}>
+                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${isNew === v ? 'bg-primary-500 text-white' : 'text-zinc-400 hover:text-white'}`}>
                   {l}
                 </button>
               ))}
@@ -384,7 +384,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                   <div>
                     <label className="block text-xs text-zinc-500 mb-1.5">الاسم الكامل *</label>
                     <input value={auth.name} onChange={e => setA('name', e.target.value)} placeholder="محمد العتيبي"
-                      className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500 transition-colors text-white" />
+                      className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
                   </div>
                   <div>
                     <label className="block text-xs text-zinc-500 mb-1.5">رقم الجوال * (يبدأ بـ 05)</label>
@@ -393,7 +393,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                       <input type="tel" value={auth.phone} maxLength={10}
                         onChange={e => setA('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
                         placeholder="05XXXXXXXX"
-                        className="flex-1 bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500 transition-colors text-white" />
+                        className="flex-1 bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
                     </div>
                     {auth.phone.length > 0 && auth.phone.length < 10 && (
                       <p className="text-xs text-zinc-600 mt-1">{auth.phone.length}/10 أرقام</p>
@@ -407,14 +407,14 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               <div>
                 <label className="block text-xs text-zinc-500 mb-1.5">البريد الإلكتروني *</label>
                 <input type="email" value={auth.email} onChange={e => setA('email', e.target.value)} placeholder="example@gmail.com"
-                  className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500 transition-colors text-white" />
+                  className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
               </div>
               <div>
                 <label className="block text-xs text-zinc-500 mb-1.5">كلمة المرور *</label>
                 <div className="relative">
                   <input type={showPass ? 'text' : 'password'} value={auth.password} onChange={e => setA('password', e.target.value)}
                     placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && handleAuth()}
-                    className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-amber-500 transition-colors text-white" />
+                    className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
                   <button type="button" onClick={() => setShowPass(!showPass)} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
                     {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
@@ -428,18 +428,18 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                     setShowReset(true)
                     await supabase.auth.resetPasswordForEmail(auth.email.trim(), { redirectTo: 'https://amerniksa.com' })
                     setResetSent(true)
-                  }} className="text-xs text-amber-400 hover:underline">
+                  }} className="text-xs text-primary-400 hover:underline">
                     نسيت كلمة المرور؟
                   </button>
-                  {resetSent && <p className="text-xs text-emerald-400 mt-1">✅ تم إرسال رابط الاستعادة لبريدك</p>}
+                  {resetSent && <p className="text-xs text-secondary-400 mt-1">✅ تم إرسال رابط الاستعادة لبريدك</p>}
                 </div>
               )}
 
               {isNew && (
                 <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
                   <div className="flex items-start gap-3 cursor-pointer" onClick={() => setAgreedTerms(!agreedTerms)}>
-                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${agreedTerms ? 'bg-amber-500 border-amber-500' : 'border-zinc-600'}`}>
-                      {agreedTerms && <span className="text-black text-xs font-bold">✓</span>}
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${agreedTerms ? 'bg-primary-500 border-primary-500' : 'border-zinc-600'}`}>
+                      {agreedTerms && <span className="text-white text-xs font-bold">✓</span>}
                     </div>
                     <p className="text-xs text-zinc-400 leading-relaxed">
                       أوافق على الشروط والأحكام وسياسة الخصوصية — أقرّ بأن المنصة وسيط فقط وغير مسؤولة عن أي نزاع ينشأ بين الطرفين
@@ -449,9 +449,9 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               )}
 
               {showEmailConfirm ? (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
+                <div className="bg-secondary-500/10 border border-secondary-500/20 rounded-xl p-4 text-center">
                   <div className="text-3xl mb-2">📧</div>
-                  <p className="text-emerald-400 font-bold text-base mb-1">تحقق من بريدك</p>
+                  <p className="text-secondary-400 font-bold text-base mb-1">تحقق من بريدك</p>
                   <p className="text-zinc-400 text-sm">أرسلنا رابط التأكيد على <span className="text-white font-medium">{auth.email}</span></p>
                   <p className="text-zinc-500 text-xs mt-2">بعد التأكيد ادخل وطلبك سينشر</p>
                 </div>
@@ -459,7 +459,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                 <>
                   {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
                   <button onClick={handleAuth} disabled={loading}
-                    className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20">
+                    className="w-full bg-primary-500 hover:bg-primary-400 text-white font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
                     {loading && <Loader2 size={18} className="animate-spin" />}
                     {isNew ? '✅ سجّل وانشر الطلب' : 'دخول ونشر الطلب'}
                   </button>

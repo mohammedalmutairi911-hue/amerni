@@ -50,19 +50,19 @@ export function ReferralPage() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
-            <Gift size={28} className="text-amber-500" />
+          <div className="w-16 h-16 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-4">
+            <Gift size={28} className="text-primary-500" />
           </div>
           <h1 className="text-3xl font-black mb-2">نظام الإحالة</h1>
-          <p className="text-zinc-500">شارك رابطك وأكسب <span className="text-amber-400 font-bold">5%</span> من قيمة كل طلب يأتي عن طريقك</p>
+          <p className="text-zinc-500">شارك رابطك وأكسب <span className="text-primary-400 font-bold">5%</span> من قيمة كل طلب يأتي عن طريقك</p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-8">
           {[
             { label: 'إجمالي الإحالات', value: stats.total, icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
-            { label: 'مكتسب', value: `${stats.earned.toFixed(1)} ر`, icon: DollarSign, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
-            { label: 'قيد التنفيذ', value: `${stats.pending.toFixed(1)} ر`, icon: TrendingUp, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
+            { label: 'مكتسب', value: `${stats.earned.toFixed(1)} ر`, icon: DollarSign, color: 'text-secondary-400', bg: 'bg-secondary-500/10 border-secondary-500/20' },
+            { label: 'قيد التنفيذ', value: `${stats.pending.toFixed(1)} ر`, icon: TrendingUp, color: 'text-primary-400', bg: 'bg-primary-500/10 border-primary-500/20' },
           ].map(({ label, value, icon: Icon, color, bg }) => (
             <div key={label} className={`border rounded-2xl p-4 text-center ${bg}`}>
               <Icon size={18} className={`${color} mx-auto mb-2`} />
@@ -77,13 +77,13 @@ export function ReferralPage() {
           <p className="text-sm font-semibold mb-3">رابط الإحالة الخاص بك</p>
           <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 mb-4">
             <span className="flex-1 text-sm text-zinc-400 truncate">{referralLink}</span>
-            <button onClick={copyLink} className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all flex-shrink-0 ${copied ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}>
+            <button onClick={copyLink} className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all flex-shrink-0 ${copied ? 'bg-secondary-500/20 text-secondary-400' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}>
               {copied ? <><CheckCircle size={13} /> نُسخ!</> : <><Copy size={13} /> نسخ</>}
             </button>
           </div>
           <div className="flex gap-2">
             <button onClick={shareLink}
-              className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded-xl text-sm transition-colors">
+              className="flex-1 flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-400 text-white font-bold py-3 rounded-xl text-sm transition-colors">
               <Share2 size={16} /> شارك الرابط
             </button>
             <button onClick={copyLink}
@@ -104,7 +104,7 @@ export function ReferralPage() {
               { n: '٤', text: 'ما في حد أقصى — كلما أحلت أكثر كسبت أكثر' },
             ].map(({ n, text }) => (
               <div key={n} className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 text-black text-xs font-black">{n}</div>
+                <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0 text-white text-xs font-black">{n}</div>
                 <p className="text-sm text-zinc-300">{text}</p>
               </div>
             ))}
@@ -131,7 +131,7 @@ export function ReferralPage() {
                 </div>
               </div>
               <div className="text-left">
-                <p className="text-sm font-bold text-amber-400">
+                <p className="text-sm font-bold text-primary-400">
                   {((r.price_final || r.price_suggested || 0) * 0.05).toFixed(1)} ر
                 </p>
                 <p className="text-xs text-zinc-600">{r.status === 'completed' ? '✅ مكتسب' : '⏳ معلق'}</p>

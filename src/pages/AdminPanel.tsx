@@ -117,16 +117,16 @@ export function AdminPanel() {
     open: 'مفتوح', in_progress: 'جاري', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع'
   }
   const STATUS_COLOR: Record<string, string> = {
-    open: 'text-amber-400 bg-amber-500/10',
+    open: 'text-primary-400 bg-primary-500/10',
     in_progress: 'text-blue-400 bg-blue-500/10',
-    completed: 'text-emerald-400 bg-emerald-500/10',
+    completed: 'text-secondary-400 bg-secondary-500/10',
     cancelled: 'text-zinc-500 bg-zinc-800',
     disputed: 'text-red-400 bg-red-500/10',
   }
 
   if (loading) return (
     <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center">
-      <Loader2 className="animate-spin text-amber-400" size={32} />
+      <Loader2 className="animate-spin text-primary-400" size={32} />
     </div>
   )
 
@@ -169,11 +169,11 @@ export function AdminPanel() {
           {TABS.map(({ id, icon: Icon, label }) => (
             <button key={id} onClick={() => setTab(id as Tab)}
               className={`flex items-center gap-1.5 px-4 py-3 text-sm whitespace-nowrap border-b-2 transition-all ${
-                tab === id ? 'border-amber-500 text-amber-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                tab === id ? 'border-primary-500 text-primary-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'
               }`}>
               <Icon size={14} /> {label}
               {id === 'workers' && stats.pending > 0 && (
-                <span className="bg-amber-500 text-black text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{stats.pending}</span>
+                <span className="bg-primary-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{stats.pending}</span>
               )}
               {id === 'conversations' && stats.disputed > 0 && (
                 <span className="bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{stats.disputed}</span>
@@ -190,11 +190,11 @@ export function AdminPanel() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { label: 'المستخدمون', value: stats.users, color: 'text-white' },
-                { label: 'عمال نشطون', value: stats.workers, color: 'text-emerald-400' },
-                { label: 'بانتظار موافقة', value: stats.pending, color: 'text-amber-400' },
+                { label: 'عمال نشطون', value: stats.workers, color: 'text-secondary-400' },
+                { label: 'بانتظار موافقة', value: stats.pending, color: 'text-primary-400' },
                 { label: 'طلبات جارية', value: stats.activeTasks, color: 'text-blue-400' },
-                { label: 'طلبات مفتوحة', value: stats.openTasks, color: 'text-amber-400' },
-                { label: 'طلبات مكتملة', value: stats.completed, color: 'text-emerald-400' },
+                { label: 'طلبات مفتوحة', value: stats.openTasks, color: 'text-primary-400' },
+                { label: 'طلبات مكتملة', value: stats.completed, color: 'text-secondary-400' },
                 { label: 'نزاعات', value: stats.disputed, color: 'text-red-400' },
                 { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-white' },
               ].map(({ label, value, color }) => (
@@ -216,7 +216,7 @@ export function AdminPanel() {
                       <span className="text-sm text-zinc-300">{city}</span>
                       <div className="flex items-center gap-2">
                         <div className="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-amber-500 rounded-full" style={{width: `${Math.round(count/tasks.length*100)}%`}} />
+                          <div className="h-full bg-primary-500 rounded-full" style={{width: `${Math.round(count/tasks.length*100)}%`}} />
                         </div>
                         <span className="text-xs text-zinc-500">{count}</span>
                       </div>
@@ -231,7 +231,7 @@ export function AdminPanel() {
                       <span className="text-sm text-zinc-300">{cat}</span>
                       <div className="flex items-center gap-2">
                         <div className="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-emerald-500 rounded-full" style={{width: `${Math.round(count/tasks.length*100)}%`}} />
+                          <div className="h-full bg-secondary-500 rounded-full" style={{width: `${Math.round(count/tasks.length*100)}%`}} />
                         </div>
                         <span className="text-xs text-zinc-500">{count}</span>
                       </div>
@@ -243,14 +243,14 @@ export function AdminPanel() {
 
             {/* Pending workers alert */}
             {stats.pending > 0 && (
-              <div className="bg-amber-950/20 border border-amber-800/30 rounded-2xl p-5">
+              <div className="bg-primary-950/20 border border-primary-800/30 rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <AlertTriangle size={16} className="text-amber-400" />
-                  <h3 className="font-semibold text-amber-300">عمال بانتظار الموافقة ({stats.pending})</h3>
+                  <AlertTriangle size={16} className="text-primary-400" />
+                  <h3 className="font-semibold text-primary-300">عمال بانتظار الموافقة ({stats.pending})</h3>
                 </div>
                 <div className="space-y-2">
                   {workers.filter(w => !w.is_approved).map(w => (
-                    <div key={w.id} className="bg-[#0d0d0d] border border-amber-800/30 rounded-2xl p-5 space-y-4">
+                    <div key={w.id} className="bg-[#0d0d0d] border border-primary-800/30 rounded-2xl p-5 space-y-4">
                       {/* Header */}
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
@@ -262,7 +262,7 @@ export function AdminPanel() {
                         </div>
                         <div className="flex gap-2">
                           <button onClick={() => approveWorker(w.user_id)}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-semibold rounded-xl hover:bg-emerald-500/20 transition-colors">
+                            className="flex items-center gap-1.5 px-4 py-2 bg-secondary-500/10 border border-secondary-500/30 text-secondary-400 text-sm font-semibold rounded-xl hover:bg-secondary-500/20 transition-colors">
                             <CheckCircle size={14} /> موافقة
                           </button>
                           <button onClick={() => rejectWorker(w.user_id)}
@@ -312,7 +312,7 @@ export function AdminPanel() {
                         <div>
                           <p className="text-xs text-zinc-500 mb-2">📷 صورة الهوية</p>
                           <a href={w.id_image_url} target="_blank" rel="noreferrer">
-                            <img src={w.id_image_url} alt="ID" className="w-full max-h-48 object-contain rounded-xl border border-zinc-700 hover:border-amber-500/50 transition-colors" />
+                            <img src={w.id_image_url} alt="ID" className="w-full max-h-48 object-contain rounded-xl border border-zinc-700 hover:border-primary-500/50 transition-colors" />
                           </a>
                           <p className="text-xs text-zinc-600 mt-1">اضغط على الصورة لتكبيرها</p>
                         </div>
@@ -331,7 +331,7 @@ export function AdminPanel() {
             {workers.length === 0 ? (
               <p className="text-center text-zinc-600 py-12">ما في عمال مسجلين</p>
             ) : workers.map(w => (
-              <div key={w.id} className={`bg-[#0d0d0d] border rounded-2xl p-5 ${!w.is_approved ? 'border-amber-800/30' : 'border-zinc-800'}`}>
+              <div key={w.id} className={`bg-[#0d0d0d] border rounded-2xl p-5 ${!w.is_approved ? 'border-primary-800/30' : 'border-zinc-800'}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <img src={getAvatar(w.full_name)} className="w-10 h-10 rounded-xl" alt="" />
@@ -339,9 +339,9 @@ export function AdminPanel() {
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{w.full_name}</p>
                         {w.is_approved ? (
-                          <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">✓ موافق</span>
+                          <span className="text-xs text-secondary-400 bg-secondary-500/10 px-2 py-0.5 rounded-full">✓ موافق</span>
                         ) : (
-                          <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">⏳ بانتظار</span>
+                          <span className="text-xs text-primary-400 bg-primary-500/10 px-2 py-0.5 rounded-full">⏳ بانتظار</span>
                         )}
                       </div>
                       <p className="text-xs text-zinc-500">{w.city} · {w.nationality} · هوية: {w.id_verified ? '✓' : '✗'}</p>
@@ -356,7 +356,7 @@ export function AdminPanel() {
                     {!w.is_approved ? (
                       <>
                         <button onClick={() => approveWorker(w.user_id)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs rounded-lg">
+                          className="flex items-center gap-1 px-3 py-1.5 bg-secondary-500/10 border border-secondary-500/30 text-secondary-400 text-xs rounded-lg">
                           <CheckCircle size={12} /> موافقة
                         </button>
                         <button onClick={() => rejectWorker(w.user_id)}
@@ -402,7 +402,7 @@ export function AdminPanel() {
                     </button>
                     {task.status === 'disputed' && (
                       <button onClick={() => updateTaskStatus(task.id, 'completed')}
-                        className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs rounded-lg">
+                        className="flex items-center gap-1 px-2.5 py-1.5 bg-secondary-500/10 border border-secondary-500/30 text-secondary-400 text-xs rounded-lg">
                         <CheckCircle size={11} /> حل
                       </button>
                     )}
@@ -427,7 +427,7 @@ export function AdminPanel() {
               {tasks.filter(t => t.status === 'in_progress' || t.status === 'disputed').map(task => (
                 <button key={task.id} onClick={() => setSelectedTask(task)}
                   className={`w-full text-right p-3 rounded-xl border transition-all ${
-                    selectedTask?.id === task.id ? 'border-amber-500/40 bg-amber-500/5' : 'border-zinc-800 bg-[#0d0d0d] hover:border-zinc-700'
+                    selectedTask?.id === task.id ? 'border-primary-500/40 bg-primary-500/5' : 'border-zinc-800 bg-[#0d0d0d] hover:border-zinc-700'
                   }`}>
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-medium truncate flex-1">{task.title}</p>
@@ -473,7 +473,7 @@ export function AdminPanel() {
                     <td className="px-4 py-3">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                         u.role === 'admin' ? 'bg-purple-500/20 text-purple-400' :
-                        u.role === 'worker' ? 'bg-amber-500/20 text-amber-400' :
+                        u.role === 'worker' ? 'bg-primary-500/20 text-primary-400' :
                         'bg-zinc-800 text-zinc-400'
                       }`}>
                         {u.role === 'admin' ? 'مدير' : u.role === 'worker' ? 'عامل' : 'عميل'}

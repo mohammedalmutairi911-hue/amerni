@@ -60,7 +60,7 @@ export function AuthModal() {
           {(['login', 'signup'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                tab === t ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white'
+                tab === t ? 'bg-primary-500 text-white' : 'text-zinc-400 hover:text-white'
               }`}>
               {t === 'login' ? 'دخول' : 'حساب جديد'}
             </button>
@@ -74,7 +74,7 @@ export function AuthModal() {
                 <label className="block text-xs text-zinc-500 mb-1">الاسم الكامل</label>
                 <input value={form.name} onChange={e => set('name', e.target.value)}
                   placeholder="محمد العتيبي"
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors" />
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
               </div>
 
               {/* Role selection */}
@@ -87,7 +87,7 @@ export function AuthModal() {
                   ].map(({ v, label, desc }) => (
                     <button key={v} onClick={() => setRole(v as any)}
                       className={`text-right p-3 rounded-xl border transition-all ${
-                        role === v ? 'border-amber-500 bg-amber-500/10' : 'border-zinc-800 hover:border-zinc-700'
+                        role === v ? 'border-primary-500 bg-primary-500/10' : 'border-zinc-800 hover:border-zinc-700'
                       }`}>
                       <p className="text-sm font-medium">{label}</p>
                       <p className="text-xs text-zinc-500 mt-0.5">{desc}</p>
@@ -102,7 +102,7 @@ export function AuthModal() {
             <label className="block text-xs text-zinc-500 mb-1">البريد الإلكتروني</label>
             <input type="email" value={form.email} onChange={e => set('email', e.target.value)}
               placeholder="example@gmail.com"
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors" />
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
           </div>
 
           <div>
@@ -110,7 +110,7 @@ export function AuthModal() {
             <div className="relative">
               <input type={showPass ? 'text' : 'password'} value={form.password} onChange={e => set('password', e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors" />
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
               <button type="button" onClick={() => setShowPass(!showPass)}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
                 {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -119,17 +119,17 @@ export function AuthModal() {
           </div>
 
           {error === '__email_confirm__' ? (
-            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
+            <div className="bg-secondary-500/10 border border-secondary-500/20 rounded-xl p-3 text-center">
               <p className="text-2xl mb-1">📧</p>
-              <p className="text-emerald-400 font-bold text-sm mb-1">تحقق من بريدك أولاً</p>
+              <p className="text-secondary-400 font-bold text-sm mb-1">تحقق من بريدك أولاً</p>
               <p className="text-zinc-400 text-xs mb-2">أرسلنا رابط التأكيد على <span className="text-white">{form.email}</span></p>
               {resendDone ? (
-                <p className="text-emerald-400 text-xs">✅ تم إرسال رابط جديد</p>
+                <p className="text-secondary-400 text-xs">✅ تم إرسال رابط جديد</p>
               ) : (
                 <button onClick={async () => {
                   await supabase.auth.resend({ type: 'signup', email: form.email.trim() })
                   setResendDone(true)
-                }} className="text-xs text-amber-400 underline underline-offset-2 hover:text-amber-300 transition-colors">
+                }} className="text-xs text-primary-400 underline underline-offset-2 hover:text-primary-300 transition-colors">
                   لم يصلني البريد — أعد الإرسال
                 </button>
               )}
@@ -138,7 +138,7 @@ export function AuthModal() {
             <>
               {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-lg">{error}</p>}
               <button onClick={submit} disabled={loading}
-                className="w-full bg-amber-500 text-black font-bold py-2.5 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                className="w-full bg-primary-500 text-white font-bold py-2.5 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading && <Loader2 size={15} className="animate-spin" />}
                 {tab === 'login' ? 'دخول' : 'إنشاء حساب'}
               </button>

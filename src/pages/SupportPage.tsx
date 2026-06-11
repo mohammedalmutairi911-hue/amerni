@@ -68,13 +68,13 @@ export function SupportPage() {
         <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl overflow-hidden flex flex-col" style={{ height: '70vh' }}>
           {/* Header */}
           <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900/50 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-              <Headphones size={16} className="text-amber-500" />
+            <div className="w-9 h-9 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+              <Headphones size={16} className="text-primary-500" />
             </div>
             <div>
               <p className="text-sm font-semibold">دعم أمرني</p>
-              <div className="flex items-center gap-1.5 text-xs text-emerald-400">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> متاح ٢٤/٧
+              <div className="flex items-center gap-1.5 text-xs text-secondary-400">
+                <div className="w-1.5 h-1.5 rounded-full bg-secondary-500 animate-pulse" /> متاح ٢٤/٧
               </div>
             </div>
           </div>
@@ -84,12 +84,12 @@ export function SupportPage() {
             {msgs.map((m, i) => (
               <div key={i} className={`flex items-start gap-2.5 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  m.role === 'assistant' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-zinc-800'
+                  m.role === 'assistant' ? 'bg-primary-500/10 border border-primary-500/20' : 'bg-zinc-800'
                 }`}>
-                  {m.role === 'assistant' ? <Bot size={14} className="text-amber-500" /> : <User size={14} className="text-zinc-400" />}
+                  {m.role === 'assistant' ? <Bot size={14} className="text-primary-500" /> : <User size={14} className="text-zinc-400" />}
                 </div>
                 <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                  m.role === 'user' ? 'bg-amber-500 text-black rounded-tr-sm' : 'bg-zinc-800 text-zinc-100 rounded-tl-sm'
+                  m.role === 'user' ? 'bg-primary-500 text-white rounded-tr-sm' : 'bg-zinc-800 text-zinc-100 rounded-tl-sm'
                 }`}>
                   {m.content}
                 </div>
@@ -97,8 +97,8 @@ export function SupportPage() {
             ))}
             {loading && (
               <div className="flex items-start gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                  <Bot size={14} className="text-amber-500" />
+                <div className="w-7 h-7 rounded-full bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+                  <Bot size={14} className="text-primary-500" />
                 </div>
                 <div className="bg-zinc-800 rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1">
                   {[0,1,2].map(i => (
@@ -112,7 +112,7 @@ export function SupportPage() {
 
           {/* Input */}
           <div className="px-3 pb-3">
-            <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 focus-within:border-amber-500/40 transition-colors">
+            <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
               <input
                 value={input} onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
@@ -120,7 +120,7 @@ export function SupportPage() {
                 className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600"
               />
               <button onClick={send} disabled={!input.trim() || loading}
-                className="text-amber-500 hover:text-amber-400 disabled:opacity-30 transition-colors">
+                className="text-primary-500 hover:text-primary-400 disabled:opacity-30 transition-colors">
                 {loading ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
               </button>
             </div>

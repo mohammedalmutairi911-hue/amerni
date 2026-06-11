@@ -107,11 +107,11 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
       {mode === 'register' && (
         <div className="flex gap-1 bg-zinc-900 rounded-xl p-1 mb-1">
           <button onClick={() => setRole('client')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'client' ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white'}`}>
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'client' ? 'bg-primary-500 text-white' : 'text-zinc-400 hover:text-white'}`}>
             🙋 أبي أطلب خدمة
           </button>
           <button onClick={() => setRole('worker')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'worker' ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white'}`}>
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'worker' ? 'bg-primary-500 text-white' : 'text-zinc-400 hover:text-white'}`}>
             🔧 أبي أقدم خدمة
           </button>
         </div>
@@ -130,22 +130,22 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
       {mode === 'register' && (
         <>
           <input value={name} onChange={e => setName(e.target.value)} placeholder="الاسم الكامل"
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500 transition-colors text-white" />
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
           <div className="flex gap-2">
             <span className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2.5 text-sm text-zinc-400 flex-shrink-0">🇸🇦 +966</span>
             <input type="tel" value={phone} maxLength={10} onChange={e => setPhone(e.target.value.replace(/\D/g,'').slice(0,10))}
               placeholder="05XXXXXXXX"
-              className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500 transition-colors text-white" />
+              className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
           </div>
         </>
       )}
       <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="البريد الإلكتروني"
-        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500 transition-colors text-white" />
+        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
       <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="كلمة المرور"
         onKeyDown={e => e.key === 'Enter' && handle()}
-        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500 transition-colors text-white" />
+        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
       {mode === 'login' && !showReset && (
-        <button onClick={() => setShowReset(true)} className="text-xs text-amber-400 hover:underline text-right w-full">
+        <button onClick={() => setShowReset(true)} className="text-xs text-primary-400 hover:underline text-right w-full">
           نسيت كلمة المرور؟
         </button>
       )}
@@ -153,7 +153,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3 space-y-2">
           <p className="text-xs text-zinc-400">سنرسل لك رابط لتغيير كلمة المرور على بريدك</p>
           {resetSent ? (
-            <p className="text-emerald-400 text-sm">✅ تم الإرسال — تحقق من بريدك</p>
+            <p className="text-secondary-400 text-sm">✅ تم الإرسال — تحقق من بريدك</p>
           ) : (
             <button onClick={handleReset} disabled={loading}
               className="w-full bg-zinc-700 hover:bg-zinc-600 text-white text-sm py-2 rounded-lg transition-colors disabled:opacity-50">
@@ -164,17 +164,17 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
         </div>
       )}
       {error === '__email_confirm__' ? (
-        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
+        <div className="bg-secondary-500/10 border border-secondary-500/20 rounded-xl p-4 text-center">
           <div className="text-3xl mb-2">📧</div>
-          <p className="text-emerald-400 font-bold mb-1">تحقق من بريدك أولاً</p>
+          <p className="text-secondary-400 font-bold mb-1">تحقق من بريدك أولاً</p>
           <p className="text-zinc-400 text-sm mb-3">أرسلنا رابط التأكيد على <span className="text-white">{email}</span></p>
           {resetSent ? (
-            <p className="text-emerald-400 text-xs">✅ تم إرسال رابط جديد — تفقد بريدك</p>
+            <p className="text-secondary-400 text-xs">✅ تم إرسال رابط جديد — تفقد بريدك</p>
           ) : (
             <button onClick={async () => {
               await supabase.auth.resend({ type: 'signup', email: email.trim() })
               setResetSent(true)
-            }} className="text-xs text-amber-400 underline underline-offset-2 hover:text-amber-300 transition-colors">
+            }} className="text-xs text-primary-400 underline underline-offset-2 hover:text-primary-300 transition-colors">
               لم يصلني البريد — أعد الإرسال
             </button>
           )}
@@ -183,7 +183,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
         <>
           {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-xl">{error}</p>}
           <button onClick={handle} disabled={loading}
-            className="w-full bg-amber-500 text-black font-bold py-3 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             {loading && <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />}
             {mode === 'login' ? 'دخول' : 'إنشاء حساب'}
           </button>
@@ -300,23 +300,23 @@ export function LandingPage() {
       {/* Navbar */}
       <nav className="fixed top-0 inset-x-0 z-50 bg-[#080808]/95 backdrop-blur border-b border-zinc-900">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <button onClick={() => setActiveTab('home')} className="text-xl font-black text-amber-400">أمرني</button>
+          <button onClick={() => setActiveTab('home')} className="text-xl font-black text-primary-400">أمرني</button>
           <div className="hidden md:flex items-center gap-1 overflow-x-auto">
             {TABS.slice(1).map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-amber-500/15 text-amber-400' : 'text-zinc-400 hover:text-white'}`}>
+                className={`px-3 py-1.5 rounded-lg text-sm transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500/15 text-primary-400' : 'text-zinc-400 hover:text-white'}`}>
                 {tab.label}
               </button>
             ))}
           </div>
           {user ? (
-            <button onClick={() => navigate('dashboard')} className="bg-amber-500 text-black font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-amber-400 transition-colors">
+            <button onClick={() => navigate('dashboard')} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-400 transition-colors">
               حسابي
             </button>
           ) : (
             <div className="flex items-center gap-2">
               <button onClick={() => { setAuthDirectMode('login'); setShowAuthDirect(true) }} className="text-zinc-400 hover:text-white text-sm transition-colors">دخول</button>
-              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-amber-500 text-black font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-amber-400 transition-colors">سجّل</button>
+              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-400 transition-colors">سجّل</button>
             </div>
           )}
         </div>
@@ -324,7 +324,7 @@ export function LandingPage() {
         <div className="md:hidden flex gap-1 px-4 pb-2 overflow-x-auto">
           {TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
-              className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-amber-500 text-black font-bold' : 'text-zinc-500 hover:text-white'}`}>
+              className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500 text-white font-bold' : 'text-zinc-500 hover:text-white'}`}>
               {tab.label}
             </button>
           ))}
@@ -338,9 +338,9 @@ export function LandingPage() {
           <div>
             {/* Welcome banner */}
             {user && profile && (
-              <div className="flex items-center justify-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-2xl px-5 py-3 mb-4">
+              <div className="flex items-center justify-center gap-2 bg-primary-500/10 border border-primary-500/20 rounded-2xl px-5 py-3 mb-4">
                 <span className="text-xl">👋</span>
-                <p className="text-amber-300 font-semibold text-sm sm:text-base">
+                <p className="text-primary-300 font-semibold text-sm sm:text-base">
                   أهلاً {(profile as any).full_name?.split(' ')[0] || 'بك'}!
                   <span className="text-zinc-400 font-normal mr-2">وش تبي اليوم؟</span>
                 </p>
@@ -349,17 +349,17 @@ export function LandingPage() {
             {/* Hero - full viewport */}
             <section className="relative min-h-[calc(100vh-56px)] flex flex-col items-center justify-center px-4 overflow-hidden">
               <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-amber-500/6 blur-3xl" />
+                <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-primary-500/6 blur-3xl" />
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:60px_60px]" />
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#080808_100%)]" />
               </div>
               <div className="relative max-w-3xl mx-auto text-center w-full">
-                <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 text-sm text-amber-400 mb-8">
+                <div className="inline-flex items-center gap-2 bg-primary-500/10 border border-primary-500/20 rounded-full px-4 py-1.5 text-sm text-primary-400 mb-8">
                   <Sparkles size={13} /> أمرني — اطلب أي شي في السعودية
                 </div>
                 <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black tracking-tight mb-4 sm:mb-6 leading-[1.05]">
                   <span className="text-white">اطلب</span>{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-500">أي شيء.</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-500">أي شيء.</span>
                   <br />
                   <span className="text-white text-3xl sm:text-5xl lg:text-6xl">ننجزه لك.</span>
                 </h1>
@@ -367,8 +367,8 @@ export function LandingPage() {
                   منصة سعودية تربطك بعمال موثوقين لإنجاز أي مهمة يومية — بذكاء وأمان.
                 </p>
                 <div className="relative max-w-xl mx-auto mb-6">
-                  <div className="flex items-center gap-2 sm:gap-3 bg-[#111] border-2 border-zinc-800 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-amber-500 transition-all shadow-2xl">
-                    <Sparkles size={18} className="text-amber-500 flex-shrink-0" />
+                  <div className="flex items-center gap-2 sm:gap-3 bg-[#111] border-2 border-zinc-800 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-primary-500 transition-all shadow-2xl">
+                    <Sparkles size={18} className="text-primary-500 flex-shrink-0" />
                     <input
                       value={taskInput} onChange={e => setTaskInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && taskInput.trim() && handleStart()}
@@ -376,7 +376,7 @@ export function LandingPage() {
                       className="flex-1 text-right bg-transparent text-white placeholder-zinc-500 text-sm outline-none"
                     />
                     <button onClick={handleStart}
-                      className="bg-amber-500 text-black text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-amber-400 transition-colors flex-shrink-0 flex items-center gap-1.5">
+                      className="bg-primary-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-400 transition-colors flex-shrink-0 flex items-center gap-1.5">
                       اطلب <ArrowLeft size={14} />
                     </button>
                   </div>
@@ -387,7 +387,7 @@ export function LandingPage() {
                 <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-8 sm:mb-10 px-2">
                   {['توصيل 🚗','تصوير 📸','تحقق 🔍','تسوق 🛍️','تعليم 📚','أخرى ✨'].map(cat => (
                     <button key={cat} onClick={() => { setTaskInput(cat.split(' ')[0]); setShowNewTask(true) }}
-                      className="px-4 py-2 bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 rounded-full text-sm text-zinc-400 hover:text-white transition-all">
+                      className="px-4 py-2 bg-zinc-900 border border-zinc-800 hover:border-primary-500/40 rounded-full text-sm text-zinc-400 hover:text-white transition-all">
                       {cat}
                     </button>
                   ))}
@@ -396,7 +396,7 @@ export function LandingPage() {
                 <div className="flex justify-center gap-6 sm:gap-10 text-center">
                   {[['١٠٬٠٠٠+', 'طلب اتنجز'], ['٢٤٠٠+', 'عامل موثوق'], ['٩٨٪', 'نسبة الرضا']].map(([v, l]) => (
                     <div key={l}>
-                      <div className="text-3xl font-black text-amber-400">{v}</div>
+                      <div className="text-3xl font-black text-primary-400">{v}</div>
                       <div className="text-xs text-zinc-500 mt-1">{l}</div>
                     </div>
                   ))}
@@ -410,8 +410,8 @@ export function LandingPage() {
                 {STEPS.map(({ n, icon: Icon, title, desc }) => (
                   <div key={n} className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
                     <div className="text-4xl font-black text-zinc-800 mb-3">{n}</div>
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-3">
-                      <Icon size={17} className="text-amber-500" />
+                    <div className="w-9 h-9 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-3">
+                      <Icon size={17} className="text-primary-500" />
                     </div>
                     <h3 className="font-semibold mb-1.5">{title}</h3>
                     <p className="text-zinc-500 text-sm leading-relaxed">{desc}</p>
@@ -434,18 +434,18 @@ export function LandingPage() {
                 {STEPS.map(({ n, icon: Icon, title, desc }) => (
                   <div key={n} className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-7 hover:border-zinc-700 transition-all">
                     <div className="text-5xl font-black text-zinc-800 mb-4">{n}</div>
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
-                      <Icon size={19} className="text-amber-500" />
+                    <div className="w-10 h-10 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-4">
+                      <Icon size={19} className="text-primary-500" />
                     </div>
                     <h3 className="font-semibold mb-2 text-lg">{title}</h3>
                     <p className="text-zinc-500 text-sm leading-relaxed">{desc}</p>
                   </div>
                 ))}
               </div>
-              <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-8 text-center">
+              <div className="bg-primary-500/5 border border-primary-500/20 rounded-2xl p-8 text-center">
                 <h3 className="text-2xl font-bold mb-3">جاهز تطلب؟</h3>
                 <p className="text-zinc-500 mb-6">اكتب طلبك الحين وعامل يقبله في ثواني</p>
-                <button onClick={() => setShowNewTask(true)} className="bg-amber-500 text-black font-bold px-8 py-3 rounded-xl hover:bg-amber-400 transition-colors">
+                <button onClick={() => setShowNewTask(true)} className="bg-primary-500 text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-400 transition-colors">
                   اطلب الحين
                 </button>
               </div>
@@ -464,11 +464,11 @@ export function LandingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                 {[
                   { icon: Bot, title: 'ذكاء اصطناعي', desc: 'اقتراح سعر مناسب، تحقق من الهوية، حماية المحادثة من تبادل الأرقام الخارجية', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
-                  { icon: UserCheck, title: 'عمال موثوقون', desc: 'كل عامل مرّ بفحص هوية صارم وموافقة الأدمن قبل القبول في المنصة', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
-                  { icon: Shield, title: 'دفع آمن', desc: 'الطلب يكتمل فقط بعد تأكيد العميل استلام الخدمة — لا خسارة لأي طرف', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+                  { icon: UserCheck, title: 'عمال موثوقون', desc: 'كل عامل مرّ بفحص هوية صارم وموافقة الأدمن قبل القبول في المنصة', color: 'text-primary-400', bg: 'bg-primary-500/10 border-primary-500/20' },
+                  { icon: Shield, title: 'دفع آمن', desc: 'الطلب يكتمل فقط بعد تأكيد العميل استلام الخدمة — لا خسارة لأي طرف', color: 'text-secondary-400', bg: 'bg-secondary-500/10 border-secondary-500/20' },
                   { icon: Star, title: 'تقييم شفاف', desc: 'كل طلب ينتهي بتقييم حقيقي يبني سمعة العامل ويساعدك باختيار الأفضل', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
                   { icon: MessageCircle, title: 'محادثة محمية', desc: 'تواصل مباشر مع العامل داخل المنصة — لا تشارك أرقامك مع أحد', color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/20' },
-                  { icon: Zap, title: 'سرعة الرد', desc: 'العمال المتاحون يشوفون طلبك فوراً ويقبلون في دقائق', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20' },
+                  { icon: Zap, title: 'سرعة الرد', desc: 'العمال المتاحون يشوفون طلبك فوراً ويقبلون في دقائق', color: 'text-primary-400', bg: 'bg-primary-500/10 border-primary-500/20' },
                 ].map(({ icon: Icon, title, desc, color, bg }) => (
                   <div key={title} className={`bg-[#0d0d0d] border rounded-2xl p-6 hover:border-zinc-600 transition-all ${bg.split(' ')[1]}`}>
                     <div className={`w-10 h-10 rounded-xl ${bg} border flex items-center justify-center mb-4`}>
@@ -495,8 +495,8 @@ export function LandingPage() {
                 <div className="space-y-2.5">
                   {TRUST.map(t => (
                     <div key={t} className="flex items-center gap-4 bg-[#0d0d0d] border border-zinc-800 rounded-xl px-5 py-4 hover:border-zinc-700 transition-all">
-                      <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
-                        <CheckCircle size={13} className="text-emerald-500" />
+                      <div className="w-6 h-6 rounded-full bg-secondary-500/15 border border-secondary-500/30 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle size={13} className="text-secondary-500" />
                       </div>
                       <span className="text-sm text-zinc-300">{t}</span>
                     </div>
@@ -504,11 +504,11 @@ export function LandingPage() {
                 </div>
                 <div className="space-y-4">
                   <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
-                    <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-emerald-500" /> تحقق الهوية</h3>
+                    <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-secondary-500" /> تحقق الهوية</h3>
                     <p className="text-zinc-500 text-sm leading-relaxed">كل عامل يرفع صورة هويته الوطنية أو إقامته، والذكاء الاصطناعي يتحقق من صحتها قبل القبول.</p>
                   </div>
                   <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
-                    <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-amber-500" /> حماية الدفع</h3>
+                    <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-primary-500" /> حماية الدفع</h3>
                     <p className="text-zinc-500 text-sm leading-relaxed">لا يكتمل الطلب إلا بعد تأكيد العميل استلام الخدمة — نظام Escrow يحمي الطرفين.</p>
                   </div>
                   <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
@@ -526,8 +526,8 @@ export function LandingPage() {
           <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-16">
-                <div className="w-20 h-20 rounded-3xl bg-amber-500 flex items-center justify-center mx-auto mb-6">
-                  <span className="text-4xl font-black text-black">أ</span>
+                <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center mx-auto mb-6">
+                  <span className="text-4xl font-black text-white">أ</span>
                 </div>
                 <h2 className="text-4xl font-black mb-4">قصتنا</h2>
                 <p className="text-zinc-400 text-lg leading-relaxed">منصة سعودية ولدت من فكرة بسيطة</p>
@@ -567,8 +567,8 @@ export function LandingPage() {
                   </div>
                 </div>
 
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-8 text-center">
-                  <p className="text-amber-300 text-lg font-semibold mb-2">"أمرني وإحنا ننجز"</p>
+                <div className="bg-primary-500/10 border border-primary-500/20 rounded-2xl p-8 text-center">
+                  <p className="text-primary-300 text-lg font-semibold mb-2">"أمرني وإحنا ننجز"</p>
                   <p className="text-zinc-500 text-sm">شعارنا يقول كل شيء — أنت تطلب وإحنا نوصلك لمن ينجز</p>
                 </div>
 
@@ -585,7 +585,7 @@ export function LandingPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-zinc-500">رقم الآيبان</span>
-                      <span className="text-amber-400 font-mono text-xs">SA54150009001465965400007</span>
+                      <span className="text-primary-400 font-mono text-xs">SA54150009001465965400007</span>
                     </div>
                   </div>
                 </div>
@@ -607,8 +607,8 @@ export function LandingPage() {
                 <div className="space-y-5">
                   <h3 className="font-bold text-lg mb-4">معلومات التواصل</h3>
                   {[
-                    { icon: Mail, label: 'البريد الإلكتروني', value: 'support@amerniksa.com', color: 'text-amber-400' },
-                    { icon: Phone, label: 'واتساب', value: '+966 5X XXX XXXX', color: 'text-emerald-400' },
+                    { icon: Mail, label: 'البريد الإلكتروني', value: 'support@amerniksa.com', color: 'text-primary-400' },
+                    { icon: Phone, label: 'واتساب', value: '+966 5X XXX XXXX', color: 'text-secondary-400' },
                     { icon: MessageCircle, label: 'الدعم المباشر', value: 'متاح ٢٤/٧ عبر الدردشة', color: 'text-blue-400' },
                     { icon: Shield, label: 'الآيبان — بنك البلاد', value: 'SA54150009001465965400007', color: 'text-zinc-300' },
                   ].map(({ icon: Icon, label, value, color }) => (
@@ -628,7 +628,7 @@ export function LandingPage() {
                     <div className="space-y-1.5 text-sm text-zinc-400">
                       <div className="flex justify-between"><span>الأحد — الخميس</span><span className="text-white">٨ص — ١١م</span></div>
                       <div className="flex justify-between"><span>الجمعة والسبت</span><span className="text-white">١٠ص — ١٠م</span></div>
-                      <div className="flex justify-between"><span>الدعم الآلي</span><span className="text-emerald-400">٢٤/٧</span></div>
+                      <div className="flex justify-between"><span>الدعم الآلي</span><span className="text-secondary-400">٢٤/٧</span></div>
                     </div>
                   </div>
                 </div>
@@ -652,17 +652,17 @@ export function LandingPage() {
                           <label className="block text-xs text-zinc-500 mb-1.5">{label}</label>
                           <input type={type} placeholder={ph} value={(contactForm as any)[k]}
                             onChange={e => setContactForm(f => ({ ...f, [k]: e.target.value }))}
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors" />
+                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
                         </div>
                       ))}
                       <div>
                         <label className="block text-xs text-zinc-500 mb-1.5">رسالتك</label>
                         <textarea value={contactForm.message} onChange={e => setContactForm(f => ({ ...f, message: e.target.value }))}
                           placeholder="اكتب رسالتك هنا..." rows={4}
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-amber-500/50 transition-colors resize-none" />
+                          className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors resize-none" />
                       </div>
                       <button onClick={sendContact} disabled={contactLoading || !contactForm.name || !contactForm.email || !contactForm.message}
-                        className="w-full bg-amber-500 text-black font-bold py-3 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+                        className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
                         {contactLoading ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                         إرسال الرسالة
                       </button>
@@ -711,7 +711,7 @@ export function LandingPage() {
                       setSupportLoading(false)
                     })
                   }}
-                    className="text-right px-4 py-3 bg-[#0d0d0d] border border-zinc-800 hover:border-amber-500/30 rounded-xl text-sm text-zinc-400 hover:text-white transition-all">
+                    className="text-right px-4 py-3 bg-[#0d0d0d] border border-zinc-800 hover:border-primary-500/30 rounded-xl text-sm text-zinc-400 hover:text-white transition-all">
                     {q}
                   </button>
                 ))}
@@ -720,13 +720,13 @@ export function LandingPage() {
               {/* Chat */}
               <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl overflow-hidden">
                 <div className="px-4 py-3 border-b border-zinc-800 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                    <Bot size={16} className="text-amber-500" />
+                  <div className="w-8 h-8 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+                    <Bot size={16} className="text-primary-500" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold">مساعد أمرني</p>
-                    <div className="flex items-center gap-1.5 text-xs text-emerald-400">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> متاح الآن
+                    <div className="flex items-center gap-1.5 text-xs text-secondary-400">
+                      <div className="w-1.5 h-1.5 rounded-full bg-secondary-500 animate-pulse" /> متاح الآن
                     </div>
                   </div>
                 </div>
@@ -734,18 +734,18 @@ export function LandingPage() {
                 <div className="h-80 overflow-y-auto px-4 py-3 space-y-3">
                   {supportMsgs.map((m, i) => (
                     <div key={i} className={`flex items-start gap-2.5 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${m.role === 'assistant' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-zinc-800'}`}>
-                        {m.role === 'assistant' ? <Bot size={13} className="text-amber-500" /> : <span className="text-xs">أ</span>}
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${m.role === 'assistant' ? 'bg-primary-500/10 border border-primary-500/20' : 'bg-zinc-800'}`}>
+                        {m.role === 'assistant' ? <Bot size={13} className="text-primary-500" /> : <span className="text-xs">أ</span>}
                       </div>
-                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === 'user' ? 'bg-amber-500 text-black rounded-tr-sm' : 'bg-zinc-800 text-zinc-100 rounded-tl-sm'}`}>
+                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === 'user' ? 'bg-primary-500 text-white rounded-tr-sm' : 'bg-zinc-800 text-zinc-100 rounded-tl-sm'}`}>
                         {m.content}
                       </div>
                     </div>
                   ))}
                   {supportLoading && (
                     <div className="flex items-start gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                        <Bot size={13} className="text-amber-500" />
+                      <div className="w-7 h-7 rounded-full bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+                        <Bot size={13} className="text-primary-500" />
                       </div>
                       <div className="bg-zinc-800 rounded-2xl px-4 py-3 flex gap-1">
                         {[0,1,2].map(i => <div key={i} className="w-2 h-2 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: `${i*150}ms` }} />)}
@@ -755,12 +755,12 @@ export function LandingPage() {
                 </div>
 
                 <div className="px-3 pb-3 border-t border-zinc-800 pt-3">
-                  <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 focus-within:border-amber-500/40 transition-colors">
+                  <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
                     <input value={supportInput} onChange={e => setSupportInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendSupport()}
                       placeholder="اكتب سؤالك..." className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600" />
                     <button onClick={sendSupport} disabled={!supportInput.trim() || supportLoading}
-                      className="text-amber-500 hover:text-amber-400 disabled:opacity-30 transition-colors">
+                      className="text-primary-500 hover:text-primary-400 disabled:opacity-30 transition-colors">
                       {supportLoading ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
                     </button>
                   </div>
@@ -768,7 +768,7 @@ export function LandingPage() {
               </div>
 
               <div className="mt-5 text-center text-sm text-zinc-500">
-                للتواصل المباشر: <a href="mailto:support@amerniksa.com" className="text-amber-400 hover:underline">support@amerniksa.com</a>
+                للتواصل المباشر: <a href="mailto:support@amerniksa.com" className="text-primary-400 hover:underline">support@amerniksa.com</a>
               </div>
             </div>
           </section>
@@ -815,8 +815,8 @@ export function LandingPage() {
                   <p className="text-zinc-400 text-sm leading-relaxed">{body}</p>
                 </div>
               ))}
-              <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6 text-center">
-                <p className="text-emerald-400 font-semibold mb-1">التزامنا بحماية خصوصيتك</p>
+              <div className="bg-secondary-500/5 border border-secondary-500/20 rounded-2xl p-6 text-center">
+                <p className="text-secondary-400 font-semibold mb-1">التزامنا بحماية خصوصيتك</p>
                 <p className="text-zinc-500 text-sm">أمرني ملتزمة بأنظمة حماية البيانات في المملكة العربية السعودية</p>
               </div>
             </div>
@@ -876,9 +876,9 @@ export function LandingPage() {
                   <p className="text-zinc-400 text-sm leading-relaxed">{body}</p>
                 </div>
               ))}
-              <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-6">
-                <p className="text-amber-400 font-semibold mb-2">بالتسجيل في أمرني أنت توافق على جميع هذه الشروط</p>
-                <p className="text-zinc-500 text-sm">للاستفسار: <a href="mailto:support@amerniksa.com" className="text-amber-400 hover:underline">support@amerniksa.com</a></p>
+              <div className="bg-primary-500/5 border border-primary-500/20 rounded-2xl p-6">
+                <p className="text-primary-400 font-semibold mb-2">بالتسجيل في أمرني أنت توافق على جميع هذه الشروط</p>
+                <p className="text-zinc-500 text-sm">للاستفسار: <a href="mailto:support@amerniksa.com" className="text-primary-400 hover:underline">support@amerniksa.com</a></p>
               </div>
             </div>
           </div>
@@ -896,7 +896,7 @@ export function LandingPage() {
             <div className="flex gap-1 bg-zinc-900 rounded-xl p-1 mb-5">
               {[{ v: 'login', l: 'دخول' }, { v: 'register', l: 'حساب جديد' }].map(({ v, l }) => (
                 <button key={v} onClick={() => setAuthDirectMode(v as any)}
-                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${authDirectMode === v ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:text-white'}`}>
+                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${authDirectMode === v ? 'bg-primary-500 text-white' : 'text-zinc-400 hover:text-white'}`}>
                   {l}
                 </button>
               ))}
@@ -910,7 +910,7 @@ export function LandingPage() {
       <footer className="border-t border-zinc-900 py-8 px-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-amber-500 flex items-center justify-center text-xs font-black text-black">أ</div>
+            <div className="w-6 h-6 rounded-md bg-primary-500 flex items-center justify-center text-xs font-black text-white">أ</div>
             <span className="text-zinc-400 text-sm font-bold">أمرني</span>
           </div>
           <p className="text-zinc-600 text-xs">© ٢٠٢٦ أمرني — جميع الحقوق محفوظة</p>

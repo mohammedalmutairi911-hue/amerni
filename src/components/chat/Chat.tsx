@@ -93,7 +93,7 @@ export function Chat({ taskId, taskTitle }: Props) {
         <div>
           <p className="text-sm font-medium">{taskTitle}</p>
           <div className="flex items-center gap-1.5 text-xs text-zinc-500 mt-0.5">
-            <Shield size={11} className="text-emerald-500" /> محمية — لا تشارك أرقام أو روابط
+            <Shield size={11} className="text-secondary-500" /> محمية — لا تشارك أرقام أو روابط
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@ export function Chat({ taskId, taskTitle }: Props) {
             <div key={m.id} className={`flex ${isMe ? 'justify-start' : 'justify-end'}`}>
               <div className="max-w-[75%]">
                 {!isMe && <p className="text-xs text-zinc-500 mb-1">{m.sender_name}</p>}
-                <div className={`rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-zinc-800 text-zinc-100' : 'bg-amber-500 text-black'}`}>
+                <div className={`rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-zinc-800 text-zinc-100' : 'bg-primary-500 text-white'}`}>
                   {m.content}
                 </div>
               </div>
@@ -133,7 +133,7 @@ export function Chat({ taskId, taskTitle }: Props) {
 
       {/* Input */}
       <div className="px-3 pb-3">
-        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 focus-within:border-amber-500/40 transition-colors">
+        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
           <input
             value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
@@ -141,7 +141,7 @@ export function Chat({ taskId, taskTitle }: Props) {
             className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600"
           />
           <button onClick={send} disabled={!input.trim() || sending}
-            className="text-amber-500 hover:text-amber-400 disabled:opacity-30 transition-colors">
+            className="text-primary-500 hover:text-primary-400 disabled:opacity-30 transition-colors">
             {sending ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
           </button>
         </div>

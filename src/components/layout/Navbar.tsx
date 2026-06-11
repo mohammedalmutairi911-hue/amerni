@@ -20,7 +20,7 @@ export function Navbar() {
     <nav className="fixed top-0 inset-x-0 z-50 bg-[#080808]/90 backdrop-blur border-b border-zinc-900">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
-        <button onClick={() => navigate('landing')} className="text-xl font-black text-amber-400">
+        <button onClick={() => navigate('landing')} className="text-xl font-black text-primary-400">
           أمرني
         </button>
 
@@ -57,7 +57,7 @@ export function Navbar() {
                     <p className="text-xs text-zinc-500">{user.email}</p>
                     <span className={`text-xs mt-1 inline-block px-2 py-0.5 rounded-full ${
                       profile.role === 'admin' ? 'bg-purple-500/20 text-purple-400' :
-                      profile.role === 'worker' ? 'bg-amber-500/20 text-amber-400' :
+                      profile.role === 'worker' ? 'bg-primary-500/20 text-primary-400' :
                       'bg-zinc-800 text-zinc-400'
                     }`}>
                       {profile.role === 'admin' ? 'مدير' : profile.role === 'worker' ? 'عامل' : 'عميل'}
@@ -103,7 +103,7 @@ export function Navbar() {
                 دخول
               </button>
               <button onClick={() => openAuth('signup')}
-                className="text-sm bg-amber-500 text-black font-bold px-4 py-1.5 rounded-lg hover:bg-amber-400 transition-colors">
+                className="text-sm bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg hover:bg-primary-400 transition-colors">
                 سجّل
               </button>
             </div>

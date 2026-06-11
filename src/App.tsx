@@ -38,13 +38,13 @@ export class ErrorBoundary extends React.Component<{children: React.ReactNode}, 
       return (
         <div className="min-h-screen bg-[#080808] flex items-center justify-center p-4">
           <div className="text-center max-w-sm">
-            <div className="text-4xl font-black text-amber-400 mb-4">أمرني</div>
+            <div className="text-4xl font-black text-primary-400 mb-4">أمرني</div>
             <p className="text-zinc-400 mb-2">حدث خطأ</p>
             <p className="text-red-400 text-xs mb-4 bg-red-950/30 p-2 rounded-lg" dir="ltr">
               {(this.state as any).error?.message || 'Unknown error'}
             </p>
             <button onClick={() => window.location.reload()}
-              className="bg-amber-500 text-black font-bold px-6 py-3 rounded-xl">
+              className="bg-primary-500 text-white font-bold px-6 py-3 rounded-xl">
               تحديث
             </button>
           </div>
@@ -124,7 +124,7 @@ export default function App() {
             setWorkerApproved(data?.is_approved || false)
             if (data?.is_approved) navigate('worker')
             setChecking(false)
-          }} className="text-sm text-amber-400 border border-amber-500/30 px-5 py-2 rounded-xl hover:bg-amber-500/10 transition-colors">
+          }} className="text-sm text-primary-400 border border-primary-500/30 px-5 py-2 rounded-xl hover:bg-primary-500/10 transition-colors">
             {checking ? 'جاري التحقق...' : 'تحقق من الحالة'}
           </button>
         </div>

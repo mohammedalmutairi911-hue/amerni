@@ -10,9 +10,9 @@ const STATUS_LABEL: Record<string, string> = {
   open: 'بانتظار عامل', in_progress: 'جاري التنفيذ', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع'
 }
 const STATUS_COLOR: Record<string, string> = {
-  open: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  open: 'text-primary-400 bg-primary-500/10 border-primary-500/20',
   in_progress: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
-  completed: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  completed: 'text-secondary-400 bg-secondary-500/10 border-secondary-500/20',
   cancelled: 'text-zinc-500 bg-zinc-800 border-zinc-700',
   disputed: 'text-red-400 bg-red-500/10 border-red-500/20',
 }
@@ -110,7 +110,7 @@ export function UserDashboard() {
   if (loading) return (
     <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center">
       <div className="text-center">
-        <div className="w-10 h-10 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-10 h-10 border-2 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
         <p className="text-zinc-600 text-sm">جاري التحميل...</p>
       </div>
     </div>
@@ -142,16 +142,16 @@ export function UserDashboard() {
                 const done = i < cur; const active = i === cur - 1
                 return (
                   <div key={s} className="flex-1 flex flex-col items-center gap-1.5">
-                    <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${done || active ? 'bg-amber-500 border-amber-500' : 'bg-zinc-900 border-zinc-700'}`}>
-                      {done ? <CheckCircle size={13} className="text-black" /> : <div className={`w-2 h-2 rounded-full ${active ? 'bg-black' : 'bg-zinc-600'}`} />}
+                    <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${done || active ? 'bg-primary-500 border-primary-500' : 'bg-zinc-900 border-zinc-700'}`}>
+                      {done ? <CheckCircle size={13} className="text-white" /> : <div className={`w-2 h-2 rounded-full ${active ? 'bg-black' : 'bg-zinc-600'}`} />}
                     </div>
-                    <span className={`text-[10px] text-center font-medium ${done || active ? 'text-amber-400' : 'text-zinc-600'}`}>{s}</span>
+                    <span className={`text-[10px] text-center font-medium ${done || active ? 'text-primary-400' : 'text-zinc-600'}`}>{s}</span>
                   </div>
                 )
               })}
             </div>
             <div className="relative h-1.5 bg-zinc-800 rounded-full">
-              <div className="absolute top-0 right-0 h-1.5 bg-gradient-to-l from-amber-400 to-amber-600 rounded-full transition-all duration-700"
+              <div className="absolute top-0 right-0 h-1.5 bg-gradient-to-l from-primary-400 to-primary-600 rounded-full transition-all duration-700"
                 style={{ width: `${((TASK_STATUS_STEP[selectedTask.status] || 0) / TRACK_STEPS.length) * 100}%` }} />
             </div>
           </div>
@@ -159,7 +159,7 @@ export function UserDashboard() {
           <div className="flex flex-wrap gap-2 text-xs">
             <span className="bg-zinc-800/80 text-zinc-300 px-3 py-1.5 rounded-full font-medium">{selectedTask.category}</span>
             <span className="bg-zinc-800/80 text-zinc-300 px-3 py-1.5 rounded-full flex items-center gap-1"><MapPin size={10} /> {selectedTask.city}</span>
-            {selectedTask.price_suggested && <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-full font-medium">💰 {selectedTask.price_suggested} ريال</span>}
+            {selectedTask.price_suggested && <span className="bg-primary-500/10 text-primary-400 border border-primary-500/20 px-3 py-1.5 rounded-full font-medium">💰 {selectedTask.price_suggested} ريال</span>}
           </div>
         </div>
 
@@ -178,13 +178,13 @@ export function UserDashboard() {
 
         {/* Waiting */}
         {selectedTask.status === 'open' && (
-          <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-5 mb-4">
+          <div className="bg-primary-500/5 border border-primary-500/20 rounded-2xl p-5 mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                <Clock size={18} className="text-amber-400 animate-pulse" />
+              <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center flex-shrink-0">
+                <Clock size={18} className="text-primary-400 animate-pulse" />
               </div>
               <div>
-                <p className="font-semibold text-amber-300">جاري البحث عن عامل مناسب</p>
+                <p className="font-semibold text-primary-300">جاري البحث عن عامل مناسب</p>
                 <p className="text-xs text-zinc-500 mt-0.5">سيتم إشعارك فور قبول عامل طلبك</p>
               </div>
             </div>
@@ -212,16 +212,16 @@ export function UserDashboard() {
 
         {/* Confirm payment */}
         {selectedTask.status === 'in_progress' && (
-          <div className="bg-gradient-to-br from-emerald-950/30 to-[#0d0d0d] border border-emerald-500/20 rounded-2xl p-5 mb-4">
+          <div className="bg-gradient-to-br from-secondary-950/30 to-[#0d0d0d] border border-secondary-500/20 rounded-2xl p-5 mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center"><Unlock size={15} className="text-emerald-400" /></div>
+              <div className="w-8 h-8 rounded-lg bg-secondary-500/20 flex items-center justify-center"><Unlock size={15} className="text-secondary-400" /></div>
               <div>
                 <h3 className="font-bold text-sm text-white">تأكيد إتمام الخدمة</h3>
                 <p className="text-xs text-zinc-500">بعد استلام الخدمة وإرسال المبلغ</p>
               </div>
             </div>
             <button onClick={confirmPayment} disabled={confirmingPayment}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+              className="w-full bg-secondary-600 hover:bg-secondary-500 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
               {confirmingPayment ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle size={15} />}
               أكدت استلام الخدمة وإرسال المبلغ
             </button>
@@ -231,22 +231,22 @@ export function UserDashboard() {
         {/* Mutual rating — client rates worker */}
         {selectedTask.status === 'completed' && selectedTask.worker_id && !ratingDone && (
           <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5 mb-4">
-            <h3 className="font-bold mb-4 flex items-center gap-2"><Star size={16} className="text-amber-400" /> قيّم تجربتك</h3>
+            <h3 className="font-bold mb-4 flex items-center gap-2"><Star size={16} className="text-primary-400" /> قيّم تجربتك</h3>
             <div className="flex gap-2 mb-4">
               {[1,2,3,4,5].map(s => (
                 <button key={s} onClick={() => setRating(s)} className="transition-transform hover:scale-110">
-                  <Star size={30} className={s <= rating ? 'text-amber-400 fill-amber-400' : 'text-zinc-700 hover:text-zinc-500'} />
+                  <Star size={30} className={s <= rating ? 'text-primary-400 fill-primary-400' : 'text-zinc-700 hover:text-zinc-500'} />
                 </button>
               ))}
             </div>
             <button onClick={submitRating} disabled={!rating}
-              className="bg-amber-500 hover:bg-amber-400 text-black font-bold px-6 py-2.5 rounded-xl text-sm disabled:opacity-40 transition-colors">
+              className="bg-primary-500 hover:bg-primary-400 text-white font-bold px-6 py-2.5 rounded-xl text-sm disabled:opacity-40 transition-colors">
               إرسال التقييم
             </button>
           </div>
         )}
         {ratingDone && (
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 mb-4 flex items-center gap-2 text-emerald-400">
+          <div className="bg-secondary-500/10 border border-secondary-500/20 rounded-xl p-4 mb-4 flex items-center gap-2 text-secondary-400">
             <CheckCircle size={16} /> <span className="font-medium">شكراً! تقييمك يساعد العمال الآخرين</span>
           </div>
         )}
@@ -255,10 +255,10 @@ export function UserDashboard() {
         <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl overflow-hidden">
           <div className="px-4 py-3.5 border-b border-zinc-800/50 flex items-center justify-between bg-zinc-900/30">
             <span className="font-semibold text-sm flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center"><MessageSquare size={14} className="text-amber-500" /></div>
+              <div className="w-7 h-7 rounded-lg bg-primary-500/10 flex items-center justify-center"><MessageSquare size={14} className="text-primary-500" /></div>
               المحادثة مع العامل
             </span>
-            <span className="text-xs text-zinc-600 flex items-center gap-1.5"><Shield size={11} className="text-emerald-500" /> محمية بالكامل</span>
+            <span className="text-xs text-zinc-600 flex items-center gap-1.5"><Shield size={11} className="text-secondary-500" /> محمية بالكامل</span>
           </div>
           <div className="h-72 overflow-y-auto px-4 py-4 space-y-2.5">
             {msgs.length === 0 && (
@@ -273,7 +273,7 @@ export function UserDashboard() {
                 <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[78%]">
                     {!isMe && <p className="text-[11px] text-zinc-500 mb-1 mr-1">{m.profiles?.full_name}</p>}
-                    <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMe ? 'bg-amber-500 text-black rounded-tr-sm font-medium' : 'bg-zinc-800 text-zinc-100 rounded-tl-sm'}`}>
+                    <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMe ? 'bg-primary-500 text-white rounded-tr-sm font-medium' : 'bg-zinc-800 text-zinc-100 rounded-tl-sm'}`}>
                       {m.content}
                     </div>
                   </div>
@@ -285,11 +285,11 @@ export function UserDashboard() {
           {blockedWarn && <div className="mx-3 mb-2 px-3 py-2 bg-red-950/40 border border-red-800/50 rounded-xl text-sm text-red-400 flex items-center gap-2"><AlertCircle size={13} /> {blockedWarn}</div>}
           {selectedTask.status === 'in_progress' && (
             <div className="px-3 pb-3">
-              <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 focus-within:border-amber-500/40 transition-colors">
+              <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 focus-within:border-primary-500/40 transition-colors">
                 <input value={msg} onChange={e => setMsg(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMsg()}
                   placeholder="اكتب رسالة للعامل..." className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600" />
-                <button onClick={sendMsg} disabled={!msg.trim() || sending} className="w-8 h-8 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:opacity-30 flex items-center justify-center transition-all">
-                  {sending ? <Loader2 size={14} className="animate-spin text-black" /> : <Send size={14} className="text-black" />}
+                <button onClick={sendMsg} disabled={!msg.trim() || sending} className="w-8 h-8 rounded-lg bg-primary-500 hover:bg-primary-400 disabled:opacity-30 flex items-center justify-center transition-all">
+                  {sending ? <Loader2 size={14} className="animate-spin text-white" /> : <Send size={14} className="text-white" />}
                 </button>
               </div>
             </div>
@@ -302,7 +302,7 @@ export function UserDashboard() {
   return (
     <div className="min-h-screen bg-[#080808] pt-14">
       {/* Hero header */}
-      <div className="bg-gradient-to-b from-amber-500/5 to-transparent border-b border-zinc-900/50">
+      <div className="bg-gradient-to-b from-primary-500/5 to-transparent border-b border-zinc-900/50">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="flex items-start justify-between mb-6">
             <div>
@@ -312,7 +312,7 @@ export function UserDashboard() {
               <p className="text-zinc-500 text-sm">وش تحتاج اليوم؟</p>
             </div>
             <button onClick={() => setShowNew(true)}
-              className="flex items-center gap-2 bg-amber-500 text-black font-bold px-5 py-2.5 rounded-xl hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20">
+              className="flex items-center gap-2 bg-primary-500 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-primary-400 transition-all shadow-lg shadow-primary-500/20">
               <Plus size={16} /> طلب جديد
             </button>
           </div>
@@ -321,9 +321,9 @@ export function UserDashboard() {
           <div className="grid grid-cols-4 gap-2">
             {[
               { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-white' },
-              { label: 'بانتظار عامل', value: openCount, color: 'text-amber-400' },
+              { label: 'بانتظار عامل', value: openCount, color: 'text-primary-400' },
               { label: 'جارية', value: activeCount, color: 'text-blue-400' },
-              { label: 'مكتملة', value: completedCount, color: 'text-emerald-400' },
+              { label: 'مكتملة', value: completedCount, color: 'text-secondary-400' },
             ].map(({ label, value, color }) => (
               <div key={label} className="bg-[#0d0d0d] border border-zinc-800/50 rounded-2xl p-3.5 text-center">
                 <div className={`text-2xl font-black ${color}`}>{value}</div>
@@ -339,7 +339,7 @@ export function UserDashboard() {
         {completedCount > 0 && (
           <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5 mb-5">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <DollarSign size={16} className="text-emerald-400" /> تاريخ المدفوعات
+              <DollarSign size={16} className="text-secondary-400" /> تاريخ المدفوعات
             </h3>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {tasks.filter(t => t.status === 'completed').map(t => (
@@ -348,7 +348,7 @@ export function UserDashboard() {
                     <p className="text-sm text-white truncate">{t.title}</p>
                     <p className="text-xs text-zinc-500">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
                   </div>
-                  <span className="text-emerald-400 font-bold text-sm mr-3">
+                  <span className="text-secondary-400 font-bold text-sm mr-3">
                     {t.price_final || t.price_suggested || '—'} ر
                   </span>
                 </div>
@@ -356,7 +356,7 @@ export function UserDashboard() {
             </div>
             <div className="mt-3 pt-3 border-t border-zinc-800 flex justify-between items-center">
               <span className="text-xs text-zinc-500">الإجمالي</span>
-              <span className="text-emerald-400 font-black">{totalSpent.toLocaleString()} ريال</span>
+              <span className="text-secondary-400 font-black">{totalSpent.toLocaleString()} ريال</span>
             </div>
           </div>
         )}
@@ -381,15 +381,15 @@ export function UserDashboard() {
 
         {/* Spent summary */}
         {completedCount > 0 && (
-          <div className="flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/15 rounded-2xl px-5 py-4 mb-5">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
-              <DollarSign size={18} className="text-emerald-400" />
+          <div className="flex items-center gap-3 bg-secondary-500/5 border border-secondary-500/15 rounded-2xl px-5 py-4 mb-5">
+            <div className="w-10 h-10 rounded-xl bg-secondary-500/10 flex items-center justify-center flex-shrink-0">
+              <DollarSign size={18} className="text-secondary-400" />
             </div>
             <div>
               <p className="text-xs text-zinc-500">إجمالي ما دفعته</p>
-              <p className="text-xl font-black text-emerald-400">{totalSpent.toLocaleString()} ريال</p>
+              <p className="text-xl font-black text-secondary-400">{totalSpent.toLocaleString()} ريال</p>
             </div>
-            <button onClick={() => navigate('referral')} className="mr-auto text-xs text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-full hover:bg-amber-500/10 transition-colors">
+            <button onClick={() => navigate('referral')} className="mr-auto text-xs text-primary-400 border border-primary-500/20 px-3 py-1.5 rounded-full hover:bg-primary-500/10 transition-colors">
               🎁 اكسب من الإحالة
             </button>
           </div>
@@ -401,7 +401,7 @@ export function UserDashboard() {
             <div className="relative">
               <Search size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="ابحث في طلباتك..."
-                className="w-full bg-[#0d0d0d] border border-zinc-800 rounded-xl pr-9 pl-4 py-2.5 text-sm outline-none focus:border-amber-500/40 transition-colors placeholder-zinc-600" />
+                className="w-full bg-[#0d0d0d] border border-zinc-800 rounded-xl pr-9 pl-4 py-2.5 text-sm outline-none focus:border-primary-500/40 transition-colors placeholder-zinc-600" />
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
               <Filter size={12} className="text-zinc-600 flex-shrink-0" />
@@ -412,7 +412,7 @@ export function UserDashboard() {
                 { v: 'completed', l: `✅ مكتمل (${completedCount})` },
               ].map(({ v, l }) => (
                 <button key={v} onClick={() => setFilter(v as any)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${filter === v ? 'bg-amber-500 text-black' : 'bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700'}`}>
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${filter === v ? 'bg-primary-500 text-white' : 'bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700'}`}>
                   {l}
                 </button>
               ))}
@@ -423,8 +423,8 @@ export function UserDashboard() {
         {/* Tasks list */}
         {filteredTasks.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-20 h-20 rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
-              <Sparkles size={32} className="text-amber-500" />
+            <div className="w-20 h-20 rounded-3xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-5">
+              <Sparkles size={32} className="text-primary-500" />
             </div>
             <h3 className="text-xl font-bold mb-2">{search ? 'ما في نتائج' : 'ما عندك طلبات بعد'}</h3>
             <p className="text-zinc-500 text-sm mb-8 max-w-xs mx-auto">
@@ -432,7 +432,7 @@ export function UserDashboard() {
             </p>
             {!search && (
               <button onClick={() => setShowNew(true)}
-                className="bg-amber-500 text-black font-bold px-8 py-3.5 rounded-xl hover:bg-amber-400 transition-colors shadow-lg shadow-amber-500/20">
+                className="bg-primary-500 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-primary-400 transition-colors shadow-lg shadow-primary-500/20">
                 اطلب الحين
               </button>
             )}
@@ -450,18 +450,18 @@ export function UserDashboard() {
                       </span>
                       {task.use_ai && <span className="text-xs text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20 flex items-center gap-1"><Bot size={9} /> AI</span>}
                     </div>
-                    <h3 className="font-bold mb-1.5 text-white leading-snug group-hover:text-amber-50 transition-colors">{task.title}</h3>
+                    <h3 className="font-bold mb-1.5 text-white leading-snug group-hover:text-primary-50 transition-colors">{task.title}</h3>
                     <div className="flex items-center gap-3 text-xs text-zinc-500 flex-wrap">
                       <span className="flex items-center gap-1"><Clock size={10} /> {new Date(task.created_at).toLocaleDateString('ar-SA')}</span>
                       <span className="flex items-center gap-1"><MapPin size={10} /> {task.city}</span>
                       {task.category && <span className="bg-zinc-800 px-2 py-0.5 rounded-full">{task.category}</span>}
-                      {(task.price_final || task.price_suggested) && <span className="text-amber-400 font-medium">💰 {task.price_final || task.price_suggested} ريال</span>}
+                      {(task.price_final || task.price_suggested) && <span className="text-primary-400 font-medium">💰 {task.price_final || task.price_suggested} ريال</span>}
                     </div>
                   </div>
                   <div className="flex-shrink-0 flex flex-col items-center gap-2 mt-1">
                     {task.status === 'in_progress' && <div className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />}
-                    {task.status === 'open' && <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />}
-                    {task.status === 'completed' && <CheckCircle size={16} className="text-emerald-500" />}
+                    {task.status === 'open' && <div className="w-2.5 h-2.5 rounded-full bg-primary-400 animate-pulse" />}
+                    {task.status === 'completed' && <CheckCircle size={16} className="text-secondary-500" />}
                     <ChevronRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
                   </div>
                 </div>
@@ -474,7 +474,7 @@ export function UserDashboard() {
         {tasks.filter(t => t.status === 'completed' && (t.price_final || t.price_suggested)).length > 0 && (
           <div className="mt-8 pt-6 border-t border-zinc-900">
             <h3 className="text-sm font-semibold text-zinc-400 mb-3 flex items-center gap-2">
-              <DollarSign size={14} className="text-emerald-500" /> تاريخ المدفوعات
+              <DollarSign size={14} className="text-secondary-500" /> تاريخ المدفوعات
             </h3>
             <div className="space-y-2">
               {tasks.filter(t => t.status === 'completed' && (t.price_final || t.price_suggested)).map(t => (
@@ -483,12 +483,12 @@ export function UserDashboard() {
                     <p className="text-sm text-white truncate max-w-[200px]">{t.title}</p>
                     <p className="text-xs text-zinc-500">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
                   </div>
-                  <span className="text-emerald-400 font-bold text-sm">{t.price_final || t.price_suggested} ريال</span>
+                  <span className="text-secondary-400 font-bold text-sm">{t.price_final || t.price_suggested} ريال</span>
                 </div>
               ))}
               <div className="flex items-center justify-between px-4 py-2">
                 <span className="text-xs text-zinc-500">الإجمالي</span>
-                <span className="text-emerald-400 font-black">{totalSpent.toLocaleString()} ريال</span>
+                <span className="text-secondary-400 font-black">{totalSpent.toLocaleString()} ريال</span>
               </div>
             </div>
           </div>
