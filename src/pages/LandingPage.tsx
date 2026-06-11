@@ -85,7 +85,18 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
       if (!password) { setError('أدخل كلمة المرور'); return }
       setLoading(true)
       const { error: err } = await signIn(email.trim(), password)
-      if (err) { setError('بريد أو كلمة مرور خاطئة'); setLoading(false); return }
+      if (err) {
+        const msg = err.message?.toLowerCase() || ''
+        if (msg.includes('email not confirmed') || msg.includes('not confirmed')) {
+          setError('__email_confirm__')
+        } else if (msg.includes('invalid login') || msg.includes('invalid credentials') || msg.includes('wrong')) {
+          setError('بريد أو كلمة مرور خاطئة')
+        } else {
+          setError(err.message || 'حدث خطأ — حاول مرة ثانية')
+        }
+        setLoading(false)
+        return
+      }
       setLoading(false)
       onSuccess()
     }
@@ -155,8 +166,18 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
       {error === '__email_confirm__' ? (
         <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center">
           <div className="text-3xl mb-2">📧</div>
-          <p className="text-emerald-400 font-bold mb-1">تحقق من بريدك</p>
-          <p className="text-zinc-400 text-sm">أرسلنا رابط التأكيد على <span className="text-white">{email}</span></p>
+          <p className="text-emerald-400 font-bold mb-1">تحقق من بريدك أولاً</p>
+          <p className="text-zinc-400 text-sm mb-3">أرسلنا رابط التأكيد على <span className="text-white">{email}</span></p>
+          {resetSent ? (
+            <p className="text-emerald-400 text-xs">✅ تم إرسال رابط جديد — تفقد بريدك</p>
+          ) : (
+            <button onClick={async () => {
+              await supabase.auth.resend({ type: 'signup', email: email.trim() })
+              setResetSent(true)
+            }} className="text-xs text-amber-400 underline underline-offset-2 hover:text-amber-300 transition-colors">
+              لم يصلني البريد — أعد الإرسال
+            </button>
+          )}
         </div>
       ) : (
         <>

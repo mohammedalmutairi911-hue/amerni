@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
+import { supabase } from '../lib/supabase'
 
 export function AuthModal() {
   const { signIn, signUp } = useAuth()
@@ -12,6 +13,7 @@ export function AuthModal() {
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [resendDone, setResendDone] = useState(false)
 
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
@@ -22,7 +24,16 @@ export function AuthModal() {
     setLoading(true)
     if (tab === 'login') {
       const { error } = await signIn(form.email, form.password)
-      if (error) { setError('بريد أو كلمة مرور خاطئة'); setLoading(false); return }
+      if (error) {
+        const msg = error.message?.toLowerCase() || ''
+        if (msg.includes('email not confirmed') || msg.includes('not confirmed')) {
+          setError('__email_confirm__')
+        } else {
+          setError('بريد أو كلمة مرور خاطئة')
+        }
+        setLoading(false)
+        return
+      }
     } else {
       const { error } = await signUp(form.email, form.password, form.name, role)
       if (error) { setError(error.message); setLoading(false); return }
@@ -107,13 +118,32 @@ export function AuthModal() {
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-lg">{error}</p>}
-
-          <button onClick={submit} disabled={loading}
-            className="w-full bg-amber-500 text-black font-bold py-2.5 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-            {loading && <Loader2 size={15} className="animate-spin" />}
-            {tab === 'login' ? 'دخول' : 'إنشاء حساب'}
-          </button>
+          {error === '__email_confirm__' ? (
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
+              <p className="text-2xl mb-1">📧</p>
+              <p className="text-emerald-400 font-bold text-sm mb-1">تحقق من بريدك أولاً</p>
+              <p className="text-zinc-400 text-xs mb-2">أرسلنا رابط التأكيد على <span className="text-white">{form.email}</span></p>
+              {resendDone ? (
+                <p className="text-emerald-400 text-xs">✅ تم إرسال رابط جديد</p>
+              ) : (
+                <button onClick={async () => {
+                  await supabase.auth.resend({ type: 'signup', email: form.email.trim() })
+                  setResendDone(true)
+                }} className="text-xs text-amber-400 underline underline-offset-2 hover:text-amber-300 transition-colors">
+                  لم يصلني البريد — أعد الإرسال
+                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-lg">{error}</p>}
+              <button onClick={submit} disabled={loading}
+                className="w-full bg-amber-500 text-black font-bold py-2.5 rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                {loading && <Loader2 size={15} className="animate-spin" />}
+                {tab === 'login' ? 'دخول' : 'إنشاء حساب'}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
