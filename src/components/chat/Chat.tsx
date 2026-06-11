@@ -87,12 +87,12 @@ export function Chat({ taskId, taskTitle }: Props) {
   }
 
   return (
-    <div className="flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden h-[500px]">
+    <div className="flex flex-col bg-[#0d0d0d] border border-zinc-800 rounded-2xl overflow-hidden h-[500px]">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
         <div>
           <p className="text-sm font-medium">{taskTitle}</p>
-          <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-0.5">
+          <div className="flex items-center gap-1.5 text-xs text-zinc-500 mt-0.5">
             <Shield size={11} className="text-secondary-500" /> محمية — لا تشارك أرقام أو روابط
           </div>
         </div>
@@ -101,20 +101,20 @@ export function Chat({ taskId, taskTitle }: Props) {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
         {msgs.length === 0 && (
-          <p className="text-center text-gray-400 text-sm py-8">ابدأ المحادثة مع العميل</p>
+          <p className="text-center text-zinc-600 text-sm py-8">ابدأ المحادثة مع العميل</p>
         )}
         {msgs.map(m => {
           const isMe = m.sender_id === user?.id
           if (m.is_system) return (
             <div key={m.id} className="flex justify-center">
-              <span className="text-xs text-gray-400 bg-gray-100 border border-gray-200 rounded-full px-3 py-1 max-w-xs text-center">{m.content}</span>
+              <span className="text-xs text-zinc-600 bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1 max-w-xs text-center">{m.content}</span>
             </div>
           )
           return (
             <div key={m.id} className={`flex ${isMe ? 'justify-start' : 'justify-end'}`}>
               <div className="max-w-[75%]">
-                {!isMe && <p className="text-xs text-gray-400 mb-1">{m.sender_name}</p>}
-                <div className={`rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-gray-100 text-gray-900' : 'bg-primary-500 text-gray-900'}`}>
+                {!isMe && <p className="text-xs text-zinc-500 mb-1">{m.sender_name}</p>}
+                <div className={`rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-zinc-800 text-zinc-100' : 'bg-primary-500 text-white'}`}>
                   {m.content}
                 </div>
               </div>
@@ -133,12 +133,12 @@ export function Chat({ taskId, taskTitle }: Props) {
 
       {/* Input */}
       <div className="px-3 pb-3">
-        <div className="flex items-center gap-2 bg-gray-100 border border-gray-300 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
+        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
           <input
             value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
             placeholder="اكتب رسالة..."
-            className="flex-1 bg-transparent text-sm outline-none placeholder-gray-400"
+            className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600"
           />
           <button onClick={send} disabled={!input.trim() || sending}
             className="text-primary-500 hover:text-primary-400 disabled:opacity-30 transition-colors">

@@ -4,14 +4,14 @@ export function JoinPage() {
   const { navigate, openAuth } = useApp()
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4" dir="rtl">
+    <div className="min-h-screen bg-[#080808] flex items-center justify-center px-4" dir="rtl">
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
           <div className="w-16 h-16 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-gray-900 text-3xl font-black">أ</span>
+            <span className="text-white text-3xl font-black">أ</span>
           </div>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">انضم كمُنجز في أمرني</h1>
-          <p className="text-gray-500">اكسب من وقتك الحر بدون رأس مال</p>
+          <h1 className="text-3xl font-black text-white mb-2">انضم كمُنجز في أمرني</h1>
+          <p className="text-zinc-400">اكسب من وقتك الحر بدون رأس مال</p>
         </div>
 
         <div className="space-y-3 mb-8">
@@ -21,22 +21,22 @@ export function JoinPage() {
             { icon: '🔒', title: 'أمان كامل', desc: 'فلوسك محمية والتواصل آمن داخل المنصة' },
             { icon: '🌟', title: 'بدون خبرة لازمة', desc: 'اي مهارة عندك لها سوق في أمرني' },
           ].map(({ icon, title, desc }) => (
-            <div key={title} className="flex items-start gap-4 bg-white border border-gray-200 rounded-2xl p-4">
+            <div key={title} className="flex items-start gap-4 bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-4">
               <span className="text-2xl">{icon}</span>
               <div>
-                <p className="font-semibold text-gray-900">{title}</p>
-                <p className="text-sm text-gray-400 mt-0.5">{desc}</p>
+                <p className="font-semibold text-white">{title}</p>
+                <p className="text-sm text-zinc-500 mt-0.5">{desc}</p>
               </div>
             </div>
           ))}
         </div>
 
         <button onClick={() => { openAuth('register'); navigate('landing') }}
-          className="w-full bg-primary-500 hover:bg-primary-400 text-gray-900 font-black py-4 rounded-2xl text-lg transition-colors mb-3">
+          className="w-full bg-primary-500 hover:bg-primary-400 text-white font-black py-4 rounded-2xl text-lg transition-colors mb-3">
           سجّل كمُنجز — مجاناً
         </button>
         <button onClick={() => navigate('landing')}
-          className="w-full text-gray-400 hover:text-gray-700 py-3 text-sm transition-colors">
+          className="w-full text-zinc-500 hover:text-zinc-300 py-3 text-sm transition-colors">
           لديك حساب؟ سجّل دخول
         </button>
       </div>
