@@ -6,7 +6,7 @@ import { getAvatar } from '../../lib/supabase'
 
 export function Navbar() {
   const { user, profile, signOut } = useAuth()
-  const { navigate, openAuth, page, theme, toggleTheme } = useApp()
+  const { navigate, openAuth } = useApp()
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropOpen, setDropOpen] = useState(false)
 
@@ -103,8 +103,12 @@ export function Navbar() {
                 دخول
               </button>
               <button onClick={() => openAuth('signup')}
-                className="text-sm bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg hover:bg-primary-400 transition-colors">
+                className="text-sm bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg hover:bg-primary-600 transition-colors">
                 سجّل
+              </button>
+              <button onClick={() => navigate('join')}
+                className="text-sm bg-secondary-500 text-white font-bold px-4 py-1.5 rounded-lg hover:bg-secondary-600 transition-colors hidden sm:block">
+                سجّل للعمل معنا
               </button>
             </div>
           )}
