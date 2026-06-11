@@ -364,7 +364,7 @@ export function LandingPage() {
                   <span className="text-white text-3xl sm:text-5xl lg:text-6xl">و نسويه عنك.</span>
                 </h1>
                 <p className="text-zinc-400 text-base sm:text-xl mb-8 sm:mb-12 max-w-xl mx-auto leading-relaxed px-2">
-                  منصة سعودية تربطك بعمال موثوقين لإنجاز أي مهمة يومية — بذكاء وأمان.
+                  منصة سعودية تربطك بشخص ثقة و كفو يسوي لك أي خدمة — بسرعة وبثقة.
                 </p>
                 <div className="relative max-w-xl mx-auto mb-6">
                   <div className="flex items-center gap-2 sm:gap-3 bg-[#111] border-2 border-zinc-800 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-primary-500 transition-all shadow-2xl">
