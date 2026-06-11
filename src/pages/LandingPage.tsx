@@ -359,9 +359,9 @@ export function LandingPage() {
                 </div>
                 <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black tracking-tight mb-4 sm:mb-6 leading-[1.05]">
                   <span className="text-white">اطلب</span>{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-500">أي شي.</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-500">أي شي</span>
                   <br />
-                  <span className="text-white text-3xl sm:text-5xl lg:text-6xl">و نسويه عنك.</span>
+                  <span className="text-white text-3xl sm:text-5xl lg:text-6xl">و نسويه عنك</span>
                 </h1>
                 <p className="text-zinc-400 text-base sm:text-xl mb-8 sm:mb-12 max-w-xl mx-auto leading-relaxed px-2">
                   منصة سعودية تربطك بشخص ثقة و كفو يسوي لك أي خدمة — بسرعة وبثقة.
