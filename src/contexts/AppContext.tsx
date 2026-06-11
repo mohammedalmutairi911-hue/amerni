@@ -16,8 +16,6 @@ export const useApp = () => useContext(AppContext)
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [page, setPage] = useState<Page>('landing')
-  const [theme, setTheme] = useState<'dark'|'light'>(() => (localStorage.getItem('theme') as any) || 'dark')
-  const toggleTheme = () => setTheme(t => { const n = t==='dark'?'light':'dark'; localStorage.setItem('theme', n); return n })
   const [authOpen, setAuthOpen] = useState(false)
   const [authTab, setAuthTab] = useState<'login' | 'signup'>('login')
 
