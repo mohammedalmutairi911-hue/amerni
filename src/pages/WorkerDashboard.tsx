@@ -14,7 +14,7 @@ const STATUS_COLOR: Record<string, string> = {
   open: 'text-primary-400 bg-primary-500/10 border-primary-500/20',
   in_progress: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   completed: 'text-secondary-400 bg-secondary-500/10 border-secondary-500/20',
-  cancelled: 'text-zinc-500 bg-zinc-800 border-zinc-700',
+  cancelled: 'text-gray-400 bg-gray-100 border-gray-300',
   disputed: 'text-red-400 bg-red-500/10 border-red-500/20',
 }
 
@@ -128,19 +128,19 @@ export function WorkerDashboard() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 pt-14 flex items-center justify-center">
       <Loader2 className="animate-spin text-primary-400" size={32} />
     </div>
   )
 
   if (!workerProfile?.is_approved) return (
-    <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center px-4">
-      <div className="max-w-sm text-center bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-10">
+    <div className="min-h-screen bg-gray-50 pt-14 flex items-center justify-center px-4">
+      <div className="max-w-sm text-center bg-white border border-gray-200 rounded-2xl p-10">
         <div className="w-16 h-16 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-5">
           <Clock size={28} className="text-primary-500" />
         </div>
         <h2 className="text-xl font-bold mb-3">طلبك قيد المراجعة</h2>
-        <p className="text-zinc-500 text-sm leading-relaxed">فريق أمرني راح يراجع بياناتك ويوافق عليك قريباً. راح تجي لك إشعار فور الموافقة.</p>
+        <p className="text-gray-400 text-sm leading-relaxed">فريق أمرني راح يراجع بياناتك ويوافق عليك قريباً. راح تجي لك إشعار فور الموافقة.</p>
       </div>
     </div>
   )
@@ -154,58 +154,58 @@ export function WorkerDashboard() {
   // Commission modal
   if (showCommission && pendingTask) return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-[#111] border border-zinc-800 rounded-2xl p-6">
+      <div className="w-full max-w-sm bg-white border border-gray-200 rounded-2xl p-6">
         <div className="w-12 h-12 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl">📋</span>
         </div>
         <h2 className="text-lg font-bold text-center mb-2">شروط قبول الطلب</h2>
-        <p className="text-zinc-400 text-sm text-center mb-5">قبل ما تقبل الطلب، يرجى الموافقة على الشروط التالية:</p>
+        <p className="text-gray-500 text-sm text-center mb-5">قبل ما تقبل الطلب، يرجى الموافقة على الشروط التالية:</p>
         
         <div className="bg-primary-500/10 border border-primary-500/20 rounded-xl p-4 mb-4 space-y-2">
-          <p className="text-sm text-white font-semibold">الطلب: {pendingTask.title}</p>
+          <p className="text-sm text-gray-900 font-semibold">الطلب: {pendingTask.title}</p>
           {pendingTask.price_suggested && (
             <p className="text-sm text-primary-400">القيمة المتوقعة: {pendingTask.price_suggested} ريال</p>
           )}
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 mb-5 space-y-3">
-          <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide mb-1">إقرار وتعهد</p>
-          <p className="text-sm text-zinc-300 leading-loose">
-            أتعهد أنا العامل المسجل في منصة <span className="text-primary-400 font-bold">أمرني</span> بأنني عند إتمام هذا الطلب بنجاح، سأقوم بتحويل عمولة خدمة بنسبة <span className="text-primary-400 font-bold">2%</span> من إجمالي قيمة العمل المتفق عليه إلى حساب المنصة التالي، وذلك خلال مدة أقصاها <span className="text-white font-medium">٧٢ ساعة</span> من إتمام الطلب.
+        <div className="bg-gray-100 border border-gray-300 rounded-xl p-4 mb-5 space-y-3">
+          <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-1">إقرار وتعهد</p>
+          <p className="text-sm text-gray-700 leading-loose">
+            أتعهد أنا العامل المسجل في منصة <span className="text-primary-400 font-bold">أمرني</span> بأنني عند إتمام هذا الطلب بنجاح، سأقوم بتحويل عمولة خدمة بنسبة <span className="text-primary-400 font-bold">2%</span> من إجمالي قيمة العمل المتفق عليه إلى حساب المنصة التالي، وذلك خلال مدة أقصاها <span className="text-gray-900 font-medium">٧٢ ساعة</span> من إتمام الطلب.
           </p>
-          <div className="bg-zinc-800 border border-zinc-600 rounded-xl p-3 space-y-2.5 text-sm">
-            <p className="text-xs text-zinc-500 font-medium">معلومات الحساب البنكي</p>
-            <div className="flex items-center justify-between border-b border-zinc-700 pb-2">
-              <span className="text-zinc-400">البنك</span>
-              <span className="text-white font-medium">بنك البلاد</span>
+          <div className="bg-gray-100 border border-gray-300 rounded-xl p-3 space-y-2.5 text-sm">
+            <p className="text-xs text-gray-400 font-medium">معلومات الحساب البنكي</p>
+            <div className="flex items-center justify-between border-b border-gray-300 pb-2">
+              <span className="text-gray-500">البنك</span>
+              <span className="text-gray-900 font-medium">بنك البلاد</span>
             </div>
-            <div className="flex items-center justify-between border-b border-zinc-700 pb-2">
-              <span className="text-zinc-400">اسم المستفيد</span>
-              <span className="text-white font-medium text-xs">مؤسسة حلول الغد للخدمات الإلكترونية</span>
+            <div className="flex items-center justify-between border-b border-gray-300 pb-2">
+              <span className="text-gray-500">اسم المستفيد</span>
+              <span className="text-gray-900 font-medium text-xs">مؤسسة حلول الغد للخدمات الإلكترونية</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-zinc-400">رقم الآيبان</span>
+              <span className="text-gray-500">رقم الآيبان</span>
               <span className="text-primary-400 font-mono text-xs">SA54150009001465965400007</span>
             </div>
           </div>
           {pendingTask.price_suggested && (
             <div className="bg-primary-500/10 border border-primary-500/20 rounded-lg px-3 py-2 flex items-center justify-between">
-              <span className="text-xs text-zinc-400">العمولة المستحقة على هذا الطلب</span>
+              <span className="text-xs text-gray-500">العمولة المستحقة على هذا الطلب</span>
               <span className="text-primary-400 font-bold">{(pendingTask.price_suggested * 0.02).toFixed(2)} ريال</span>
             </div>
           )}
-          <p className="text-xs text-zinc-600 leading-relaxed">
+          <p className="text-xs text-gray-400 leading-relaxed">
             بالضغط على "أوافق وأقبل الطلب" أقر بقراءة هذا التعهد والموافقة عليه، ويُعدّ هذا الإقرار ملزماً قانونياً وفق أنظمة المملكة العربية السعودية.
           </p>
         </div>
 
         <div className="flex gap-3">
           <button onClick={() => { setShowCommission(false); setPendingTask(null) }}
-            className="flex-1 border border-zinc-700 text-zinc-300 py-2.5 rounded-xl text-sm hover:border-zinc-600 transition-colors">
+            className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-xl text-sm hover:border-gray-300 transition-colors">
             إلغاء
           </button>
           <button onClick={confirmAcceptTask}
-            className="flex-1 bg-primary-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors">
+            className="flex-1 bg-primary-500 text-gray-900 font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors">
             أوافق وأقبل الطلب
           </button>
         </div>
@@ -223,15 +223,15 @@ export function WorkerDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#080808] pt-14">
+    <div className="min-h-screen bg-gray-50 pt-14">
       {/* Top header */}
-      <div className="bg-[#0d0d0d] border-b border-zinc-800 px-4 py-3">
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={getAvatar(profile?.full_name || '')} className="w-9 h-9 rounded-xl" alt="" />
             <div>
               <p className="font-semibold text-sm">{profile?.full_name}</p>
-              <div className="flex items-center gap-1 text-xs text-zinc-500">
+              <div className="flex items-center gap-1 text-xs text-gray-400">
                 <Star size={10} className="text-primary-400" />
                 {workerProfile?.rating ? workerProfile.rating.toFixed(1) : '—'}
                 <span className="mx-1">·</span>
@@ -243,7 +243,7 @@ export function WorkerDashboard() {
             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium border transition-all ${
               workerProfile?.is_online
                 ? 'bg-secondary-500/10 border-secondary-500/30 text-secondary-400'
-                : 'bg-zinc-900 border-zinc-700 text-zinc-400'
+                : 'bg-gray-100 border-gray-300 text-gray-500'
             }`}>
             {toggling ? <Loader2 size={14} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={14} /> متاح</> : <><WifiOff size={14} /> أوفلاين</>}
           </button>
@@ -251,16 +251,16 @@ export function WorkerDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-[#0d0d0d] border-b border-zinc-800 sticky top-14 z-10">
+      <div className="bg-white border-b border-gray-200 sticky top-14 z-10">
         <div className="max-w-4xl mx-auto px-4 flex gap-0.5 overflow-x-auto">
           {TABS.map(({ id, icon: Icon, label, badge }) => (
             <button key={id} onClick={() => setTab(id as Tab)}
               className={`flex items-center gap-1.5 px-3 py-3 text-xs font-medium whitespace-nowrap border-b-2 transition-all ${
-                tab === id ? 'border-primary-500 text-primary-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                tab === id ? 'border-primary-500 text-primary-400' : 'border-transparent text-gray-400 hover:text-gray-700'
               }`}>
               <Icon size={13} /> {label}
               {badge !== undefined && badge > 0 && (
-                <span className="bg-primary-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{badge > 9 ? '9+' : badge}</span>
+                <span className="bg-primary-500 text-gray-900 text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{badge > 9 ? '9+' : badge}</span>
               )}
             </button>
           ))}
@@ -280,18 +280,18 @@ export function WorkerDashboard() {
                 { label: 'جارية الآن', value: activeTasks.length, icon: TrendingUp, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
                 { label: 'هذا الشهر', value: thisMonth, icon: Calendar, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
               ].map(({ label, value, icon: Icon, color, bg }) => (
-                <div key={label} className={`bg-[#0d0d0d] border ${bg.split(' ')[1]} rounded-2xl p-5`}>
+                <div key={label} className={`bg-white border ${bg.split(' ')[1]} rounded-2xl p-5`}>
                   <div className={`w-9 h-9 rounded-xl ${bg} border flex items-center justify-center mb-3`}>
                     <Icon size={17} className={color} />
                   </div>
                   <div className={`text-2xl font-black mb-1 ${color}`}>{value}</div>
-                  <div className="text-xs text-zinc-500">{label}</div>
+                  <div className="text-xs text-gray-400">{label}</div>
                 </div>
               ))}
             </div>
 
             {/* Rating card */}
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">تقييمك</h3>
                 <div className="flex items-center gap-1">
@@ -302,34 +302,34 @@ export function WorkerDashboard() {
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3 text-center">
-                <div className="bg-zinc-900 rounded-xl p-3">
-                  <div className="text-lg font-bold text-white">{completedTasks.length}</div>
-                  <div className="text-xs text-zinc-500">مكتمل</div>
+                <div className="bg-gray-100 rounded-xl p-3">
+                  <div className="text-lg font-bold text-gray-900">{completedTasks.length}</div>
+                  <div className="text-xs text-gray-400">مكتمل</div>
                 </div>
-                <div className="bg-zinc-900 rounded-xl p-3">
-                  <div className="text-lg font-bold text-white">{activeTasks.length}</div>
-                  <div className="text-xs text-zinc-500">جاري</div>
+                <div className="bg-gray-100 rounded-xl p-3">
+                  <div className="text-lg font-bold text-gray-900">{activeTasks.length}</div>
+                  <div className="text-xs text-gray-400">جاري</div>
                 </div>
-                <div className="bg-zinc-900 rounded-xl p-3">
-                  <div className="text-lg font-bold text-white">{myTasks.filter(t => t.status === 'cancelled').length}</div>
-                  <div className="text-xs text-zinc-500">ملغي</div>
+                <div className="bg-gray-100 rounded-xl p-3">
+                  <div className="text-lg font-bold text-gray-900">{myTasks.filter(t => t.status === 'cancelled').length}</div>
+                  <div className="text-xs text-gray-400">ملغي</div>
                 </div>
               </div>
             </div>
 
             {/* Recent tasks */}
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">آخر الطلبات</h3>
                 <button onClick={() => setTab('my-tasks')} className="text-xs text-primary-400 flex items-center gap-1">الكل <ArrowRight size={12} /></button>
               </div>
               {myTasks.length === 0 ? (
-                <p className="text-zinc-600 text-sm text-center py-6">ما قبلت أي طلب بعد</p>
+                <p className="text-gray-400 text-sm text-center py-6">ما قبلت أي طلب بعد</p>
               ) : myTasks.slice(0, 5).map(task => (
-                <div key={task.id} className="flex items-center justify-between py-3 border-b border-zinc-800/50 last:border-0">
+                <div key={task.id} className="flex items-center justify-between py-3 border-b border-gray-200/50 last:border-0">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{task.title}</p>
-                    <p className="text-xs text-zinc-500">{new Date(task.created_at).toLocaleDateString('ar-SA')}</p>
+                    <p className="text-xs text-gray-400">{new Date(task.created_at).toLocaleDateString('ar-SA')}</p>
                   </div>
                   <div className="flex items-center gap-2 mr-3">
                     {(task.price_final || task.price_suggested) ? (
@@ -342,7 +342,7 @@ export function WorkerDashboard() {
             </div>
 
             {/* Skills */}
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <h3 className="font-semibold mb-3">مهاراتي</h3>
               <div className="flex flex-wrap gap-2">
                 {(workerProfile?.skills || []).map(s => (
@@ -360,8 +360,8 @@ export function WorkerDashboard() {
             <div className="relative mb-1">
               <input value={searchQ} onChange={e => setSearchQ(e.target.value)}
                 placeholder="🔍 ابحث في الطلبات..."
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-primary-500/50" />
-              {searchQ && <button onClick={() => setSearchQ('')} className="absolute left-3 top-2.5 text-zinc-500 hover:text-white">✕</button>}
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-primary-500/50" />
+              {searchQ && <button onClick={() => setSearchQ('')} className="absolute left-3 top-2.5 text-gray-400 hover:text-gray-900">✕</button>}
             </div>
             {/* Smart filter */}
             <div className="flex gap-2 overflow-x-auto pb-1">
@@ -371,18 +371,18 @@ export function WorkerDashboard() {
                 { id: 'all', label: '🌐 كل الطلبات' },
               ].map(f => (
                 <button key={f.id} onClick={() => setCityFilter(f.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${cityFilter === f.id ? 'bg-primary-500 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}>
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${cityFilter === f.id ? 'bg-primary-500 text-gray-900' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                   {f.label}
                 </button>
               ))}
             </div>
             {!workerProfile?.is_online && (
-              <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-500 mb-2">
+              <div className="flex items-center gap-3 bg-gray-100/50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-400 mb-2">
                 <WifiOff size={15} /> فعّل الأنلاين من الأعلى عشان تظهر للعملاء
               </div>
             )}
             {feedTasks.length === 0 ? (
-              <div className="text-center py-16 text-zinc-600">
+              <div className="text-center py-16 text-gray-400">
                 <Zap size={32} className="mx-auto mb-3 opacity-30" />
                 <p>ما في طلبات متاحة الحين</p>
               </div>
@@ -399,26 +399,26 @@ export function WorkerDashboard() {
                 }
                 return true
               }).map(task => (
-              <div key={task.id} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div key={task.id} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-all">
                 <div className="flex items-start justify-between mb-3 gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-xs bg-primary-500/10 border border-primary-500/20 text-primary-400 rounded-full px-2 py-0.5">جديد</span>
-                      <span className="text-xs text-zinc-500">{task.category}</span>
-                      <span className="text-xs text-zinc-500">{task.city}</span>
+                      <span className="text-xs text-gray-400">{task.category}</span>
+                      <span className="text-xs text-gray-400">{task.city}</span>
                       {task.use_ai && <span className="text-xs text-purple-400">AI</span>}
                     </div>
                     <h3 className="font-semibold">{task.title}</h3>
-                    <p className="text-sm text-zinc-500 mt-1 line-clamp-2">{task.description}</p>
+                    <p className="text-sm text-gray-400 mt-1 line-clamp-2">{task.description}</p>
                   </div>
                   {task.price_suggested && (
                     <span className="text-primary-400 font-bold text-sm flex-shrink-0">{task.price_suggested} ر</span>
                   )}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-zinc-600">{new Date(task.created_at).toLocaleDateString('ar-SA')}</span>
+                  <span className="text-xs text-gray-400">{new Date(task.created_at).toLocaleDateString('ar-SA')}</span>
                   <button onClick={() => acceptTask(task)} disabled={accepting === task.id}
-                    className="bg-primary-500 text-white text-sm font-bold px-5 py-1.5 rounded-lg hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center gap-1">
+                    className="bg-primary-500 text-gray-900 text-sm font-bold px-5 py-1.5 rounded-lg hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center gap-1">
                     {accepting === task.id ? <Loader2 size={13} className="animate-spin" /> : <Zap size={13} />}
                     اقبل
                   </button>
@@ -432,20 +432,20 @@ export function WorkerDashboard() {
         {tab === 'my-tasks' && (
           <div className="space-y-3">
             {myTasks.length === 0 ? (
-              <div className="text-center py-16 text-zinc-600">
+              <div className="text-center py-16 text-gray-400">
                 <Briefcase size={32} className="mx-auto mb-3 opacity-30" />
                 <p>ما قبلت أي طلب بعد</p>
                 <button onClick={() => setTab('feed')} className="text-primary-400 text-sm mt-2">تصفح الطلبات المتاحة ←</button>
               </div>
             ) : myTasks.map(task => (
-              <div key={task.id} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-5">
+              <div key={task.id} className="bg-white border border-gray-200 rounded-xl p-5">
                 <div className="flex items-start justify-between mb-3 gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${STATUS_COLOR[task.status]}`}>{STATUS_LABEL[task.status]}</span>
                     </div>
                     <h3 className="font-semibold truncate">{task.title}</h3>
-                    <p className="text-xs text-zinc-500 mt-0.5">{(task as any).profiles?.full_name} · {new Date(task.created_at).toLocaleDateString('ar-SA')}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{(task as any).profiles?.full_name} · {new Date(task.created_at).toLocaleDateString('ar-SA')}</p>
                   </div>
                   <span className="text-primary-400 font-bold flex-shrink-0">{task.price_final || task.price_suggested || '—'} ر</span>
                 </div>
@@ -453,7 +453,7 @@ export function WorkerDashboard() {
                   {task.status === 'in_progress' && (
                     <>
                       <button onClick={() => { setSelectedTask(task); setTab('chat') }}
-                        className="flex-1 flex items-center justify-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 text-sm py-2 rounded-lg transition-colors">
+                        className="flex-1 flex items-center justify-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-sm py-2 rounded-lg transition-colors">
                         <MessageSquare size={14} /> محادثة
                       </button>
                       <button onClick={() => {
@@ -482,22 +482,22 @@ export function WorkerDashboard() {
           <div>
             {selectedTask ? (
               <div>
-                <button onClick={() => setSelectedTask(null)} className="text-sm text-zinc-400 hover:text-white mb-4 flex items-center gap-1">← رجوع</button>
+                <button onClick={() => setSelectedTask(null)} className="text-sm text-gray-500 hover:text-gray-900 mb-4 flex items-center gap-1">← رجوع</button>
                 <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
               </div>
             ) : (
               <div className="space-y-2">
-                <p className="text-zinc-500 text-sm mb-4">اختر طلب عشان تفتح المحادثة</p>
+                <p className="text-gray-400 text-sm mb-4">اختر طلب عشان تفتح المحادثة</p>
                 {myTasks.filter(t => t.status === 'in_progress').length === 0 ? (
-                  <div className="text-center py-16 text-zinc-600">
+                  <div className="text-center py-16 text-gray-400">
                     <MessageSquare size={32} className="mx-auto mb-3 opacity-30" />
                     <p>ما في محادثات نشطة</p>
                   </div>
                 ) : myTasks.filter(t => t.status === 'in_progress').map(task => (
                   <button key={task.id} onClick={() => setSelectedTask(task)}
-                    className="w-full bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4 text-right hover:border-zinc-700 transition-all">
+                    className="w-full bg-white border border-gray-200 rounded-xl p-4 text-right hover:border-gray-300 transition-all">
                     <p className="font-medium">{task.title}</p>
-                    <p className="text-xs text-zinc-500 mt-0.5">{(task as any).profiles?.full_name}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{(task as any).profiles?.full_name}</p>
                   </button>
                 ))}
               </div>
@@ -507,41 +507,41 @@ export function WorkerDashboard() {
 
         {/* Schedule */}
         {tab === 'schedule' && (
-          <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+          <div className="bg-white border border-gray-200 rounded-2xl p-5">
             <h2 className="font-bold mb-4">جدول توفرك</h2>
             {workerProfile?.schedule && Object.keys(workerProfile.schedule).length > 0 ? (
               <div className="space-y-2">
                 {Object.entries(workerProfile.schedule).map(([day, s]: [string, any]) => (
-                  <div key={day} className={`flex items-center justify-between rounded-xl px-4 py-3 ${s.active ? 'bg-primary-500/5 border border-primary-500/20' : 'bg-zinc-900/50 border border-zinc-800'}`}>
-                    <span className={`text-sm font-medium ${s.active ? 'text-white' : 'text-zinc-500'}`}>{day}</span>
-                    {s.active ? <span className="text-xs text-primary-400">{s.from} — {s.to}</span> : <span className="text-xs text-zinc-600">غير متاح</span>}
+                  <div key={day} className={`flex items-center justify-between rounded-xl px-4 py-3 ${s.active ? 'bg-primary-500/5 border border-primary-500/20' : 'bg-gray-100/50 border border-gray-200'}`}>
+                    <span className={`text-sm font-medium ${s.active ? 'text-gray-900' : 'text-gray-400'}`}>{day}</span>
+                    {s.active ? <span className="text-xs text-primary-400">{s.from} — {s.to}</span> : <span className="text-xs text-gray-400">غير متاح</span>}
                   </div>
                 ))}
               </div>
-            ) : <p className="text-zinc-500 text-sm">ما في جدول محدد</p>}
+            ) : <p className="text-gray-400 text-sm">ما في جدول محدد</p>}
           </div>
         )}
 
         {/* Profile */}
         {tab === 'profile' && (
           <div className="space-y-4">
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
               <div className="flex items-center gap-4 mb-5">
                 <img src={getAvatar(profile?.full_name || '')} className="w-16 h-16 rounded-2xl" alt="" />
                 <div>
                   <h2 className="text-xl font-bold">{profile?.full_name}</h2>
-                  <p className="text-zinc-500 text-sm">{workerProfile?.city} · {workerProfile?.nationality}</p>
+                  <p className="text-gray-400 text-sm">{workerProfile?.city} · {workerProfile?.nationality}</p>
                   <div className="flex items-center gap-1 mt-1">
                     <Star size={13} className="text-primary-400 fill-primary-400" />
                     <span className="text-sm font-medium">{workerProfile?.rating ? workerProfile.rating.toFixed(1) : '—'}</span>
-                    <span className="text-xs text-zinc-600">({completedTasks.length} طلب)</span>
+                    <span className="text-xs text-gray-400">({completedTasks.length} طلب)</span>
                   </div>
                 </div>
               </div>
-              {workerProfile?.bio && <p className="text-sm text-zinc-400 leading-relaxed border-t border-zinc-800 pt-4">{workerProfile.bio}</p>}
+              {workerProfile?.bio && <p className="text-sm text-gray-500 leading-relaxed border-t border-gray-200 pt-4">{workerProfile.bio}</p>}
             </div>
 
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <h3 className="font-semibold mb-3">بياناتي</h3>
               <div className="space-y-2.5">
                 {[
@@ -550,15 +550,15 @@ export function WorkerDashboard() {
                   ['التحقق', workerProfile?.id_verified ? '✓ موثق' : '✗ غير موثق'],
                   ['الحالة', workerProfile?.is_approved ? '✓ موافق عليه' : '⏳ قيد المراجعة'],
                 ].map(([k, v]) => (
-                  <div key={k} className="flex justify-between items-center border-b border-zinc-800/50 pb-2 last:border-0">
-                    <span className="text-zinc-500 text-sm">{k}</span>
+                  <div key={k} className="flex justify-between items-center border-b border-gray-200/50 pb-2 last:border-0">
+                    <span className="text-gray-400 text-sm">{k}</span>
                     <span className="text-sm font-medium">{v || '—'}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <h3 className="font-semibold mb-3">مهاراتي</h3>
               <div className="flex flex-wrap gap-2">
                 {(workerProfile?.skills || []).map(s => (
