@@ -77,8 +77,32 @@ export function UserDashboard() {
   const confirmPayment = async () => {
     if (!selectedTask || !user) return
     setConfirmingPayment(true)
+    const price = (selectedTask as any).price_final || (selectedTask as any).price_suggested || 0
+    const commission = (price * 0.02).toFixed(2)
     await supabase.from('tasks').update({ status: 'completed' }).eq('id', selectedTask!.id)
-    await supabase.from('task_messages').insert({ task_id: selectedTask.id, sender_id: user.id, content: '✅ العميل أكد استلام الخدمة وإرسال المبلغ.', is_blocked: false })
+    // Confirm message
+    await supabase.from('task_messages').insert({
+      task_id: selectedTask.id, sender_id: user.id,
+      content: '✅ العميل أكد استلام الخدمة — الطلب مكتمل.',
+      is_blocked: false
+    })
+    // Commission reminder message to worker
+    if (price > 0) {
+      await supabase.from('task_messages').insert({
+        task_id: selectedTask.id, sender_id: user.id,
+        content: '💰 تذكير للعامل: يرجى تحويل عمولة المنصة (' + commission + ' ريال = 2% من ' + price + ' ريال) إلى حساب أمرني — IBAN: SA54150009001465965400007 | بنك البلاد | مؤسسة حلول الغد — خلال ٧٢ ساعة.',
+        is_blocked: false
+      })
+    }
+    // Notify worker
+    if (selectedTask.worker_id) {
+      await supabase.from('notifications').insert({
+        user_id: selectedTask.worker_id,
+        title: 'تم تأكيد استلام الخدمة ✅',
+        body: 'العميل أكد الاستلام — لا تنسَ تحويل العمولة (' + commission + ' ريال) خلال ٧٢ ساعة',
+        type: 'payment_reminder',
+      })
+    }
     setSelectedTask(p => p ? { ...p, status: 'completed' } : null)
     setConfirmingPayment(false)
   }

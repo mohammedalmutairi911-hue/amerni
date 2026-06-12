@@ -37,6 +37,7 @@ export function WorkerDashboard() {
   const [proofUrl, setProofUrl] = useState('')
   const [proofNote, setProofNote] = useState('')
   const [uploadingProof, setUploadingProof] = useState(false)
+  const [paymentReminderTask, setPaymentReminderTask] = useState<Task | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -263,6 +264,71 @@ export function WorkerDashboard() {
 
   return (
     <div className="min-h-screen bg-[#080808] pt-14">
+
+      {/* Payment Reminder Modal - shown after task completed */}
+      {paymentReminderTask && (() => {
+        const price = (paymentReminderTask as any).price_final || (paymentReminderTask as any).price_suggested || 0
+        const commission = (price * 0.02).toFixed(2)
+        return (
+          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+            <div className="bg-[#111] border border-zinc-800 rounded-2xl w-full max-w-md p-6">
+              <div className="w-12 h-12 rounded-2xl bg-secondary-500/10 border border-secondary-500/20 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">💰</span>
+              </div>
+              <h3 className="text-lg font-bold text-center mb-1">تذكير تحويل العمولة</h3>
+              <p className="text-zinc-400 text-sm text-center mb-5">الطلب اكتمل — يرجى تحويل عمولة المنصة</p>
+
+              {/* Task info */}
+              <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-zinc-400">الطلب</span>
+                  <span className="text-white font-medium">{(paymentReminderTask as any).title}</span>
+                </div>
+                <div className="flex justify-between text-sm border-t border-zinc-800 pt-2">
+                  <span className="text-zinc-400">قيمة الطلب</span>
+                  <span className="text-white font-bold">{price} ريال</span>
+                </div>
+                <div className="flex justify-between text-sm border-t border-zinc-800 pt-2">
+                  <span className="text-zinc-400">نسبة العمولة</span>
+                  <span className="text-primary-400 font-bold">2%</span>
+                </div>
+                <div className="flex justify-between text-sm border-t border-zinc-800 pt-2 bg-primary-500/10 rounded-lg px-3 py-2 -mx-1">
+                  <span className="text-zinc-300 font-medium">المبلغ المستحق تحويله</span>
+                  <span className="text-primary-400 font-black text-base">{commission} ريال</span>
+                </div>
+              </div>
+
+              {/* IBAN info */}
+              <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 mb-5 space-y-3">
+                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">معلومات الحساب البنكي</p>
+                <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+                  <span className="text-zinc-400 text-sm">البنك</span>
+                  <span className="text-white font-medium text-sm">بنك البلاد</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+                  <span className="text-zinc-400 text-sm">اسم المستفيد</span>
+                  <span className="text-white font-medium text-xs text-left max-w-[55%]">مؤسسة حلول الغد للخدمات الإلكترونية</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-400 text-sm">رقم الآيبان</span>
+                  <button onClick={() => navigator.clipboard.writeText('SA54150009001465965400007')}
+                    className="text-primary-400 font-mono text-xs hover:text-primary-300 transition-colors flex items-center gap-1">
+                    SA54150009001465965400007
+                    <Copy size={11} />
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-xs text-zinc-600 text-center mb-4">يجب التحويل خلال ٧٢ ساعة من إتمام الطلب وفق الاتفاقية</p>
+
+              <button onClick={() => setPaymentReminderTask(null)}
+                className="w-full py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-bold text-sm transition-colors">
+                فهمت — سأقوم بالتحويل
+              </button>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Completion Modal */}
       {completingTask && (
@@ -548,9 +614,10 @@ export function WorkerDashboard() {
                     </div>
                   )}
                   {task.status === 'completed' && (
-                    <div className="flex-1 flex items-center justify-center gap-1.5 bg-secondary-500/10 text-secondary-400 text-sm py-2 rounded-lg">
-                      <CheckCircle size={14} /> مكتمل ✓
-                    </div>
+                    <button onClick={() => setPaymentReminderTask(task)}
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-secondary-500/10 text-secondary-400 text-sm py-2 rounded-lg border border-secondary-500/20 hover:bg-secondary-500/20 transition-colors">
+                      <CheckCircle size={14} /> مكتمل — عرض تفاصيل العمولة
+                    </button>
                   )}
                 </div>
               </div>
