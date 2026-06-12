@@ -5,9 +5,25 @@ import { filterContent } from '../../lib/contentFilter'
 import { useAuth } from '../../contexts/AuthContext'
 
 const BLOCKED_PATTERNS = [
-  /(\+966|00966|05\d{8})/,
-  /[\w.-]+@[\w.-]+\.\w{2,}/,
-  /wa\.me|whatsapp|واتساب|telegram|t\.me/i
+  // أرقام الجوال السعودية
+  /(\+966|00966|966)/,
+  /(05\d[\s\-.]?\d{3}[\s\-.]?\d{4})/,
+  // أي تسلسل من 7 أرقام أو أكثر (مع فواصل أو بدونها)
+  /\d[\s\-.]?\d[\s\-.]?\d[\s\-.]?\d[\s\-.]?\d[\s\-.]?\d[\s\-.]?\d/,
+  // إيميل
+  /[\w.+\-]+\s*@\s*[\w.\-]+\.\w{2,}/,
+  // تطبيقات التواصل
+  /wa\.me|whatsapp|واتس|واتساب/i,
+  /telegram|تيليجرام|تلغرام|t\.me/i,
+  /snapchat|سناب/i,
+  /instagram|انستا/i,
+  /twitter|تويتر|x\.com/i,
+  /تيك\s*توك|tiktok/i,
+  // عبارات التحويل للخارج
+  /تواصل\s*معي\s*على|كلمني\s*على|راسلني\s*على/i,
+  /call\s*me|contact\s*me/i,
+  // روابط
+  /https?:\/\/|www\./i,
 ]
 
 interface Msg {
@@ -93,7 +109,7 @@ export function Chat({ taskId, taskTitle }: Props) {
         <div>
           <p className="text-sm font-medium">{taskTitle}</p>
           <div className="flex items-center gap-1.5 text-xs text-zinc-500 mt-0.5">
-            <Shield size={11} className="text-secondary-500" /> محمية — لا تشارك أرقام أو روابط
+            <Shield size={11} className="text-secondary-500" /> محادثة محمية — التواصل داخل المنصة فقط
           </div>
         </div>
       </div>
@@ -126,16 +142,20 @@ export function Chat({ taskId, taskTitle }: Props) {
 
       {/* Blocked warning */}
       {blocked && (
-        <div className="mx-3 mb-2 px-4 py-2 bg-red-950/40 border border-red-800/50 rounded-xl text-sm text-red-400">
-          {blocked}
+        <div className="mx-3 mb-2 px-4 py-3 bg-red-950/40 border border-red-800/50 rounded-xl text-sm text-red-400 flex items-start gap-2">
+          <span className="text-lg leading-none">⛔</span>
+          <div>
+            <p className="font-bold mb-0.5">تم حظر الرسالة</p>
+            <p className="text-xs text-red-400/80">لا يُسمح بمشاركة أرقام الجوال أو الإيميل أو روابط التواصل — التواصل داخل المنصة فقط</p>
+          </div>
         </div>
       )}
 
       {/* Input */}
       <div className="px-3 pb-3">
-        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
+        <div className={`flex items-center gap-2 bg-zinc-900 border rounded-xl px-3 py-2 transition-colors ${blocked ? 'border-red-800/70' : 'border-zinc-700 focus-within:border-primary-500/40'}`}>
           <input
-            value={input} onChange={e => setInput(e.target.value)}
+            value={input} onChange={e => { setInput(e.target.value); if(blocked) setBlocked('') }}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
             placeholder="اكتب رسالة..."
             className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600"
