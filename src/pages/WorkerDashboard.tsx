@@ -9,12 +9,13 @@ import { getAvatar } from '../lib/supabase'
 
 type Tab = 'overview' | 'feed' | 'my-tasks' | 'chat' | 'schedule' | 'profile'
 
-const STATUS_LABEL: Record<string, string> = { open: 'مفتوح', in_progress: 'جاري', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع' }
+const STATUS_LABEL: Record<string, string> = { open: 'مفتوح', in_progress: 'جاري', pending_confirmation: 'بانتظار تأكيد العميل', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع' }
 const STATUS_COLOR: Record<string, string> = {
   open: 'text-primary-400 bg-primary-500/10 border-primary-500/20',
   in_progress: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   completed: 'text-secondary-400 bg-secondary-500/10 border-secondary-500/20',
   cancelled: 'text-zinc-500 bg-zinc-800 border-zinc-700',
+  pending_confirmation: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
   disputed: 'text-red-400 bg-red-500/10 border-red-500/20',
 }
 
@@ -32,6 +33,10 @@ export function WorkerDashboard() {
   const [toggling, setToggling] = useState(false)
   const [pendingTask, setPendingTask] = useState<Task | null>(null)
   const [showCommission, setShowCommission] = useState(false)
+  const [completingTask, setCompletingTask] = useState<Task | null>(null)
+  const [proofUrl, setProofUrl] = useState('')
+  const [proofNote, setProofNote] = useState('')
+  const [uploadingProof, setUploadingProof] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -116,6 +121,40 @@ export function WorkerDashboard() {
     }).eq('user_id', user!.id)
     await fetchMyTasks()
     await fetchWorkerProfile()
+  }
+
+  const submitCompletion = async () => {
+    if (!completingTask || !user) return
+    setUploadingProof(true)
+    const price = completingTask.price_final || completingTask.price_suggested || 0
+    // Update task status to pending_confirmation with proof
+    await supabase.from('tasks').update({
+      status: 'pending_confirmation',
+      price_final: price,
+      completion_note: proofNote,
+      completion_proof: proofUrl || null,
+    }).eq('id', completingTask.id)
+    // Send system message in chat
+    await supabase.from('task_messages').insert({
+      task_id: completingTask.id,
+      sender_id: user.id,
+      content: '🏁 العامل أعلن إنهاء الطلب — بانتظار تأكيد العميل للاستلام.',
+      is_blocked: false,
+    })
+    // Notify client
+    if (completingTask.client_id) {
+      await supabase.from('notifications').insert({
+        user_id: completingTask.client_id,
+        title: 'طلبك اكتمل ✅',
+        body: 'العامل أنهى طلبك "' + completingTask.title + '" — راجع وأكد الاستلام',
+        type: 'task_update',
+      })
+    }
+    await fetchMyTasks()
+    setUploadingProof(false)
+    setCompletingTask(null)
+    setProofUrl('')
+    setProofNote('')
   }
 
   const toggleOnline = async () => {
@@ -224,6 +263,47 @@ export function WorkerDashboard() {
 
   return (
     <div className="min-h-screen bg-[#080808] pt-14">
+
+      {/* Completion Modal */}
+      {completingTask && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#111] border border-zinc-800 rounded-2xl w-full max-w-md p-5">
+            <h3 className="text-lg font-bold mb-1">إنهاء الطلب</h3>
+            <p className="text-zinc-400 text-sm mb-4">أضف ملاحظة أو صورة كدليل على الإنجاز — سيراها العميل قبل التأكيد</p>
+
+            <textarea
+              value={proofNote}
+              onChange={e => setProofNote(e.target.value)}
+              placeholder="ملاحظة للعميل (اختياري): مثال — انتهيت من التوصيل، الطرد موضوع عند الباب"
+              rows={3}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm outline-none resize-none placeholder-zinc-600 focus:border-primary-500/40 mb-3"
+            />
+
+            <input
+              value={proofUrl}
+              onChange={e => setProofUrl(e.target.value)}
+              placeholder="رابط صورة الإنجاز (اختياري) — ارفع الصورة على imgur.com وأرسل الرابط"
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm outline-none placeholder-zinc-600 focus:border-primary-500/40 mb-4"
+            />
+
+            {proofUrl && (
+              <img src={proofUrl} alt="دليل الإنجاز" className="w-full h-40 object-cover rounded-xl mb-4 border border-zinc-700" onError={e => (e.currentTarget.style.display='none')} />
+            )}
+
+            <div className="flex gap-2">
+              <button onClick={() => { setCompletingTask(null); setProofUrl(''); setProofNote('') }}
+                className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-sm text-zinc-400 hover:bg-zinc-800 transition-colors">
+                إلغاء
+              </button>
+              <button onClick={submitCompletion} disabled={uploadingProof}
+                className="flex-1 py-2.5 rounded-xl bg-secondary-500 hover:bg-secondary-600 text-white font-bold text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                {uploadingProof ? <><span className="animate-spin">⏳</span> جاري...</> : '✅ أرسل للعميل'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top header */}
       <div className="bg-[#0d0d0d] border-b border-zinc-800 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -456,15 +536,16 @@ export function WorkerDashboard() {
                         className="flex-1 flex items-center justify-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 text-sm py-2 rounded-lg transition-colors">
                         <MessageSquare size={14} /> محادثة
                       </button>
-                      <button onClick={() => {
-                          const price = prompt('أدخل السعر النهائي المتفق عليه (ريال):')
-                          if (price && !isNaN(Number(price))) completeTask(task.id, Number(price))
-                          else if (price !== null) completeTask(task.id, task.price_suggested || 0)
-                        }}
+                      <button onClick={() => setCompletingTask(task)}
                         className="flex-1 flex items-center justify-center gap-1.5 bg-secondary-500/15 hover:bg-secondary-500/25 text-secondary-400 text-sm py-2 rounded-lg border border-secondary-500/20 transition-colors">
-                        <CheckCircle size={14} /> أكملت الطلب
+                        <Upload size={14} /> أنهيت الطلب
                       </button>
                     </>
+                  )}
+                  {task.status === 'pending_confirmation' && (
+                    <div className="flex-1 flex items-center justify-center gap-1.5 bg-yellow-500/10 text-yellow-400 text-sm py-2 rounded-lg border border-yellow-500/20">
+                      <Clock size={14} /> بانتظار تأكيد العميل
+                    </div>
                   )}
                   {task.status === 'completed' && (
                     <div className="flex-1 flex items-center justify-center gap-1.5 bg-secondary-500/10 text-secondary-400 text-sm py-2 rounded-lg">

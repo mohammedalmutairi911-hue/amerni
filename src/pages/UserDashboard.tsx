@@ -7,13 +7,14 @@ import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
 
 const STATUS_LABEL: Record<string, string> = {
-  open: 'بانتظار عامل', in_progress: 'جاري التنفيذ', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع'
+  open: 'بانتظار عامل', in_progress: 'جاري التنفيذ', pending_confirmation: 'بانتظار تأكيدك', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع'
 }
 const STATUS_COLOR: Record<string, string> = {
   open: 'text-primary-400 bg-primary-500/10 border-primary-500/20',
   in_progress: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   completed: 'text-secondary-400 bg-secondary-500/10 border-secondary-500/20',
   cancelled: 'text-zinc-500 bg-zinc-800 border-zinc-700',
+  pending_confirmation: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
   disputed: 'text-red-400 bg-red-500/10 border-red-500/20',
 }
 const TRACK_STEPS = ['تم النشر', 'عامل قبل', 'جاري', 'اكتمل']
@@ -76,7 +77,7 @@ export function UserDashboard() {
   const confirmPayment = async () => {
     if (!selectedTask || !user) return
     setConfirmingPayment(true)
-    await supabase.from('tasks').update({ status: 'completed' }).eq('id', selectedTask.id)
+    await supabase.from('tasks').update({ status: 'completed' }).eq('id', selectedTask!.id)
     await supabase.from('task_messages').insert({ task_id: selectedTask.id, sender_id: user.id, content: '✅ العميل أكد استلام الخدمة وإرسال المبلغ.', is_blocked: false })
     setSelectedTask(p => p ? { ...p, status: 'completed' } : null)
     setConfirmingPayment(false)
@@ -210,20 +211,32 @@ export function UserDashboard() {
           </div>
         )}
 
-        {/* Confirm payment */}
-        {selectedTask.status === 'in_progress' && (
-          <div className="bg-gradient-to-br from-secondary-950/30 to-[#0d0d0d] border border-secondary-500/20 rounded-2xl p-5 mb-4">
+        {/* Confirm payment - triggered when worker marks pending_confirmation */}
+        {selectedTask.status === 'pending_confirmation' && (
+          <div className="bg-gradient-to-br from-secondary-950/30 to-[#0d0d0d] border border-secondary-500/30 rounded-2xl p-5 mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-secondary-500/20 flex items-center justify-center"><Unlock size={15} className="text-secondary-400" /></div>
+              <div className="w-8 h-8 rounded-lg bg-secondary-500/20 flex items-center justify-center"><CheckCircle size={15} className="text-secondary-400" /></div>
               <div>
-                <h3 className="font-bold text-sm text-white">تأكيد إتمام الخدمة</h3>
-                <p className="text-xs text-zinc-500">بعد استلام الخدمة وإرسال المبلغ</p>
+                <h3 className="font-bold text-sm text-white">🏁 العامل أنهى الطلب — راجع وأكد</h3>
+                <p className="text-xs text-zinc-500">تحقق من الإنجاز ثم أكد الاستلام</p>
               </div>
             </div>
+            {(selectedTask as any).completion_proof && (
+              <div className="mb-3">
+                <p className="text-xs text-zinc-500 mb-2">صورة الإنجاز:</p>
+                <img src={(selectedTask as any).completion_proof} alt="إنجاز" className="w-full rounded-xl border border-zinc-700 max-h-48 object-cover" />
+              </div>
+            )}
+            {(selectedTask as any).completion_note && (
+              <div className="bg-zinc-900 rounded-xl px-4 py-3 mb-3 text-sm text-zinc-300 border border-zinc-800">
+                <p className="text-xs text-zinc-500 mb-1">ملاحظة العامل:</p>
+                {(selectedTask as any).completion_note}
+              </div>
+            )}
             <button onClick={confirmPayment} disabled={confirmingPayment}
-              className="w-full bg-secondary-600 hover:bg-secondary-500 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+              className="w-full bg-secondary-500 hover:bg-secondary-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
               {confirmingPayment ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle size={15} />}
-              أكدت استلام الخدمة وإرسال المبلغ
+              ✅ استلمت الخدمة وأؤكد الإنجاز
             </button>
           </div>
         )}
