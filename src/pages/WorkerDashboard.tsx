@@ -96,18 +96,26 @@ export function WorkerDashboard() {
     if (!pendingTask) return
     setAccepting(pendingTask.id)
     setShowCommission(false)
-    await supabase.from('tasks').update({ worker_id: user!.id, status: 'in_progress' }).eq('id', pendingTask.id)
-    
-    // إشعار العميل بقبول طلبه
-    const clientId = pendingTask.client_id || pendingTask.user_id
-    if (clientId) {
-      await supabase.from('notifications').insert({
-        user_id: clientId,
-        title: '🎉 قبل شخص طلبك!',
-        body: `طلبك "${pendingTask.title}" اتقبل — افتح المحادثة الحين`
-      })
+    // استخدام الدالة الآمنة بدل التحديث المباشر — تمنع قبول نفس الطلب من عاملين بنفس اللحظة
+    const price = (pendingTask as any).price_suggested || (pendingTask as any).client_price || 0
+    const { data, error } = await supabase.rpc('accept_task', {
+      p_task_id: pendingTask.id,
+      p_worker_id: user!.id,
+      p_worker_price: price,
+    })
+
+    if (!error && data === 'ok') {
+      // إشعار العميل بقبول طلبه (الدالة نفسها ترسل إشعاراً أساسياً، هذا إشعار إضافي بصيغة العامل)
+      const clientId = pendingTask.client_id || pendingTask.user_id
+      if (clientId) {
+        await supabase.from('notifications').insert({
+          user_id: clientId,
+          title: '🎉 قبل شخص طلبك!',
+          body: `طلبك "${pendingTask.title}" اتقبل — افتح المحادثة الحين`
+        })
+      }
     }
-    
+
     await fetchFeedTasks()
     await fetchMyTasks()
     setAccepting(null)
@@ -128,28 +136,16 @@ export function WorkerDashboard() {
     if (!completingTask || !user) return
     setUploadingProof(true)
     const price = completingTask.price_final || completingTask.price_suggested || 0
-    // Update task status to pending_confirmation with proof
-    await supabase.from('tasks').update({
-      status: 'pending_confirmation',
-      price_final: price,
-      completion_note: proofNote,
-      completion_proof: proofUrl || null,
-    }).eq('id', completingTask.id)
-    // Send system message in chat
-    await supabase.from('task_messages').insert({
-      task_id: completingTask.id,
-      sender_id: user.id,
-      content: '🏁 العامل أعلن إنهاء الطلب — بانتظار تأكيد العميل للاستلام.',
-      is_blocked: false,
+    // استخدام الدالة الآمنة (security definer) بدل التحديث المباشر —
+    // تتحقق من أن العامل فعلاً صاحب المهمة وأن حالتها صحيحة قبل التعديل
+    const { data, error } = await supabase.rpc('submit_task_completion', {
+      p_task_id: completingTask.id,
+      p_price: price,
+      p_note: proofNote,
+      p_proof_url: proofUrl || null,
     })
-    // Notify client
-    if (completingTask.client_id) {
-      await supabase.from('notifications').insert({
-        user_id: completingTask.client_id,
-        title: 'طلبك اكتمل ✅',
-        body: 'العامل أنهى طلبك "' + completingTask.title + '" — راجع وأكد الاستلام',
-        type: 'task_update',
-      })
+    if (error || data !== 'ok') {
+      console.error('submit_task_completion failed:', error || data)
     }
     await fetchMyTasks()
     setUploadingProof(false)

@@ -31,7 +31,7 @@ export function JoinPage() {
           ))}
         </div>
 
-        <button onClick={() => { openAuth('register'); navigate('landing') }}
+        <button onClick={() => { openAuth('signup'); navigate('landing') }}
           className="w-full bg-primary-500 hover:bg-primary-400 text-white font-black py-4 rounded-2xl text-lg transition-colors mb-3">
           سجّل كمُنجز — مجاناً
         </button>

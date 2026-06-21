@@ -63,10 +63,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
     if (!error && data.user) {
       // انتظر شوي وبعدين احفظ البروفايل مع الـ role الصح
+      // ملاحظة: الـtrigger handle_new_user في قاعدة البيانات يسوي هذا تلقائياً عند التسجيل،
+      // هذا upsert احتياطي فقط لو تأخر الـtrigger أو لتحديث role بدقة بعد التسجيل
       setTimeout(async () => {
-        await supabase.from('profiles').upsert({
-          id: data.user!.id, email, full_name: fullName, role, phone_verified: false
-        }).catch(() => {})
+        try {
+          await supabase.from('profiles').upsert({
+            id: data.user!.id, email, full_name: fullName, role, phone_verified: false
+          })
+        } catch {
+          // تجاهل الخطأ بصمت — الـtrigger في قاعدة البيانات غالباً أنشأ البروفايل أصلاً
+        }
         await fetchProfile(data.user!.id)
       }, 500)
     }

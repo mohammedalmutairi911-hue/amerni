@@ -27,6 +27,14 @@ if (workerParam) {
   ;(window as any).__workerProfileId = workerParam
 }
 
+// التقاط رابط الإحالة (?ref=xxxxxxxx) وحفظه محلياً —
+// كان هذا الجزء مفقوداً بالكامل، مما يجعل نظام الإحالة في ReferralPage.tsx
+// لا يعمل أبداً لأن referred_by لا يُحفظ في أي مكان عند التسجيل
+const refParam = urlParams.get('ref')
+if (refParam) {
+  localStorage.setItem('amerni_referred_by', refParam)
+}
+
 export class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
   state = { hasError: false }
   static getDerivedStateFromError(error: Error) { return { hasError: true, error } }

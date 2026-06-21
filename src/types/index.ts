@@ -34,12 +34,13 @@ export interface WorkerProfile {
 export interface Task {
   id: string
   client_id: string
+  user_id?: string
   worker_id?: string
   title: string
   description: string
   category: string
   city: string
-  status: 'open' | 'accepted' | 'in_progress' | 'completed' | 'cancelled' | 'disputed'
+  status: 'open' | 'accepted' | 'in_progress' | 'pending_confirmation' | 'completed' | 'cancelled' | 'disputed'
   price_suggested?: number
   price_final?: number
   worker_price?: number

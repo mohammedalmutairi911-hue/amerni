@@ -31,9 +31,20 @@ export function BountiesPage() {
   const applyTask = async (task: Task) => {
     if (!user) { navigate('landing'); return }
     setApplying(task.id)
-    await supabase.from('tasks').update({ worker_id: user.id, status: 'in_progress' }).eq('id', task.id)
-    setApplied(p => new Set([...p, task.id]))
-    setTasks(p => p.filter(t => t.id !== task.id))
+    // استخدام الدالة الآمنة بدل التحديث المباشر — تمنع تعارض قبول نفس الطلب
+    // من أكثر من عامل بنفس اللحظة (race condition) وتتحقق من حالة الطلب فعلياً
+    const { data, error } = await supabase.rpc('accept_task', {
+      p_task_id: task.id,
+      p_worker_id: user.id,
+      p_worker_price: (task as any).price_suggested || (task as any).client_price || 0,
+    })
+    if (!error && data === 'ok') {
+      setApplied(p => new Set([...p, task.id]))
+      setTasks(p => p.filter(t => t.id !== task.id))
+    } else {
+      // الطلب اتقبل من عامل ثاني قبلك بثوانٍ — حدّث القائمة
+      setTasks(p => p.filter(t => t.id !== task.id))
+    }
     setApplying(null)
   }
 

@@ -29,7 +29,7 @@ const STEPS = [
   { n: '٣', icon: Users, title: 'تكلمه وتابع', desc: 'محادثة مباشرة تفتح تلقائياً.' },
 ]
 
-type Tab = 'home' | 'how' | 'features' | 'trust' | 'about' | 'contact' | 'support'
+type Tab = 'home' | 'how' | 'features' | 'trust' | 'about' | 'contact' | 'support' | 'privacy' | 'terms'
 
 const SUPPORT_SYSTEM = `أنت مساعد خدمة عملاء لمنصة "أمرني" السعودية لطلب الخدمات.
 مهمتك مساعدة العملاء والعمال بأسلوب ودي وسعودي.

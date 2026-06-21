@@ -68,6 +68,19 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
 
   const saveTask = async (uid: string): Promise<boolean> => {
     const finalCategory = getFinalCategory()
+    // نقرأ كود الإحالة المحفوظ (إن وجد) من localStorage — اتُقط عند فتح الموقع بـ ?ref=
+    // نحوله من 8 أحرف مختصرة إلى UUID كامل عبر البحث في profiles (الرابط يحتوي أول 8 خانات فقط)
+    let referredByUid: string | null = null
+    const refCode = localStorage.getItem('amerni_referred_by')
+    if (refCode && refCode.length === 8) {
+      const { data: referrer } = await supabase
+        .from('profiles')
+        .select('id')
+        .ilike('id', `${refCode}%`)
+        .maybeSingle()
+      if (referrer && referrer.id !== uid) referredByUid = referrer.id
+    }
+
     const { data, error: err } = await supabase.from('tasks').insert({
       client_id: uid,
       user_id: uid,
@@ -78,6 +91,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       use_ai: task.use_ai,
       status: 'open',
       ...(task.deadline ? { deadline: task.deadline } : {}),
+      ...(referredByUid ? { referred_by: referredByUid } : {}),
       price_suggested: task.budget ? Number(task.budget) : null
     }).select().single()
 
