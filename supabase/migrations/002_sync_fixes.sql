@@ -192,6 +192,24 @@ alter table public.tasks drop constraint if exists tasks_description_length_chec
 alter table public.tasks add constraint tasks_description_length_check
   check (description is null or char_length(description) <= 2000);
 
+-- ── 9.1) تصحيح النموذج الاقتصادي لمكافأة الإحالة (قرار اقتصادي بعد بحث سوقي) ──
+-- المشكلة الأصلية: الواجهة كانت تَعِد بـ5% من قيمة الطلب كمكافأة إحالة، بينما
+-- عمولة المنصة نفسها 2% فقط — أي إحالة ناجحة كانت تُخسِّر المنصة 3% صافية.
+--
+-- القرار: تحويل النموذج من "% من قيمة الطلب" إلى "% من عمولة المنصة نفسها"
+-- (نفس فلسفة Fiverr Affiliate Program) — هذا يضمن رياضياً استحالة تجاوز
+-- المكافأة لعمولة المنصة، بغض النظر عن النسبة المختارة مستقبلاً.
+-- النسبة اخترناها 30% من عمولة المنصة (= 0.6% من قيمة الطلب الفعلية):
+-- أعلى من متوسط الصناعة العام (10-15%) لتكون محفزة فعلاً لمنصة ناشئة تحتاج
+-- نمواً سريعاً، بينما تبقي للمنصة 70% من عمولتها كربح صافٍ مضمون دائماً.
+--
+-- دالة محسوبة في قاعدة البيانات (مو في JavaScript) لضمان مصدر حقيقة واحد
+-- لا يمكن للمستخدم التلاعب بعرضه عبر Developer Console.
+create or replace function public.calculate_referral_reward(p_order_value numeric)
+returns numeric language sql immutable as $$
+  select round(p_order_value * 0.02 * 0.30, 2);
+$$;
+
 -- ── 9) دالة آمنة لتسليم المهمة (تستبدل التحديث المباشر غير الآمن في WorkerDashboard.tsx) ──
 create or replace function public.submit_task_completion(
   p_task_id uuid,

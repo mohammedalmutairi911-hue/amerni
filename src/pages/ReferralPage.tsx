@@ -25,8 +25,13 @@ export function ReferralPage() {
       .order('created_at', { ascending: false })
     
     const list = data || []
-    const earned = list.filter(t => t.status === 'completed').reduce((s: number, t: any) => s + ((t.price_final || t.price_suggested || 0) * 0.05), 0)
-    const pending = list.filter(t => t.status === 'in_progress').reduce((s: number, t: any) => s + ((t.price_final || t.price_suggested || 0) * 0.05), 0)
+    // النموذج الاقتصادي المُصحَّح: المكافأة = 30% من عمولة المنصة الفعلية (2%)
+    // وليس 5% من قيمة الطلب كما كان سابقاً — الصيغة القديمة كانت تجعل المنصة
+    // تخسر 3 نقاط مئوية صافية على كل طلب محال (تدفع أكثر مما تكسب أصلاً)
+    const PLATFORM_COMMISSION = 0.02
+    const REFERRAL_SHARE = 0.30
+    const earned = list.filter(t => t.status === 'completed').reduce((s: number, t: any) => s + ((t.price_final || t.price_suggested || 0) * PLATFORM_COMMISSION * REFERRAL_SHARE), 0)
+    const pending = list.filter(t => t.status === 'in_progress').reduce((s: number, t: any) => s + ((t.price_final || t.price_suggested || 0) * PLATFORM_COMMISSION * REFERRAL_SHARE), 0)
     
     setReferrals(list)
     setStats({ total: list.length, earned, pending })
@@ -54,7 +59,7 @@ export function ReferralPage() {
             <Gift size={28} className="text-primary-500" />
           </div>
           <h1 className="text-3xl font-black mb-2">نظام الإحالة</h1>
-          <p className="text-zinc-500">شارك رابطك وأكسب <span className="text-primary-400 font-bold">5%</span> من قيمة كل طلب يأتي عن طريقك</p>
+          <p className="text-zinc-500">شارك رابطك وأكسب <span className="text-primary-400 font-bold">30%</span> من عمولة المنصة على كل طلب يأتي عن طريقك</p>
         </div>
 
         {/* Stats */}
@@ -132,7 +137,7 @@ export function ReferralPage() {
               </div>
               <div className="text-left">
                 <p className="text-sm font-bold text-primary-400">
-                  {((r.price_final || r.price_suggested || 0) * 0.05).toFixed(1)} ر
+                  {((r.price_final || r.price_suggested || 0) * 0.02 * 0.30).toFixed(2)} ر
                 </p>
                 <p className="text-xs text-zinc-600">{r.status === 'completed' ? '✅ مكتسب' : '⏳ معلق'}</p>
               </div>
