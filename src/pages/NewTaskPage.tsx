@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ArrowLeft, ArrowRight, Sparkles, MapPin, DollarSign, Bot, CheckCircle, Loader2, Eye, EyeOff, Tag } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { filterContent } from '../lib/contentFilter'
+import { trackEvent } from '../lib/analytics'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 
@@ -101,6 +102,9 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       return false
     }
 
+    // فريق تحليل البيانات: تتبع نشر الطلب بنجاح (أول خطوة في funnel المنصة)
+    trackEvent('task_created', uid, { category: finalCategory, city: task.city, has_budget: !!task.budget })
+
     // Notify matching workers
     if (data) {
       const { data: workers } = await supabase
@@ -121,8 +125,14 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
 
   const handleNext = () => {
     setError('')
-    if (!task.title.trim()) { setError('اكتب طلبك أولاً'); return }
-    
+    const titleTrimmed = task.title.trim()
+    // فريق QA: اكتشف عدم وجود حد أدنى/أقصى لطول العنوان — كان يقبل حرفاً واحداً
+    // أو نصاً بآلاف الأحرف يكسر تصميم الواجهة عند العمال الذين يستعرضون الطلبات
+    if (!titleTrimmed) { setError('اكتب طلبك أولاً'); return }
+    if (titleTrimmed.length < 5) { setError('اكتب وصفاً أوضح لطلبك (5 أحرف على الأقل)'); return }
+    if (titleTrimmed.length > 150) { setError('عنوان الطلب طويل جداً — اختصره لـ150 حرف كحد أقصى'); return }
+    if (task.description.trim().length > 2000) { setError('وصف الطلب طويل جداً — اختصره لـ2000 حرف كحد أقصى'); return }
+
     // فلتر المحتوى المحظور
     const filterResult = filterContent(task.title + ' ' + task.description)
     if (filterResult.blocked) {

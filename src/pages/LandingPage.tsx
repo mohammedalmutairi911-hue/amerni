@@ -508,8 +508,8 @@ export function LandingPage() {
                     <p className="text-zinc-500 text-sm leading-relaxed">كل عامل يرفع صورة هويته الوطنية أو إقامته، والذكاء الاصطناعي يتحقق من صحتها قبل القبول.</p>
                   </div>
                   <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
-                    <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-primary-500" /> حماية الدفع</h3>
-                    <p className="text-zinc-500 text-sm leading-relaxed">لا يكتمل الطلب إلا بعد تأكيد العميل استلام الخدمة — نظام Escrow يحمي الطرفين.</p>
+                    <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-primary-500" /> حماية إتمام الطلب</h3>
+                    <p className="text-zinc-500 text-sm leading-relaxed">لا يُغلق الطلب رسمياً إلا بعد تأكيدك الصريح لاستلام الخدمة — هذا يحميك من إغلاق أي طلب دون رضاك.</p>
                   </div>
                   <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
                     <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-blue-500" /> خصوصية التواصل</h3>
