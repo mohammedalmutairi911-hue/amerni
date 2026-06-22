@@ -82,13 +82,30 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       if (referrer && referrer.id !== uid) referredByUid = referrer.id
     }
 
+    // تحويل النص العربي للموعد إلى تاريخ فعلي
+    const deadlineMap: Record<string, number> = {
+      'أسرع وقت ممكن': 2,
+      'خلال ساعتين': 2,
+      'اليوم': 8,
+      'خلال يومين': 48,
+      'هذا الأسبوع': 168,
+    }
+    let deadlineISO: string | null = null
+    if (task.deadline && deadlineMap[task.deadline]) {
+      const d = new Date()
+      d.setHours(d.getHours() + deadlineMap[task.deadline])
+      deadlineISO = d.toISOString()
+    } else if (task.deadline && task.deadline.includes('T')) {
+      deadlineISO = task.deadline // تاريخ datetime-local
+    }
+
     const { data, error: err } = await supabase.rpc('create_task', {
       p_title:       task.title.trim(),
       p_description: task.description.trim() || task.title.trim(),
       p_category:    finalCategory,
       p_city:        task.city,
       p_budget:      task.budget ? Number(task.budget) : null,
-      p_deadline:    task.deadline || null,
+      p_deadline:    deadlineISO,
       p_use_ai:      task.use_ai ?? false
     })
 
