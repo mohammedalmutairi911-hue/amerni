@@ -221,14 +221,22 @@ export function UserDashboard() {
         {/* Waiting */}
         {selectedTask.status === 'open' && (
           <div className="bg-primary-500/5 border border-primary-500/20 rounded-2xl p-5 mb-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center flex-shrink-0">
                 <Clock size={18} className="text-primary-400 animate-pulse" />
               </div>
               <div>
                 <p className="font-semibold text-primary-300">جاري البحث عن عامل مناسب</p>
-                <p className="text-xs text-zinc-500 mt-0.5">سيتم إشعارك فور قبول عامل طلبك</p>
+                <p className="text-xs text-zinc-500 mt-0.5">عادةً خلال 5–15 دقيقة — سنشعرك فور القبول</p>
               </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              {[['⚡','طلبك وصل للعمال'],['🔔','ستجيك إشعار فور القبول'],['💬','محادثة تفتح تلقائياً']].map(([e,t]) => (
+                <div key={t} className="bg-primary-500/5 rounded-xl p-2.5">
+                  <div className="text-lg mb-1">{e}</div>
+                  <p className="text-xs text-zinc-500 leading-tight">{t}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -237,14 +245,18 @@ export function UserDashboard() {
         {selectedTask.status === 'in_progress' && (
           <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-5 mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                <CheckCircle size={18} className="text-blue-400" />
+              <div className="w-11 h-11 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0 text-lg font-bold text-blue-300">
+                {workerName ? workerName[0] : '👷'}
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold text-blue-300">
-                  {workerName ? `${workerName} يعمل على طلبك` : 'عامل قبل طلبك وبدأ العمل'}
+                  {workerName || 'العامل'} يعمل على طلبك
                 </p>
                 <p className="text-xs text-zinc-500 mt-0.5">تواصل معه عبر المحادثة أدناه</p>
+              </div>
+              <div className="text-right">
+                <div className="text-xs text-yellow-400 font-bold">⭐ موثّق</div>
+                <div className="text-xs text-zinc-600 mt-0.5">هوية سعودية</div>
               </div>
             </div>
           </div>
@@ -252,15 +264,19 @@ export function UserDashboard() {
 
         {/* Dispute button */}
         {selectedTask.status === 'in_progress' && (
-          <div className="flex justify-end mb-2">
-            <button onClick={async () => {
-              if (confirm('هل تريد رفع نزاع لهذا الطلب؟ سيتم إشعار فريق أمرني للمراجعة.')) {
-                await supabase.rpc('raise_dispute', { p_task_id: selectedTask.id })
-                setSelectedTask(p => p ? { ...p, status: 'disputed' } : null)
-              }
-            }} className="text-xs text-red-400 border border-red-900/50 px-3 py-1.5 rounded-lg hover:bg-red-950/30 transition-colors">
-              ⚠️ رفع نزاع
-            </button>
+          <div className="mb-4 bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+            <p className="text-xs text-zinc-500 mb-2">⚠️ في حال وجود مشكلة مع العامل</p>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-zinc-600 leading-relaxed">إذا لم يُنجز العامل الطلب أو حدث خلاف، يمكنك رفع نزاع — فريق أمرني سيراجع المحادثة ويتواصل معك خلال 24 ساعة.</p>
+              <button onClick={async () => {
+                if (confirm('هل تريد رفع نزاع؟ سيراجع فريق أمرني المحادثة ويتواصل معك خلال 24 ساعة.')) {
+                  await supabase.rpc('raise_dispute', { p_task_id: selectedTask.id })
+                  setSelectedTask(p => p ? { ...p, status: 'disputed' } : null)
+                }
+              }} className="flex-shrink-0 text-xs text-red-400 border border-red-900/50 px-3 py-2 rounded-lg hover:bg-red-950/30 transition-colors whitespace-nowrap">
+                رفع نزاع
+              </button>
+            </div>
           </div>
         )}
 
@@ -488,19 +504,58 @@ export function UserDashboard() {
 
         {/* Tasks list */}
         {filteredTasks.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-20 h-20 rounded-3xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-5">
-              <Sparkles size={32} className="text-primary-500" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">{search ? 'ما في نتائج' : 'ما عندك طلبات بعد'}</h3>
-            <p className="text-zinc-500 text-sm mb-8 max-w-xs mx-auto">
-              {search ? 'جرب كلمة بحث ثانية' : 'اكتب أي شيء تحتاجه وعامل يقبله في ثواني'}
-            </p>
-            {!search && (
-              <button onClick={() => setShowNew(true)}
-                className="bg-primary-500 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-primary-400 transition-colors shadow-lg shadow-primary-500/20">
-                اطلب الحين
-              </button>
+          <div className="py-10">
+            {!search ? (
+              <div className="space-y-4">
+                {/* Welcome card */}
+                <div className="bg-gradient-to-br from-primary-500/10 to-transparent border border-primary-500/20 rounded-2xl p-6 text-center mb-6">
+                  <div className="text-4xl mb-3">👋</div>
+                  <h3 className="text-xl font-bold mb-2">أهلاً — اطلب أي شيء</h3>
+                  <p className="text-zinc-400 text-sm mb-5 max-w-xs mx-auto leading-relaxed">
+                    عامل موثّق بهويته السعودية سيقبل طلبك في دقائق
+                  </p>
+                  <button onClick={() => setShowNew(true)}
+                    className="bg-primary-500 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-primary-400 transition-colors shadow-lg shadow-primary-500/20">
+                    اطلب الحين
+                  </button>
+                </div>
+
+                {/* How it works steps */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { e: '✍️', t: 'اكتب طلبك', d: 'أي شيء تحتاجه' },
+                    { e: '⚡', t: 'عامل يقبل', d: 'عادةً خلال 5-15 دقيقة' },
+                    { e: '✅', t: 'أكّد الإنجاز', d: 'لما ينتهي تأكّد' },
+                  ].map(({ e, t, d }) => (
+                    <div key={t} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4 text-center">
+                      <div className="text-2xl mb-2">{e}</div>
+                      <p className="text-sm font-semibold text-white">{t}</p>
+                      <p className="text-xs text-zinc-500 mt-1">{d}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Trust badges */}
+                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4">
+                  <p className="text-xs text-zinc-500 mb-3 text-center">لماذا أمرني آمنة؟</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      ['🆔','كل عامل موثّق بهوية وطنية'],
+                      ['🔒','تواصلك داخل المنصة فقط'],
+                      ['⭐','تقييمات حقيقية من عملاء'],
+                      ['🛡️','دعم مباشر عند أي مشكلة'],
+                    ].map(([e, t]) => (
+                      <div key={t as string} className="flex items-center gap-2 text-xs text-zinc-400">
+                        <span>{e}</span><span>{t}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-zinc-500">ما في نتائج — جرّب كلمة بحث ثانية</p>
+              </div>
             )}
           </div>
         ) : (

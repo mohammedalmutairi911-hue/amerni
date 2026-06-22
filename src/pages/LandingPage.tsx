@@ -401,6 +401,20 @@ export function LandingPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* Trust bar */}
+                <div className="mt-8 flex flex-wrap justify-center gap-3">
+                  {[
+                    { e: '🆔', t: 'هوية وطنية موثّقة' },
+                    { e: '⚡', t: 'رد خلال 15 دقيقة' },
+                    { e: '🔒', t: 'تواصل آمن داخل المنصة' },
+                    { e: '⭐', t: 'تقييمات حقيقية' },
+                  ].map(({ e, t }) => (
+                    <div key={t} className="flex items-center gap-1.5 text-xs text-zinc-500 bg-zinc-900/60 border border-zinc-800 rounded-full px-3 py-1.5">
+                      <span>{e}</span><span>{t}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
 
