@@ -17,7 +17,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 bg-[#080808]/90 backdrop-blur border-b border-zinc-900">
+    <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/90 backdrop-blur border-b border-slate-200">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
         <button onClick={() => navigate('landing')} className="text-xl font-black text-primary-400">
@@ -25,10 +25,10 @@ export function Navbar() {
         </button>
 
         {!user && (
-          <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
-            <button onClick={() => scrollTo('how-it-works')} className="hover:text-white transition-colors">كيف تشتغل</button>
-            <button onClick={() => scrollTo('features')} className="hover:text-white transition-colors">المميزات</button>
-            <button onClick={() => scrollTo('trust')} className="hover:text-white transition-colors">الثقة والأمان</button>
+          <div className="hidden md:flex items-center gap-6 text-sm text-slate-500">
+            <button onClick={() => scrollTo('how-it-works')} className="hover:text-slate-900 transition-colors">كيف تشتغل</button>
+            <button onClick={() => scrollTo('features')} className="hover:text-slate-900 transition-colors">المميزات</button>
+            <button onClick={() => scrollTo('trust')} className="hover:text-slate-900 transition-colors">الثقة والأمان</button>
           </div>
         )}
 
@@ -38,22 +38,22 @@ export function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setDropOpen(!dropOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-zinc-800 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition-colors"
               >
                 <img src={profile.avatar_url || getAvatar(profile.full_name)} className="w-7 h-7 rounded-full" alt="" />
                 <span className="text-sm hidden sm:block">{profile.full_name}</span>
-                <ChevronDown size={14} className="text-zinc-500" />
+                <ChevronDown size={14} className="text-slate-400" />
               </button>
 
               {dropOpen && (
-                <div className="absolute left-0 top-full mt-2 w-52 bg-[#111] border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b border-zinc-800">
+                <div className="absolute left-0 top-full mt-2 w-52 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-slate-200">
                     <p className="text-sm font-medium">{profile.full_name}</p>
-                    <p className="text-xs text-zinc-500">{user.email}</p>
+                    <p className="text-xs text-slate-400">{user.email}</p>
                     <span className={`text-xs mt-1 inline-block px-2 py-0.5 rounded-full ${
                       profile.role === 'admin' ? 'bg-purple-500/20 text-purple-400' :
                       profile.role === 'worker' ? 'bg-primary-500/20 text-primary-400' :
-                      'bg-zinc-800 text-zinc-400'
+                      'bg-slate-100 text-slate-500'
                     }`}>
                       {profile.role === 'admin' ? 'مدير' : profile.role === 'worker' ? 'عامل' : 'عميل'}
                     </span>
@@ -62,24 +62,24 @@ export function Navbar() {
                     {(profile.role === 'client' || profile.role === 'admin') && (
                       <>
                         <button onClick={() => { navigate('dashboard'); setDropOpen(false) }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors">
+                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                           <LayoutDashboard size={15} /> حسابي
                         </button>
                         <button onClick={() => { navigate('browse'); setDropOpen(false) }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors">
+                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                           <Users size={15} /> تصفح العمال
                         </button>
                       </>
                     )}
                     {profile.role === 'worker' && (
                       <button onClick={() => { navigate('worker'); setDropOpen(false) }}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors">
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <Briefcase size={15} /> مهامي
                       </button>
                     )}
                     {profile.role === 'admin' && (
                       <button onClick={() => { navigate('admin'); setDropOpen(false) }}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 rounded-lg transition-colors">
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <Shield size={15} /> الإدارة
                       </button>
                     )}
@@ -94,15 +94,15 @@ export function Navbar() {
           ) : (
             <div className="flex items-center gap-2">
               <button onClick={() => openAuth('login')}
-                className="text-sm text-zinc-400 hover:text-white px-3 py-1.5 transition-colors">
+                className="text-sm text-slate-500 hover:text-slate-900 px-3 py-1.5 transition-colors">
                 دخول
               </button>
               <button onClick={() => openAuth('signup')}
-                className="text-sm bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg hover:bg-primary-600 transition-colors">
+                className="text-sm bg-primary-500 text-slate-900 font-bold px-4 py-1.5 rounded-lg hover:bg-primary-600 transition-colors">
                 سجّل
               </button>
               <button onClick={() => navigate('join')}
-                className="text-sm bg-secondary-500 text-white font-bold px-4 py-1.5 rounded-lg hover:bg-secondary-600 transition-colors hidden sm:block">
+                className="text-sm bg-secondary-500 text-slate-900 font-bold px-4 py-1.5 rounded-lg hover:bg-secondary-600 transition-colors hidden sm:block">
                 سجّل للعمل معنا
               </button>
             </div>

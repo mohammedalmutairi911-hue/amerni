@@ -50,17 +50,17 @@ export function AuthModal() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-[#111] border border-zinc-800 rounded-2xl p-6 relative">
-        <button onClick={closeAuth} className="absolute top-4 left-4 text-zinc-500 hover:text-white">
+      <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 relative">
+        <button onClick={closeAuth} className="absolute top-4 left-4 text-slate-400 hover:text-slate-900">
           <X size={18} />
         </button>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-zinc-900 rounded-xl p-1 mb-6">
+        <div className="flex gap-1 bg-white rounded-xl p-1 mb-6">
           {(['login', 'signup'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                tab === t ? 'bg-primary-500 text-white' : 'text-zinc-400 hover:text-white'
+                tab === t ? 'bg-primary-500 text-slate-900' : 'text-slate-500 hover:text-slate-900'
               }`}>
               {t === 'login' ? 'دخول' : 'حساب جديد'}
             </button>
@@ -71,15 +71,15 @@ export function AuthModal() {
           {tab === 'signup' && (
             <>
               <div>
-                <label className="block text-xs text-zinc-500 mb-1">الاسم الكامل</label>
+                <label className="block text-xs text-slate-400 mb-1">الاسم الكامل</label>
                 <input value={form.name} onChange={e => set('name', e.target.value)}
                   placeholder="محمد العتيبي"
-                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
               </div>
 
               {/* Role selection */}
               <div>
-                <label className="block text-xs text-zinc-500 mb-2">أنا</label>
+                <label className="block text-xs text-slate-400 mb-2">أنا</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { v: 'client', label: 'أطلب خدمة', desc: 'أريد شخص ينجز لي شيء' },
@@ -87,10 +87,10 @@ export function AuthModal() {
                   ].map(({ v, label, desc }) => (
                     <button key={v} onClick={() => setRole(v as any)}
                       className={`text-right p-3 rounded-xl border transition-all ${
-                        role === v ? 'border-primary-500 bg-primary-500/10' : 'border-zinc-800 hover:border-zinc-700'
+                        role === v ? 'border-primary-500 bg-primary-500/10' : 'border-slate-200 hover:border-slate-300'
                       }`}>
                       <p className="text-sm font-medium">{label}</p>
-                      <p className="text-xs text-zinc-500 mt-0.5">{desc}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{desc}</p>
                     </button>
                   ))}
                 </div>
@@ -99,20 +99,20 @@ export function AuthModal() {
           )}
 
           <div>
-            <label className="block text-xs text-zinc-500 mb-1">البريد الإلكتروني</label>
+            <label className="block text-xs text-slate-400 mb-1">البريد الإلكتروني</label>
             <input type="email" value={form.email} onChange={e => set('email', e.target.value)}
               placeholder="example@gmail.com"
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
           </div>
 
           <div>
-            <label className="block text-xs text-zinc-500 mb-1">كلمة المرور</label>
+            <label className="block text-xs text-slate-400 mb-1">كلمة المرور</label>
             <div className="relative">
               <input type={showPass ? 'text' : 'password'} value={form.password} onChange={e => set('password', e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
               <button type="button" onClick={() => setShowPass(!showPass)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                 {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
@@ -122,7 +122,7 @@ export function AuthModal() {
             <div className="bg-secondary-500/10 border border-secondary-500/20 rounded-xl p-3 text-center">
               <p className="text-2xl mb-1">📧</p>
               <p className="text-secondary-400 font-bold text-sm mb-1">تحقق من بريدك أولاً</p>
-              <p className="text-zinc-400 text-xs mb-2">أرسلنا رابط التأكيد على <span className="text-white">{form.email}</span></p>
+              <p className="text-slate-500 text-xs mb-2">أرسلنا رابط التأكيد على <span className="text-slate-900">{form.email}</span></p>
               {resendDone ? (
                 <p className="text-secondary-400 text-xs">✅ تم إرسال رابط جديد</p>
               ) : (
@@ -138,7 +138,7 @@ export function AuthModal() {
             <>
               {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-lg">{error}</p>}
               <button onClick={submit} disabled={loading}
-                className="w-full bg-primary-500 text-white font-bold py-2.5 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                className="w-full bg-primary-500 text-slate-900 font-bold py-2.5 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading && <Loader2 size={15} className="animate-spin" />}
                 {tab === 'login' ? 'دخول' : 'إنشاء حساب'}
               </button>

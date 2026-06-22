@@ -44,15 +44,15 @@ export class ErrorBoundary extends React.Component<{children: React.ReactNode}, 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#080808] flex items-center justify-center p-4">
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
           <div className="text-center max-w-sm">
             <div className="text-4xl font-black text-primary-400 mb-4">أمرني</div>
-            <p className="text-zinc-400 mb-2">حدث خطأ</p>
+            <p className="text-slate-500 mb-2">حدث خطأ</p>
             <p className="text-red-400 text-xs mb-4 bg-red-950/30 p-2 rounded-lg" dir="ltr">
               {(this.state as any).error?.message || 'Unknown error'}
             </p>
             <button onClick={() => window.location.reload()}
-              className="bg-primary-500 text-white font-bold px-6 py-3 rounded-xl">
+              className="bg-primary-500 text-slate-900 font-bold px-6 py-3 rounded-xl">
               تحديث
             </button>
           </div>
@@ -121,11 +121,11 @@ export default function App() {
       }} /></>
     )
     if (!workerApproved) return (
-      <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center px-4">
-        <div className="max-w-sm text-center bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-10">
+      <div className="min-h-screen bg-slate-50 pt-14 flex items-center justify-center px-4">
+        <div className="max-w-sm text-center bg-white border border-slate-200 rounded-2xl p-10">
           <div className="text-5xl mb-5">⏳</div>
           <h2 className="text-xl font-bold mb-3">طلبك قيد المراجعة</h2>
-          <p className="text-zinc-500 text-sm leading-relaxed mb-6">فريق أمرني راح يراجع بياناتك ويوافق عليك قريباً.</p>
+          <p className="text-slate-400 text-sm leading-relaxed mb-6">فريق أمرني راح يراجع بياناتك ويوافق عليك قريباً.</p>
           <button onClick={async () => {
             setChecking(true)
             const { data } = await supabase.from('worker_profiles').select('is_approved').eq('user_id', user.id).single()

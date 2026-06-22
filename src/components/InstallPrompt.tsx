@@ -48,48 +48,48 @@ export function InstallPrompt() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 max-w-sm mx-auto">
-      <div className="bg-[#111] border border-primary-500/30 rounded-2xl p-4 shadow-2xl">
+      <div className="bg-white border border-primary-500/30 rounded-2xl p-4 shadow-2xl">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3 flex-1">
             <div className="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-lg font-black">أ</span>
+              <span className="text-slate-900 text-lg font-black">أ</span>
             </div>
-            <p className="font-bold text-white text-sm">أضف أمرني لشاشتك الرئيسية</p>
+            <p className="font-bold text-slate-900 text-sm">أضف أمرني لشاشتك الرئيسية</p>
           </div>
-          <button onClick={handleDismiss} className="text-zinc-600 hover:text-zinc-400 flex-shrink-0">
+          <button onClick={handleDismiss} className="text-slate-400 hover:text-slate-500 flex-shrink-0">
             <X size={16} />
           </button>
         </div>
 
         {isIOS ? (
           <div className="space-y-2">
-            <div className="flex items-center gap-2 bg-zinc-900 rounded-xl px-3 py-2.5">
+            <div className="flex items-center gap-2 bg-white rounded-xl px-3 py-2.5">
               <span className="text-primary-400 text-lg">١</span>
-              <p className="text-zinc-300 text-xs">اضغط على أيقونة المشاركة <span className="text-primary-400 font-bold">□↑</span> في الأسفل</p>
+              <p className="text-slate-600 text-xs">اضغط على أيقونة المشاركة <span className="text-primary-400 font-bold">□↑</span> في الأسفل</p>
             </div>
-            <div className="flex items-center gap-2 bg-zinc-900 rounded-xl px-3 py-2.5">
+            <div className="flex items-center gap-2 bg-white rounded-xl px-3 py-2.5">
               <span className="text-primary-400 text-lg">٢</span>
-              <p className="text-zinc-300 text-xs">اختر <span className="text-primary-400 font-bold">"إضافة إلى الشاشة الرئيسية"</span></p>
+              <p className="text-slate-600 text-xs">اختر <span className="text-primary-400 font-bold">"إضافة إلى الشاشة الرئيسية"</span></p>
             </div>
-            <div className="flex items-center gap-2 bg-zinc-900 rounded-xl px-3 py-2.5">
+            <div className="flex items-center gap-2 bg-white rounded-xl px-3 py-2.5">
               <span className="text-primary-400 text-lg">٣</span>
-              <p className="text-zinc-300 text-xs">اضغط <span className="text-primary-400 font-bold">"إضافة"</span> وخلاص ✓</p>
+              <p className="text-slate-600 text-xs">اضغط <span className="text-primary-400 font-bold">"إضافة"</span> وخلاص ✓</p>
             </div>
           </div>
         ) : deferredPrompt ? (
           <button onClick={handleInstall}
-            className="w-full bg-primary-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors flex items-center justify-center gap-2">
+            className="w-full bg-primary-500 text-slate-900 font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors flex items-center justify-center gap-2">
             <Download size={15} /> تثبيت التطبيق
           </button>
         ) : (
           <div className="space-y-2">
-            <div className="flex items-center gap-2 bg-zinc-900 rounded-xl px-3 py-2.5">
+            <div className="flex items-center gap-2 bg-white rounded-xl px-3 py-2.5">
               <span className="text-primary-400 text-lg">١</span>
-              <p className="text-zinc-300 text-xs">اضغط على <span className="text-primary-400 font-bold">⋮</span> في المتصفح</p>
+              <p className="text-slate-600 text-xs">اضغط على <span className="text-primary-400 font-bold">⋮</span> في المتصفح</p>
             </div>
-            <div className="flex items-center gap-2 bg-zinc-900 rounded-xl px-3 py-2.5">
+            <div className="flex items-center gap-2 bg-white rounded-xl px-3 py-2.5">
               <span className="text-primary-400 text-lg">٢</span>
-              <p className="text-zinc-300 text-xs">اختر <span className="text-primary-400 font-bold">"إضافة إلى الشاشة الرئيسية"</span></p>
+              <p className="text-slate-600 text-xs">اختر <span className="text-primary-400 font-bold">"إضافة إلى الشاشة الرئيسية"</span></p>
             </div>
           </div>
         )}

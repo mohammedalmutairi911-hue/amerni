@@ -166,13 +166,13 @@ export function WorkerDashboard() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-surface-base pt-14 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 pt-14 flex items-center justify-center">
       <Loader2 className="animate-spin text-primary-500" size={32} />
     </div>
   )
 
   if (!workerProfile?.is_approved) return (
-    <div className="min-h-screen bg-surface-base pt-14 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-50 pt-14 flex items-center justify-center px-4">
       <div className="max-w-sm text-center bg-white border border-slate-200 rounded-2xl p-10">
         <div className="w-16 h-16 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-5">
           <Clock size={28} className="text-primary-500" />
@@ -191,8 +191,8 @@ export function WorkerDashboard() {
 
   // Commission modal
   if (showCommission && pendingTask) return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4">
-      <div className="w-full max-w-sm bg-surface-raised border border-slate-200 rounded-t-2xl sm:rounded-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/80 backdrop-blur-sm p-0 sm:p-4">
+      <div className="w-full max-w-sm bg-slate-50 border border-slate-200 rounded-t-2xl sm:rounded-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh]">
         {/* Header ثابت */}
         <div className="p-5 pb-3 flex-shrink-0">
           <div className="w-10 h-10 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-3">
@@ -216,7 +216,7 @@ export function WorkerDashboard() {
             <p className="text-sm text-slate-700 leading-loose">
               أتعهد أنا العامل المسجل في منصة <span className="text-primary-500 font-bold">أمرني</span> بأنني عند إتمام هذا الطلب بنجاح، سأقوم بتحويل عمولة خدمة بنسبة <span className="text-primary-500 font-bold">2%</span> من إجمالي قيمة العمل المتفق عليه إلى حساب المنصة التالي، وذلك خلال مدة أقصاها <span className="text-slate-900 font-medium">٧٢ ساعة</span> من إتمام الطلب.
             </p>
-            <div className="bg-slate-100 border border-zinc-600 rounded-xl p-3 space-y-2 text-sm">
+            <div className="bg-slate-100 border border-slate-300 rounded-xl p-3 space-y-2 text-sm">
               <p className="text-xs text-slate-400 font-medium">معلومات الحساب البنكي</p>
               <div className="flex items-center justify-between border-b border-slate-300 pb-2">
                 <span className="text-slate-500">البنك</span>
@@ -246,11 +246,11 @@ export function WorkerDashboard() {
         {/* الأزرار ثابتة في الأسفل */}
         <div className="flex gap-3 p-5 pt-3 flex-shrink-0 border-t border-slate-200">
           <button onClick={() => { setShowCommission(false); setPendingTask(null) }}
-            className="flex-1 border border-slate-300 text-slate-700 py-3 rounded-xl text-sm hover:border-zinc-600 transition-colors">
+            className="flex-1 border border-slate-300 text-slate-700 py-3 rounded-xl text-sm hover:border-slate-300 transition-colors">
             إلغاء
           </button>
           <button onClick={confirmAcceptTask}
-            className="flex-1 bg-primary-500 text-white font-bold py-3 rounded-xl text-sm hover:bg-primary-700 transition-colors">
+            className="flex-1 bg-primary-500 text-slate-900 font-bold py-3 rounded-xl text-sm hover:bg-primary-700 transition-colors">
             أوافق وأقبل الطلب
           </button>
         </div>
@@ -268,15 +268,15 @@ export function WorkerDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-surface-base pt-14">
+    <div className="min-h-screen bg-slate-50 pt-14">
 
       {/* Payment Reminder Modal - shown after task completed */}
       {paymentReminderTask && (() => {
         const price = (paymentReminderTask as any).price_final || (paymentReminderTask as any).price_suggested || 0
         const commission = (price * 0.02).toFixed(2)
         return (
-          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-            <div className="bg-surface-raised border border-slate-200 rounded-2xl w-full max-w-md p-6">
+          <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl w-full max-w-md p-6">
               <div className="w-12 h-12 rounded-2xl bg-secondary-500/10 border border-secondary-500/20 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">💰</span>
               </div>
@@ -338,7 +338,7 @@ export function WorkerDashboard() {
       {/* Completion Modal */}
       {completingTask && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-surface-raised border border-slate-200 rounded-2xl w-full max-w-md p-5">
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl w-full max-w-md p-5">
             <h3 className="text-lg font-bold mb-1">إنهاء الطلب</h3>
             <p className="text-slate-500 text-sm mb-4">أضف ملاحظة أو صورة كدليل على الإنجاز — سيراها العميل قبل التأكيد</p>
 
@@ -347,14 +347,14 @@ export function WorkerDashboard() {
               onChange={e => setProofNote(e.target.value)}
               placeholder="ملاحظة للعميل (اختياري): مثال — انتهيت من التوصيل، الطرد موضوع عند الباب"
               rows={3}
-              className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none resize-none placeholder-zinc-600 focus:border-primary-500/40 mb-3"
+              className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none resize-none placeholder-slate-400 focus:border-primary-500/40 mb-3"
             />
 
             <input
               value={proofUrl}
               onChange={e => setProofUrl(e.target.value)}
               placeholder="رابط صورة الإنجاز (اختياري) — ارفع الصورة على imgur.com وأرسل الرابط"
-              className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none placeholder-zinc-600 focus:border-primary-500/40 mb-4"
+              className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm outline-none placeholder-slate-400 focus:border-primary-500/40 mb-4"
             />
 
             {proofUrl && (
@@ -398,7 +398,7 @@ export function WorkerDashboard() {
           <button onClick={toggleOnline} disabled={toggling}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${
               workerProfile?.is_online
-                ? 'bg-secondary-500 border-secondary-500 text-white'
+                ? 'bg-secondary-500 border-secondary-500 text-slate-900'
                 : 'bg-white border-slate-300 text-slate-600 hover:border-slate-400'
             }`}>
             {toggling ? <Loader2 size={14} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={14} /> متاح الآن</> : <><WifiOff size={14} /> غير متاح</>}
@@ -452,7 +452,7 @@ export function WorkerDashboard() {
                 <h3 className="font-semibold">تقييمك</h3>
                 <div className="flex items-center gap-1">
                   {[1,2,3,4,5].map(s => (
-                    <Star key={s} size={16} className={s <= Math.round(workerProfile?.rating || 0) ? 'text-primary-500 fill-primary-400' : 'text-zinc-700'} />
+                    <Star key={s} size={16} className={s <= Math.round(workerProfile?.rating || 0) ? 'text-primary-500 fill-primary-400' : 'text-slate-300'} />
                   ))}
                   <span className="text-primary-500 font-bold text-sm mr-1">{workerProfile?.rating ? workerProfile.rating.toFixed(1) : '—'}</span>
                 </div>
@@ -516,7 +516,7 @@ export function WorkerDashboard() {
             <div className="relative mb-1">
               <input value={searchQ} onChange={e => setSearchQ(e.target.value)}
                 placeholder="🔍 ابحث في الطلبات..."
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-zinc-600 focus:outline-none focus:border-primary-500/50" />
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-primary-500/50" />
               {searchQ && <button onClick={() => setSearchQ('')} className="absolute left-3 top-2.5 text-slate-400 hover:text-slate-900">✕</button>}
             </div>
             {/* Smart filter */}
@@ -527,7 +527,7 @@ export function WorkerDashboard() {
                 { id: 'all', label: '🌐 كل الطلبات' },
               ].map(f => (
                 <button key={f.id} onClick={() => setCityFilter(f.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${cityFilter === f.id ? 'bg-primary-500 text-slate-900' : 'bg-slate-100 text-slate-500 hover:bg-zinc-700'}`}>
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 transition-all ${cityFilter === f.id ? 'bg-primary-500 text-slate-900' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
                   {f.label}
                 </button>
               ))}
@@ -609,7 +609,7 @@ export function WorkerDashboard() {
                   {['in_progress'].includes(task.status) && (
                     <>
                       <button onClick={() => { setSelectedTask(task); setTab('chat') }}
-                        className="flex-1 flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-zinc-700 text-sm py-2 rounded-lg transition-colors">
+                        className="flex-1 flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-sm py-2 rounded-lg transition-colors">
                         <MessageSquare size={14} /> محادثة
                       </button>
                       <button onClick={() => setCompletingTask(task)}

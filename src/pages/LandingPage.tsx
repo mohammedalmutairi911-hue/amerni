@@ -157,7 +157,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
             <p className="text-secondary-400 text-sm">✅ تم الإرسال — تحقق من بريدك</p>
           ) : (
             <button onClick={handleReset} disabled={loading}
-              className="w-full bg-zinc-700 hover:bg-zinc-600 text-slate-900 text-sm py-2 rounded-lg transition-colors disabled:opacity-50">
+              className="w-full bg-slate-200 hover:bg-zinc-600 text-slate-900 text-sm py-2 rounded-lg transition-colors disabled:opacity-50">
               {loading ? 'جاري الإرسال...' : 'أرسل رابط الاستعادة'}
             </button>
           )}
@@ -184,7 +184,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
         <>
           {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-xl">{error}</p>}
           <button onClick={handle} disabled={loading}
-            className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full bg-primary-500 text-slate-900 font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             {loading && <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />}
             {mode === 'login' ? 'دخول' : 'إنشاء حساب'}
           </button>
@@ -303,7 +303,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Navbar */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-surface-base/95 backdrop-blur border-b border-slate-200">
+      <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/95 backdrop-blur border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <button onClick={() => setActiveTab('home')} className="text-xl font-black text-primary-500">أمرني</button>
           <div className="hidden md:flex items-center gap-1 overflow-x-auto">
@@ -315,13 +315,13 @@ export function LandingPage() {
             ))}
           </div>
           {user ? (
-            <button onClick={() => navigate('dashboard')} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
+            <button onClick={() => navigate('dashboard')} className="bg-primary-500 text-slate-900 font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
               حسابي
             </button>
           ) : (
             <div className="flex items-center gap-2">
               <button onClick={() => { setAuthDirectMode('login'); setShowAuthDirect(true) }} className="text-slate-500 hover:text-slate-900 text-sm transition-colors">دخول</button>
-              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">سجّل</button>
+              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-slate-900 font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">سجّل</button>
             </div>
           )}
         </div>
@@ -329,7 +329,7 @@ export function LandingPage() {
         <div className="md:hidden flex gap-1 px-4 pb-2 overflow-x-auto">
           {TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
-              className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500 text-white font-bold' : 'text-slate-400 hover:text-slate-900'}`}>
+              className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-900'}`}>
               {tab.label}
             </button>
           ))}
@@ -380,7 +380,7 @@ export function LandingPage() {
                       className="flex-1 text-right bg-transparent text-slate-900 placeholder-slate-400 text-sm outline-none"
                     />
                     <button onClick={handleStart}
-                      className="bg-primary-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-colors flex-shrink-0 flex items-center gap-1.5">
+                      className="bg-primary-500 text-slate-900 text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-colors flex-shrink-0 flex items-center gap-1.5">
                       بحث <ArrowLeft size={14} />
                     </button>
                   </div>
@@ -468,7 +468,7 @@ export function LandingPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-slate-400">يبدأ من <span className="text-slate-900 font-bold">{price} ر.س</span></span>
                         <button onClick={() => setShowNewTask(true)}
-                          className="text-xs bg-primary-500 text-white px-3 py-1.5 rounded-lg hover:bg-primary-700 transition-colors font-bold">
+                          className="text-xs bg-primary-500 text-slate-900 px-3 py-1.5 rounded-lg hover:bg-primary-700 transition-colors font-bold">
                           احجز الآن
                         </button>
                       </div>
@@ -481,7 +481,7 @@ export function LandingPage() {
             {/* CTA for workers */}
             <section className="py-16 px-4 bg-primary-500">
               <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-3xl font-black text-white mb-3">جاهز لتقديم خدماتك؟</h2>
+                <h2 className="text-3xl font-black text-slate-900 mb-3">جاهز لتقديم خدماتك؟</h2>
                 <p className="text-blue-100 mb-8">انضم إلى آلاف المحترفين في آمرني وضاعف دخلك من خلال الوصول إلى آلاف العملاء في منطقتك.</p>
                 <div className="flex flex-wrap justify-center gap-3">
                   <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }}
@@ -489,7 +489,7 @@ export function LandingPage() {
                     سجّل الآن كمحترف
                   </button>
                   <button onClick={() => setActiveTab('how')}
-                    className="border-2 border-white text-white font-bold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors">
+                    className="border-2 border-white text-slate-900 font-bold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors">
                     تعرف على المزيد
                   </button>
                 </div>
@@ -523,7 +523,7 @@ export function LandingPage() {
                   ))}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl p-6 text-white">
+                  <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl p-6 text-slate-900">
                     <div className="text-2xl mb-3">🚗</div>
                     <h3 className="font-black text-lg mb-1">خدمات التوصيل الفاخرة</h3>
                     <p className="text-blue-100 text-sm mb-4">خدمات نقل وتوصيل خاصة بمهنية عالية وأمان تام، نضمن لك الوصول في الوقت المحدد بأفضل السيارات.</p>
@@ -544,18 +544,18 @@ export function LandingPage() {
             </section>
 
             {/* Footer */}
-            <footer className="bg-slate-900 text-white py-10 px-4">
+            <footer className="bg-slate-900 text-slate-900 py-10 px-4">
               <div className="max-w-5xl mx-auto">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                   <div>
-                    <p className="font-black text-xl text-white mb-1">آمرني</p>
+                    <p className="font-black text-xl text-slate-900 mb-1">آمرني</p>
                     <p className="text-slate-400 text-sm">نظام الخدمات المنزلية الذكي</p>
                   </div>
                   <div className="flex flex-wrap gap-4 text-sm text-slate-400">
-                    <button onClick={() => setActiveTab('privacy')} className="hover:text-white transition-colors">سياسة الخصوصية</button>
-                    <button onClick={() => setActiveTab('terms')} className="hover:text-white transition-colors">الشروط والأحكام</button>
-                    <button onClick={() => setActiveTab('support')} className="hover:text-white transition-colors">الدعم الفني</button>
-                    <button onClick={() => setActiveTab('contact')} className="hover:text-white transition-colors">اتصل بنا</button>
+                    <button onClick={() => setActiveTab('privacy')} className="hover:text-slate-900 transition-colors">سياسة الخصوصية</button>
+                    <button onClick={() => setActiveTab('terms')} className="hover:text-slate-900 transition-colors">الشروط والأحكام</button>
+                    <button onClick={() => setActiveTab('support')} className="hover:text-slate-900 transition-colors">الدعم الفني</button>
+                    <button onClick={() => setActiveTab('contact')} className="hover:text-slate-900 transition-colors">اتصل بنا</button>
                   </div>
                 </div>
                 <div className="border-t border-slate-800 mt-6 pt-6 text-center text-slate-500 text-xs">
@@ -587,7 +587,7 @@ export function LandingPage() {
                 ))}
               </div>
               <div className="bg-primary-500 rounded-2xl p-8 text-center">
-                <h3 className="text-2xl font-bold text-white mb-3">جاهز للبدء؟</h3>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3">جاهز للبدء؟</h3>
                 <p className="text-blue-100 mb-6">اكتب طلبك الآن وسيتواصل معك أفضل المحترفين في منطقتك</p>
                 <button onClick={() => setShowNewTask(true)} className="bg-white text-primary-500 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
                   اطلب الآن
@@ -614,7 +614,7 @@ export function LandingPage() {
                   { icon: MessageCircle, title: 'محادثة محمية', desc: 'تواصل مباشر مع العامل داخل المنصة — لا تشارك أرقامك مع أحد', color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/20' },
                   { icon: Zap, title: 'سرعة الرد', desc: 'العمال المتاحون يشوفون طلبك فوراً ويقبلون في دقائق', color: 'text-primary-500', bg: 'bg-primary-500/10 border-primary-500/20' },
                 ].map(({ icon: Icon, title, desc, color, bg }) => (
-                  <div key={title} className={`bg-white border rounded-2xl p-6 hover:border-zinc-600 transition-all ${bg.split(' ')[1]}`}>
+                  <div key={title} className={`bg-white border rounded-2xl p-6 hover:border-slate-300 transition-all ${bg.split(' ')[1]}`}>
                     <div className={`w-10 h-10 rounded-xl ${bg} border flex items-center justify-center mb-4`}>
                       <Icon size={19} className={color} />
                     </div>
@@ -671,7 +671,7 @@ export function LandingPage() {
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-16">
                 <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center mx-auto mb-6">
-                  <span className="text-4xl font-black text-white">آ</span>
+                  <span className="text-4xl font-black text-slate-900">آ</span>
                 </div>
                 <h2 className="text-4xl font-black text-slate-900 mb-4">من نحن</h2>
                 <p className="text-slate-500 text-lg leading-relaxed">منصة آمرني — نظام الخدمات المنزلية الذكي</p>
@@ -711,7 +711,7 @@ export function LandingPage() {
                 </div>
 
                 <div className="bg-primary-500 rounded-2xl p-8 text-center">
-                  <p className="text-white text-xl font-black mb-2">"آمرني وإحنا ننجز"</p>
+                  <p className="text-slate-900 text-xl font-black mb-2">"آمرني وإحنا ننجز"</p>
                   <p className="text-blue-100 text-sm">أنت تطلب وإحنا نوصلك لمن ينجز</p>
                 </div>
 
@@ -804,7 +804,7 @@ export function LandingPage() {
                           className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors resize-none" />
                       </div>
                       <button onClick={sendContact} disabled={contactLoading || !contactForm.name || !contactForm.email || !contactForm.message}
-                        className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+                        className="w-full bg-primary-500 text-slate-900 font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
                         {contactLoading ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                         إرسال الرسالة
                       </button>
@@ -879,7 +879,7 @@ export function LandingPage() {
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${m.role === 'assistant' ? 'bg-primary-500/10 border border-primary-500/20' : 'bg-slate-100'}`}>
                         {m.role === 'assistant' ? <Bot size={13} className="text-primary-500" /> : <span className="text-xs">أ</span>}
                       </div>
-                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === 'user' ? 'bg-primary-500 text-slate-900 rounded-tr-sm' : 'bg-slate-100 text-zinc-100 rounded-tl-sm'}`}>
+                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === 'user' ? 'bg-primary-500 text-slate-900 rounded-tr-sm' : 'bg-slate-100 text-slate-800 rounded-tl-sm'}`}>
                         {m.content}
                       </div>
                     </div>
@@ -900,7 +900,7 @@ export function LandingPage() {
                   <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
                     <input value={supportInput} onChange={e => setSupportInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendSupport()}
-                      placeholder="اكتب سؤالك..." className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600" />
+                      placeholder="اكتب سؤالك..." className="flex-1 bg-transparent text-sm outline-none placeholder-slate-400" />
                     <button onClick={sendSupport} disabled={!supportInput.trim() || supportLoading}
                       className="text-primary-500 hover:text-primary-500 disabled:opacity-30 transition-colors">
                       {supportLoading ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
@@ -1029,8 +1029,8 @@ export function LandingPage() {
 
       {/* Direct Auth Modal */}
       {showAuthDirect && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-surface-raised border border-slate-200 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">{authDirectMode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب'}</h2>
               <button onClick={() => setShowAuthDirect(false)} className="text-slate-400 hover:text-slate-900">✕</button>

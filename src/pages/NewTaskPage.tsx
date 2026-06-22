@@ -196,17 +196,17 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#080808] overflow-y-auto" style={{WebkitOverflowScrolling: "touch"}}>
+    <div className="fixed inset-0 z-50 bg-slate-50 overflow-y-auto" style={{WebkitOverflowScrolling: "touch"}}>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#080808]/95 backdrop-blur border-b border-zinc-900 px-4 py-3.5 flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur border-b border-slate-200 px-4 py-3.5 flex items-center justify-between">
         <button onClick={step === 'auth' ? () => setStep('details') : onClose}
-          className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors text-sm">
+          className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 transition-colors text-sm">
           <ArrowRight size={16} /> {step === 'auth' ? 'رجوع' : 'إلغاء'}
         </button>
         <span className="text-primary-400 font-black text-lg">أمرني</span>
         <div className="flex gap-1.5">
           {['details','auth'].map((s, i) => (
-            <div key={s} className={`h-1 rounded-full transition-all ${step === s ? 'w-6 bg-primary-500' : 'w-3 bg-zinc-700'}`} />
+            <div key={s} className={`h-1 rounded-full transition-all ${step === s ? 'w-6 bg-primary-500' : 'w-3 bg-slate-200'}`} />
           ))}
         </div>
       </div>
@@ -217,20 +217,20 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
           <div className="space-y-5">
             <div>
               <h1 className="text-2xl font-black mb-1">وش تبي؟</h1>
-              <p className="text-zinc-500 text-sm">اكتب طلبك وسنوصله لعامل مناسب</p>
+              <p className="text-slate-400 text-sm">اكتب طلبك وسنوصله لعامل مناسب</p>
             </div>
 
             {/* Task title */}
             <div>
-              <label className="block text-xs text-zinc-400 mb-2 font-medium">طلبك *</label>
+              <label className="block text-xs text-slate-500 mb-2 font-medium">طلبك *</label>
               <textarea value={task.title} onChange={e => handleTitleChange(e.target.value)}
                 placeholder="مثال: أبي أحد يجيب لي غداء من مطعم في حي النزهة الرياض..." rows={2} autoFocus
-                className="w-full bg-[#111] border-2 border-zinc-800 focus:border-primary-500 rounded-2xl px-4 py-3.5 text-white text-sm outline-none transition-colors resize-none placeholder-zinc-600" />
+                className="w-full bg-white border-2 border-slate-200 focus:border-primary-500 rounded-2xl px-4 py-3.5 text-slate-900 text-sm outline-none transition-colors resize-none placeholder-slate-400" />
             </div>
 
             {/* Category - buttons + free text for أخرى */}
             <div>
-              <label className="block text-xs text-zinc-400 mb-2 font-medium flex items-center gap-1.5">
+              <label className="block text-xs text-slate-500 mb-2 font-medium flex items-center gap-1.5">
                 <Tag size={12} className="text-primary-500" /> التصنيف *
                 {task.category && task.category !== 'أخرى' && !task.customCategory && (
                   <span className="text-primary-400 text-xs">— تم اكتشافه تلقائياً ✨</span>
@@ -243,9 +243,9 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                     className={`text-right px-4 py-3 rounded-xl border transition-all ${
                       task.category === cat
                         ? 'border-primary-500 bg-primary-500/10'
-                        : 'border-zinc-800 bg-[#111] hover:border-zinc-700'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
                     }`}>
-                    <p className={`text-sm font-medium ${task.category === cat ? 'text-primary-300' : 'text-white'}`}>{cat}</p>
+                    <p className={`text-sm font-medium ${task.category === cat ? 'text-primary-300' : 'text-slate-900'}`}>{cat}</p>
                   </button>
                 ))}
               </div>
@@ -257,7 +257,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                     onChange={e => setT('customCategory', e.target.value)}
                     placeholder="اكتب التصنيف هنا..."
                     autoFocus
-                    className="w-full bg-[#111] border-2 border-primary-500/50 focus:border-primary-500 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none transition-colors"
+                    className="w-full bg-white border-2 border-primary-500/50 focus:border-primary-500 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 outline-none transition-colors"
                   />
                 </div>
               )}
@@ -266,29 +266,29 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             {/* City & Budget */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-zinc-400 mb-2 font-medium flex items-center gap-1"><MapPin size={11} className="text-primary-500" /> المدينة</label>
+                <label className="block text-xs text-slate-500 mb-2 font-medium flex items-center gap-1"><MapPin size={11} className="text-primary-500" /> المدينة</label>
                 <select value={task.city} onChange={e => setT('city', e.target.value)}
-                  className="w-full bg-[#111] border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-primary-500 transition-colors">
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-primary-500 transition-colors">
                   {CITIES.map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-zinc-400 mb-2 font-medium flex items-center gap-1"><DollarSign size={11} className="text-primary-500" /> ميزانيتك</label>
-                <div className="flex items-center gap-2 bg-[#111] border border-zinc-800 rounded-xl px-3 py-2.5 focus-within:border-primary-500 transition-colors">
+                <label className="block text-xs text-slate-500 mb-2 font-medium flex items-center gap-1"><DollarSign size={11} className="text-primary-500" /> ميزانيتك</label>
+                <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2.5 focus-within:border-primary-500 transition-colors">
                   <input type="number" value={task.budget} onChange={e => setT('budget', e.target.value)}
-                    placeholder="80" className="flex-1 bg-transparent text-sm outline-none text-white" />
-                  <span className="text-zinc-500 text-xs">ريال</span>
+                    placeholder="80" className="flex-1 bg-transparent text-sm outline-none text-slate-900" />
+                  <span className="text-slate-400 text-xs">ريال</span>
                 </div>
               </div>
             </div>
 
             {/* Deadline */}
             <div>
-              <label className="block text-xs text-zinc-400 mb-2 font-medium">⏰ وقت الإنجاز المطلوب</label>
+              <label className="block text-xs text-slate-500 mb-2 font-medium">⏰ وقت الإنجاز المطلوب</label>
               <div className="flex gap-2 flex-wrap">
                 {['أسرع وقت ممكن', 'خلال ساعتين', 'اليوم', 'خلال يومين', 'هذا الأسبوع'].map(d => (
                   <button key={d} type="button" onClick={() => setT('deadline', d)}
-                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${task.deadline === d ? 'border-primary-500 bg-primary-500/10 text-primary-300' : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'}`}>
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${task.deadline === d ? 'border-primary-500 bg-primary-500/10 text-primary-300' : 'border-slate-200 text-slate-400 hover:border-slate-300'}`}>
                     {d}
                   </button>
                 ))}
@@ -297,31 +297,31 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
 
             {/* Details */}
             <div>
-              <label className="block text-xs text-zinc-400 mb-2 font-medium">تفاصيل إضافية (اختياري)</label>
+              <label className="block text-xs text-slate-500 mb-2 font-medium">تفاصيل إضافية (اختياري)</label>
               <textarea value={task.description} onChange={e => setT('description', e.target.value)}
                 placeholder="أي تفاصيل تساعد العامل..." rows={2}
-                className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors resize-none placeholder-zinc-600 text-white" />
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors resize-none placeholder-slate-400 text-slate-900" />
             </div>
 
             {/* AI toggle */}
             <div onClick={() => setT('use_ai', !task.use_ai)}
-              className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all ${task.use_ai ? 'border-purple-500 bg-purple-500/10' : 'border-zinc-800 hover:border-zinc-700'}`}>
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${task.use_ai ? 'bg-purple-500/20' : 'bg-zinc-800'}`}>
-                <Bot size={20} className={task.use_ai ? 'text-purple-400' : 'text-zinc-500'} />
+              className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all ${task.use_ai ? 'border-purple-500 bg-purple-500/10' : 'border-slate-200 hover:border-slate-300'}`}>
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${task.use_ai ? 'bg-purple-500/20' : 'bg-slate-100'}`}>
+                <Bot size={20} className={task.use_ai ? 'text-purple-400' : 'text-slate-400'} />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-sm text-white">أريد حل بالذكاء الاصطناعي</p>
-                <p className="text-xs text-zinc-500 mt-0.5">أسرع وأرخص — للشرح والبحث والكتابة</p>
+                <p className="font-semibold text-sm text-slate-900">أريد حل بالذكاء الاصطناعي</p>
+                <p className="text-xs text-slate-400 mt-0.5">أسرع وأرخص — للشرح والبحث والكتابة</p>
               </div>
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${task.use_ai ? 'bg-purple-500 border-purple-500' : 'border-zinc-600'}`}>
-                {task.use_ai && <CheckCircle size={13} className="text-white" />}
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${task.use_ai ? 'bg-purple-500 border-purple-500' : 'border-slate-300'}`}>
+                {task.use_ai && <CheckCircle size={13} className="text-slate-900" />}
               </div>
             </div>
 
             {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
 
             <button onClick={handleNext} disabled={loading}
-              className="w-full bg-primary-500 hover:bg-primary-400 text-white font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
+              className="w-full bg-primary-500 hover:bg-primary-400 text-slate-900 font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
               {loading ? <Loader2 size={18} className="animate-spin" /> : null}
               {user ? 'نشر الطلب' : 'التالي — إنشاء حساب'} <ArrowLeft size={16} />
             </button>
@@ -333,7 +333,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
           <div className="space-y-5">
             <div>
               <h1 className="text-2xl font-black mb-1">{isNew ? 'سجّل وانشر طلبك' : 'أهلاً بعودتك'}</h1>
-              <p className="text-zinc-500 text-sm">خطوة وحدة وطلبك ينشر فوراً</p>
+              <p className="text-slate-400 text-sm">خطوة وحدة وطلبك ينشر فوراً</p>
             </div>
 
             {/* Google Sign In - prominent at top */}
@@ -349,9 +349,9 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-zinc-800" />
-              <span className="text-xs text-zinc-600">أو بالبريد الإلكتروني</span>
-              <div className="flex-1 h-px bg-zinc-800" />
+              <div className="flex-1 h-px bg-slate-100" />
+              <span className="text-xs text-slate-400">أو بالبريد الإلكتروني</span>
+              <div className="flex-1 h-px bg-slate-100" />
             </div>
 
             {/* Task summary */}
@@ -360,8 +360,8 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                 <Sparkles size={15} className="text-primary-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs text-primary-400 font-medium mb-1">طلبك</p>
-                  <p className="text-sm text-white font-medium">{task.title}</p>
-                  <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-500 flex-wrap">
+                  <p className="text-sm text-slate-900 font-medium">{task.title}</p>
+                  <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-400 flex-wrap">
                     <span>{getFinalCategory()}</span>
                     <span>📍 {task.city}</span>
                     {task.budget && <span>💰 {task.budget} ريال</span>}
@@ -371,10 +371,10 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             </div>
 
             {/* Toggle */}
-            <div className="flex gap-1 bg-zinc-900 rounded-2xl p-1">
+            <div className="flex gap-1 bg-white rounded-2xl p-1">
               {[{ v: true, l: 'حساب جديد' }, { v: false, l: 'عندي حساب' }].map(({ v, l }) => (
                 <button key={l} onClick={() => { setIsNew(v); setError('') }}
-                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${isNew === v ? 'bg-primary-500 text-white' : 'text-zinc-400 hover:text-white'}`}>
+                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${isNew === v ? 'bg-primary-500 text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
                   {l}
                 </button>
               ))}
@@ -384,21 +384,21 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               {isNew && (
                 <>
                   <div>
-                    <label className="block text-xs text-zinc-500 mb-1.5">الاسم الكامل *</label>
+                    <label className="block text-xs text-slate-400 mb-1.5">الاسم الكامل *</label>
                     <input value={auth.name} onChange={e => setA('name', e.target.value)} placeholder="محمد العتيبي"
-                      className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-slate-900" />
                   </div>
                   <div>
-                    <label className="block text-xs text-zinc-500 mb-1.5">رقم الجوال * (يبدأ بـ 05)</label>
+                    <label className="block text-xs text-slate-400 mb-1.5">رقم الجوال * (يبدأ بـ 05)</label>
                     <div className="flex gap-2">
-                      <span className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-3 text-sm text-zinc-400 flex-shrink-0">🇸🇦 +966</span>
+                      <span className="bg-slate-100 border border-slate-300 rounded-xl px-3 py-3 text-sm text-slate-500 flex-shrink-0">🇸🇦 +966</span>
                       <input type="tel" value={auth.phone} maxLength={10}
                         onChange={e => setA('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
                         placeholder="05XXXXXXXX"
-                        className="flex-1 bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
+                        className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-slate-900" />
                     </div>
                     {auth.phone.length > 0 && auth.phone.length < 10 && (
-                      <p className="text-xs text-zinc-600 mt-1">{auth.phone.length}/10 أرقام</p>
+                      <p className="text-xs text-slate-400 mt-1">{auth.phone.length}/10 أرقام</p>
                     )}
                     {auth.phone.length === 10 && !auth.phone.startsWith('05') && (
                       <p className="text-xs text-red-400 mt-1">يجب أن يبدأ بـ 05</p>
@@ -407,17 +407,17 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                 </>
               )}
               <div>
-                <label className="block text-xs text-zinc-500 mb-1.5">البريد الإلكتروني *</label>
+                <label className="block text-xs text-slate-400 mb-1.5">البريد الإلكتروني *</label>
                 <input type="email" value={auth.email} onChange={e => setA('email', e.target.value)} placeholder="example@gmail.com"
-                  className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-slate-900" />
               </div>
               <div>
-                <label className="block text-xs text-zinc-500 mb-1.5">كلمة المرور *</label>
+                <label className="block text-xs text-slate-400 mb-1.5">كلمة المرور *</label>
                 <div className="relative">
                   <input type={showPass ? 'text' : 'password'} value={auth.password} onChange={e => setA('password', e.target.value)}
                     placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && handleAuth()}
-                    className="w-full bg-[#111] border border-zinc-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-white" />
-                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary-500 transition-colors text-slate-900" />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
@@ -438,12 +438,12 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               )}
 
               {isNew && (
-                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+                <div className="bg-white border border-slate-200 rounded-xl p-4">
                   <div className="flex items-start gap-3 cursor-pointer" onClick={() => setAgreedTerms(!agreedTerms)}>
-                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${agreedTerms ? 'bg-primary-500 border-primary-500' : 'border-zinc-600'}`}>
-                      {agreedTerms && <span className="text-white text-xs font-bold">✓</span>}
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${agreedTerms ? 'bg-primary-500 border-primary-500' : 'border-slate-300'}`}>
+                      {agreedTerms && <span className="text-slate-900 text-xs font-bold">✓</span>}
                     </div>
-                    <p className="text-xs text-zinc-400 leading-relaxed">
+                    <p className="text-xs text-slate-500 leading-relaxed">
                       أوافق على الشروط والأحكام وسياسة الخصوصية — أقرّ بأن المنصة وسيط فقط وغير مسؤولة عن أي نزاع ينشأ بين الطرفين
                     </p>
                   </div>
@@ -454,18 +454,18 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                 <div className="bg-secondary-500/10 border border-secondary-500/20 rounded-xl p-4 text-center">
                   <div className="text-3xl mb-2">📧</div>
                   <p className="text-secondary-400 font-bold text-base mb-1">تحقق من بريدك</p>
-                  <p className="text-zinc-400 text-sm">أرسلنا رابط التأكيد على <span className="text-white font-medium">{auth.email}</span></p>
-                  <p className="text-zinc-500 text-xs mt-2">بعد التأكيد ادخل وطلبك سينشر</p>
+                  <p className="text-slate-500 text-sm">أرسلنا رابط التأكيد على <span className="text-slate-900 font-medium">{auth.email}</span></p>
+                  <p className="text-slate-400 text-xs mt-2">بعد التأكيد ادخل وطلبك سينشر</p>
                 </div>
               ) : (
                 <>
                   {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
                   <button onClick={handleAuth} disabled={loading}
-                    className="w-full bg-primary-500 hover:bg-primary-400 text-white font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
+                    className="w-full bg-primary-500 hover:bg-primary-400 text-slate-900 font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
                     {loading && <Loader2 size={18} className="animate-spin" />}
                     {isNew ? '✅ سجّل وانشر الطلب' : 'دخول ونشر الطلب'}
                   </button>
-                  <p className="text-xs text-zinc-600 text-center">بالتسجيل أنت توافق على شروط الاستخدام</p>
+                  <p className="text-xs text-slate-400 text-center">بالتسجيل أنت توافق على شروط الاستخدام</p>
                 </>
               )}
             </div>

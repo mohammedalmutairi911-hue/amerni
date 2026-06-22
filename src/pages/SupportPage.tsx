@@ -59,15 +59,15 @@ export function SupportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080808] pt-14 px-4 py-6">
+    <div className="min-h-screen bg-slate-50 pt-14 px-4 py-6">
       <div className="max-w-xl mx-auto">
-        <button onClick={() => navigate('dashboard')} className="flex items-center gap-1.5 text-zinc-500 hover:text-white text-sm mb-4 transition-colors">
+        <button onClick={() => navigate('dashboard')} className="flex items-center gap-1.5 text-slate-400 hover:text-slate-900 text-sm mb-4 transition-colors">
           <ArrowLeft size={14} /> رجوع
         </button>
 
-        <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl overflow-hidden flex flex-col" style={{ height: '70vh' }}>
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col" style={{ height: '70vh' }}>
           {/* Header */}
-          <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-900/50 flex items-center gap-3">
+          <div className="px-4 py-3 border-b border-slate-200 bg-slate-100 flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
               <Headphones size={16} className="text-primary-500" />
             </div>
@@ -84,12 +84,12 @@ export function SupportPage() {
             {msgs.map((m, i) => (
               <div key={i} className={`flex items-start gap-2.5 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  m.role === 'assistant' ? 'bg-primary-500/10 border border-primary-500/20' : 'bg-zinc-800'
+                  m.role === 'assistant' ? 'bg-primary-500/10 border border-primary-500/20' : 'bg-slate-100'
                 }`}>
-                  {m.role === 'assistant' ? <Bot size={14} className="text-primary-500" /> : <User size={14} className="text-zinc-400" />}
+                  {m.role === 'assistant' ? <Bot size={14} className="text-primary-500" /> : <User size={14} className="text-slate-500" />}
                 </div>
                 <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                  m.role === 'user' ? 'bg-primary-500 text-white rounded-tr-sm' : 'bg-zinc-800 text-zinc-100 rounded-tl-sm'
+                  m.role === 'user' ? 'bg-primary-500 text-slate-900 rounded-tr-sm' : 'bg-slate-100 text-slate-800 rounded-tl-sm'
                 }`}>
                   {m.content}
                 </div>
@@ -100,7 +100,7 @@ export function SupportPage() {
                 <div className="w-7 h-7 rounded-full bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
                   <Bot size={14} className="text-primary-500" />
                 </div>
-                <div className="bg-zinc-800 rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1">
+                <div className="bg-slate-100 rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1">
                   {[0,1,2].map(i => (
                     <div key={i} className="w-2 h-2 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />
                   ))}
@@ -112,12 +112,12 @@ export function SupportPage() {
 
           {/* Input */}
           <div className="px-3 pb-3">
-            <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
+            <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
               <input
                 value={input} onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
                 placeholder="اكتب رسالتك..."
-                className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600"
+                className="flex-1 bg-transparent text-sm outline-none placeholder-slate-400"
               />
               <button onClick={send} disabled={!input.trim() || loading}
                 className="text-primary-500 hover:text-primary-400 disabled:opacity-30 transition-colors">

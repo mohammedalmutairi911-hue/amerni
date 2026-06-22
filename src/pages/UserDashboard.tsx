@@ -150,7 +150,7 @@ export function UserDashboard() {
   if (showNew) return <NewTaskPage onClose={() => { setShowNew(false); fetchTasks() }} />
 
   if (loading) return (
-    <div className="min-h-screen bg-surface-base pt-14 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 pt-14 flex items-center justify-center">
       <div className="text-center">
         <div className="w-10 h-10 border-2 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
         <p className="text-slate-400 text-sm">جاري التحميل...</p>
@@ -160,7 +160,7 @@ export function UserDashboard() {
 
   // Task detail
   if (selectedTask) return (
-    <div className="min-h-screen bg-surface-base pt-14">
+    <div className="min-h-screen bg-slate-50 pt-14">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <button onClick={() => { setSelectedTask(null); fetchTasks() }}
           className="text-sm text-slate-500 hover:text-slate-900 mb-6 flex items-center gap-1.5 transition-colors">
@@ -317,7 +317,7 @@ export function UserDashboard() {
             <div className="flex gap-2 mb-4">
               {[1,2,3,4,5].map(s => (
                 <button key={s} onClick={() => setRating(s)} className="transition-transform hover:scale-110">
-                  <Star size={30} className={s <= rating ? 'text-primary-500 fill-primary-400' : 'text-zinc-700 hover:text-slate-400'} />
+                  <Star size={30} className={s <= rating ? 'text-primary-500 fill-primary-400' : 'text-slate-300 hover:text-slate-400'} />
                 </button>
               ))}
             </div>
@@ -345,7 +345,7 @@ export function UserDashboard() {
           <div className="h-72 overflow-y-auto px-4 py-4 space-y-2.5">
             {msgs.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full py-8 gap-2">
-                <MessageSquare size={28} className="text-zinc-700" />
+                <MessageSquare size={28} className="text-slate-300" />
                 <p className="text-slate-400 text-sm">{selectedTask.status === 'open' ? 'المحادثة تبدأ بعد قبول العامل' : 'لا توجد رسائل'}</p>
               </div>
             )}
@@ -355,7 +355,7 @@ export function UserDashboard() {
                 <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[78%]">
                     {!isMe && <p className="text-[11px] text-slate-400 mb-1 mr-1">{m.profiles?.full_name}</p>}
-                    <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMe ? 'bg-primary-500 text-slate-900 rounded-tr-sm font-medium' : 'bg-slate-100 text-zinc-100 rounded-tl-sm'}`}>
+                    <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMe ? 'bg-primary-500 text-slate-900 rounded-tr-sm font-medium' : 'bg-slate-100 text-slate-800 rounded-tl-sm'}`}>
                       {m.content}
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export function UserDashboard() {
             <div className="px-3 pb-3">
               <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-2.5 focus-within:border-primary-500/40 transition-colors">
                 <input value={msg} onChange={e => setMsg(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMsg()}
-                  placeholder="اكتب رسالة للعامل..." className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600" />
+                  placeholder="اكتب رسالة للعامل..." className="flex-1 bg-transparent text-sm outline-none placeholder-slate-400" />
                 <button onClick={sendMsg} disabled={!msg.trim() || sending} className="w-8 h-8 rounded-lg bg-primary-500 hover:bg-primary-700 disabled:opacity-30 flex items-center justify-center transition-all">
                   {sending ? <Loader2 size={14} className="animate-spin text-slate-900" /> : <Send size={14} className="text-slate-900" />}
                 </button>
@@ -395,7 +395,7 @@ export function UserDashboard() {
               <p className="text-slate-500 text-sm">ملخص نشاطك — تتبع طلباتك الحالية، ورصيد محفظتك، واكتشف الخدمات الأكثر طلباً اليوم.</p>
             </div>
             <button onClick={() => setShowNew(true)}
-              className="flex items-center gap-2 bg-primary-500 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-sm">
+              className="flex items-center gap-2 bg-primary-500 text-slate-900 font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-sm">
               <Plus size={16} /> طلب خدمة جديدة
             </button>
           </div>
@@ -484,7 +484,7 @@ export function UserDashboard() {
             <div className="relative">
               <Search size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="ابحث في طلباتك..."
-                className="w-full bg-white border border-slate-200 rounded-xl pr-9 pl-4 py-2.5 text-sm outline-none focus:border-primary-500/40 transition-colors placeholder-zinc-600" />
+                className="w-full bg-white border border-slate-200 rounded-xl pr-9 pl-4 py-2.5 text-sm outline-none focus:border-primary-500/40 transition-colors placeholder-slate-400" />
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
               <Filter size={12} className="text-slate-400 flex-shrink-0" />
@@ -495,7 +495,7 @@ export function UserDashboard() {
                 { v: 'completed', l: `✅ مكتمل (${completedCount})` },
               ].map(({ v, l }) => (
                 <button key={v} onClick={() => setFilter(v as any)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${filter === v ? 'bg-primary-500 text-slate-900' : 'bg-slate-100/80 text-slate-500 hover:bg-zinc-700'}`}>
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${filter === v ? 'bg-primary-500 text-slate-900' : 'bg-slate-100/80 text-slate-500 hover:bg-slate-200'}`}>
                   {l}
                 </button>
               ))}
@@ -516,7 +516,7 @@ export function UserDashboard() {
                     عامل موثّق بهويته السعودية سيقبل طلبك في دقائق
                   </p>
                   <button onClick={() => setShowNew(true)}
-                    className="bg-primary-500 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/20">
+                    className="bg-primary-500 text-slate-900 font-bold px-8 py-3.5 rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/20">
                     اطلب الحين
                   </button>
                 </div>

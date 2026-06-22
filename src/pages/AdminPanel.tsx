@@ -125,13 +125,13 @@ export function AdminPanel() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-surface-base pt-14 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 pt-14 flex items-center justify-center">
       <Loader2 className="animate-spin text-primary-400" size={32} />
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-surface-base pt-14">
+    <div className="min-h-screen bg-slate-50 pt-14">
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-4 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
