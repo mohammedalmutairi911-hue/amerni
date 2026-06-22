@@ -4,6 +4,7 @@ import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { NewTaskPage } from './NewTaskPage'
+import { ServiceBrowsePage } from './ServiceBrowsePage'
 
 const EXAMPLES = [
   'أبي أحد يوصل طرد من العنوان',
@@ -201,6 +202,7 @@ export function LandingPage() {
   const [visible, setVisible] = useState(true)
   const [taskInput, setTaskInput] = useState('')
   const [showNewTask, setShowNewTask] = useState(false)
+  const [showBrowse, setShowBrowse] = useState(false)
   const [showAuthDirect, setShowAuthDirect] = useState(false)
   const [authDirectMode, setAuthDirectMode] = useState<'login'|'register'>('login')
 
@@ -291,12 +293,15 @@ export function LandingPage() {
     { id: 'terms', label: 'الشروط والأحكام' },
   ]
 
-  const handleBrowse = () => navigate('browse')
+  const handleBrowse = () => setShowBrowse(true)
   const handleBounties = () => navigate('bounties')
   const handleEarn = () => navigate('earn')
 
+  if (showBrowse) return <ServiceBrowsePage onClose={() => setShowBrowse(false)} />
+  if (showNewTask) return <NewTaskPage onClose={() => setShowNewTask(false)} />
+
   return (
-    <div className="min-h-screen bg-surface-base text-slate-900 flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Navbar */}
       <nav className="fixed top-0 inset-x-0 z-50 bg-surface-base/95 backdrop-blur border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -338,11 +343,11 @@ export function LandingPage() {
           <div>
             {/* Welcome banner */}
             {user && profile && (
-              <div className="flex items-center justify-center gap-2 bg-primary-500/10 border border-primary-500/20 rounded-2xl px-5 py-3 mb-4">
+              <div className="flex items-center justify-center gap-2 bg-primary-500/5 border border-primary-500/10 px-5 py-3">
                 <span className="text-xl">👋</span>
-                <p className="text-primary-300 font-semibold text-sm sm:text-base">
+                <p className="text-primary-500 font-semibold text-sm sm:text-base">
                   أهلاً {(profile as any).full_name?.split(' ')[0] || 'بك'}!
-                  <span className="text-slate-500 font-normal mr-2">وش تبي اليوم؟</span>
+                  <span className="text-slate-500 font-normal mr-2">بماذا يمكننا مساعدتك اليوم؟</span>
                 </p>
               </div>
             )}
@@ -357,40 +362,43 @@ export function LandingPage() {
                   <Sparkles size={13} /> آمرني — اطلب أي شيء في السعودية
                 </div>
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-4 sm:mb-6 leading-[1.1]">
-                  <span className="text-slate-900">دليل الخدمات</span>{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-500">المتكامل</span>
+                  <span className="text-slate-900">شريكك الموثوق</span><br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-500 to-accent-500">للخدمات المنزلية</span>
                 </h1>
                 <p className="text-slate-500 text-base sm:text-xl mb-8 sm:mb-12 max-w-xl mx-auto leading-relaxed px-2">
-                  منصة سعودية تربطك بشخص ثقة وكفو يسوي لك أي خدمة — بسرعة وبثقة.
+                  نربطك بأفضل المحترفين المعتمدين في المملكة لضمان جودة منزلك وراحتك.
                 </p>
-                <div className="relative max-w-xl mx-auto mb-6">
-                  <div className="flex items-center gap-2 sm:gap-3 bg-surface-raised border-2 border-slate-200 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-primary-500 transition-all shadow-2xl">
+
+                {/* Search bar */}
+                <div className="relative max-w-xl mx-auto mb-4">
+                  <div className="flex items-center gap-2 sm:gap-3 bg-white border-2 border-slate-200 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-primary-500 transition-all shadow-lg">
                     <Sparkles size={18} className="text-primary-500 flex-shrink-0" />
                     <input
                       value={taskInput} onChange={e => setTaskInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && taskInput.trim() && handleStart()}
                       placeholder={visible ? EXAMPLES[idx] : ''}
-                      className="flex-1 text-right bg-transparent text-slate-900 placeholder-zinc-500 text-sm outline-none"
+                      className="flex-1 text-right bg-transparent text-slate-900 placeholder-slate-400 text-sm outline-none"
                     />
                     <button onClick={handleStart}
                       className="bg-primary-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-colors flex-shrink-0 flex items-center gap-1.5">
-                      اطلب الآن <ArrowLeft size={14} />
+                      بحث <ArrowLeft size={14} />
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400 mb-8">ما الذي يمكننا القيام به من أجلك؟</p>
 
-                {/* Quick categories */}
+                {/* Popular services */}
+                <p className="text-xs text-slate-400 mb-3">خدمات شائعة:</p>
                 <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-10 px-2">
-                  {['🚗 توصيل','📸 تصوير','🔍 تحقق','🛍️ تسوق','📚 تعليم','✨ أخرى'].map(cat => (
+                  {['🧹 تنظيف مكيفات','🔧 سباكة','🏠 تعقيم منازل','⚡ كهرباء','❄️ تكييف','✨ أخرى'].map(cat => (
                     <button key={cat} onClick={() => { setTaskInput(cat.split(' ')[1]); setShowNewTask(true) }}
-                      className="px-4 py-2 bg-white border border-slate-200 hover:border-primary-500/40 rounded-full text-sm text-slate-500 hover:text-slate-900 transition-all">
+                      className="px-4 py-2 bg-white border border-slate-200 hover:border-primary-500 hover:text-primary-500 rounded-full text-sm text-slate-600 transition-all shadow-sm">
                       {cat}
                     </button>
                   ))}
                 </div>
 
-                <div className="flex justify-center gap-6 sm:gap-10 text-center">
+                {/* Stats */}
+                <div className="flex justify-center gap-6 sm:gap-12 text-center mb-8">
                   {[['١٠٬٠٠٠+', 'طلب منجز'], ['٢٤٠٠+', 'عامل موثوق'], ['٩٨٪', 'نسبة الرضا'], ['٢٤/٧', 'دعم متواصل']].map(([v, l]) => (
                     <div key={l}>
                       <div className="text-2xl sm:text-3xl font-black text-primary-500">{v}</div>
@@ -398,36 +406,112 @@ export function LandingPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </section>
 
-                {/* Trust bar */}
-                <div className="mt-8 flex flex-wrap justify-center gap-2">
+            {/* Why Amerni section */}
+            <section className="py-16 px-4 bg-white">
+              <div className="max-w-5xl mx-auto">
+                <h2 className="text-3xl font-black text-center text-slate-900 mb-3">لماذا تختار آمرني؟</h2>
+                <p className="text-slate-500 text-center mb-12">نضمن لك أفضل تجربة خدمة في المملكة</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[
-                    { e: '🆔', t: 'موثق عبر أبشر' },
-                    { e: '💳', t: 'دفع آمن — مدى وأبل باي' },
-                    { e: '🔒', t: 'تواصل محمي داخل المنصة' },
-                    { e: '⭐', t: 'تقييمات حقيقية' },
-                  ].map(({ e, t }) => (
-                    <div key={t} className="flex items-center gap-1.5 text-xs text-slate-400 bg-white/60 border border-slate-200 rounded-full px-3 py-1.5">
-                      <span>{e}</span><span>{t}</span>
+                    { icon: UserCheck, color: 'text-primary-500', bg: 'bg-primary-50', title: 'محترفون معتمدون', desc: 'يخضع جميع مزودي الخدمة لدينا لعملية فحص وتدقيق صارمة لضمان أعلى معايير الجودة والأمان.' },
+                    { icon: Shield, color: 'text-accent-500', bg: 'bg-accent-50', title: 'مدفوعات آمنة', desc: 'احجز وادفع إلكترونياً بكل سهولة وأمان عبر مدى أو أبل باي. نضمن حقوقك المالية حتى اكتمال الخدمة.' },
+                    { icon: Star, color: 'text-secondary-500', bg: 'bg-secondary-50', title: 'دعم على مدار الساعة', desc: 'فريق خدمة العملاء لدينا جاهز لمساعدتك في أي وقت لضمان تجربة سلسة ومميزة.' },
+                  ].map(({ icon: Icon, color, bg, title, desc }) => (
+                    <div key={title} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                      <div className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center mb-4`}>
+                        <Icon size={22} className={color} />
+                      </div>
+                      <h3 className="font-bold text-slate-900 mb-2">{title}</h3>
+                      <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
                     </div>
                   ))}
                 </div>
               </div>
             </section>
 
-            {/* Quick how it works */}
-            <section className="py-20 px-4 bg-slate-50">
-              <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
-                {STEPS.map(({ n, icon: Icon, title, desc }) => (
-                  <div key={n} className="bg-white border border-slate-200 rounded-2xl p-6">
-                    <div className="text-4xl font-black text-zinc-800 mb-3">{n}</div>
-                    <div className="w-9 h-9 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-3">
-                      <Icon size={17} className="text-primary-500" />
-                    </div>
-                    <h3 className="font-semibold mb-1.5">{title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+            {/* Top rated professionals */}
+            <section className="py-16 px-4 bg-slate-50">
+              <div className="max-w-5xl mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900">المحترفون الأعلى تقييماً</h2>
+                    <p className="text-slate-500 text-sm mt-1">اختر من بين نخبة الفنيين الذين حازوا على ثقة آلاف العملاء</p>
                   </div>
-                ))}
+                  <button onClick={() => setShowNewTask(true)} className="text-primary-500 text-sm font-semibold hover:underline">عرض الكل</button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[
+                    { name: 'م. أحمد القحطاني', role: 'خبير صيانة أنظمة التكييف', jobs: '+٥٠٠ عملية', price: '١٥٠', rating: '4.9' },
+                    { name: 'شركة التنظيف العميق', role: 'خدمات التنظيف والتعقيم', jobs: '+١٢٠٠ عملية', price: '٢٩٩', rating: '4.8' },
+                    { name: 'م. خالد العتيبي', role: 'متخصص سباكة وتأسيس', jobs: '+٣٠٠ عملية', price: '١٢٠', rating: '5.0' },
+                    { name: 'م. فهد بن ناصر', role: 'خبير تمديدات كهربائية', jobs: '+٨٠٠ عملية', price: '١٨٠', rating: '4.7' },
+                  ].map(({ name, role, jobs, price, rating }) => (
+                    <div key={name} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all group">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-primary-500 font-bold text-lg">
+                          {name[2]}
+                        </div>
+                        <span className="text-xs bg-green-100 text-green-600 font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                          <CheckCircle size={10} /> موثق
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-slate-900 text-sm mb-1">{name}</h4>
+                      <p className="text-slate-500 text-xs mb-2">{role}</p>
+                      <div className="flex items-center gap-1 mb-3">
+                        <Star size={11} className="text-accent-500 fill-accent-500" />
+                        <span className="text-xs font-bold text-slate-700">{rating}</span>
+                        <span className="text-xs text-slate-400 mr-1">• {jobs}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-slate-400">يبدأ من <span className="text-slate-900 font-bold">{price} ر.س</span></span>
+                        <button onClick={() => setShowNewTask(true)}
+                          className="text-xs bg-primary-500 text-white px-3 py-1.5 rounded-lg hover:bg-primary-700 transition-colors font-bold">
+                          احجز الآن
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* CTA for workers */}
+            <section className="py-16 px-4 bg-primary-500">
+              <div className="max-w-3xl mx-auto text-center">
+                <h2 className="text-3xl font-black text-white mb-3">جاهز لتقديم خدماتك؟</h2>
+                <p className="text-blue-100 mb-8">انضم إلى آلاف المحترفين في آمرني وضاعف دخلك من خلال الوصول إلى آلاف العملاء في منطقتك.</p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }}
+                    className="bg-white text-primary-500 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
+                    سجّل الآن كمحترف
+                  </button>
+                  <button onClick={() => setActiveTab('how')}
+                    className="border-2 border-white text-white font-bold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors">
+                    تعرف على المزيد
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* Quick how it works */}
+            <section className="py-16 px-4 bg-white">
+              <div className="max-w-4xl mx-auto">
+                <h2 className="text-2xl font-black text-center text-slate-900 mb-10">استكشف خدماتنا</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+                  {STEPS.map(({ n, icon: Icon, title, desc }) => (
+                    <div key={n} className="bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:border-primary-500/30 transition-all">
+                      <div className="text-4xl font-black text-slate-200 mb-3">{n}</div>
+                      <div className="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center mb-3">
+                        <Icon size={17} className="text-primary-500" />
+                      </div>
+                      <h3 className="font-bold text-slate-900 mb-1.5">{title}</h3>
+                      <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
           </div>

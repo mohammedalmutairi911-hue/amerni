@@ -382,20 +382,20 @@ export function UserDashboard() {
   )
 
   return (
-    <div className="min-h-screen bg-surface-base pt-14">
+    <div className="min-h-screen bg-slate-50 pt-14">
       {/* Hero header */}
-      <div className="bg-gradient-to-b from-primary-500/5 to-transparent border-b border-slate-200/50">
+      <div className="bg-white border-b border-slate-200">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-black mb-1">
-                أهلاً {profile?.full_name?.split(' ')[0] || ''} 👋
+              <h1 className="text-2xl font-black text-slate-900 mb-1">
+                مرحباً بك، {profile?.full_name?.split(' ')[0] || 'عزيزي العميل'} 👋
               </h1>
-              <p className="text-slate-400 text-sm">وش تحتاج اليوم؟</p>
+              <p className="text-slate-500 text-sm">تتبع طلباتك الحالية، واكتشف الخدمات الأكثر طلباً اليوم.</p>
             </div>
             <button onClick={() => setShowNew(true)}
-              className="flex items-center gap-2 bg-primary-500 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/20">
-              <Plus size={16} /> طلب جديد
+              className="flex items-center gap-2 bg-primary-500 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-sm">
+              <Plus size={16} /> طلب خدمة جديدة
             </button>
           </div>
 
@@ -403,11 +403,11 @@ export function UserDashboard() {
           <div className="grid grid-cols-4 gap-2">
             {[
               { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-slate-900' },
-              { label: 'بانتظار عامل', value: openCount, color: 'text-primary-500' },
-              { label: 'جارية', value: activeCount, color: 'text-blue-400' },
-              { label: 'مكتملة', value: completedCount, color: 'text-secondary-400' },
+              { label: 'بانتظار مقدم', value: openCount, color: 'text-primary-500' },
+              { label: 'جارية', value: activeCount, color: 'text-blue-500' },
+              { label: 'مكتملة', value: completedCount, color: 'text-secondary-500' },
             ].map(({ label, value, color }) => (
-              <div key={label} className="bg-white border border-slate-200/50 rounded-2xl p-3.5 text-center">
+              <div key={label} className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-center">
                 <div className={`text-2xl font-black ${color}`}>{value}</div>
                 <div className="text-[10px] text-slate-400 mt-1 leading-tight">{label}</div>
               </div>
@@ -419,13 +419,13 @@ export function UserDashboard() {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Payment history */}
         {completedCount > 0 && (
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-5">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <DollarSign size={16} className="text-secondary-400" /> تاريخ المدفوعات
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-5 shadow-sm">
+            <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <DollarSign size={16} className="text-secondary-500" /> الطلبات السابقة
             </h3>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {tasks.filter(t => t.status === 'completed').map(t => (
-                <div key={t.id} className="flex items-center justify-between py-2 border-b border-slate-200/50 last:border-0">
+                <div key={t.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-slate-900 truncate">{t.title}</p>
                     <p className="text-xs text-slate-400">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>

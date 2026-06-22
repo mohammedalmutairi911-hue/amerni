@@ -376,27 +376,32 @@ export function WorkerDashboard() {
       )}
 
       {/* Top header */}
-      <div className="bg-white border-b border-slate-200 px-4 py-3">
+      <div className="bg-white border-b border-slate-200 px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={getAvatar(profile?.full_name || '')} className="w-9 h-9 rounded-xl" alt="" />
+            <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center text-primary-500 font-black text-lg">
+              {profile?.full_name?.[0] || '؟'}
+            </div>
             <div>
-              <p className="font-semibold text-sm">{profile?.full_name}</p>
-              <div className="flex items-center gap-1 text-xs text-slate-400">
-                <Star size={10} className="text-primary-500" />
-                {workerProfile?.rating ? workerProfile.rating.toFixed(1) : '—'}
+              <div className="flex items-center gap-2">
+                <p className="font-bold text-slate-900">{profile?.full_name}</p>
+                <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">محترف موثق</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
+                <Star size={10} className="text-accent-500 fill-accent-500" />
+                <span className="font-bold">{workerProfile?.rating ? workerProfile.rating.toFixed(1) : '—'}</span>
                 <span className="mx-1">·</span>
-                {workerProfile?.city}
+                <span>{workerProfile?.city}</span>
               </div>
             </div>
           </div>
           <button onClick={toggleOnline} disabled={toggling}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium border transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${
               workerProfile?.is_online
-                ? 'bg-secondary-500/10 border-secondary-500/30 text-secondary-400'
-                : 'bg-white border-slate-300 text-slate-500'
+                ? 'bg-secondary-500 border-secondary-500 text-white'
+                : 'bg-white border-slate-300 text-slate-600 hover:border-slate-400'
             }`}>
-            {toggling ? <Loader2 size={14} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={14} /> متاح</> : <><WifiOff size={14} /> أوفلاين</>}
+            {toggling ? <Loader2 size={14} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={14} /> متاح الآن</> : <><WifiOff size={14} /> غير متاح</>}
           </button>
         </div>
       </div>
@@ -426,17 +431,17 @@ export function WorkerDashboard() {
             {/* Stats grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'إجمالي المكاسب', value: `${totalEarnings.toLocaleString()} ر`, icon: DollarSign, color: 'text-secondary-400', bg: 'bg-secondary-500/10 border-secondary-500/20' },
-                { label: 'طلبات مكتملة', value: completedTasks.length, icon: CheckCircle, color: 'text-primary-500', bg: 'bg-primary-500/10 border-primary-500/20' },
-                { label: 'جارية الآن', value: activeTasks.length, icon: TrendingUp, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
-                { label: 'هذا الشهر', value: thisMonth, icon: Calendar, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
+                { label: 'إجمالي الأرباح', value: `${totalEarnings.toLocaleString()} ر.س`, icon: DollarSign, color: 'text-secondary-500', bg: 'bg-secondary-50 border-secondary-200' },
+                { label: 'طلبات مكتملة', value: completedTasks.length, icon: CheckCircle, color: 'text-primary-500', bg: 'bg-primary-50 border-primary-200' },
+                { label: 'جارية الآن', value: activeTasks.length, icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-50 border-blue-200' },
+                { label: 'هذا الشهر', value: thisMonth, icon: Calendar, color: 'text-accent-500', bg: 'bg-amber-50 border-amber-200' },
               ].map(({ label, value, icon: Icon, color, bg }) => (
-                <div key={label} className={`bg-white border ${bg.split(' ')[1]} rounded-2xl p-5`}>
+                <div key={label} className={`bg-white border ${bg.split(' ')[1]} rounded-2xl p-5 shadow-sm`}>
                   <div className={`w-9 h-9 rounded-xl ${bg} border flex items-center justify-center mb-3`}>
                     <Icon size={17} className={color} />
                   </div>
                   <div className={`text-2xl font-black mb-1 ${color}`}>{value}</div>
-                  <div className="text-xs text-slate-400">{label}</div>
+                  <div className="text-xs text-slate-500">{label}</div>
                 </div>
               ))}
             </div>
