@@ -150,7 +150,7 @@ export function UserDashboard() {
   if (showNew) return <NewTaskPage onClose={() => { setShowNew(false); fetchTasks() }} />
 
   if (loading) return (
-    <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center">
+    <div className="min-h-screen bg-surface-base pt-14 flex items-center justify-center">
       <div className="text-center">
         <div className="w-10 h-10 border-2 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
         <p className="text-zinc-600 text-sm">جاري التحميل...</p>
@@ -160,7 +160,7 @@ export function UserDashboard() {
 
   // Task detail
   if (selectedTask) return (
-    <div className="min-h-screen bg-[#080808] pt-14">
+    <div className="min-h-screen bg-surface-base pt-14">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <button onClick={() => { setSelectedTask(null); fetchTasks() }}
           className="text-sm text-zinc-400 hover:text-white mb-6 flex items-center gap-1.5 transition-colors">
@@ -312,7 +312,7 @@ export function UserDashboard() {
 
         {/* Mutual rating — client rates worker */}
         {selectedTask.status === 'completed' && selectedTask.worker_id && !ratingDone && (
-          <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5 mb-4">
+          <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5 mb-4">
             <h3 className="font-bold mb-4 flex items-center gap-2"><Star size={16} className="text-primary-400" /> قيّم تجربتك</h3>
             <div className="flex gap-2 mb-4">
               {[1,2,3,4,5].map(s => (
@@ -334,7 +334,7 @@ export function UserDashboard() {
         )}
 
         {/* Chat */}
-        <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl overflow-hidden">
+        <div className="bg-surface-panel border border-zinc-800 rounded-2xl overflow-hidden">
           <div className="px-4 py-3.5 border-b border-zinc-800/50 flex items-center justify-between bg-zinc-900/30">
             <span className="font-semibold text-sm flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-primary-500/10 flex items-center justify-center"><MessageSquare size={14} className="text-primary-500" /></div>
@@ -382,7 +382,7 @@ export function UserDashboard() {
   )
 
   return (
-    <div className="min-h-screen bg-[#080808] pt-14">
+    <div className="min-h-screen bg-surface-base pt-14">
       {/* Hero header */}
       <div className="bg-gradient-to-b from-primary-500/5 to-transparent border-b border-zinc-900/50">
         <div className="max-w-2xl mx-auto px-4 py-8">
@@ -394,7 +394,7 @@ export function UserDashboard() {
               <p className="text-zinc-500 text-sm">وش تحتاج اليوم؟</p>
             </div>
             <button onClick={() => setShowNew(true)}
-              className="flex items-center gap-2 bg-primary-500 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-primary-400 transition-all shadow-lg shadow-primary-500/20">
+              className="flex items-center gap-2 bg-primary-500 text-black font-bold px-5 py-2.5 rounded-xl hover:bg-primary-400 transition-all shadow-lg shadow-primary-500/20">
               <Plus size={16} /> طلب جديد
             </button>
           </div>
@@ -407,7 +407,7 @@ export function UserDashboard() {
               { label: 'جارية', value: activeCount, color: 'text-blue-400' },
               { label: 'مكتملة', value: completedCount, color: 'text-secondary-400' },
             ].map(({ label, value, color }) => (
-              <div key={label} className="bg-[#0d0d0d] border border-zinc-800/50 rounded-2xl p-3.5 text-center">
+              <div key={label} className="bg-surface-panel border border-zinc-800/50 rounded-2xl p-3.5 text-center">
                 <div className={`text-2xl font-black ${color}`}>{value}</div>
                 <div className="text-[10px] text-zinc-500 mt-1 leading-tight">{label}</div>
               </div>
@@ -419,7 +419,7 @@ export function UserDashboard() {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Payment history */}
         {completedCount > 0 && (
-          <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5 mb-5">
+          <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5 mb-5">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <DollarSign size={16} className="text-secondary-400" /> تاريخ المدفوعات
             </h3>
@@ -483,7 +483,7 @@ export function UserDashboard() {
             <div className="relative">
               <Search size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="ابحث في طلباتك..."
-                className="w-full bg-[#0d0d0d] border border-zinc-800 rounded-xl pr-9 pl-4 py-2.5 text-sm outline-none focus:border-primary-500/40 transition-colors placeholder-zinc-600" />
+                className="w-full bg-surface-panel border border-zinc-800 rounded-xl pr-9 pl-4 py-2.5 text-sm outline-none focus:border-primary-500/40 transition-colors placeholder-zinc-600" />
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
               <Filter size={12} className="text-zinc-600 flex-shrink-0" />
@@ -515,7 +515,7 @@ export function UserDashboard() {
                     عامل موثّق بهويته السعودية سيقبل طلبك في دقائق
                   </p>
                   <button onClick={() => setShowNew(true)}
-                    className="bg-primary-500 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-primary-400 transition-colors shadow-lg shadow-primary-500/20">
+                    className="bg-primary-500 text-black font-bold px-8 py-3.5 rounded-xl hover:bg-primary-400 transition-colors shadow-lg shadow-primary-500/20">
                     اطلب الحين
                   </button>
                 </div>
@@ -527,7 +527,7 @@ export function UserDashboard() {
                     { e: '⚡', t: 'عامل يقبل', d: 'عادةً خلال 5-15 دقيقة' },
                     { e: '✅', t: 'أكّد الإنجاز', d: 'لما ينتهي تأكّد' },
                   ].map(({ e, t, d }) => (
-                    <div key={t} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4 text-center">
+                    <div key={t} className="bg-surface-panel border border-zinc-800 rounded-xl p-4 text-center">
                       <div className="text-2xl mb-2">{e}</div>
                       <p className="text-sm font-semibold text-white">{t}</p>
                       <p className="text-xs text-zinc-500 mt-1">{d}</p>
@@ -536,7 +536,7 @@ export function UserDashboard() {
                 </div>
 
                 {/* Trust badges */}
-                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4">
+                <div className="bg-surface-panel border border-zinc-800 rounded-xl p-4">
                   <p className="text-xs text-zinc-500 mb-3 text-center">لماذا أمرني آمنة؟</p>
                   <div className="grid grid-cols-2 gap-2">
                     {[
@@ -562,7 +562,7 @@ export function UserDashboard() {
           <div className="space-y-2.5">
             {filteredTasks.map(task => (
               <button key={task.id} onClick={() => openTask(task)}
-                className="w-full bg-[#0d0d0d] border border-zinc-800/60 hover:border-zinc-700 rounded-2xl p-5 text-right transition-all hover:shadow-lg hover:shadow-black/30 group">
+                className="w-full bg-surface-panel border border-zinc-800/60 hover:border-zinc-700 rounded-2xl p-5 text-right transition-all hover:shadow-lg hover:shadow-black/30 group">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -599,7 +599,7 @@ export function UserDashboard() {
             </h3>
             <div className="space-y-2">
               {tasks.filter(t => t.status === 'completed' && (t.price_final || t.price_suggested)).map(t => (
-                <div key={t.id} className="flex items-center justify-between bg-[#0d0d0d] border border-zinc-800/50 rounded-xl px-4 py-3">
+                <div key={t.id} className="flex items-center justify-between bg-surface-panel border border-zinc-800/50 rounded-xl px-4 py-3">
                   <div>
                     <p className="text-sm text-white truncate max-w-[200px]">{t.title}</p>
                     <p className="text-xs text-zinc-500">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>

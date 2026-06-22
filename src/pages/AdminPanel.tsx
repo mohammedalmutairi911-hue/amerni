@@ -125,15 +125,15 @@ export function AdminPanel() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center">
+    <div className="min-h-screen bg-surface-base pt-14 flex items-center justify-center">
       <Loader2 className="animate-spin text-primary-400" size={32} />
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-[#080808] pt-14">
+    <div className="min-h-screen bg-surface-base pt-14">
       {/* Header */}
-      <div className="bg-[#0d0d0d] border-b border-zinc-800 px-4 py-4">
+      <div className="bg-surface-panel border-b border-zinc-800 px-4 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-purple-500/15 flex items-center justify-center">
@@ -164,7 +164,7 @@ export function AdminPanel() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-zinc-800 bg-[#0d0d0d] sticky top-14 z-10">
+      <div className="border-b border-zinc-800 bg-surface-panel sticky top-14 z-10">
         <div className="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto">
           {TABS.map(({ id, icon: Icon, label }) => (
             <button key={id} onClick={() => setTab(id as Tab)}
@@ -198,7 +198,7 @@ export function AdminPanel() {
                 { label: 'نزاعات', value: stats.disputed, color: 'text-red-400' },
                 { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-white' },
               ].map(({ label, value, color }) => (
-                <div key={label} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-5">
+                <div key={label} className="bg-surface-panel border border-zinc-800 rounded-xl p-5">
                   <div className={`text-2xl font-black mb-1 ${color}`}>{value}</div>
                   <div className="text-sm text-zinc-400">{label}</div>
                 </div>
@@ -208,7 +208,7 @@ export function AdminPanel() {
             {/* Top cities & categories */}
             {tasks.length > 0 && (
               <div className="grid sm:grid-cols-2 gap-4">
-                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+                <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5">
                   <h3 className="font-semibold mb-4 text-sm text-zinc-400">📍 أكثر المدن نشاطاً</h3>
                   {Object.entries(tasks.reduce((acc: any, t) => { acc[t.city||'غير محدد'] = (acc[t.city||'غير محدد']||0)+1; return acc }, {}))
                     .sort((a:any,b:any) => b[1]-a[1]).slice(0,5).map(([city, count]: any) => (
@@ -223,7 +223,7 @@ export function AdminPanel() {
                     </div>
                   ))}
                 </div>
-                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+                <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5">
                   <h3 className="font-semibold mb-4 text-sm text-zinc-400">📂 أكثر التصنيفات</h3>
                   {Object.entries(tasks.reduce((acc: any, t) => { acc[t.category||'أخرى'] = (acc[t.category||'أخرى']||0)+1; return acc }, {}))
                     .sort((a:any,b:any) => b[1]-a[1]).slice(0,5).map(([cat, count]: any) => (
@@ -250,7 +250,7 @@ export function AdminPanel() {
                 </div>
                 <div className="space-y-2">
                   {workers.filter(w => !w.is_approved).map(w => (
-                    <div key={w.id} className="bg-[#0d0d0d] border border-primary-800/30 rounded-2xl p-5 space-y-4">
+                    <div key={w.id} className="bg-surface-panel border border-primary-800/30 rounded-2xl p-5 space-y-4">
                       {/* Header */}
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
@@ -331,7 +331,7 @@ export function AdminPanel() {
             {workers.length === 0 ? (
               <p className="text-center text-zinc-600 py-12">ما في عمال مسجلين</p>
             ) : workers.map(w => (
-              <div key={w.id} className={`bg-[#0d0d0d] border rounded-2xl p-5 ${!w.is_approved ? 'border-primary-800/30' : 'border-zinc-800'}`}>
+              <div key={w.id} className={`bg-surface-panel border rounded-2xl p-5 ${!w.is_approved ? 'border-primary-800/30' : 'border-zinc-800'}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <img src={getAvatar(w.full_name)} className="w-10 h-10 rounded-xl" alt="" />
@@ -381,7 +381,7 @@ export function AdminPanel() {
         {tab === 'tasks' && (
           <div className="space-y-3">
             {tasks.map(task => (
-              <div key={task.id} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4">
+              <div key={task.id} className="bg-surface-panel border border-zinc-800 rounded-xl p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -427,7 +427,7 @@ export function AdminPanel() {
               {tasks.filter(t => t.status === 'in_progress' || t.status === 'disputed').map(task => (
                 <button key={task.id} onClick={() => setSelectedTask(task)}
                   className={`w-full text-right p-3 rounded-xl border transition-all ${
-                    selectedTask?.id === task.id ? 'border-primary-500/40 bg-primary-500/5' : 'border-zinc-800 bg-[#0d0d0d] hover:border-zinc-700'
+                    selectedTask?.id === task.id ? 'border-primary-500/40 bg-primary-500/5' : 'border-zinc-800 bg-surface-panel hover:border-zinc-700'
                   }`}>
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-medium truncate flex-1">{task.title}</p>
@@ -444,7 +444,7 @@ export function AdminPanel() {
               {selectedTask ? (
                 <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
               ) : (
-                <div className="flex items-center justify-center h-80 border border-zinc-800 rounded-2xl bg-[#0d0d0d] text-zinc-600">
+                <div className="flex items-center justify-center h-80 border border-zinc-800 rounded-2xl bg-surface-panel text-zinc-600">
                   <div className="text-center">
                     <MessageSquare size={32} className="mx-auto mb-2 opacity-30" />
                     <p>اختر محادثة</p>
@@ -457,7 +457,7 @@ export function AdminPanel() {
 
         {/* Users */}
         {tab === 'users' && (
-          <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl overflow-hidden">
+          <div className="bg-surface-panel border border-zinc-800 rounded-2xl overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-zinc-800">

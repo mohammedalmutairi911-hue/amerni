@@ -183,7 +183,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
         <>
           {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-xl">{error}</p>}
           <button onClick={handle} disabled={loading}
-            className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full bg-primary-500 text-black font-bold py-3 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             {loading && <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />}
             {mode === 'login' ? 'دخول' : 'إنشاء حساب'}
           </button>
@@ -296,9 +296,9 @@ export function LandingPage() {
   const handleEarn = () => navigate('earn')
 
   return (
-    <div className="min-h-screen bg-[#080808] text-white flex flex-col">
+    <div className="min-h-screen bg-surface-base text-white flex flex-col">
       {/* Navbar */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-[#080808]/95 backdrop-blur border-b border-zinc-900">
+      <nav className="fixed top-0 inset-x-0 z-50 bg-surface-base/95 backdrop-blur border-b border-zinc-900">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <button onClick={() => setActiveTab('home')} className="text-xl font-black text-primary-400">أمرني</button>
           <div className="hidden md:flex items-center gap-1 overflow-x-auto">
@@ -310,13 +310,13 @@ export function LandingPage() {
             ))}
           </div>
           {user ? (
-            <button onClick={() => navigate('dashboard')} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-400 transition-colors">
+            <button onClick={() => navigate('dashboard')} className="bg-primary-500 text-black font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-400 transition-colors">
               حسابي
             </button>
           ) : (
             <div className="flex items-center gap-2">
               <button onClick={() => { setAuthDirectMode('login'); setShowAuthDirect(true) }} className="text-zinc-400 hover:text-white text-sm transition-colors">دخول</button>
-              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-400 transition-colors">سجّل</button>
+              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-black font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-400 transition-colors">سجّل</button>
             </div>
           )}
         </div>
@@ -324,7 +324,7 @@ export function LandingPage() {
         <div className="md:hidden flex gap-1 px-4 pb-2 overflow-x-auto">
           {TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
-              className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500 text-white font-bold' : 'text-zinc-500 hover:text-white'}`}>
+              className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500 text-black font-bold' : 'text-zinc-500 hover:text-white'}`}>
               {tab.label}
             </button>
           ))}
@@ -367,7 +367,7 @@ export function LandingPage() {
                   منصة سعودية تربطك بشخص ثقة و كفو يسوي لك أي خدمة — بسرعة وبثقة.
                 </p>
                 <div className="relative max-w-xl mx-auto mb-6">
-                  <div className="flex items-center gap-2 sm:gap-3 bg-[#111] border-2 border-zinc-800 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-primary-500 transition-all shadow-2xl">
+                  <div className="flex items-center gap-2 sm:gap-3 bg-surface-raised border-2 border-zinc-800 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-primary-500 transition-all shadow-2xl">
                     <Sparkles size={18} className="text-primary-500 flex-shrink-0" />
                     <input
                       value={taskInput} onChange={e => setTaskInput(e.target.value)}
@@ -376,7 +376,7 @@ export function LandingPage() {
                       className="flex-1 text-right bg-transparent text-white placeholder-zinc-500 text-sm outline-none"
                     />
                     <button onClick={handleStart}
-                      className="bg-primary-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-400 transition-colors flex-shrink-0 flex items-center gap-1.5">
+                      className="bg-primary-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-400 transition-colors text-black flex-shrink-0 flex items-center gap-1.5">
                       اطلب <ArrowLeft size={14} />
                     </button>
                   </div>
@@ -422,7 +422,7 @@ export function LandingPage() {
             <section className="py-20 px-4 bg-zinc-900/10">
               <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
                 {STEPS.map(({ n, icon: Icon, title, desc }) => (
-                  <div key={n} className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+                  <div key={n} className="bg-surface-panel border border-zinc-800 rounded-2xl p-6">
                     <div className="text-4xl font-black text-zinc-800 mb-3">{n}</div>
                     <div className="w-9 h-9 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-3">
                       <Icon size={17} className="text-primary-500" />
@@ -446,7 +446,7 @@ export function LandingPage() {
               </div>
               <div className="grid md:grid-cols-3 gap-6 mb-16">
                 {STEPS.map(({ n, icon: Icon, title, desc }) => (
-                  <div key={n} className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-7 hover:border-zinc-700 transition-all">
+                  <div key={n} className="bg-surface-panel border border-zinc-800 rounded-2xl p-7 hover:border-zinc-700 transition-all">
                     <div className="text-5xl font-black text-zinc-800 mb-4">{n}</div>
                     <div className="w-10 h-10 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-4">
                       <Icon size={19} className="text-primary-500" />
@@ -459,7 +459,7 @@ export function LandingPage() {
               <div className="bg-primary-500/5 border border-primary-500/20 rounded-2xl p-8 text-center">
                 <h3 className="text-2xl font-bold mb-3">جاهز تطلب؟</h3>
                 <p className="text-zinc-500 mb-6">اكتب طلبك الحين وعامل يقبله في ثواني</p>
-                <button onClick={() => setShowNewTask(true)} className="bg-primary-500 text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-400 transition-colors">
+                <button onClick={() => setShowNewTask(true)} className="bg-primary-500 text-black font-bold px-8 py-3 rounded-xl hover:bg-primary-400 transition-colors">
                   اطلب الحين
                 </button>
               </div>
@@ -484,7 +484,7 @@ export function LandingPage() {
                   { icon: MessageCircle, title: 'محادثة محمية', desc: 'تواصل مباشر مع العامل داخل المنصة — لا تشارك أرقامك مع أحد', color: 'text-pink-400', bg: 'bg-pink-500/10 border-pink-500/20' },
                   { icon: Zap, title: 'سرعة الرد', desc: 'العمال المتاحون يشوفون طلبك فوراً ويقبلون في دقائق', color: 'text-primary-400', bg: 'bg-primary-500/10 border-primary-500/20' },
                 ].map(({ icon: Icon, title, desc, color, bg }) => (
-                  <div key={title} className={`bg-[#0d0d0d] border rounded-2xl p-6 hover:border-zinc-600 transition-all ${bg.split(' ')[1]}`}>
+                  <div key={title} className={`bg-surface-panel border rounded-2xl p-6 hover:border-zinc-600 transition-all ${bg.split(' ')[1]}`}>
                     <div className={`w-10 h-10 rounded-xl ${bg} border flex items-center justify-center mb-4`}>
                       <Icon size={19} className={color} />
                     </div>
@@ -508,7 +508,7 @@ export function LandingPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
                 <div className="space-y-2.5">
                   {TRUST.map(t => (
-                    <div key={t} className="flex items-center gap-4 bg-[#0d0d0d] border border-zinc-800 rounded-xl px-5 py-4 hover:border-zinc-700 transition-all">
+                    <div key={t} className="flex items-center gap-4 bg-surface-panel border border-zinc-800 rounded-xl px-5 py-4 hover:border-zinc-700 transition-all">
                       <div className="w-6 h-6 rounded-full bg-secondary-500/15 border border-secondary-500/30 flex items-center justify-center flex-shrink-0">
                         <CheckCircle size={13} className="text-secondary-500" />
                       </div>
@@ -517,15 +517,15 @@ export function LandingPage() {
                   ))}
                 </div>
                 <div className="space-y-4">
-                  <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+                  <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-6">
                     <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-secondary-500" /> تحقق الهوية</h3>
                     <p className="text-zinc-500 text-sm leading-relaxed">كل عامل يرفع صورة هويته الوطنية أو إقامته، والذكاء الاصطناعي يتحقق من صحتها قبل القبول.</p>
                   </div>
-                  <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+                  <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-6">
                     <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-primary-500" /> حماية إتمام الطلب</h3>
                     <p className="text-zinc-500 text-sm leading-relaxed">لا يُغلق الطلب رسمياً إلا بعد تأكيدك الصريح لاستلام الخدمة — هذا يحميك من إغلاق أي طلب دون رضاك.</p>
                   </div>
-                  <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+                  <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-6">
                     <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-blue-500" /> خصوصية التواصل</h3>
                     <p className="text-zinc-500 text-sm leading-relaxed">المحادثة داخل المنصة فقط — فلتر ذكي يمنع مشاركة أرقام الجوال والإيميلات.</p>
                   </div>
@@ -548,14 +548,14 @@ export function LandingPage() {
               </div>
 
               <div className="space-y-8 text-zinc-300 leading-relaxed">
-                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-8">
+                <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-8">
                   <h3 className="text-xl font-bold text-white mb-4">من نحن؟</h3>
                   <p className="text-zinc-400 leading-loose">
                     نحن مؤسسة حلول الغد للخدمات الإلكترونية — نقدم منصة أمرني السعودية التي تربطك مع أفضل الأشخاص والخبراء لإنجاز طلبك بأمان وسرعة. بدأت الفكرة من مشكلة حقيقية: كيف أجد شخصاً موثوقاً ينجز لي مهمة بسيطة دون خوف أو تعقيد؟
                   </p>
                 </div>
 
-                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-8">
+                <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-8">
                   <h3 className="text-xl font-bold text-white mb-4">رسالتنا</h3>
                   <p className="text-zinc-400 leading-loose">
                     نؤمن أن كل شخص يستحق مساعدة سريعة وموثوقة. سواء كنت مشغولاً في العمل أو تحتاج لمهمة بسيطة، أمرني هنا عشانك.
@@ -563,7 +563,7 @@ export function LandingPage() {
                   </p>
                 </div>
 
-                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-8">
+                <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-8">
                   <h3 className="text-xl font-bold text-white mb-4">قيمنا</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
                     {[
@@ -586,7 +586,7 @@ export function LandingPage() {
                   <p className="text-zinc-500 text-sm">شعارنا يقول كل شيء — أنت تطلب وإحنا نوصلك لمن ينجز</p>
                 </div>
 
-                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+                <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-6">
                   <h3 className="font-bold text-white mb-4">عن المؤسسة</h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -626,7 +626,7 @@ export function LandingPage() {
                     { icon: MessageCircle, label: 'الدعم المباشر', value: 'متاح ٢٤/٧ عبر الدردشة', color: 'text-blue-400' },
                     { icon: Shield, label: 'الآيبان — بنك البلاد', value: 'SA54150009001465965400007', color: 'text-zinc-300' },
                   ].map(({ icon: Icon, label, value, color }) => (
-                    <div key={label} className="flex items-center gap-4 bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4">
+                    <div key={label} className="flex items-center gap-4 bg-surface-panel border border-zinc-800 rounded-xl p-4">
                       <div className={`w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center flex-shrink-0`}>
                         <Icon size={18} className={color} />
                       </div>
@@ -637,7 +637,7 @@ export function LandingPage() {
                     </div>
                   ))}
 
-                  <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+                  <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5">
                     <h4 className="font-semibold mb-2">ساعات العمل</h4>
                     <div className="space-y-1.5 text-sm text-zinc-400">
                       <div className="flex justify-between"><span>الأحد — الخميس</span><span className="text-white">٨ص — ١١م</span></div>
@@ -648,7 +648,7 @@ export function LandingPage() {
                 </div>
 
                 {/* Contact form */}
-                <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+                <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-6">
                   <h3 className="font-bold text-lg mb-5">أرسل رسالة</h3>
                   {contactSent ? (
                     <div className="text-center py-10">
@@ -676,7 +676,7 @@ export function LandingPage() {
                           className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors resize-none" />
                       </div>
                       <button onClick={sendContact} disabled={contactLoading || !contactForm.name || !contactForm.email || !contactForm.message}
-                        className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+                        className="w-full bg-primary-500 text-black font-bold py-3 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
                         {contactLoading ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                         إرسال الرسالة
                       </button>
@@ -725,14 +725,14 @@ export function LandingPage() {
                       setSupportLoading(false)
                     })
                   }}
-                    className="text-right px-4 py-3 bg-[#0d0d0d] border border-zinc-800 hover:border-primary-500/30 rounded-xl text-sm text-zinc-400 hover:text-white transition-all">
+                    className="text-right px-4 py-3 bg-surface-panel border border-zinc-800 hover:border-primary-500/30 rounded-xl text-sm text-zinc-400 hover:text-white transition-all">
                     {q}
                   </button>
                 ))}
               </div>
 
               {/* Chat */}
-              <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl overflow-hidden">
+              <div className="bg-surface-panel border border-zinc-800 rounded-2xl overflow-hidden">
                 <div className="px-4 py-3 border-b border-zinc-800 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
                     <Bot size={16} className="text-primary-500" />
@@ -824,7 +824,7 @@ export function LandingPage() {
                   body: 'قد نُفصح عن بياناتك للجهات القانونية السعودية المختصة إذا طُلب ذلك بموجب أمر قضائي أو للتحقيق في نشاط مشبوه يهدد سلامة المستخدمين.'
                 },
               ].map(({ title, body }) => (
-                <div key={title} className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+                <div key={title} className="bg-surface-panel border border-zinc-800 rounded-2xl p-6">
                   <h3 className="font-bold text-white mb-3">{title}</h3>
                   <p className="text-zinc-400 text-sm leading-relaxed">{body}</p>
                 </div>
@@ -885,7 +885,7 @@ export function LandingPage() {
                   body: 'تخضع هذه الشروط لأنظمة المملكة العربية السعودية وتُفسَّر وفقاً لها. أي نزاع يخضع للاختصاص القضائي في المملكة العربية السعودية.'
                 },
               ].map(({ title, body }) => (
-                <div key={title} className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+                <div key={title} className="bg-surface-panel border border-zinc-800 rounded-2xl p-6">
                   <h3 className="font-bold text-white mb-3">{title}</h3>
                   <p className="text-zinc-400 text-sm leading-relaxed">{body}</p>
                 </div>
@@ -902,7 +902,7 @@ export function LandingPage() {
       {/* Direct Auth Modal */}
       {showAuthDirect && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-[#111] border border-zinc-800 rounded-2xl p-6 shadow-2xl">
+          <div className="w-full max-w-sm bg-surface-raised border border-zinc-800 rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">{authDirectMode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب'}</h2>
               <button onClick={() => setShowAuthDirect(false)} className="text-zinc-500 hover:text-white">✕</button>

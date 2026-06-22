@@ -166,14 +166,14 @@ export function WorkerDashboard() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center">
+    <div className="min-h-screen bg-surface-base pt-14 flex items-center justify-center">
       <Loader2 className="animate-spin text-primary-400" size={32} />
     </div>
   )
 
   if (!workerProfile?.is_approved) return (
-    <div className="min-h-screen bg-[#080808] pt-14 flex items-center justify-center px-4">
-      <div className="max-w-sm text-center bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-10">
+    <div className="min-h-screen bg-surface-base pt-14 flex items-center justify-center px-4">
+      <div className="max-w-sm text-center bg-surface-panel border border-zinc-800 rounded-2xl p-10">
         <div className="w-16 h-16 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-5">
           <Clock size={28} className="text-primary-500" />
         </div>
@@ -192,7 +192,7 @@ export function WorkerDashboard() {
   // Commission modal
   if (showCommission && pendingTask) return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4">
-      <div className="w-full max-w-sm bg-[#111] border border-zinc-800 rounded-t-2xl sm:rounded-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh]">
+      <div className="w-full max-w-sm bg-surface-raised border border-zinc-800 rounded-t-2xl sm:rounded-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh]">
         {/* Header ثابت */}
         <div className="p-5 pb-3 flex-shrink-0">
           <div className="w-10 h-10 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-3">
@@ -250,7 +250,7 @@ export function WorkerDashboard() {
             إلغاء
           </button>
           <button onClick={confirmAcceptTask}
-            className="flex-1 bg-primary-500 text-white font-bold py-3 rounded-xl text-sm hover:bg-primary-400 transition-colors">
+            className="flex-1 bg-primary-500 text-black font-bold py-3 rounded-xl text-sm hover:bg-primary-400 transition-colors">
             أوافق وأقبل الطلب
           </button>
         </div>
@@ -268,7 +268,7 @@ export function WorkerDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#080808] pt-14">
+    <div className="min-h-screen bg-surface-base pt-14">
 
       {/* Payment Reminder Modal - shown after task completed */}
       {paymentReminderTask && (() => {
@@ -276,7 +276,7 @@ export function WorkerDashboard() {
         const commission = (price * 0.02).toFixed(2)
         return (
           <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-            <div className="bg-[#111] border border-zinc-800 rounded-2xl w-full max-w-md p-6">
+            <div className="bg-surface-raised border border-zinc-800 rounded-2xl w-full max-w-md p-6">
               <div className="w-12 h-12 rounded-2xl bg-secondary-500/10 border border-secondary-500/20 flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">💰</span>
               </div>
@@ -338,7 +338,7 @@ export function WorkerDashboard() {
       {/* Completion Modal */}
       {completingTask && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#111] border border-zinc-800 rounded-2xl w-full max-w-md p-5">
+          <div className="bg-surface-raised border border-zinc-800 rounded-2xl w-full max-w-md p-5">
             <h3 className="text-lg font-bold mb-1">إنهاء الطلب</h3>
             <p className="text-zinc-400 text-sm mb-4">أضف ملاحظة أو صورة كدليل على الإنجاز — سيراها العميل قبل التأكيد</p>
 
@@ -376,7 +376,7 @@ export function WorkerDashboard() {
       )}
 
       {/* Top header */}
-      <div className="bg-[#0d0d0d] border-b border-zinc-800 px-4 py-3">
+      <div className="bg-surface-panel border-b border-zinc-800 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={getAvatar(profile?.full_name || '')} className="w-9 h-9 rounded-xl" alt="" />
@@ -402,7 +402,7 @@ export function WorkerDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-[#0d0d0d] border-b border-zinc-800 sticky top-14 z-10">
+      <div className="bg-surface-panel border-b border-zinc-800 sticky top-14 z-10">
         <div className="max-w-4xl mx-auto px-4 flex gap-0.5 overflow-x-auto">
           {TABS.map(({ id, icon: Icon, label, badge }) => (
             <button key={id} onClick={() => setTab(id as Tab)}
@@ -431,7 +431,7 @@ export function WorkerDashboard() {
                 { label: 'جارية الآن', value: activeTasks.length, icon: TrendingUp, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
                 { label: 'هذا الشهر', value: thisMonth, icon: Calendar, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
               ].map(({ label, value, icon: Icon, color, bg }) => (
-                <div key={label} className={`bg-[#0d0d0d] border ${bg.split(' ')[1]} rounded-2xl p-5`}>
+                <div key={label} className={`bg-surface-panel border ${bg.split(' ')[1]} rounded-2xl p-5`}>
                   <div className={`w-9 h-9 rounded-xl ${bg} border flex items-center justify-center mb-3`}>
                     <Icon size={17} className={color} />
                   </div>
@@ -442,7 +442,7 @@ export function WorkerDashboard() {
             </div>
 
             {/* Rating card */}
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">تقييمك</h3>
                 <div className="flex items-center gap-1">
@@ -469,7 +469,7 @@ export function WorkerDashboard() {
             </div>
 
             {/* Recent tasks */}
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">آخر الطلبات</h3>
                 <button onClick={() => setTab('my-tasks')} className="text-xs text-primary-400 flex items-center gap-1">الكل <ArrowRight size={12} /></button>
@@ -493,7 +493,7 @@ export function WorkerDashboard() {
             </div>
 
             {/* Skills */}
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5">
               <h3 className="font-semibold mb-3">مهاراتي</h3>
               <div className="flex flex-wrap gap-2">
                 {(workerProfile?.skills || []).map(s => (
@@ -550,7 +550,7 @@ export function WorkerDashboard() {
                 }
                 return true
               }).map(task => (
-              <div key={task.id} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
+              <div key={task.id} className="bg-surface-panel border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-all">
                 <div className="flex items-start justify-between mb-3 gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -589,7 +589,7 @@ export function WorkerDashboard() {
                 <button onClick={() => setTab('feed')} className="text-primary-400 text-sm mt-2">تصفح الطلبات المتاحة ←</button>
               </div>
             ) : myTasks.map(task => (
-              <div key={task.id} className="bg-[#0d0d0d] border border-zinc-800 rounded-xl p-5">
+              <div key={task.id} className="bg-surface-panel border border-zinc-800 rounded-xl p-5">
                 <div className="flex items-start justify-between mb-3 gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -648,7 +648,7 @@ export function WorkerDashboard() {
                   </div>
                 ) : myTasks.filter(t => ['in_progress'].includes(t.status)).map(task => (
                   <button key={task.id} onClick={() => setSelectedTask(task)}
-                    className="w-full bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4 text-right hover:border-zinc-700 transition-all">
+                    className="w-full bg-surface-panel border border-zinc-800 rounded-xl p-4 text-right hover:border-zinc-700 transition-all">
                     <p className="font-medium">{task.title}</p>
                     <p className="text-xs text-zinc-500 mt-0.5">{(task as any).profiles?.full_name}</p>
                   </button>
@@ -660,7 +660,7 @@ export function WorkerDashboard() {
 
         {/* Schedule */}
         {tab === 'schedule' && (
-          <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+          <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5">
             <h2 className="font-bold mb-4">جدول توفرك</h2>
             {workerProfile?.schedule && Object.keys(workerProfile.schedule).length > 0 ? (
               <div className="space-y-2">
@@ -678,7 +678,7 @@ export function WorkerDashboard() {
         {/* Profile */}
         {tab === 'profile' && (
           <div className="space-y-4">
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-6">
+            <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-6">
               <div className="flex items-center gap-4 mb-5">
                 <img src={getAvatar(profile?.full_name || '')} className="w-16 h-16 rounded-2xl" alt="" />
                 <div>
@@ -694,7 +694,7 @@ export function WorkerDashboard() {
               {workerProfile?.bio && <p className="text-sm text-zinc-400 leading-relaxed border-t border-zinc-800 pt-4">{workerProfile.bio}</p>}
             </div>
 
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5">
               <h3 className="font-semibold mb-3">بياناتي</h3>
               <div className="space-y-2.5">
                 {[
@@ -711,7 +711,7 @@ export function WorkerDashboard() {
               </div>
             </div>
 
-            <div className="bg-[#0d0d0d] border border-zinc-800 rounded-2xl p-5">
+            <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5">
               <h3 className="font-semibold mb-3">مهاراتي</h3>
               <div className="flex flex-wrap gap-2">
                 {(workerProfile?.skills || []).map(s => (
