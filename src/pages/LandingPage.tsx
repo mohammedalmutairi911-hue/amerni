@@ -283,13 +283,13 @@ export function LandingPage() {
 
   const TABS = [
     { id: 'home', label: 'الرئيسية' },
-    { id: 'how', label: 'كيف تشتغل' },
-    { id: 'features', label: 'المميزات' },
+    { id: 'how', label: 'كيف يعمل؟' },
+    { id: 'features', label: 'الخدمات' },
     { id: 'trust', label: 'الثقة والأمان' },
-    { id: 'about', label: 'عنّا' },
-    { id: 'contact', label: 'تواصل معنا' },
-    { id: 'support', label: 'الدعم' },
-    { id: 'privacy', label: 'الخصوصية والأمان' },
+    { id: 'about', label: 'من نحن' },
+    { id: 'contact', label: 'اتصل بنا' },
+    { id: 'support', label: 'الدعم الفني' },
+    { id: 'privacy', label: 'سياسة الخصوصية' },
     { id: 'terms', label: 'الشروط والأحكام' },
   ]
 
@@ -362,11 +362,11 @@ export function LandingPage() {
                   <Sparkles size={13} /> آمرني — اطلب أي شيء في السعودية
                 </div>
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-4 sm:mb-6 leading-[1.1]">
-                  <span className="text-slate-900">شريكك الموثوق</span><br/>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-500 to-accent-500">للخدمات المنزلية</span>
+                  <span className="text-slate-900">دليل الخدمات</span>{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-500 to-accent-500">المتكامل</span>
                 </h1>
-                <p className="text-slate-500 text-base sm:text-xl mb-8 sm:mb-12 max-w-xl mx-auto leading-relaxed px-2">
-                  نربطك بأفضل المحترفين المعتمدين في المملكة لضمان جودة منزلك وراحتك.
+                <p className="text-slate-500 text-base sm:text-xl mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed px-2">
+                  منصة سعودية تربطك بشخص ثقة وكفو يسوي لك أي خدمة — بسرعة وبثقة.
                 </p>
 
                 {/* Search bar */}
@@ -389,8 +389,8 @@ export function LandingPage() {
                 {/* Popular services */}
                 <p className="text-xs text-slate-400 mb-3">خدمات شائعة:</p>
                 <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-10 px-2">
-                  {['🧹 تنظيف مكيفات','🔧 سباكة','🏠 تعقيم منازل','⚡ كهرباء','❄️ تكييف','✨ أخرى'].map(cat => (
-                    <button key={cat} onClick={() => { setTaskInput(cat.split(' ')[1]); setShowNewTask(true) }}
+                  {['تنظيف مكيفات','سباكة','تعقيم منازل','كهرباء','تكييف','صيانة'].map(cat => (
+                    <button key={cat} onClick={() => { setTaskInput(cat); setShowNewTask(true) }}
                       className="px-4 py-2 bg-white border border-slate-200 hover:border-primary-500 hover:text-primary-500 rounded-full text-sm text-slate-600 transition-all shadow-sm">
                       {cat}
                     </button>
@@ -413,7 +413,7 @@ export function LandingPage() {
             <section className="py-16 px-4 bg-white">
               <div className="max-w-5xl mx-auto">
                 <h2 className="text-3xl font-black text-center text-slate-900 mb-3">لماذا تختار آمرني؟</h2>
-                <p className="text-slate-500 text-center mb-12">نضمن لك أفضل تجربة خدمة في المملكة</p>
+                <p className="text-slate-500 text-center mb-12">حلول متكاملة لكل ركن في منزلك</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[
                     { icon: UserCheck, color: 'text-primary-500', bg: 'bg-primary-50', title: 'محترفون معتمدون', desc: 'يخضع جميع مزودي الخدمة لدينا لعملية فحص وتدقيق صارمة لضمان أعلى معايير الجودة والأمان.' },
@@ -496,52 +496,101 @@ export function LandingPage() {
               </div>
             </section>
 
-            {/* Quick how it works */}
+            {/* Explore services */}
             <section className="py-16 px-4 bg-white">
-              <div className="max-w-4xl mx-auto">
-                <h2 className="text-2xl font-black text-center text-slate-900 mb-10">استكشف خدماتنا</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
-                  {STEPS.map(({ n, icon: Icon, title, desc }) => (
-                    <div key={n} className="bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:border-primary-500/30 transition-all">
-                      <div className="text-4xl font-black text-slate-200 mb-3">{n}</div>
-                      <div className="w-9 h-9 rounded-xl bg-primary-500/10 flex items-center justify-center mb-3">
-                        <Icon size={17} className="text-primary-500" />
-                      </div>
-                      <h3 className="font-bold text-slate-900 mb-1.5">{title}</h3>
-                      <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
-                    </div>
+              <div className="max-w-5xl mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900">استكشف خدماتنا</h2>
+                    <p className="text-slate-500 text-sm mt-1">حلول متكاملة لكل ركن في منزلك</p>
+                  </div>
+                  <button onClick={() => setShowBrowse(true)} className="text-primary-500 text-sm font-semibold hover:underline">عرض الكل</button>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+                  {[
+                    { icon: '🧹', label: 'التنظيف' },
+                    { icon: '❄️', label: 'التكييف' },
+                    { icon: '🔧', label: 'السباكة' },
+                    { icon: '⚡', label: 'الكهرباء' },
+                    { icon: '🏗️', label: 'الصيانة' },
+                    { icon: '✨', label: 'أخرى' },
+                  ].map(({ icon, label }) => (
+                    <button key={label} onClick={() => setShowBrowse(true)}
+                      className="bg-slate-50 border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-2xl p-4 text-center transition-all group">
+                      <div className="text-3xl mb-2">{icon}</div>
+                      <p className="text-sm font-semibold text-slate-700 group-hover:text-primary-500">{label}</p>
+                    </button>
                   ))}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl p-6 text-white">
+                    <div className="text-2xl mb-3">🚗</div>
+                    <h3 className="font-black text-lg mb-1">خدمات التوصيل الفاخرة</h3>
+                    <p className="text-blue-100 text-sm mb-4">خدمات نقل وتوصيل خاصة بمهنية عالية وأمان تام، نضمن لك الوصول في الوقت المحدد بأفضل السيارات.</p>
+                    <button onClick={() => setShowNewTask(true)} className="bg-white text-primary-500 font-bold px-4 py-2 rounded-xl text-sm hover:bg-blue-50 transition-colors">
+                      اطلب الآن
+                    </button>
+                  </div>
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+                    <div className="text-2xl mb-3">🛍️</div>
+                    <h3 className="font-black text-lg text-slate-900 mb-1">المساعد الشخصي للتسوق</h3>
+                    <p className="text-slate-500 text-sm mb-4">اترك عنك عناء الزحام، فريقنا جاهز لشراء كافة مستلزماتك وتوصيلها لباب بيتك.</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-primary-50 text-primary-500 font-bold px-3 py-1 rounded-full">+٢٤٠٠ عامل</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
+
+            {/* Footer */}
+            <footer className="bg-slate-900 text-white py-10 px-4">
+              <div className="max-w-5xl mx-auto">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <div>
+                    <p className="font-black text-xl text-white mb-1">آمرني</p>
+                    <p className="text-slate-400 text-sm">نظام الخدمات المنزلية الذكي</p>
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-sm text-slate-400">
+                    <button onClick={() => setActiveTab('privacy')} className="hover:text-white transition-colors">سياسة الخصوصية</button>
+                    <button onClick={() => setActiveTab('terms')} className="hover:text-white transition-colors">الشروط والأحكام</button>
+                    <button onClick={() => setActiveTab('support')} className="hover:text-white transition-colors">الدعم الفني</button>
+                    <button onClick={() => setActiveTab('contact')} className="hover:text-white transition-colors">اتصل بنا</button>
+                  </div>
+                </div>
+                <div className="border-t border-slate-800 mt-6 pt-6 text-center text-slate-500 text-xs">
+                  © ٢٠٢٤ آمرني — جميع الحقوق محفوظة
+                </div>
+              </div>
+            </footer>
           </div>
         )}
 
         {/* HOW IT WORKS */}
         {activeTab === 'how' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
-                <h2 className="text-4xl font-black mb-3">كيف تشتغل أمرني؟</h2>
-                <p className="text-slate-400">من الطلب للإنجاز في دقائق</p>
+                <h2 className="text-4xl font-black text-slate-900 mb-3">كيف يعمل آمرني؟</h2>
+                <p className="text-slate-500">من الطلب للإنجاز في دقائق</p>
               </div>
               <div className="grid md:grid-cols-3 gap-6 mb-16">
                 {STEPS.map(({ n, icon: Icon, title, desc }) => (
-                  <div key={n} className="bg-white border border-slate-200 rounded-2xl p-7 hover:border-slate-300 transition-all">
-                    <div className="text-5xl font-black text-zinc-800 mb-4">{n}</div>
-                    <div className="w-10 h-10 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mb-4">
+                  <div key={n} className="bg-white border border-slate-200 rounded-2xl p-7 hover:shadow-md transition-all">
+                    <div className="text-5xl font-black text-slate-100 mb-4">{n}</div>
+                    <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center mb-4">
                       <Icon size={19} className="text-primary-500" />
                     </div>
-                    <h3 className="font-semibold mb-2 text-lg">{title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+                    <h3 className="font-bold text-slate-900 mb-2 text-lg">{title}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
                   </div>
                 ))}
               </div>
-              <div className="bg-primary-500/5 border border-primary-500/20 rounded-2xl p-8 text-center">
-                <h3 className="text-2xl font-bold mb-3">جاهز تطلب؟</h3>
-                <p className="text-slate-400 mb-6">اكتب طلبك الحين وعامل يقبله في ثواني</p>
-                <button onClick={() => setShowNewTask(true)} className="bg-primary-500 text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-700 transition-colors">
-                  اطلب الحين
+              <div className="bg-primary-500 rounded-2xl p-8 text-center">
+                <h3 className="text-2xl font-bold text-white mb-3">جاهز للبدء؟</h3>
+                <p className="text-blue-100 mb-6">اكتب طلبك الآن وسيتواصل معك أفضل المحترفين في منطقتك</p>
+                <button onClick={() => setShowNewTask(true)} className="bg-white text-primary-500 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
+                  اطلب الآن
                 </button>
               </div>
             </div>
@@ -618,70 +667,68 @@ export function LandingPage() {
 
         {/* ABOUT */}
         {activeTab === 'about' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-16">
                 <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center mx-auto mb-6">
-                  <span className="text-4xl font-black text-slate-900">أ</span>
+                  <span className="text-4xl font-black text-white">آ</span>
                 </div>
-                <h2 className="text-4xl font-black mb-4">قصتنا</h2>
-                <p className="text-slate-500 text-lg leading-relaxed">منصة سعودية ولدت من فكرة بسيطة</p>
+                <h2 className="text-4xl font-black text-slate-900 mb-4">من نحن</h2>
+                <p className="text-slate-500 text-lg leading-relaxed">منصة آمرني — نظام الخدمات المنزلية الذكي</p>
               </div>
 
-              <div className="space-y-8 text-slate-700 leading-relaxed">
-                <div className="bg-white border border-slate-200 rounded-2xl p-8">
+              <div className="space-y-6">
+                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
                   <h3 className="text-xl font-bold text-slate-900 mb-4">من نحن؟</h3>
                   <p className="text-slate-500 leading-loose">
-                    نحن مؤسسة حلول الغد للخدمات الإلكترونية — نقدم منصة أمرني السعودية التي تربطك مع أفضل الأشخاص والخبراء لإنجاز طلبك بأمان وسرعة. بدأت الفكرة من مشكلة حقيقية: كيف أجد شخصاً موثوقاً ينجز لي مهمة بسيطة دون خوف أو تعقيد؟
+                    نحن مؤسسة حلول الغد للخدمات الإلكترونية — نقدم منصة آمرني السعودية الرائدة التي تربطك بأفضل المحترفين المعتمدين في المملكة لضمان جودة منزلك وراحتك. بدأت الفكرة من حاجة حقيقية: كيف أجد محترفاً موثوقاً لإنجاز خدمة منزلية دون خوف أو تعقيد؟
                   </p>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-8">
+                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
                   <h3 className="text-xl font-bold text-slate-900 mb-4">رسالتنا</h3>
                   <p className="text-slate-500 leading-loose">
-                    نؤمن أن كل شخص يستحق مساعدة سريعة وموثوقة. سواء كنت مشغولاً في العمل أو تحتاج لمهمة بسيطة، أمرني هنا عشانك.
-                    هدفنا بناء اقتصاد خدمي قائم على الثقة — حيث يكسب العامل بشرف وينجز العميل بثقة.
+                    نؤمن أن كل منزل يستحق أفضل رعاية. سواء كنت تحتاج لصيانة، تنظيف، أو أي خدمة منزلية — آمرني هنا لتوصيلك بالمحترف المناسب بسرعة وأمان. هدفنا بناء منظومة خدمات قائمة على الثقة، حيث يكسب المحترف بشرف ويحصل العميل على أفضل جودة.
                   </p>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-8">
-                  <h3 className="text-xl font-bold text-slate-900 mb-4">قيمنا</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+                  <h3 className="text-xl font-bold text-slate-900 mb-5">قيمنا</h3>
+                  <div className="grid grid-cols-2 gap-4">
                     {[
-                      { emoji: '🤝', title: 'الثقة أولاً', desc: 'كل عامل موثق بهويته الوطنية' },
-                      { emoji: '⚡', title: 'السرعة', desc: 'طلبك يوصل للعامل في ثوانٍ' },
-                      { emoji: '🛡️', title: 'الأمان', desc: 'فلوسك محمية حتى الإنجاز' },
-                      { emoji: '🌟', title: 'الجودة', desc: 'تقييمات حقيقية من عملاء حقيقيين' },
+                      { emoji: '🆔', title: 'محترفون معتمدون', desc: 'موثق عبر أبشر وخاضع لفحص صارم' },
+                      { emoji: '⚡', title: 'استجابة سريعة', desc: 'يصلك رد المحترف في دقائق' },
+                      { emoji: '💳', title: 'مدفوعات آمنة', desc: 'مدى وأبل باي — مضمون حتى الإنجاز' },
+                      { emoji: '⭐', title: 'جودة مضمونة', desc: 'تقييمات حقيقية من عملاء حقيقيين' },
                     ].map(({ emoji, title, desc }) => (
-                      <div key={title} className="bg-white rounded-xl p-4">
+                      <div key={title} className="bg-slate-50 rounded-xl p-4">
                         <div className="text-2xl mb-2">{emoji}</div>
-                        <p className="font-semibold text-slate-900 text-sm">{title}</p>
-                        <p className="text-slate-400 text-xs mt-1">{desc}</p>
+                        <p className="font-bold text-slate-900 text-sm">{title}</p>
+                        <p className="text-slate-500 text-xs mt-1">{desc}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="bg-primary-500/10 border border-primary-500/20 rounded-2xl p-8 text-center">
-                  <p className="text-primary-300 text-lg font-semibold mb-2">"أمرني وإحنا ننجز"</p>
-                  <p className="text-slate-400 text-sm">شعارنا يقول كل شيء — أنت تطلب وإحنا نوصلك لمن ينجز</p>
+                <div className="bg-primary-500 rounded-2xl p-8 text-center">
+                  <p className="text-white text-xl font-black mb-2">"آمرني وإحنا ننجز"</p>
+                  <p className="text-blue-100 text-sm">أنت تطلب وإحنا نوصلك لمن ينجز</p>
                 </div>
 
-                <div className="bg-white border border-slate-200 rounded-2xl p-6">
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                   <h3 className="font-bold text-slate-900 mb-4">عن المؤسسة</h3>
                   <div className="space-y-3 text-sm">
-                    <div className="flex justify-between items-center border-b border-slate-200 pb-3">
-                      <span className="text-slate-400">اسم المؤسسة</span>
-                      <span className="text-slate-900 font-medium">مؤسسة حلول الغد للخدمات الإلكترونية</span>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-slate-200 pb-3">
-                      <span className="text-slate-400">البنك</span>
-                      <span className="text-slate-900 font-medium">بنك البلاد</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-400">رقم الآيبان</span>
-                      <span className="text-primary-500 font-mono text-xs">SA54150009001465965400007</span>
-                    </div>
+                    {[
+                      ['اسم المؤسسة', 'مؤسسة حلول الغد للخدمات الإلكترونية'],
+                      ['البنك', 'بنك البلاد'],
+                      ['رقم الآيبان', 'SA54150009001465965400007'],
+                      ['البريد الإلكتروني', 'support@amerniksa.com'],
+                    ].map(([k, v]) => (
+                      <div key={k} className="flex justify-between items-center border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+                        <span className="text-slate-900 font-medium">{v}</span>
+                        <span className="text-slate-400">{k}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>

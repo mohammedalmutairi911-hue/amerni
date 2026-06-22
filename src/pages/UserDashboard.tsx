@@ -388,10 +388,11 @@ export function UserDashboard() {
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="flex items-start justify-between mb-6">
             <div>
+              <p className="text-sm text-slate-500 mb-1">مرحباً بك</p>
               <h1 className="text-2xl font-black text-slate-900 mb-1">
-                مرحباً بك، {profile?.full_name?.split(' ')[0] || 'عزيزي العميل'} 👋
+                {profile?.full_name || 'عميل آمرني المميز'}
               </h1>
-              <p className="text-slate-500 text-sm">تتبع طلباتك الحالية، واكتشف الخدمات الأكثر طلباً اليوم.</p>
+              <p className="text-slate-500 text-sm">ملخص نشاطك — تتبع طلباتك الحالية، ورصيد محفظتك، واكتشف الخدمات الأكثر طلباً اليوم.</p>
             </div>
             <button onClick={() => setShowNew(true)}
               className="flex items-center gap-2 bg-primary-500 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-sm">
@@ -404,7 +405,7 @@ export function UserDashboard() {
             {[
               { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-slate-900' },
               { label: 'بانتظار مقدم', value: openCount, color: 'text-primary-500' },
-              { label: 'جارية', value: activeCount, color: 'text-blue-500' },
+              { label: 'الطلبات النشطة', value: activeCount, color: 'text-blue-500' },
               { label: 'مكتملة', value: completedCount, color: 'text-secondary-500' },
             ].map(({ label, value, color }) => (
               <div key={label} className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-center">
