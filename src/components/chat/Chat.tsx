@@ -100,7 +100,7 @@ export function Chat({ taskId, taskTitle }: Props) {
     if (!user || sending) return
     const text = input.trim()
 
-    // فلتر المحتوى
+    // فلتر المحتوى — نص فقط، الصور والصوت تمر مباشرة
     if (text) {
       const isBlocked = BLOCKED_PATTERNS.some(p => p.test(text))
       if (isBlocked) {
