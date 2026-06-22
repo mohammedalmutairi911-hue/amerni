@@ -10,10 +10,10 @@ const STATUS_LABEL: Record<string, string> = {
   open: 'بانتظار عامل', in_progress: 'جاري التنفيذ', pending_confirmation: 'بانتظار تأكيدك', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع'
 }
 const STATUS_COLOR: Record<string, string> = {
-  open: 'text-primary-400 bg-primary-500/10 border-primary-500/20',
+  open: 'text-primary-500 bg-primary-500/10 border-primary-500/20',
   in_progress: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   completed: 'text-secondary-400 bg-secondary-500/10 border-secondary-500/20',
-  cancelled: 'text-zinc-500 bg-zinc-800 border-zinc-700',
+  cancelled: 'text-slate-400 bg-slate-100 border-slate-300',
   pending_confirmation: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
   disputed: 'text-red-400 bg-red-500/10 border-red-500/20',
 }
@@ -153,7 +153,7 @@ export function UserDashboard() {
     <div className="min-h-screen bg-surface-base pt-14 flex items-center justify-center">
       <div className="text-center">
         <div className="w-10 h-10 border-2 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-zinc-600 text-sm">جاري التحميل...</p>
+        <p className="text-slate-400 text-sm">جاري التحميل...</p>
       </div>
     </div>
   )
@@ -163,12 +163,12 @@ export function UserDashboard() {
     <div className="min-h-screen bg-surface-base pt-14">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <button onClick={() => { setSelectedTask(null); fetchTasks() }}
-          className="text-sm text-zinc-400 hover:text-white mb-6 flex items-center gap-1.5 transition-colors">
+          className="text-sm text-slate-500 hover:text-slate-900 mb-6 flex items-center gap-1.5 transition-colors">
           ← رجوع
         </button>
 
         {/* Task card */}
-        <div className="bg-gradient-to-br from-[#111] to-[#0d0d0d] border border-zinc-800 rounded-2xl p-6 mb-4">
+        <div className="bg-gradient-to-br from-[#111] to-[#0d0d0d] border border-slate-200 rounded-2xl p-6 mb-4">
           <div className="flex items-start justify-between gap-3 mb-5">
             <h2 className="font-bold text-xl flex-1 leading-snug">{selectedTask.title}</h2>
             <span className={`text-xs px-3 py-1.5 rounded-full border font-semibold flex-shrink-0 ${STATUS_COLOR[selectedTask.status]}`}>
@@ -184,24 +184,24 @@ export function UserDashboard() {
                 const done = i < cur; const active = i === cur - 1
                 return (
                   <div key={s} className="flex-1 flex flex-col items-center gap-1.5">
-                    <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${done || active ? 'bg-primary-500 border-primary-500' : 'bg-zinc-900 border-zinc-700'}`}>
-                      {done ? <CheckCircle size={13} className="text-white" /> : <div className={`w-2 h-2 rounded-full ${active ? 'bg-black' : 'bg-zinc-600'}`} />}
+                    <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${done || active ? 'bg-primary-500 border-primary-500' : 'bg-white border-slate-300'}`}>
+                      {done ? <CheckCircle size={13} className="text-slate-900" /> : <div className={`w-2 h-2 rounded-full ${active ? 'bg-black' : 'bg-zinc-600'}`} />}
                     </div>
-                    <span className={`text-[10px] text-center font-medium ${done || active ? 'text-primary-400' : 'text-zinc-600'}`}>{s}</span>
+                    <span className={`text-[10px] text-center font-medium ${done || active ? 'text-primary-500' : 'text-slate-400'}`}>{s}</span>
                   </div>
                 )
               })}
             </div>
-            <div className="relative h-1.5 bg-zinc-800 rounded-full">
+            <div className="relative h-1.5 bg-slate-100 rounded-full">
               <div className="absolute top-0 right-0 h-1.5 bg-gradient-to-l from-primary-400 to-primary-600 rounded-full transition-all duration-700"
                 style={{ width: `${((TASK_STATUS_STEP[selectedTask.status] || 0) / TRACK_STEPS.length) * 100}%` }} />
             </div>
           </div>
 
           <div className="flex flex-wrap gap-2 text-xs">
-            <span className="bg-zinc-800/80 text-zinc-300 px-3 py-1.5 rounded-full font-medium">{selectedTask.category}</span>
-            <span className="bg-zinc-800/80 text-zinc-300 px-3 py-1.5 rounded-full flex items-center gap-1"><MapPin size={10} /> {selectedTask.city}</span>
-            {selectedTask.price_suggested && <span className="bg-primary-500/10 text-primary-400 border border-primary-500/20 px-3 py-1.5 rounded-full font-medium">💰 {selectedTask.price_suggested} ريال</span>}
+            <span className="bg-slate-100/80 text-slate-700 px-3 py-1.5 rounded-full font-medium">{selectedTask.category}</span>
+            <span className="bg-slate-100/80 text-slate-700 px-3 py-1.5 rounded-full flex items-center gap-1"><MapPin size={10} /> {selectedTask.city}</span>
+            {selectedTask.price_suggested && <span className="bg-primary-500/10 text-primary-500 border border-primary-500/20 px-3 py-1.5 rounded-full font-medium">💰 {selectedTask.price_suggested} ريال</span>}
           </div>
         </div>
 
@@ -213,7 +213,7 @@ export function UserDashboard() {
             </div>
             <div>
               <p className="text-sm font-semibold text-red-300">نزاع قيد المراجعة</p>
-              <p className="text-xs text-zinc-500 mt-0.5">فريق أمرني راح يراجع الطلب ويتواصل معك</p>
+              <p className="text-xs text-slate-400 mt-0.5">فريق أمرني راح يراجع الطلب ويتواصل معك</p>
             </div>
           </div>
         )}
@@ -223,18 +223,18 @@ export function UserDashboard() {
           <div className="bg-primary-500/5 border border-primary-500/20 rounded-2xl p-5 mb-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center flex-shrink-0">
-                <Clock size={18} className="text-primary-400 animate-pulse" />
+                <Clock size={18} className="text-primary-500 animate-pulse" />
               </div>
               <div>
                 <p className="font-semibold text-primary-300">جاري البحث عن عامل مناسب</p>
-                <p className="text-xs text-zinc-500 mt-0.5">عادةً خلال 5–15 دقيقة — سنشعرك فور القبول</p>
+                <p className="text-xs text-slate-400 mt-0.5">عادةً خلال 5–15 دقيقة — سنشعرك فور القبول</p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 text-center">
               {[['⚡','طلبك وصل للعمال'],['🔔','ستجيك إشعار فور القبول'],['💬','محادثة تفتح تلقائياً']].map(([e,t]) => (
                 <div key={t} className="bg-primary-500/5 rounded-xl p-2.5">
                   <div className="text-lg mb-1">{e}</div>
-                  <p className="text-xs text-zinc-500 leading-tight">{t}</p>
+                  <p className="text-xs text-slate-400 leading-tight">{t}</p>
                 </div>
               ))}
             </div>
@@ -252,11 +252,11 @@ export function UserDashboard() {
                 <p className="font-semibold text-blue-300">
                   {workerName || 'العامل'} يعمل على طلبك
                 </p>
-                <p className="text-xs text-zinc-500 mt-0.5">تواصل معه عبر المحادثة أدناه</p>
+                <p className="text-xs text-slate-400 mt-0.5">تواصل معه عبر المحادثة أدناه</p>
               </div>
               <div className="text-right">
                 <div className="text-xs text-yellow-400 font-bold">⭐ موثّق</div>
-                <div className="text-xs text-zinc-600 mt-0.5">هوية سعودية</div>
+                <div className="text-xs text-slate-400 mt-0.5">هوية سعودية</div>
               </div>
             </div>
           </div>
@@ -264,10 +264,10 @@ export function UserDashboard() {
 
         {/* Dispute button */}
         {selectedTask.status === 'in_progress' && (
-          <div className="mb-4 bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
-            <p className="text-xs text-zinc-500 mb-2">⚠️ في حال وجود مشكلة مع العامل</p>
+          <div className="mb-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
+            <p className="text-xs text-slate-400 mb-2">⚠️ في حال وجود مشكلة مع العامل</p>
             <div className="flex items-center justify-between gap-3">
-              <p className="text-xs text-zinc-600 leading-relaxed">إذا لم يُنجز العامل الطلب أو حدث خلاف، يمكنك رفع نزاع — فريق أمرني سيراجع المحادثة ويتواصل معك خلال 24 ساعة.</p>
+              <p className="text-xs text-slate-400 leading-relaxed">إذا لم يُنجز العامل الطلب أو حدث خلاف، يمكنك رفع نزاع — فريق أمرني سيراجع المحادثة ويتواصل معك خلال 24 ساعة.</p>
               <button onClick={async () => {
                 if (confirm('هل تريد رفع نزاع؟ سيراجع فريق أمرني المحادثة ويتواصل معك خلال 24 ساعة.')) {
                   await supabase.rpc('raise_dispute', { p_task_id: selectedTask.id })
@@ -286,24 +286,24 @@ export function UserDashboard() {
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-secondary-500/20 flex items-center justify-center"><CheckCircle size={15} className="text-secondary-400" /></div>
               <div>
-                <h3 className="font-bold text-sm text-white">🏁 العامل أنهى الطلب — راجع وأكد</h3>
-                <p className="text-xs text-zinc-500">تحقق من الإنجاز ثم أكد الاستلام</p>
+                <h3 className="font-bold text-sm text-slate-900">🏁 العامل أنهى الطلب — راجع وأكد</h3>
+                <p className="text-xs text-slate-400">تحقق من الإنجاز ثم أكد الاستلام</p>
               </div>
             </div>
             {(selectedTask as any).completion_proof && (
               <div className="mb-3">
-                <p className="text-xs text-zinc-500 mb-2">صورة الإنجاز:</p>
-                <img src={(selectedTask as any).completion_proof} alt="إنجاز" className="w-full rounded-xl border border-zinc-700 max-h-48 object-cover" />
+                <p className="text-xs text-slate-400 mb-2">صورة الإنجاز:</p>
+                <img src={(selectedTask as any).completion_proof} alt="إنجاز" className="w-full rounded-xl border border-slate-300 max-h-48 object-cover" />
               </div>
             )}
             {(selectedTask as any).completion_note && (
-              <div className="bg-zinc-900 rounded-xl px-4 py-3 mb-3 text-sm text-zinc-300 border border-zinc-800">
-                <p className="text-xs text-zinc-500 mb-1">ملاحظة العامل:</p>
+              <div className="bg-white rounded-xl px-4 py-3 mb-3 text-sm text-slate-700 border border-slate-200">
+                <p className="text-xs text-slate-400 mb-1">ملاحظة العامل:</p>
                 {(selectedTask as any).completion_note}
               </div>
             )}
             <button onClick={confirmPayment} disabled={confirmingPayment}
-              className="w-full bg-secondary-500 hover:bg-secondary-600 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+              className="w-full bg-secondary-500 hover:bg-secondary-600 disabled:opacity-50 text-slate-900 font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
               {confirmingPayment ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle size={15} />}
               ✅ استلمت الخدمة وأؤكد الإنجاز
             </button>
@@ -312,17 +312,17 @@ export function UserDashboard() {
 
         {/* Mutual rating — client rates worker */}
         {selectedTask.status === 'completed' && selectedTask.worker_id && !ratingDone && (
-          <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5 mb-4">
-            <h3 className="font-bold mb-4 flex items-center gap-2"><Star size={16} className="text-primary-400" /> قيّم تجربتك</h3>
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-4">
+            <h3 className="font-bold mb-4 flex items-center gap-2"><Star size={16} className="text-primary-500" /> قيّم تجربتك</h3>
             <div className="flex gap-2 mb-4">
               {[1,2,3,4,5].map(s => (
                 <button key={s} onClick={() => setRating(s)} className="transition-transform hover:scale-110">
-                  <Star size={30} className={s <= rating ? 'text-primary-400 fill-primary-400' : 'text-zinc-700 hover:text-zinc-500'} />
+                  <Star size={30} className={s <= rating ? 'text-primary-500 fill-primary-400' : 'text-zinc-700 hover:text-slate-400'} />
                 </button>
               ))}
             </div>
             <button onClick={submitRating} disabled={!rating}
-              className="bg-primary-500 hover:bg-primary-400 text-white font-bold px-6 py-2.5 rounded-xl text-sm disabled:opacity-40 transition-colors">
+              className="bg-primary-500 hover:bg-primary-700 text-slate-900 font-bold px-6 py-2.5 rounded-xl text-sm disabled:opacity-40 transition-colors">
               إرسال التقييم
             </button>
           </div>
@@ -334,19 +334,19 @@ export function UserDashboard() {
         )}
 
         {/* Chat */}
-        <div className="bg-surface-panel border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="px-4 py-3.5 border-b border-zinc-800/50 flex items-center justify-between bg-zinc-900/30">
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div className="px-4 py-3.5 border-b border-slate-200/50 flex items-center justify-between bg-slate-50">
             <span className="font-semibold text-sm flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-primary-500/10 flex items-center justify-center"><MessageSquare size={14} className="text-primary-500" /></div>
               المحادثة مع العامل
             </span>
-            <span className="text-xs text-zinc-600 flex items-center gap-1.5"><Shield size={11} className="text-secondary-500" /> محمية بالكامل</span>
+            <span className="text-xs text-slate-400 flex items-center gap-1.5"><Shield size={11} className="text-secondary-500" /> محمية بالكامل</span>
           </div>
           <div className="h-72 overflow-y-auto px-4 py-4 space-y-2.5">
             {msgs.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full py-8 gap-2">
                 <MessageSquare size={28} className="text-zinc-700" />
-                <p className="text-zinc-600 text-sm">{selectedTask.status === 'open' ? 'المحادثة تبدأ بعد قبول العامل' : 'لا توجد رسائل'}</p>
+                <p className="text-slate-400 text-sm">{selectedTask.status === 'open' ? 'المحادثة تبدأ بعد قبول العامل' : 'لا توجد رسائل'}</p>
               </div>
             )}
             {msgs.map(m => {
@@ -354,8 +354,8 @@ export function UserDashboard() {
               return (
                 <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[78%]">
-                    {!isMe && <p className="text-[11px] text-zinc-500 mb-1 mr-1">{m.profiles?.full_name}</p>}
-                    <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMe ? 'bg-primary-500 text-white rounded-tr-sm font-medium' : 'bg-zinc-800 text-zinc-100 rounded-tl-sm'}`}>
+                    {!isMe && <p className="text-[11px] text-slate-400 mb-1 mr-1">{m.profiles?.full_name}</p>}
+                    <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMe ? 'bg-primary-500 text-slate-900 rounded-tr-sm font-medium' : 'bg-slate-100 text-zinc-100 rounded-tl-sm'}`}>
                       {m.content}
                     </div>
                   </div>
@@ -367,11 +367,11 @@ export function UserDashboard() {
           {blockedWarn && <div className="mx-3 mb-2 px-3 py-2 bg-red-950/40 border border-red-800/50 rounded-xl text-sm text-red-400 flex items-center gap-2"><AlertCircle size={13} /> {blockedWarn}</div>}
           {['in_progress', 'pending_confirmation'].includes(selectedTask.status) && (
             <div className="px-3 pb-3">
-              <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 focus-within:border-primary-500/40 transition-colors">
+              <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-2.5 focus-within:border-primary-500/40 transition-colors">
                 <input value={msg} onChange={e => setMsg(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMsg()}
                   placeholder="اكتب رسالة للعامل..." className="flex-1 bg-transparent text-sm outline-none placeholder-zinc-600" />
-                <button onClick={sendMsg} disabled={!msg.trim() || sending} className="w-8 h-8 rounded-lg bg-primary-500 hover:bg-primary-400 disabled:opacity-30 flex items-center justify-center transition-all">
-                  {sending ? <Loader2 size={14} className="animate-spin text-white" /> : <Send size={14} className="text-white" />}
+                <button onClick={sendMsg} disabled={!msg.trim() || sending} className="w-8 h-8 rounded-lg bg-primary-500 hover:bg-primary-700 disabled:opacity-30 flex items-center justify-center transition-all">
+                  {sending ? <Loader2 size={14} className="animate-spin text-slate-900" /> : <Send size={14} className="text-slate-900" />}
                 </button>
               </div>
             </div>
@@ -384,17 +384,17 @@ export function UserDashboard() {
   return (
     <div className="min-h-screen bg-surface-base pt-14">
       {/* Hero header */}
-      <div className="bg-gradient-to-b from-primary-500/5 to-transparent border-b border-zinc-900/50">
+      <div className="bg-gradient-to-b from-primary-500/5 to-transparent border-b border-slate-200/50">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="flex items-start justify-between mb-6">
             <div>
               <h1 className="text-2xl font-black mb-1">
                 أهلاً {profile?.full_name?.split(' ')[0] || ''} 👋
               </h1>
-              <p className="text-zinc-500 text-sm">وش تحتاج اليوم؟</p>
+              <p className="text-slate-400 text-sm">وش تحتاج اليوم؟</p>
             </div>
             <button onClick={() => setShowNew(true)}
-              className="flex items-center gap-2 bg-primary-500 text-black font-bold px-5 py-2.5 rounded-xl hover:bg-primary-400 transition-all shadow-lg shadow-primary-500/20">
+              className="flex items-center gap-2 bg-primary-500 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/20">
               <Plus size={16} /> طلب جديد
             </button>
           </div>
@@ -402,14 +402,14 @@ export function UserDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-4 gap-2">
             {[
-              { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-white' },
-              { label: 'بانتظار عامل', value: openCount, color: 'text-primary-400' },
+              { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-slate-900' },
+              { label: 'بانتظار عامل', value: openCount, color: 'text-primary-500' },
               { label: 'جارية', value: activeCount, color: 'text-blue-400' },
               { label: 'مكتملة', value: completedCount, color: 'text-secondary-400' },
             ].map(({ label, value, color }) => (
-              <div key={label} className="bg-surface-panel border border-zinc-800/50 rounded-2xl p-3.5 text-center">
+              <div key={label} className="bg-white border border-slate-200/50 rounded-2xl p-3.5 text-center">
                 <div className={`text-2xl font-black ${color}`}>{value}</div>
-                <div className="text-[10px] text-zinc-500 mt-1 leading-tight">{label}</div>
+                <div className="text-[10px] text-slate-400 mt-1 leading-tight">{label}</div>
               </div>
             ))}
           </div>
@@ -419,16 +419,16 @@ export function UserDashboard() {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Payment history */}
         {completedCount > 0 && (
-          <div className="bg-surface-panel border border-zinc-800 rounded-2xl p-5 mb-5">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 mb-5">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <DollarSign size={16} className="text-secondary-400" /> تاريخ المدفوعات
             </h3>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {tasks.filter(t => t.status === 'completed').map(t => (
-                <div key={t.id} className="flex items-center justify-between py-2 border-b border-zinc-800/50 last:border-0">
+                <div key={t.id} className="flex items-center justify-between py-2 border-b border-slate-200/50 last:border-0">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{t.title}</p>
-                    <p className="text-xs text-zinc-500">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
+                    <p className="text-sm text-slate-900 truncate">{t.title}</p>
+                    <p className="text-xs text-slate-400">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
                   </div>
                   <span className="text-secondary-400 font-bold text-sm mr-3">
                     {t.price_final || t.price_suggested || '—'} ر
@@ -436,8 +436,8 @@ export function UserDashboard() {
                 </div>
               ))}
             </div>
-            <div className="mt-3 pt-3 border-t border-zinc-800 flex justify-between items-center">
-              <span className="text-xs text-zinc-500">الإجمالي</span>
+            <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
+              <span className="text-xs text-slate-400">الإجمالي</span>
               <span className="text-secondary-400 font-black">{totalSpent.toLocaleString()} ريال</span>
             </div>
           </div>
@@ -452,10 +452,10 @@ export function UserDashboard() {
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                   <span className="text-xs font-bold text-blue-400">طلب جاري الآن</span>
-                  <ChevronRight size={14} className="text-zinc-600 mr-auto" />
+                  <ChevronRight size={14} className="text-slate-400 mr-auto" />
                 </div>
-                <h3 className="font-bold text-white mb-1">{task.title}</h3>
-                <p className="text-xs text-zinc-500">اضغط للمحادثة مع العامل وتتبع التقدم</p>
+                <h3 className="font-bold text-slate-900 mb-1">{task.title}</h3>
+                <p className="text-xs text-slate-400">اضغط للمحادثة مع العامل وتتبع التقدم</p>
               </button>
             ))}
           </div>
@@ -468,10 +468,10 @@ export function UserDashboard() {
               <DollarSign size={18} className="text-secondary-400" />
             </div>
             <div>
-              <p className="text-xs text-zinc-500">إجمالي ما دفعته</p>
+              <p className="text-xs text-slate-400">إجمالي ما دفعته</p>
               <p className="text-xl font-black text-secondary-400">{totalSpent.toLocaleString()} ريال</p>
             </div>
-            <button onClick={() => navigate('referral')} className="mr-auto text-xs text-primary-400 border border-primary-500/20 px-3 py-1.5 rounded-full hover:bg-primary-500/10 transition-colors">
+            <button onClick={() => navigate('referral')} className="mr-auto text-xs text-primary-500 border border-primary-500/20 px-3 py-1.5 rounded-full hover:bg-primary-500/10 transition-colors">
               🎁 اكسب من الإحالة
             </button>
           </div>
@@ -481,12 +481,12 @@ export function UserDashboard() {
         {tasks.length > 0 && (
           <div className="space-y-3 mb-4">
             <div className="relative">
-              <Search size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+              <Search size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="ابحث في طلباتك..."
-                className="w-full bg-surface-panel border border-zinc-800 rounded-xl pr-9 pl-4 py-2.5 text-sm outline-none focus:border-primary-500/40 transition-colors placeholder-zinc-600" />
+                className="w-full bg-white border border-slate-200 rounded-xl pr-9 pl-4 py-2.5 text-sm outline-none focus:border-primary-500/40 transition-colors placeholder-zinc-600" />
             </div>
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <Filter size={12} className="text-zinc-600 flex-shrink-0" />
+              <Filter size={12} className="text-slate-400 flex-shrink-0" />
               {[
                 { v: 'all', l: `الكل (${tasks.length})` },
                 { v: 'open', l: `⏳ بانتظار (${openCount})` },
@@ -494,7 +494,7 @@ export function UserDashboard() {
                 { v: 'completed', l: `✅ مكتمل (${completedCount})` },
               ].map(({ v, l }) => (
                 <button key={v} onClick={() => setFilter(v as any)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${filter === v ? 'bg-primary-500 text-white' : 'bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700'}`}>
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${filter === v ? 'bg-primary-500 text-slate-900' : 'bg-slate-100/80 text-slate-500 hover:bg-zinc-700'}`}>
                   {l}
                 </button>
               ))}
@@ -511,11 +511,11 @@ export function UserDashboard() {
                 <div className="bg-gradient-to-br from-primary-500/10 to-transparent border border-primary-500/20 rounded-2xl p-6 text-center mb-6">
                   <div className="text-4xl mb-3">👋</div>
                   <h3 className="text-xl font-bold mb-2">أهلاً — اطلب أي شيء</h3>
-                  <p className="text-zinc-400 text-sm mb-5 max-w-xs mx-auto leading-relaxed">
+                  <p className="text-slate-500 text-sm mb-5 max-w-xs mx-auto leading-relaxed">
                     عامل موثّق بهويته السعودية سيقبل طلبك في دقائق
                   </p>
                   <button onClick={() => setShowNew(true)}
-                    className="bg-primary-500 text-black font-bold px-8 py-3.5 rounded-xl hover:bg-primary-400 transition-colors shadow-lg shadow-primary-500/20">
+                    className="bg-primary-500 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/20">
                     اطلب الحين
                   </button>
                 </div>
@@ -527,17 +527,17 @@ export function UserDashboard() {
                     { e: '⚡', t: 'عامل يقبل', d: 'عادةً خلال 5-15 دقيقة' },
                     { e: '✅', t: 'أكّد الإنجاز', d: 'لما ينتهي تأكّد' },
                   ].map(({ e, t, d }) => (
-                    <div key={t} className="bg-surface-panel border border-zinc-800 rounded-xl p-4 text-center">
+                    <div key={t} className="bg-white border border-slate-200 rounded-xl p-4 text-center">
                       <div className="text-2xl mb-2">{e}</div>
-                      <p className="text-sm font-semibold text-white">{t}</p>
-                      <p className="text-xs text-zinc-500 mt-1">{d}</p>
+                      <p className="text-sm font-semibold text-slate-900">{t}</p>
+                      <p className="text-xs text-slate-400 mt-1">{d}</p>
                     </div>
                   ))}
                 </div>
 
                 {/* Trust badges */}
-                <div className="bg-surface-panel border border-zinc-800 rounded-xl p-4">
-                  <p className="text-xs text-zinc-500 mb-3 text-center">لماذا أمرني آمنة؟</p>
+                <div className="bg-white border border-slate-200 rounded-xl p-4">
+                  <p className="text-xs text-slate-400 mb-3 text-center">لماذا أمرني آمنة؟</p>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       ['🆔','كل عامل موثّق بهوية وطنية'],
@@ -545,7 +545,7 @@ export function UserDashboard() {
                       ['⭐','تقييمات حقيقية من عملاء'],
                       ['🛡️','دعم مباشر عند أي مشكلة'],
                     ].map(([e, t]) => (
-                      <div key={t as string} className="flex items-center gap-2 text-xs text-zinc-400">
+                      <div key={t as string} className="flex items-center gap-2 text-xs text-slate-500">
                         <span>{e}</span><span>{t}</span>
                       </div>
                     ))}
@@ -554,7 +554,7 @@ export function UserDashboard() {
               </div>
             ) : (
               <div className="text-center py-16">
-                <p className="text-zinc-500">ما في نتائج — جرّب كلمة بحث ثانية</p>
+                <p className="text-slate-400">ما في نتائج — جرّب كلمة بحث ثانية</p>
               </div>
             )}
           </div>
@@ -562,7 +562,7 @@ export function UserDashboard() {
           <div className="space-y-2.5">
             {filteredTasks.map(task => (
               <button key={task.id} onClick={() => openTask(task)}
-                className="w-full bg-surface-panel border border-zinc-800/60 hover:border-zinc-700 rounded-2xl p-5 text-right transition-all hover:shadow-lg hover:shadow-black/30 group">
+                className="w-full bg-white border border-slate-200/60 hover:border-slate-300 rounded-2xl p-5 text-right transition-all hover:shadow-lg hover:shadow-black/30 group">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -571,19 +571,19 @@ export function UserDashboard() {
                       </span>
                       {task.use_ai && <span className="text-xs text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20 flex items-center gap-1"><Bot size={9} /> AI</span>}
                     </div>
-                    <h3 className="font-bold mb-1.5 text-white leading-snug group-hover:text-primary-50 transition-colors">{task.title}</h3>
-                    <div className="flex items-center gap-3 text-xs text-zinc-500 flex-wrap">
+                    <h3 className="font-bold mb-1.5 text-slate-900 leading-snug group-hover:text-primary-50 transition-colors">{task.title}</h3>
+                    <div className="flex items-center gap-3 text-xs text-slate-400 flex-wrap">
                       <span className="flex items-center gap-1"><Clock size={10} /> {new Date(task.created_at).toLocaleDateString('ar-SA')}</span>
                       <span className="flex items-center gap-1"><MapPin size={10} /> {task.city}</span>
-                      {task.category && <span className="bg-zinc-800 px-2 py-0.5 rounded-full">{task.category}</span>}
-                      {(task.price_final || task.price_suggested) && <span className="text-primary-400 font-medium">💰 {task.price_final || task.price_suggested} ريال</span>}
+                      {task.category && <span className="bg-slate-100 px-2 py-0.5 rounded-full">{task.category}</span>}
+                      {(task.price_final || task.price_suggested) && <span className="text-primary-500 font-medium">💰 {task.price_final || task.price_suggested} ريال</span>}
                     </div>
                   </div>
                   <div className="flex-shrink-0 flex flex-col items-center gap-2 mt-1">
                     {task.status === 'in_progress' && <div className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />}
                     {task.status === 'open' && <div className="w-2.5 h-2.5 rounded-full bg-primary-400 animate-pulse" />}
                     {task.status === 'completed' && <CheckCircle size={16} className="text-secondary-500" />}
-                    <ChevronRight size={14} className="text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    <ChevronRight size={14} className="text-slate-400 group-hover:text-slate-500 transition-colors" />
                   </div>
                 </div>
               </button>
@@ -593,22 +593,22 @@ export function UserDashboard() {
 
         {/* تاريخ المدفوعات */}
         {tasks.filter(t => t.status === 'completed' && (t.price_final || t.price_suggested)).length > 0 && (
-          <div className="mt-8 pt-6 border-t border-zinc-900">
-            <h3 className="text-sm font-semibold text-zinc-400 mb-3 flex items-center gap-2">
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <h3 className="text-sm font-semibold text-slate-500 mb-3 flex items-center gap-2">
               <DollarSign size={14} className="text-secondary-500" /> تاريخ المدفوعات
             </h3>
             <div className="space-y-2">
               {tasks.filter(t => t.status === 'completed' && (t.price_final || t.price_suggested)).map(t => (
-                <div key={t.id} className="flex items-center justify-between bg-surface-panel border border-zinc-800/50 rounded-xl px-4 py-3">
+                <div key={t.id} className="flex items-center justify-between bg-white border border-slate-200/50 rounded-xl px-4 py-3">
                   <div>
-                    <p className="text-sm text-white truncate max-w-[200px]">{t.title}</p>
-                    <p className="text-xs text-zinc-500">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
+                    <p className="text-sm text-slate-900 truncate max-w-[200px]">{t.title}</p>
+                    <p className="text-xs text-slate-400">{new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
                   </div>
                   <span className="text-secondary-400 font-bold text-sm">{t.price_final || t.price_suggested} ريال</span>
                 </div>
               ))}
               <div className="flex items-center justify-between px-4 py-2">
-                <span className="text-xs text-zinc-500">الإجمالي</span>
+                <span className="text-xs text-slate-400">الإجمالي</span>
                 <span className="text-secondary-400 font-black">{totalSpent.toLocaleString()} ريال</span>
               </div>
             </div>
@@ -616,13 +616,13 @@ export function UserDashboard() {
         )}
 
         {/* Bottom CTAs */}
-        <div className="grid grid-cols-2 gap-3 mt-8 pt-6 border-t border-zinc-900">
+        <div className="grid grid-cols-2 gap-3 mt-8 pt-6 border-t border-slate-200">
           <button onClick={() => navigate('browse')}
-            className="flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 py-3 rounded-xl text-sm text-zinc-400 hover:text-white transition-all">
+            className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-slate-300 py-3 rounded-xl text-sm text-slate-500 hover:text-slate-900 transition-all">
             👥 تصفح العمال
           </button>
           <button onClick={() => navigate('bounties')}
-            className="flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 py-3 rounded-xl text-sm text-zinc-400 hover:text-white transition-all">
+            className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-slate-300 py-3 rounded-xl text-sm text-slate-500 hover:text-slate-900 transition-all">
             ⚡ الطلبات المتاحة
           </button>
         </div>
