@@ -7,11 +7,10 @@ import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
 
 const STATUS_LABEL: Record<string, string> = {
-  open: 'بانتظار عامل', accepted: 'عامل قبل — جاري', in_progress: 'جاري التنفيذ', pending_confirmation: 'بانتظار تأكيدك', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع'
+  open: 'بانتظار عامل', in_progress: 'جاري التنفيذ', pending_confirmation: 'بانتظار تأكيدك', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع'
 }
 const STATUS_COLOR: Record<string, string> = {
   open: 'text-primary-400 bg-primary-500/10 border-primary-500/20',
-  accepted: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   in_progress: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   completed: 'text-secondary-400 bg-secondary-500/10 border-secondary-500/20',
   cancelled: 'text-zinc-500 bg-zinc-800 border-zinc-700',
@@ -19,7 +18,7 @@ const STATUS_COLOR: Record<string, string> = {
   disputed: 'text-red-400 bg-red-500/10 border-red-500/20',
 }
 const TRACK_STEPS = ['تم النشر', 'عامل قبل', 'جاري', 'اكتمل']
-const TASK_STATUS_STEP: Record<string, number> = { open: 1, accepted: 2, in_progress: 2, pending_confirmation: 3, completed: 4, cancelled: 0, disputed: 1 }
+const TASK_STATUS_STEP: Record<string, number> = { open: 1, in_progress: 2, pending_confirmation: 3, completed: 4, cancelled: 0, disputed: 1 }
 const BLOCKED = [/(\+966|00966|05\d{8})/, /[\w.-]+@[\w.-]+\.\w{2,}/, /wa\.me|whatsapp|واتساب|telegram|t\.me/i]
 interface Msg { id: string; sender_id: string; content: string; is_blocked: boolean; created_at: string; profiles?: { full_name: string } }
 
@@ -53,24 +52,48 @@ export function UserDashboard() {
     setLoading(false)
   }
 
+  const [workerName, setWorkerName] = useState<string>('')
+  const channelRef = useRef<any>(null)
+
   const openTask = async (task: Task) => {
-    setSelectedTask(task); setRatingDone(false); setRating(0)
-    const { data } = await supabase
+    setSelectedTask(task); setRatingDone(false); setRating(0); setMsgs([]); setWorkerName('')
+
+    // جيب الرسائل
+    const { data: msgData } = await supabase
       .from('task_messages')
       .select('id, sender_id, content, is_system_message, is_filtered, created_at')
       .eq('task_id', task.id)
       .order('created_at')
-    setMsgs(data || [])
-    const ch = supabase.channel(`task-${task.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'task_messages', filter: `task_id=eq.${task.id}` },
-        () => supabase.from('task_messages')
+    setMsgs(msgData || [])
+
+    // جيب اسم العامل
+    if (task.worker_id) {
+      const { data: wp } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', task.worker_id)
+        .maybeSingle()
+      if (wp?.full_name) setWorkerName(wp.full_name)
+    }
+
+    // أغلق الـ channel القديم
+    if (channelRef.current) supabase.removeChannel(channelRef.current)
+
+    // اشترك في التحديثات
+    const ch = supabase.channel(`task-${task.id}-${Date.now()}`)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'task_messages',
+        filter: `task_id=eq.${task.id}`
+      }, () => supabase.from('task_messages')
           .select('id, sender_id, content, is_system_message, is_filtered, created_at')
           .eq('task_id', task.id).order('created_at')
           .then(({ data }) => setMsgs(data || [])))
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tasks', filter: `id=eq.${task.id}` },
-        ({ new: u }) => setSelectedTask(u as Task))
+      .on('postgres_changes', {
+        event: 'UPDATE', schema: 'public', table: 'tasks',
+        filter: `id=eq.${task.id}`
+      }, ({ new: u }) => setSelectedTask(u as Task))
       .subscribe()
-    return () => supabase.removeChannel(ch)
+    channelRef.current = ch
   }
 
   const sendMsg = async () => {
@@ -114,7 +137,7 @@ export function UserDashboard() {
   }
 
   const totalSpent = tasks.filter(t => t.status === 'completed').reduce((s, t) => s + (t.price_final || t.price_suggested || 0), 0)
-  const activeCount = tasks.filter(t => ['accepted', 'in_progress', 'pending_confirmation'].includes(t.status)).length
+  const activeCount = tasks.filter(t => ['in_progress', 'pending_confirmation'].includes(t.status)).length
   const completedCount = tasks.filter(t => t.status === 'completed').length
   const openCount = tasks.filter(t => t.status === 'open').length
 
@@ -210,15 +233,17 @@ export function UserDashboard() {
           </div>
         )}
 
-        {/* Accepted - worker started */}
-        {selectedTask.status === 'accepted' && (
+        {/* Worker accepted - in_progress */}
+        {selectedTask.status === 'in_progress' && (
           <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-5 mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
                 <CheckCircle size={18} className="text-blue-400" />
               </div>
               <div>
-                <p className="font-semibold text-blue-300">عامل قبل طلبك وبدأ العمل</p>
+                <p className="font-semibold text-blue-300">
+                  {workerName ? `${workerName} يعمل على طلبك` : 'عامل قبل طلبك وبدأ العمل'}
+                </p>
                 <p className="text-xs text-zinc-500 mt-0.5">تواصل معه عبر المحادثة أدناه</p>
               </div>
             </div>
@@ -226,7 +251,7 @@ export function UserDashboard() {
         )}
 
         {/* Dispute button */}
-        {['accepted', 'in_progress'].includes(selectedTask.status) && (
+        {selectedTask.status === 'in_progress' && (
           <div className="flex justify-end mb-2">
             <button onClick={async () => {
               if (confirm('هل تريد رفع نزاع لهذا الطلب؟ سيتم إشعار فريق أمرني للمراجعة.')) {
@@ -324,7 +349,7 @@ export function UserDashboard() {
             <div ref={endRef} />
           </div>
           {blockedWarn && <div className="mx-3 mb-2 px-3 py-2 bg-red-950/40 border border-red-800/50 rounded-xl text-sm text-red-400 flex items-center gap-2"><AlertCircle size={13} /> {blockedWarn}</div>}
-          {['accepted', 'in_progress', 'pending_confirmation'].includes(selectedTask.status) && (
+          {['in_progress', 'pending_confirmation'].includes(selectedTask.status) && (
             <div className="px-3 pb-3">
               <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 focus-within:border-primary-500/40 transition-colors">
                 <input value={msg} onChange={e => setMsg(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMsg()}
