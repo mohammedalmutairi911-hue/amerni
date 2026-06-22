@@ -54,11 +54,18 @@ export function UserDashboard() {
 
   const openTask = async (task: Task) => {
     setSelectedTask(task); setRatingDone(false); setRating(0)
-    const { data } = await supabase.from('task_messages').select('*, profiles(full_name)').eq('task_id', task.id).order('created_at')
+    const { data } = await supabase
+      .from('task_messages')
+      .select('id, sender_id, content, is_system_message, is_filtered, created_at')
+      .eq('task_id', task.id)
+      .order('created_at')
     setMsgs(data || [])
     const ch = supabase.channel(`task-${task.id}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'task_messages', filter: `task_id=eq.${task.id}` },
-        () => supabase.from('task_messages').select('*, profiles(full_name)').eq('task_id', task.id).order('created_at').then(({ data }) => setMsgs(data || [])))
+        () => supabase.from('task_messages')
+          .select('id, sender_id, content, is_system_message, is_filtered, created_at')
+          .eq('task_id', task.id).order('created_at')
+          .then(({ data }) => setMsgs(data || [])))
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tasks', filter: `id=eq.${task.id}` },
         ({ new: u }) => setSelectedTask(u as Task))
       .subscribe()
@@ -70,7 +77,12 @@ export function UserDashboard() {
     if (!text || !user || !selectedTask) return
     if (BLOCKED.some(p => p.test(text))) { setBlockedWarn('⛔ لا يمكن مشاركة بيانات تواصل'); setTimeout(() => setBlockedWarn(''), 4000); return }
     setSending(true)
-    await supabase.from('task_messages').insert({ task_id: selectedTask.id, sender_id: user.id, content: text, is_blocked: false })
+    await supabase.from('task_messages').insert({
+      task_id: selectedTask.id,
+      sender_id: user.id,
+      content: text,
+      is_system_message: false,
+    })
     setMsg(''); setSending(false)
   }
 

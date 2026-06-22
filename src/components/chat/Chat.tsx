@@ -5,24 +5,18 @@ import { filterContent } from '../../lib/contentFilter'
 import { useAuth } from '../../contexts/AuthContext'
 
 const BLOCKED_PATTERNS = [
-  // أرقام الجوال السعودية
   /(\+966|00966|966)/,
   /(05\d[\s\-.]?\d{3}[\s\-.]?\d{4})/,
-  // أي تسلسل من 7 أرقام أو أكثر (مع فواصل أو بدونها)
   /\d[\s\-.]?\d[\s\-.]?\d[\s\-.]?\d[\s\-.]?\d[\s\-.]?\d[\s\-.]?\d/,
-  // إيميل
   /[\w.+\-]+\s*@\s*[\w.\-]+\.\w{2,}/,
-  // تطبيقات التواصل
   /wa\.me|whatsapp|واتس|واتساب/i,
   /telegram|تيليجرام|تلغرام|t\.me/i,
   /snapchat|سناب/i,
   /instagram|انستا/i,
   /twitter|تويتر|x\.com/i,
   /تيك\s*توك|tiktok/i,
-  // عبارات التحويل للخارج
   /تواصل\s*معي\s*على|كلمني\s*على|راسلني\s*على/i,
   /call\s*me|contact\s*me/i,
-  // روابط
   /https?:\/\/|www\./i,
 ]
 
@@ -32,7 +26,6 @@ interface Msg {
   content: string
   is_system: boolean
   created_at: string
-  sender_name?: string
 }
 
 interface Props {
@@ -60,15 +53,18 @@ export function Chat({ taskId, taskTitle }: Props) {
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [msgs])
 
   const fetchMsgs = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('task_messages')
-      .select('*, profiles(full_name)')
+      .select('id, sender_id, content, is_system_message, is_filtered, created_at')
       .eq('task_id', taskId)
       .order('created_at')
+    if (error) console.error('fetchMsgs error:', error)
     setMsgs((data || []).map((m: any) => ({
-      id: m.id, sender_id: m.sender_id, content: m.content,
-      is_system: m.is_blocked || false, created_at: m.created_at,
-      sender_name: m.profiles?.full_name
+      id: m.id,
+      sender_id: m.sender_id,
+      content: m.is_filtered ? 'تم حذف هذه الرسالة' : m.content,
+      is_system: m.is_system_message || false,
+      created_at: m.created_at,
     })))
   }
 
@@ -77,47 +73,45 @@ export function Chat({ taskId, taskTitle }: Props) {
     if (!text || !user || sending) return
     setInput('')
 
-    // Check contact info patterns
     const isBlocked = BLOCKED_PATTERNS.some(p => p.test(text))
     if (isBlocked) {
-      setBlocked('⛔ لا يمكن مشاركة بيانات التواصل — التواصل داخل المنصة فقط')
+      setBlocked('لا يمكن مشاركة بيانات التواصل — التواصل داخل المنصة فقط')
       setTimeout(() => setBlocked(''), 4000)
-      // Save as blocked
-      supabase.from('blocked_messages').insert({ task_id: taskId, sender_id: user.id, content: text, reason: 'contact_info' })
       return
     }
 
-    // فلتر المحتوى المحظور
     const contentCheck = filterContent(text)
     if (contentCheck.blocked) {
-      setBlocked('⛔ ' + contentCheck.reason + ' — هذه الرسالة تخالف سياسة المنصة')
+      setBlocked(contentCheck.reason + ' — هذه الرسالة تخالف سياسة المنصة')
       setTimeout(() => setBlocked(''), 5000)
       return
     }
-    
+
     setSending(true)
-    await supabase.from('task_messages').insert({
-      task_id: taskId, sender_id: user.id, content: text, is_blocked: false
+    const { error } = await supabase.from('task_messages').insert({
+      task_id: taskId,
+      sender_id: user.id,
+      content: text,
+      is_system_message: false,
     })
+    if (error) console.error('send error:', error)
     setSending(false)
   }
 
   return (
     <div className="flex flex-col bg-[#0d0d0d] border border-zinc-800 rounded-2xl overflow-hidden h-[500px]">
-      {/* Header */}
       <div className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
         <div>
           <p className="text-sm font-medium">{taskTitle}</p>
           <div className="flex items-center gap-1.5 text-xs text-zinc-500 mt-0.5">
-            <Shield size={11} className="text-secondary-500" /> محادثة محمية — التواصل داخل المنصة فقط
+            <Shield size={11} className="text-secondary-500" /> محادثة محمية
           </div>
         </div>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
         {msgs.length === 0 && (
-          <p className="text-center text-zinc-600 text-sm py-8">ابدأ المحادثة مع العميل</p>
+          <p className="text-center text-zinc-600 text-sm py-8">ابدأ المحادثة</p>
         )}
         {msgs.map(m => {
           const isMe = m.sender_id === user?.id
@@ -127,10 +121,9 @@ export function Chat({ taskId, taskTitle }: Props) {
             </div>
           )
           return (
-            <div key={m.id} className={`flex ${isMe ? 'justify-start' : 'justify-end'}`}>
+            <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
               <div className="max-w-[75%]">
-                {!isMe && <p className="text-xs text-zinc-500 mb-1">{m.sender_name}</p>}
-                <div className={`rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-zinc-800 text-zinc-100' : 'bg-primary-500 text-white'}`}>
+                <div className={`rounded-2xl px-4 py-2.5 text-sm ${isMe ? 'bg-primary-500 text-white' : 'bg-zinc-800 text-zinc-100'}`}>
                   {m.content}
                 </div>
               </div>
@@ -140,18 +133,12 @@ export function Chat({ taskId, taskTitle }: Props) {
         <div ref={endRef} />
       </div>
 
-      {/* Blocked warning */}
       {blocked && (
-        <div className="mx-3 mb-2 px-4 py-3 bg-red-950/40 border border-red-800/50 rounded-xl text-sm text-red-400 flex items-start gap-2">
-          <span className="text-lg leading-none">⛔</span>
-          <div>
-            <p className="font-bold mb-0.5">تم حظر الرسالة</p>
-            <p className="text-xs text-red-400/80">لا يُسمح بمشاركة أرقام الجوال أو الإيميل أو روابط التواصل — التواصل داخل المنصة فقط</p>
-          </div>
+        <div className="mx-3 mb-2 px-4 py-2 bg-red-950/40 border border-red-800/50 rounded-xl text-sm text-red-400">
+          {blocked}
         </div>
       )}
 
-      {/* Input */}
       <div className="px-3 pb-3">
         <div className={`flex items-center gap-2 bg-zinc-900 border rounded-xl px-3 py-2 transition-colors ${blocked ? 'border-red-800/70' : 'border-zinc-700 focus-within:border-primary-500/40'}`}>
           <input
