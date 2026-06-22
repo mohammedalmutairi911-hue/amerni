@@ -193,59 +193,66 @@ export function WorkerDashboard() {
 
   // Commission modal
   if (showCommission && pendingTask) return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-[#111] border border-zinc-800 rounded-2xl p-6">
-        <div className="w-12 h-12 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl">📋</span>
-        </div>
-        <h2 className="text-lg font-bold text-center mb-2">شروط قبول الطلب</h2>
-        <p className="text-zinc-400 text-sm text-center mb-5">قبل ما تقبل الطلب، يرجى الموافقة على الشروط التالية:</p>
-        
-        <div className="bg-primary-500/10 border border-primary-500/20 rounded-xl p-4 mb-4 space-y-2">
-          <p className="text-sm text-white font-semibold">الطلب: {pendingTask.title}</p>
-          {pendingTask.price_suggested && (
-            <p className="text-sm text-primary-400">القيمة المتوقعة: {pendingTask.price_suggested} ريال</p>
-          )}
-        </div>
-
-        <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 mb-5 space-y-3">
-          <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide mb-1">إقرار وتعهد</p>
-          <p className="text-sm text-zinc-300 leading-loose">
-            أتعهد أنا العامل المسجل في منصة <span className="text-primary-400 font-bold">أمرني</span> بأنني عند إتمام هذا الطلب بنجاح، سأقوم بتحويل عمولة خدمة بنسبة <span className="text-primary-400 font-bold">2%</span> من إجمالي قيمة العمل المتفق عليه إلى حساب المنصة التالي، وذلك خلال مدة أقصاها <span className="text-white font-medium">٧٢ ساعة</span> من إتمام الطلب.
-          </p>
-          <div className="bg-zinc-800 border border-zinc-600 rounded-xl p-3 space-y-2.5 text-sm">
-            <p className="text-xs text-zinc-500 font-medium">معلومات الحساب البنكي</p>
-            <div className="flex items-center justify-between border-b border-zinc-700 pb-2">
-              <span className="text-zinc-400">البنك</span>
-              <span className="text-white font-medium">بنك البلاد</span>
-            </div>
-            <div className="flex items-center justify-between border-b border-zinc-700 pb-2">
-              <span className="text-zinc-400">اسم المستفيد</span>
-              <span className="text-white font-medium text-xs">مؤسسة حلول الغد للخدمات الإلكترونية</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-zinc-400">رقم الآيبان</span>
-              <span className="text-primary-400 font-mono text-xs">SA54150009001465965400007</span>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="w-full max-w-sm bg-[#111] border border-zinc-800 rounded-t-2xl sm:rounded-2xl flex flex-col max-h-[90vh]">
+        {/* Header ثابت */}
+        <div className="p-5 pb-3 flex-shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center mx-auto mb-3">
+            <span className="text-xl">📋</span>
           </div>
-          {pendingTask.price_suggested && (
-            <div className="bg-primary-500/10 border border-primary-500/20 rounded-lg px-3 py-2 flex items-center justify-between">
-              <span className="text-xs text-zinc-400">العمولة المستحقة على هذا الطلب</span>
-              <span className="text-primary-400 font-bold">{(pendingTask.price_suggested * 0.02).toFixed(2)} ريال</span>
-            </div>
-          )}
-          <p className="text-xs text-zinc-600 leading-relaxed">
-            بالضغط على "أوافق وأقبل الطلب" أقر بقراءة هذا التعهد والموافقة عليه، ويُعدّ هذا الإقرار ملزماً قانونياً وفق أنظمة المملكة العربية السعودية.
-          </p>
+          <h2 className="text-base font-bold text-center mb-1">شروط قبول الطلب</h2>
+          <p className="text-zinc-400 text-xs text-center">قبل ما تقبل الطلب، يرجى الموافقة على الشروط التالية:</p>
         </div>
 
-        <div className="flex gap-3">
+        {/* المحتوى scrollable */}
+        <div className="overflow-y-auto flex-1 px-5 pb-3 space-y-3">
+          <div className="bg-primary-500/10 border border-primary-500/20 rounded-xl p-3 space-y-1">
+            <p className="text-sm text-white font-semibold">الطلب: {pendingTask.title}</p>
+            {pendingTask.price_suggested && (
+              <p className="text-sm text-primary-400">القيمة المتوقعة: {pendingTask.price_suggested} ريال</p>
+            )}
+          </div>
+
+          <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 space-y-3">
+            <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">إقرار وتعهد</p>
+            <p className="text-sm text-zinc-300 leading-loose">
+              أتعهد أنا العامل المسجل في منصة <span className="text-primary-400 font-bold">أمرني</span> بأنني عند إتمام هذا الطلب بنجاح، سأقوم بتحويل عمولة خدمة بنسبة <span className="text-primary-400 font-bold">2%</span> من إجمالي قيمة العمل المتفق عليه إلى حساب المنصة التالي، وذلك خلال مدة أقصاها <span className="text-white font-medium">٧٢ ساعة</span> من إتمام الطلب.
+            </p>
+            <div className="bg-zinc-800 border border-zinc-600 rounded-xl p-3 space-y-2 text-sm">
+              <p className="text-xs text-zinc-500 font-medium">معلومات الحساب البنكي</p>
+              <div className="flex items-center justify-between border-b border-zinc-700 pb-2">
+                <span className="text-zinc-400">البنك</span>
+                <span className="text-white font-medium">بنك البلاد</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-zinc-700 pb-2">
+                <span className="text-zinc-400">اسم المستفيد</span>
+                <span className="text-white font-medium text-xs">مؤسسة حلول الغد للخدمات الإلكترونية</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-400">رقم الآيبان</span>
+                <span className="text-primary-400 font-mono text-xs">SA54150009001465965400007</span>
+              </div>
+            </div>
+            {pendingTask.price_suggested && (
+              <div className="bg-primary-500/10 border border-primary-500/20 rounded-lg px-3 py-2 flex items-center justify-between">
+                <span className="text-xs text-zinc-400">العمولة المستحقة</span>
+                <span className="text-primary-400 font-bold">{(pendingTask.price_suggested * 0.02).toFixed(2)} ريال</span>
+              </div>
+            )}
+            <p className="text-xs text-zinc-600 leading-relaxed">
+              بالضغط على "أوافق وأقبل الطلب" أقر بقراءة هذا التعهد والموافقة عليه، ويُعدّ هذا الإقرار ملزماً قانونياً وفق أنظمة المملكة العربية السعودية.
+            </p>
+          </div>
+        </div>
+
+        {/* الأزرار ثابتة في الأسفل */}
+        <div className="flex gap-3 p-5 pt-3 flex-shrink-0 border-t border-zinc-800">
           <button onClick={() => { setShowCommission(false); setPendingTask(null) }}
-            className="flex-1 border border-zinc-700 text-zinc-300 py-2.5 rounded-xl text-sm hover:border-zinc-600 transition-colors">
+            className="flex-1 border border-zinc-700 text-zinc-300 py-3 rounded-xl text-sm hover:border-zinc-600 transition-colors">
             إلغاء
           </button>
           <button onClick={confirmAcceptTask}
-            className="flex-1 bg-primary-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors">
+            className="flex-1 bg-primary-500 text-white font-bold py-3 rounded-xl text-sm hover:bg-primary-400 transition-colors">
             أوافق وأقبل الطلب
           </button>
         </div>
