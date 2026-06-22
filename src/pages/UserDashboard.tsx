@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
+import { Chat } from '../components/chat/Chat'
 
 const STATUS_LABEL: Record<string, string> = {
   open: 'بانتظار عامل', in_progress: 'جاري التنفيذ', pending_confirmation: 'بانتظار تأكيدك', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع'
@@ -334,49 +335,15 @@ export function UserDashboard() {
         )}
 
         {/* Chat */}
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-          <div className="px-4 py-3.5 border-b border-slate-200/50 flex items-center justify-between bg-slate-50">
-            <span className="font-semibold text-sm flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-primary-500/10 flex items-center justify-center"><MessageSquare size={14} className="text-primary-500" /></div>
-              المحادثة مع العامل
-            </span>
-            <span className="text-xs text-slate-400 flex items-center gap-1.5"><Shield size={11} className="text-secondary-500" /> محمية بالكامل</span>
+        {['in_progress', 'pending_confirmation', 'completed'].includes(selectedTask.status) && (
+          <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
+        )}
+        {selectedTask.status === 'open' && (
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 text-center">
+            <MessageSquare size={28} className="text-slate-300 mx-auto mb-2" />
+            <p className="text-slate-400 text-sm">المحادثة تبدأ بعد قبول مقدم الخدمة</p>
           </div>
-          <div className="h-72 overflow-y-auto px-4 py-4 space-y-2.5">
-            {msgs.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full py-8 gap-2">
-                <MessageSquare size={28} className="text-slate-300" />
-                <p className="text-slate-400 text-sm">{selectedTask.status === 'open' ? 'المحادثة تبدأ بعد قبول العامل' : 'لا توجد رسائل'}</p>
-              </div>
-            )}
-            {msgs.map(m => {
-              const isMe = m.sender_id === user?.id
-              return (
-                <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  <div className="max-w-[78%]">
-                    {!isMe && <p className="text-[11px] text-slate-400 mb-1 mr-1">{m.profiles?.full_name}</p>}
-                    <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${isMe ? 'bg-primary-500 text-slate-900 rounded-tr-sm font-medium' : 'bg-slate-100 text-slate-800 rounded-tl-sm'}`}>
-                      {m.content}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-            <div ref={endRef} />
-          </div>
-          {blockedWarn && <div className="mx-3 mb-2 px-3 py-2 bg-red-950/40 border border-red-800/50 rounded-xl text-sm text-red-400 flex items-center gap-2"><AlertCircle size={13} /> {blockedWarn}</div>}
-          {['in_progress', 'pending_confirmation'].includes(selectedTask.status) && (
-            <div className="px-3 pb-3">
-              <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-2.5 focus-within:border-primary-500/40 transition-colors">
-                <input value={msg} onChange={e => setMsg(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMsg()}
-                  placeholder="اكتب رسالة للعامل..." className="flex-1 bg-transparent text-sm outline-none placeholder-slate-400" />
-                <button onClick={sendMsg} disabled={!msg.trim() || sending} className="w-8 h-8 rounded-lg bg-primary-500 hover:bg-primary-700 disabled:opacity-30 flex items-center justify-center transition-all">
-                  {sending ? <Loader2 size={14} className="animate-spin text-slate-900" /> : <Send size={14} className="text-slate-900" />}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   )
