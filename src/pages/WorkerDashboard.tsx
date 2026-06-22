@@ -353,7 +353,7 @@ export function WorkerDashboard() {
                         <div key={task.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
                           <div className="flex gap-4">
                             <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center text-2xl flex-shrink-0">
-                              🔧
+                              📋
                             </div>
                             <div>
                               <div className="flex items-center gap-2 mb-1">
@@ -405,7 +405,7 @@ export function WorkerDashboard() {
                     <div className="mt-5 p-4 bg-green-50 rounded-xl border border-green-200">
                       <p className="font-bold text-green-700 text-sm mb-1">فرصة أرباح 🚀</p>
                       <p className="text-green-600 text-xs leading-relaxed">
-                        طلب مرتفع على خدمات الكهرباء في منطقتك هذا الأسبوع. حدّث توفرك لتحصل على أكثر.
+                        الطلبات في منطقتك مرتفعة الآن. حدّث حالتك إلى "متاح" لاستقبال المزيد من الطلبات.
                       </p>
                     </div>
                   </div>

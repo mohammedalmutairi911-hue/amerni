@@ -22,9 +22,9 @@ const STATUS_COLOR: Record<string, string> = {
 }
 
 const QUICK_SERVICES = [
-  { icon: '🍽️', label: 'مطاعم' },
-  { icon: '🛒', label: 'مقاضي' },
-  { icon: '💊', label: 'صيدلية' },
+  { icon: '🚗', label: 'توصيل' },
+  { icon: '📸', label: 'تصوير' },
+  { icon: '🛍️', label: 'تسوق' },
   { icon: '✨', label: 'أخرى' },
 ]
 
