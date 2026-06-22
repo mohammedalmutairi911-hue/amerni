@@ -90,7 +90,12 @@ export function WorkerDashboard() {
   }, [user?.id, workerProfile?.is_approved])
 
   const fetchMyTasks = async () => {
-    const { data } = await supabase.from('tasks').select('*, profiles(full_name)').eq('worker_id', user!.id).order('created_at', { ascending: false })
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('worker_id', user!.id)
+      .order('created_at', { ascending: false })
+    if (error) console.error('fetchMyTasks error:', error)
     setMyTasks(data || [])
   }
 
@@ -181,7 +186,7 @@ export function WorkerDashboard() {
 
   // Stats
   const completedTasks = myTasks.filter(t => t.status === 'completed')
-  const activeTasks = myTasks.filter(t => t.status === 'in_progress')
+  const activeTasks = myTasks.filter(t => ['in_progress', 'accepted', 'pending_confirmation'].includes(t.status))
   const totalEarnings = completedTasks.reduce((s, t) => s + (t.price_final || t.price_suggested || 0), 0)
   const thisMonth = completedTasks.filter(t => new Date(t.created_at).getMonth() === new Date().getMonth()).length
 
@@ -597,7 +602,7 @@ export function WorkerDashboard() {
                   <span className="text-primary-400 font-bold flex-shrink-0">{task.price_final || task.price_suggested || '—'} ر</span>
                 </div>
                 <div className="flex gap-2">
-                  {task.status === 'in_progress' && (
+                  {['accepted', 'in_progress'].includes(task.status) && (
                     <>
                       <button onClick={() => { setSelectedTask(task); setTab('chat') }}
                         className="flex-1 flex items-center justify-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 text-sm py-2 rounded-lg transition-colors">
@@ -637,12 +642,12 @@ export function WorkerDashboard() {
             ) : (
               <div className="space-y-2">
                 <p className="text-zinc-500 text-sm mb-4">اختر طلب عشان تفتح المحادثة</p>
-                {myTasks.filter(t => t.status === 'in_progress').length === 0 ? (
+                {myTasks.filter(t => ['accepted', 'in_progress'].includes(t.status)).length === 0 ? (
                   <div className="text-center py-16 text-zinc-600">
                     <MessageSquare size={32} className="mx-auto mb-3 opacity-30" />
                     <p>ما في محادثات نشطة</p>
                   </div>
-                ) : myTasks.filter(t => t.status === 'in_progress').map(task => (
+                ) : myTasks.filter(t => ['accepted', 'in_progress'].includes(t.status)).map(task => (
                   <button key={task.id} onClick={() => setSelectedTask(task)}
                     className="w-full bg-[#0d0d0d] border border-zinc-800 rounded-xl p-4 text-right hover:border-zinc-700 transition-all">
                     <p className="font-medium">{task.title}</p>
