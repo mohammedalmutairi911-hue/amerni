@@ -389,8 +389,8 @@ export function LandingPage() {
                 {/* Popular services */}
                 <p className="text-xs text-slate-400 mb-3">خدمات شائعة:</p>
                 <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-10 px-2">
-                  {['تنظيف مكيفات','سباكة','تعقيم منازل','كهرباء','تكييف','صيانة'].map(cat => (
-                    <button key={cat} onClick={() => { setTaskInput(cat); setShowNewTask(true) }}
+                  {['🚗 توصيل','📸 تصوير','🔍 تحقق','🛍️ تسوق','📚 تعليم','✨ أخرى'].map(cat => (
+                    <button key={cat} onClick={() => { setTaskInput(cat.split(' ')[1]); setShowNewTask(true) }}
                       className="px-4 py-2 bg-white border border-slate-200 hover:border-primary-500 hover:text-primary-500 rounded-full text-sm text-slate-600 transition-all shadow-sm">
                       {cat}
                     </button>
