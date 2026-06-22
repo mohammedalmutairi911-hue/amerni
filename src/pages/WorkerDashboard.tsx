@@ -103,24 +103,18 @@ export function WorkerDashboard() {
     if (!pendingTask) return
     setAccepting(pendingTask.id)
     setShowCommission(false)
-    // استخدام الدالة الآمنة بدل التحديث المباشر — تمنع قبول نفس الطلب من عاملين بنفس اللحظة
     const price = (pendingTask as any).price_suggested || (pendingTask as any).client_price || 0
-    const { data, error } = await supabase.rpc('accept_task', {
+    const { error } = await supabase.rpc('accept_task', {
       p_task_id: pendingTask.id,
-      p_worker_id: user!.id,
-      p_worker_price: price,
+      p_worker_price: price || null,
     })
 
-    if (!error && data === 'ok') {
-      // إشعار العميل بقبول طلبه (الدالة نفسها ترسل إشعاراً أساسياً، هذا إشعار إضافي بصيغة العامل)
-      const clientId = pendingTask.client_id || pendingTask.user_id
-      if (clientId) {
-        await supabase.from('notifications').insert({
-          user_id: clientId,
-          title: '🎉 قبل شخص طلبك!',
-          body: `طلبك "${pendingTask.title}" اتقبل — افتح المحادثة الحين`
-        })
-      }
+    if (error) {
+      console.error('accept_task error:', error)
+      alert('حدث خطأ أثناء قبول الطلب: ' + error.message)
+      setAccepting(null)
+      setPendingTask(null)
+      return
     }
 
     await fetchFeedTasks()
