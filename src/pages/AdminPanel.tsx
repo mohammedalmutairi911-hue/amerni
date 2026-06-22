@@ -80,17 +80,17 @@ export function AdminPanel() {
   }
 
   const approveWorker = async (userId: string) => {
-    const { error } = await supabase.from('worker_profiles').update({ is_approved: true }).eq('user_id', userId)
-    console.log('approve error:', error)
+    await supabase.rpc('admin_approve_worker', { p_user_id: userId, p_approved: true })
     await fetchAll()
   }
 
   const rejectWorker = async (userId: string) => {
-    await supabase.from('worker_profiles').update({ is_approved: false }).eq('user_id', userId)
+    await supabase.rpc('admin_approve_worker', { p_user_id: userId, p_approved: false })
     await fetchAll()
   }
 
   const updateTaskStatus = async (taskId: string, status: string) => {
+    // الأدمن فقط يقدر يغير status مباشرة — محمي بـ RLS admin check
     await supabase.from('tasks').update({ status }).eq('id', taskId)
     setTasks(p => p.map(t => t.id === taskId ? { ...t, status: status as any } : t))
   }

@@ -123,11 +123,8 @@ export function WorkerDashboard() {
     setTab('my-tasks')
   }
 
-  const completeTask = async (taskId: string, price: number) => {
-    await supabase.from('tasks').update({ status: 'completed', price_final: price }).eq('id', taskId)
-    await supabase.from('worker_profiles').update({
-      total_tasks: (workerProfile?.total_tasks || 0) + 1,
-    }).eq('user_id', user!.id)
+  const completeTask = async (taskId: string) => {
+    // submit_task_completion في الباك اند تتولى كل شي
     await fetchMyTasks()
     await fetchWorkerProfile()
   }

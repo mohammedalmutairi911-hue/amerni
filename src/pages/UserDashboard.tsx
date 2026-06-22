@@ -77,31 +77,14 @@ export function UserDashboard() {
   const confirmPayment = async () => {
     if (!selectedTask || !user) return
     setConfirmingPayment(true)
-    const price = (selectedTask as any).price_final || (selectedTask as any).price_suggested || 0
-    const commission = (price * 0.02).toFixed(2)
-    await supabase.from('tasks').update({ status: 'completed' }).eq('id', selectedTask!.id)
-    // Confirm message
-    await supabase.from('task_messages').insert({
-      task_id: selectedTask.id, sender_id: user.id,
-      content: '✅ العميل أكد استلام الخدمة — الطلب مكتمل.',
-      is_blocked: false
+    // المنطق كله في الباك اند — لا أسعار ولا عمولات في الفرونت
+    const { error } = await supabase.rpc('confirm_task_completion', {
+      p_task_id: selectedTask.id
     })
-    // Commission reminder message to worker
-    if (price > 0) {
-      await supabase.from('task_messages').insert({
-        task_id: selectedTask.id, sender_id: user.id,
-        content: '💰 تذكير للعامل: يرجى تحويل عمولة المنصة (' + commission + ' ريال = 2% من ' + price + ' ريال) إلى حساب أمرني — IBAN: SA54150009001465965400007 | بنك البلاد | مؤسسة حلول الغد — خلال ٧٢ ساعة.',
-        is_blocked: false
-      })
-    }
-    // Notify worker
-    if (selectedTask.worker_id) {
-      await supabase.from('notifications').insert({
-        user_id: selectedTask.worker_id,
-        title: 'تم تأكيد استلام الخدمة ✅',
-        body: 'العميل أكد الاستلام — لا تنسَ تحويل العمولة (' + commission + ' ريال) خلال ٧٢ ساعة',
-        type: 'payment_reminder',
-      })
+    if (error) {
+      console.error('confirm error:', error)
+      setConfirmingPayment(false)
+      return
     }
     setSelectedTask(p => p ? { ...p, status: 'completed' } : null)
     setConfirmingPayment(false)
@@ -109,18 +92,12 @@ export function UserDashboard() {
 
   const submitRating = async () => {
     if (!rating || !selectedTask?.worker_id) return
-    await supabase.from('ratings').insert({ task_id: selectedTask.id, worker_id: selectedTask.worker_id, rater_id: user!.id, stars: rating })
-    // إشعار العامل بالتقييم
-    try {
-      await supabase.from('notifications').insert({
-        user_id: selectedTask.worker_id,
-        title: `⭐ حصلت على تقييم ${rating} نجوم!`,
-        body: `العميل قيّمك على طلب: ${selectedTask.title}`
-      })
-    } catch {
-      // فشل الإشعار لا يجب أن يمنع إتمام التقييم نفسه
-    }
-    setRatingDone(true)
+    // التقييم وتحديث المتوسط وإشعار العامل — كلها في الباك اند
+    const { error } = await supabase.rpc('rate_worker', {
+      p_task_id: selectedTask.id,
+      p_stars: rating
+    })
+    if (!error) setRatingDone(true)
   }
 
   const totalSpent = tasks.filter(t => t.status === 'completed').reduce((s, t) => s + (t.price_final || t.price_suggested || 0), 0)
@@ -225,12 +202,7 @@ export function UserDashboard() {
           <div className="flex justify-end mb-2">
             <button onClick={async () => {
               if (confirm('هل تريد رفع نزاع لهذا الطلب؟ سيتم إشعار فريق أمرني للمراجعة.')) {
-                await supabase.from('tasks').update({ status: 'disputed' }).eq('id', selectedTask.id)
-                await supabase.from('notifications').insert({
-                  user_id: selectedTask.worker_id,
-                  title: '⚠️ تم رفع نزاع',
-                  body: `العميل رفع نزاع على طلب: ${selectedTask.title}`
-                })
+                await supabase.rpc('raise_dispute', { p_task_id: selectedTask.id })
                 setSelectedTask(p => p ? { ...p, status: 'disputed' } : null)
               }
             }} className="text-xs text-red-400 border border-red-900/50 px-3 py-1.5 rounded-lg hover:bg-red-950/30 transition-colors">

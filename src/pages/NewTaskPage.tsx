@@ -82,19 +82,15 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       if (referrer && referrer.id !== uid) referredByUid = referrer.id
     }
 
-    const { data, error: err } = await supabase.from('tasks').insert({
-      client_id: uid,
-      user_id: uid,
-      title: task.title.trim(),
-      description: task.description.trim() || task.title.trim(),
-      category: finalCategory,
-      city: task.city,
-      use_ai: task.use_ai,
-      status: 'open',
-      ...(task.deadline ? { deadline: task.deadline } : {}),
-      ...(referredByUid ? { referred_by: referredByUid } : {}),
-      price_suggested: task.budget ? Number(task.budget) : null
-    }).select().single()
+    const { data, error: err } = await supabase.rpc('create_task', {
+      p_title:       task.title.trim(),
+      p_description: task.description.trim() || task.title.trim(),
+      p_category:    finalCategory,
+      p_city:        task.city,
+      p_budget:      task.budget ? Number(task.budget) : null,
+      p_deadline:    task.deadline || null,
+      p_use_ai:      task.use_ai ?? false
+    })
 
     if (err) {
       console.error('Task error:', err)
@@ -102,24 +98,6 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       return false
     }
 
-    // فريق تحليل البيانات: تتبع نشر الطلب بنجاح (أول خطوة في funnel المنصة)
-    trackEvent('task_created', uid, { category: finalCategory, city: task.city, has_budget: !!task.budget })
-
-    // Notify matching workers
-    if (data) {
-      const { data: workers } = await supabase
-        .from('worker_profiles')
-        .select('user_id')
-        .eq('is_approved', true)
-        .eq('is_online', true)
-        .contains('skills', [finalCategory])
-        .eq('city', task.city)
-      if (workers?.length) {
-        await supabase.from('notifications').insert(
-          workers.map(w => ({ user_id: w.user_id, title: 'طلب جديد يناسبك ⚡', body: task.title.trim(), task_id: data.id }))
-        )
-      }
-    }
     return true
   }
 
