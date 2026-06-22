@@ -62,9 +62,14 @@ export function WorkerDashboard() {
   }
 
   const fetchFeedTasks = async () => {
-    const { data } = await supabase.from('tasks').select('*, profiles(full_name)').eq('status', 'open').order('created_at', { ascending: false }).limit(20)
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('status', 'open')
+      .order('created_at', { ascending: false })
+      .limit(50)
+    if (error) console.error('fetchFeedTasks error:', error)
     const newTasks = data || []
-    // أرسل إشعار لو جاء طلب جديد
     if (feedTasks.length > 0 && newTasks.length > feedTasks.length) {
       sendLocalNotification('أمرني ⚡ طلب جديد!', newTasks[0]?.title || 'جاك طلب جديد يناسب مهاراتك')
     }
