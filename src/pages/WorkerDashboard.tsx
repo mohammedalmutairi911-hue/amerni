@@ -50,7 +50,9 @@ export function WorkerDashboard() {
 
   const fetchAll = async () => {
     setLoading(true)
-    await Promise.all([fetchWorkerProfile(), fetchFeedTasks(), fetchMyTasks()])
+    // نجيب الـ profile أولاً عشان الفلتر يشتغل صح
+    await fetchWorkerProfile()
+    await Promise.all([fetchFeedTasks(), fetchMyTasks()])
     setLoading(false)
   }
 
@@ -530,11 +532,11 @@ export function WorkerDashboard() {
                 if (cityFilter === 'city') return t.city === workerProfile?.city
                 if (cityFilter === 'smart') {
                   const cityMatch = !t.city || t.city === workerProfile?.city
-                  const skillMatch = !workerProfile?.skills?.length || 
-                    workerProfile.skills.some((s: string) => 
-                      t.category?.includes(s) || s.includes(t.category || '')
+                  const skillMatch = !workerProfile?.skills?.length ||
+                    workerProfile.skills.some((s: string) =>
+                      s.trim() === t.category?.trim()
                     )
-                  return cityMatch || skillMatch
+                  return cityMatch && skillMatch
                 }
                 return true
               }).map(task => (
