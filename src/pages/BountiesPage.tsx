@@ -22,7 +22,7 @@ export function BountiesPage() {
   useEffect(() => { fetchTasks() }, [])
 
   const fetchTasks = async () => {
-    const { data } = await supabase.from('tasks').select('*, profiles(full_name)')
+    const { data } = await supabase.from('tasks').select('*')
       .eq('status', 'open').order('created_at', { ascending: false })
     setTasks(data || [])
     setLoading(false)

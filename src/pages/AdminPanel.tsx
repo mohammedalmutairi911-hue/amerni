@@ -55,7 +55,7 @@ export function AdminPanel() {
     setLoading(true)
     const [wRes, tRes, uRes] = await Promise.all([
       supabase.from('worker_profiles').select('*').order('created_at', { ascending: false }),
-      supabase.from('tasks').select('*, profiles(full_name, email)').order('created_at', { ascending: false }),
+      supabase.from('tasks').select('*').order('created_at', { ascending: false }),
       supabase.from('profiles').select('*').order('created_at', { ascending: false })
     ])
     const errs: string[] = []
