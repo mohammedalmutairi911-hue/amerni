@@ -52,14 +52,17 @@ export function AdminPanel() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const [{ data: w }, { data: t }, { data: u }] = await Promise.all([
+    const [wRes, tRes, uRes] = await Promise.all([
       supabase.from('worker_profiles').select('*').order('created_at', { ascending: false }),
-      supabase.from('tasks').select('*, profiles(full_name)').order('created_at', { ascending: false }),
+      supabase.from('tasks').select('*, profiles(full_name, email)').order('created_at', { ascending: false }),
       supabase.from('profiles').select('*').order('created_at', { ascending: false })
     ])
-    setWorkers(w || [])
-    setTasks(t || [])
-    setUsers(u || [])
+    if (wRes.error) console.error('[Admin] workers error:', wRes.error)
+    if (tRes.error) console.error('[Admin] tasks error:', tRes.error)
+    if (uRes.error) console.error('[Admin] users error:', uRes.error)
+    setWorkers(wRes.data || [])
+    setTasks(tRes.data || [])
+    setUsers(uRes.data || [])
     setLoading(false)
   }
 
@@ -448,7 +451,7 @@ export function AdminPanel() {
             {/* قائمة الطلبات - يمين */}
             <div className="lg:col-span-1 space-y-2">
               <p className="text-xs text-slate-400 mb-3">اختر طلباً لمشاهدة المحادثة</p>
-              {tasks.filter(t => ['in_progress','disputed','pending_confirmation'].includes(t.status)).map(task => (
+              {tasks.map(task => (
                 <button key={task.id} onClick={() => setSelectedTask(task)}
                   className={`w-full text-right p-3 rounded-xl border transition-all ${
                     selectedTask?.id === task.id ? 'border-primary-500 bg-primary-50' : 'border-slate-200 bg-white hover:border-slate-300'
@@ -457,11 +460,17 @@ export function AdminPanel() {
                     <p className="text-sm font-medium truncate flex-1">{task.title}</p>
                     {task.status === 'disputed' && <AlertTriangle size={12} className="text-red-400 flex-shrink-0" />}
                   </div>
-                  <p className="text-xs text-slate-400">{task.status === 'disputed' ? '⚠️ نزاع' : task.status === 'pending_confirmation' ? '⏳ بانتظار تأكيد' : '🔄 جاري'}</p>
+                  <p className="text-xs text-slate-400">
+                    {task.status === 'disputed' ? '⚠️ نزاع' :
+                     task.status === 'pending_confirmation' ? '⏳ بانتظار تأكيد' :
+                     task.status === 'in_progress' ? '🔄 جاري' :
+                     task.status === 'completed' ? '✅ مكتمل' :
+                     task.status === 'open' ? '📬 مفتوح' : task.status}
+                  </p>
                 </button>
               ))}
-              {tasks.filter(t => ['in_progress','disputed','pending_confirmation'].includes(t.status)).length === 0 && (
-                <p className="text-slate-400 text-sm text-center py-8">ما في محادثات نشطة</p>
+              {tasks.length === 0 && (
+                <p className="text-slate-400 text-sm text-center py-8">ما في طلبات بعد</p>
               )}
             </div>
             {/* المحادثة - يسار */}
