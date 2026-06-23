@@ -444,10 +444,10 @@ export function LandingPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { name: 'م. أحمد القحطاني', role: 'خبير صيانة أنظمة التكييف', jobs: '+٥٠٠ عملية', price: '١٥٠', rating: '4.9' },
-                    { name: 'شركة التنظيف العميق', role: 'خدمات التنظيف والتعقيم', jobs: '+١٢٠٠ عملية', price: '٢٩٩', rating: '4.8' },
-                    { name: 'م. خالد العتيبي', role: 'متخصص سباكة وتأسيس', jobs: '+٣٠٠ عملية', price: '١٢٠', rating: '5.0' },
-                    { name: 'م. فهد بن ناصر', role: 'خبير تمديدات كهربائية', jobs: '+٨٠٠ عملية', price: '١٨٠', rating: '4.7' },
+                    { name: 'سارة المطيري', role: 'مساعدة إدارية وتنظيم', jobs: '+٣٠٠ مهمة', price: '٨٠', rating: '4.9' },
+                    { name: 'محمد الشهري', role: 'توصيل ومشاوير', jobs: '+٨٠٠ مهمة', price: '٥٠', rating: '4.8' },
+                    { name: 'نورة القحطاني', role: 'تصوير ومحتوى', jobs: '+٢٠٠ مهمة', price: '١٢٠', rating: '5.0' },
+                    { name: 'ريم الدوسري', role: 'استشارات تغذية وصحة', jobs: '+١٨٠ مهمة', price: '١٥٠', rating: '4.9' },
                   ].map(({ name, role, jobs, price, rating }) => (
                     <div key={name} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all group">
                       <div className="flex items-center justify-between mb-3">
@@ -508,12 +508,12 @@ export function LandingPage() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
                   {[
-                    { icon: '🧹', label: 'التنظيف' },
-                    { icon: '❄️', label: 'التكييف' },
-                    { icon: '🔧', label: 'السباكة' },
-                    { icon: '⚡', label: 'الكهرباء' },
-                    { icon: '🏗️', label: 'الصيانة' },
-                    { icon: '✨', label: 'أخرى' },
+                    { icon: '🚗', label: 'توصيل' },
+                    { icon: '📸', label: 'تصوير' },
+                    { icon: '🔍', label: 'تحقق' },
+                    { icon: '🛍️', label: 'تسوق' },
+                    { icon: '📚', label: 'تعليم' },
+                    { icon: '⚖️', label: 'استشارات' },
                   ].map(({ icon, label }) => (
                     <button key={label} onClick={() => setShowBrowse(true)}
                       className="bg-slate-50 border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-2xl p-4 text-center transition-all group">
@@ -688,7 +688,7 @@ export function LandingPage() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
                   <h3 className="text-xl font-bold text-slate-900 mb-4">رسالتنا</h3>
                   <p className="text-slate-500 leading-loose">
-                    نؤمن أن كل منزل يستحق أفضل رعاية. سواء كنت تحتاج لصيانة، تنظيف، أو أي خدمة منزلية — آمرني هنا لتوصيلك بالمحترف المناسب بسرعة وأمان. هدفنا بناء منظومة خدمات قائمة على الثقة، حيث يكسب المحترف بشرف ويحصل العميل على أفضل جودة.
+                    نؤمن أن كل شخص يستحق مساعدة سريعة وموثوقة. سواء كنت تحتاج توصيلاً، تصويراً، مساعدة إدارية، أو استشارة متخصصة — آمرني هنا لتوصيلك بمن يساعدك بسرعة وأمان. هدفنا بناء منظومة خدمات قائمة على الثقة، حيث يكسب مقدم الخدمة بشرف ويحصل العميل على أفضل جودة.
                   </p>
                 </div>
 

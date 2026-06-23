@@ -2,17 +2,17 @@ import { useState } from 'react'
 import { Search, Filter, Star, CheckCircle, ArrowLeft, MapPin, Clock } from 'lucide-react'
 import { BookingPage } from './BookingPage'
 
-const CATEGORIES = ['الكل', '🧹 تنظيف', '❄️ تكييف', '🔧 سباكة', '⚡ كهرباء', '🏗️ صيانة', '📚 تعليم', '🚗 توصيل']
+const CATEGORIES = ['الكل', '🚗 توصيل', '📸 تصوير', '🔍 تحقق', '🛍️ تسوق', '📚 تعليم', '🤝 مساعدة', '⚖️ استشارات', '✨ أخرى']
 
 const PROFESSIONALS = [
-  { id: 1, name: 'م. أحمد القحطاني', role: 'خبير صيانة أنظمة التكييف', rating: '4.9', reviews: 512, jobs: '٥٠٠+', price: '١٥٠', category: '❄️ تكييف', area: 'الرياض', badge: 'الأعلى تقييماً' },
-  { id: 2, name: 'شركة التنظيف العميق', role: 'خدمات التنظيف والتعقيم', rating: '4.8', reviews: 1241, jobs: '١٢٠٠+', price: '٢٩٩', category: '🧹 تنظيف', area: 'الرياض', badge: '' },
-  { id: 3, name: 'م. خالد العتيبي', role: 'متخصص سباكة وتأسيس', rating: '5.0', reviews: 304, jobs: '٣٠٠+', price: '١٢٠', category: '🔧 سباكة', area: 'جدة', badge: 'الأفضل' },
-  { id: 4, name: 'م. فهد بن ناصر', role: 'خبير تمديدات كهربائية', rating: '4.7', reviews: 826, jobs: '٨٠٠+', price: '١٨٠', category: '⚡ كهرباء', area: 'الرياض', badge: '' },
-  { id: 5, name: 'شركة النظافة المتميزة', role: 'تنظيف المنازل والمكاتب', rating: '4.6', reviews: 432, jobs: '٤٠٠+', price: '٢٠٠', category: '🧹 تنظيف', area: 'الدمام', badge: '' },
-  { id: 6, name: 'م. سعد المطيري', role: 'صيانة عامة وكهرباء', rating: '4.8', reviews: 218, jobs: '٢٠٠+', price: '١٣٥', category: '⚡ كهرباء', area: 'الرياض', badge: '' },
-  { id: 7, name: 'فريق الصيانة السريعة', role: 'جميع أعمال الصيانة المنزلية', rating: '4.9', reviews: 680, jobs: '٦٥٠+', price: '١٦٠', category: '🏗️ صيانة', area: 'الرياض', badge: 'سريع الاستجابة' },
-  { id: 8, name: 'أ. نورة الشمري', role: 'معلمة رياضيات وعلوم', rating: '5.0', reviews: 148, jobs: '١٤٠+', price: '٨٠', category: '📚 تعليم', area: 'الرياض', badge: '' },
+  { id: 1, name: 'سارة المطيري', role: 'مساعدة إدارية وتنظيم مواعيد', rating: '4.9', reviews: 312, jobs: '٣٠٠+', price: '٨٠', category: '🤝 مساعدة', area: 'الرياض', badge: 'الأعلى تقييماً' },
+  { id: 2, name: 'محمد الشهري', role: 'توصيل ومشاوير خاصة', rating: '4.8', reviews: 841, jobs: '٨٠٠+', price: '٥٠', category: '🚗 توصيل', area: 'الرياض', badge: '' },
+  { id: 3, name: 'نورة القحطاني', role: 'تصوير منتجات وسوشيال ميديا', rating: '5.0', reviews: 204, jobs: '٢٠٠+', price: '١٢٠', category: '📸 تصوير', area: 'جدة', badge: 'الأفضل' },
+  { id: 4, name: 'عبدالله العتيبي', role: 'تحقق ومتابعة ومراسلات', rating: '4.7', reviews: 426, jobs: '٤٠٠+', price: '٦٠', category: '🔍 تحقق', area: 'الرياض', badge: '' },
+  { id: 5, name: 'ريم الدوسري', role: 'استشارات تغذية وصحة', rating: '4.9', reviews: 183, jobs: '١٨٠+', price: '١٥٠', category: '⚖️ استشارات', area: 'الرياض', badge: 'موثق' },
+  { id: 6, name: 'فيصل الزهراني', role: 'استشارات مالية وتخطيط', rating: '4.8', reviews: 97, jobs: '٩٠+', price: '٢٠٠', category: '⚖️ استشارات', area: 'الرياض', badge: '' },
+  { id: 7, name: 'هند المالكي', role: 'تعليم وشرح مواد دراسية', rating: '4.9', reviews: 380, jobs: '٣٥٠+', price: '٧٠', category: '📚 تعليم', area: 'الرياض', badge: 'سريع الاستجابة' },
+  { id: 8, name: 'أحمد البقمي', role: 'تسوق ومشتريات شخصية', rating: '4.7', reviews: 148, jobs: '١٤٠+', price: '٤٠', category: '🛍️ تسوق', area: 'الرياض', badge: '' },
 ]
 
 export function ServiceBrowsePage({ onClose }: { onClose: () => void }) {

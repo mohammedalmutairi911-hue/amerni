@@ -319,26 +319,43 @@ export function UserDashboard() {
                 ) : (
                   <div className="space-y-3">
                     {[...activeTasks, ...openTasks].slice(0, 3).map(task => (
-                      <button key={task.id} onClick={() => openTask(task)}
-                        className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 hover:border-primary-500/30 transition-all text-right">
-                        <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${
-                            task.status === 'in_progress' ? 'bg-amber-100' : 'bg-blue-100'
-                          }`}>
-                            {task.status === 'in_progress' ? '🔧' : '📦'}
+                      <div key={task.id} className="bg-slate-50 rounded-xl border border-slate-200 hover:border-primary-500/30 transition-all">
+                        <button onClick={() => openTask(task)}
+                          className="w-full flex items-center justify-between p-4 text-right">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${
+                              task.status === 'in_progress' ? 'bg-amber-100' :
+                              task.status === 'pending_confirmation' ? 'bg-purple-100' : 'bg-blue-100'
+                            }`}>
+                              {task.status === 'in_progress' ? '⚡' : task.status === 'pending_confirmation' ? '✅' : '📦'}
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-slate-900 text-sm">{task.title}</p>
+                              <p className="text-xs text-slate-400 mt-0.5">{STATUS_LABEL[task.status]}</p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="font-bold text-slate-900 text-sm">{task.title}</p>
-                            <p className="text-xs text-slate-400 mt-0.5">{STATUS_LABEL[task.status]}</p>
-                          </div>
-                        </div>
-                        <div className="text-left flex-shrink-0">
-                          <span className={`text-xs px-2.5 py-1 rounded-full border font-bold ${STATUS_COLOR[task.status]}`}>
-                            {task.status === 'in_progress' ? 'قيد التنفيذ' : 'بانتظار مقدم'}
+                          <span className={`text-xs px-2.5 py-1 rounded-full border font-bold flex-shrink-0 ${STATUS_COLOR[task.status]}`}>
+                            {STATUS_LABEL[task.status]}
                           </span>
-                          <div className="mt-1.5 text-xs text-primary-500 font-medium">تفاصيل ←</div>
-                        </div>
-                      </button>
+                        </button>
+                        {task.status === 'pending_confirmation' && (
+                          <div className="px-4 pb-4">
+                            <button onClick={async (e) => {
+                              e.stopPropagation()
+                              setConfirmingPayment(true)
+                              const { error } = await supabase.rpc('confirm_task_completion', { p_task_id: task.id })
+                              if (!error) {
+                                setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: 'completed' } : t))
+                              }
+                              setConfirmingPayment(false)
+                            }} disabled={confirmingPayment}
+                              className="w-full bg-primary-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-primary-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
+                              {confirmingPayment ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+                              تأكيد استلام الخدمة
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}

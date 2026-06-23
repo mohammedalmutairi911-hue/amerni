@@ -3,10 +3,7 @@ import { CheckCircle, Upload, Loader2, Camera, Clock, Star } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
-const SKILLS = [
-  'توصيل ومشاوير', 'تصوير ومحتوى', 'تحقق ومتابعة', 'مساعدة إدارية',
-  'تسوق ومشتريات', 'صيانة وتركيب', 'تعليم وشرح', 'خدمات منزلية', 'أخرى'
-]
+const SKILLS = ['الكل', 'توصيل ومشاوير', 'تصوير ومحتوى', 'تحقق ومتابعة', 'تسوق ومشتريات', 'تعليم وشرح', 'مساعدة إدارية', 'استشارة قانونية', 'استشارة مالية', 'استشارة تغذية', 'أخرى']
 const DAYS = ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة']
 
 interface Props { onSuccess: () => void }

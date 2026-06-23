@@ -131,7 +131,7 @@ export function AdminPanel() {
   )
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-14">
+    <div className="min-h-screen bg-slate-50 pt-14" dir="rtl">
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-4 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -379,7 +379,7 @@ export function AdminPanel() {
 
         {/* Tasks */}
         {tab === 'tasks' && (
-          <div className="space-y-3">
+          <div className="space-y-3" dir="rtl">
             {tasks.map(task => (
               <div key={task.id} className="bg-white border border-slate-200 rounded-xl p-4">
                 <div className="flex items-start justify-between gap-3">
@@ -421,33 +421,35 @@ export function AdminPanel() {
 
         {/* Conversations */}
         {tab === 'conversations' && (
-          <div className="grid lg:grid-cols-3 gap-4">
+          <div className="grid lg:grid-cols-3 gap-4" dir="rtl">
+            {/* قائمة الطلبات - يمين */}
             <div className="lg:col-span-1 space-y-2">
               <p className="text-xs text-slate-400 mb-3">اختر طلباً لمشاهدة المحادثة</p>
-              {tasks.filter(t => t.status === 'in_progress' || t.status === 'disputed').map(task => (
+              {tasks.filter(t => ['in_progress','disputed','pending_confirmation'].includes(t.status)).map(task => (
                 <button key={task.id} onClick={() => setSelectedTask(task)}
                   className={`w-full text-right p-3 rounded-xl border transition-all ${
-                    selectedTask?.id === task.id ? 'border-primary-500/40 bg-primary-500/5' : 'border-slate-200 bg-white hover:border-slate-300'
+                    selectedTask?.id === task.id ? 'border-primary-500 bg-primary-50' : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}>
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-medium truncate flex-1">{task.title}</p>
                     {task.status === 'disputed' && <AlertTriangle size={12} className="text-red-400 flex-shrink-0" />}
                   </div>
-                  <p className="text-xs text-slate-400">{task.status === 'disputed' ? 'نزاع' : 'جاري'}</p>
+                  <p className="text-xs text-slate-400">{task.status === 'disputed' ? '⚠️ نزاع' : task.status === 'pending_confirmation' ? '⏳ بانتظار تأكيد' : '🔄 جاري'}</p>
                 </button>
               ))}
-              {tasks.filter(t => ['in_progress','disputed'].includes(t.status)).length === 0 && (
+              {tasks.filter(t => ['in_progress','disputed','pending_confirmation'].includes(t.status)).length === 0 && (
                 <p className="text-slate-400 text-sm text-center py-8">ما في محادثات نشطة</p>
               )}
             </div>
-            <div className="lg:col-span-2">
+            {/* المحادثة - يسار */}
+            <div className="lg:col-span-2" dir="rtl">
               {selectedTask ? (
                 <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
               ) : (
                 <div className="flex items-center justify-center h-80 border border-slate-200 rounded-2xl bg-white text-slate-400">
                   <div className="text-center">
                     <MessageSquare size={32} className="mx-auto mb-2 opacity-30" />
-                    <p>اختر محادثة</p>
+                    <p>اختر محادثة من القائمة</p>
                   </div>
                 </div>
               )}

@@ -22,14 +22,14 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
   const [confirmed, setConfirmed] = useState(false)
 
   const professional = {
-    name: 'المهندس فهد العتيبي',
-    role: 'صيانة تكييف منزلية',
+    name: 'سارة المطيري',
+    role: 'مساعدة إدارية وتنظيم مواعيد',
     rating: '4.9',
-    reviews: '١٢٠',
-    price: '١٥٠',
-    duration: '٢ ساعة',
-    inspection: '٥٠',
-    total: '٣٥٠',
+    reviews: '٣١٢',
+    price: '٨٠',
+    duration: 'ساعتان',
+    inspection: '٢٠',
+    total: '١٨٠',
   }
 
   if (confirmed) return (

@@ -6,7 +6,7 @@ import { trackEvent } from '../lib/analytics'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 
-const SUGGESTED_CATS = ['توصيل ومشاوير', 'تصوير ومحتوى', 'تحقق ومتابعة', 'مساعدة إدارية', 'تسوق', 'تعليم وشرح', 'صيانة وتركيب', 'أخرى']
+const SUGGESTED_CATS = ['توصيل ومشاوير', 'تصوير ومحتوى', 'تحقق ومتابعة', 'تسوق ومشتريات', 'تعليم وشرح', 'مساعدة إدارية', 'استشارة قانونية', 'استشارة مالية', 'استشارة تغذية', 'أخرى']
 const CITIES = ['الرياض', 'جدة', 'مكة', 'المدينة', 'الدمام', 'الخبر', 'تبوك', 'أبها', 'حائل', 'جازان', 'القصيم', 'نجران']
 
 const detectCategory = (title: string): string => {
@@ -17,7 +17,7 @@ const detectCategory = (title: string): string => {
   if (/ترجمة|معاملة|ورقة|إداري/.test(t)) return 'مساعدة إدارية'
   if (/تسوق|شراء|منتج/.test(t)) return 'تسوق'
   if (/شرح|تعليم|دراسة/.test(t)) return 'تعليم وشرح'
-  if (/صيانة|تركيب|إصلاح/.test(t)) return 'صيانة وتركيب'
+  if (/استشارة قانونية|قانون/.test(t)) return 'استشارة قانونية'
   return ''
 }
 
