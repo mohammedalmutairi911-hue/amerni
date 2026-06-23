@@ -486,19 +486,19 @@ export function AdminPanel() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-200">
-                  {['الاسم', 'الدور', 'البريد', 'تاريخ التسجيل'].map(h => (
+                  {['الاسم', 'الدور', 'البريد', 'تاريخ التسجيل', 'إجراء'].map(h => (
                     <th key={h} className="text-right text-xs text-slate-400 font-medium px-4 py-3">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {users.map(u => (
-                  <tr key={u.id} className="border-b border-slate-200/50 hover:bg-slate-100/10 transition-colors">
-                    <td className="px-4 py-3 text-sm font-medium">{u.full_name || '—'}</td>
+                  <tr key={u.id} className="border-b border-slate-200/50 hover:bg-slate-50 transition-colors">
+                    <td className="px-4 py-3 text-sm font-medium text-slate-900">{u.full_name || '—'}</td>
                     <td className="px-4 py-3">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        u.role === 'admin' ? 'bg-purple-500/20 text-purple-400' :
-                        u.role === 'worker' ? 'bg-primary-500/20 text-primary-400' :
+                        u.role === 'admin' ? 'bg-purple-100 text-purple-600' :
+                        u.role === 'worker' ? 'bg-primary-100 text-primary-600' :
                         'bg-slate-100 text-slate-500'
                       }`}>
                         {u.role === 'admin' ? 'مدير' : u.role === 'worker' ? 'عامل' : 'عميل'}
@@ -506,6 +506,21 @@ export function AdminPanel() {
                     </td>
                     <td className="px-4 py-3 text-sm text-slate-500">{u.email}</td>
                     <td className="px-4 py-3 text-sm text-slate-400">{new Date(u.created_at).toLocaleDateString('ar-SA')}</td>
+                    <td className="px-4 py-3">
+                      {u.role !== 'admin' && (
+                        <button onClick={async () => {
+                          if (!confirm(`حذف ${u.full_name || u.email}؟ هذا الإجراء لا يمكن التراجع عنه.`)) return
+                          const { error } = await supabase.rpc('admin_delete_user', { p_user_id: u.id })
+                          if (error) {
+                            alert('خطأ: ' + error.message)
+                          } else {
+                            setUsers(prev => prev.filter(x => x.id !== u.id))
+                          }
+                        }} className="text-xs text-red-500 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors font-medium">
+                          حذف
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
