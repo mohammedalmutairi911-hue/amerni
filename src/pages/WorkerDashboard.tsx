@@ -278,7 +278,7 @@ export function WorkerDashboard() {
       {/* Sidebar - Desktop - LEFT side like design */}
       <aside className="hidden md:flex flex-col h-screen fixed left-0 top-0 bg-white border-r border-slate-200 w-64 z-50 shadow-sm">
         <div className="p-6 border-b border-slate-100">
-          <h1 className="text-xl font-black text-primary-500">آمرني</h1>
+          <button onClick={() => navigate('landing')} className="text-xl font-black text-primary-500 hover:opacity-80 transition-opacity">آمرني</button>
         </div>
 
         {/* Profile */}
@@ -337,13 +337,12 @@ export function WorkerDashboard() {
       <main className="flex-1 md:mr-0 md:ml-64 min-h-screen pb-20 md:pb-0">
 
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-slate-200 px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shadow-sm">
           <div className="flex items-center gap-3">
-            {/* Mobile only */}
-            <h1 className="md:hidden text-lg font-black text-primary-500">آمرني</h1>
+            <button onClick={() => navigate('landing')} className="md:hidden text-lg font-black text-primary-500 hover:opacity-80 transition-opacity">آمرني</button>
             <div className="hidden md:block">
-              <h2 className="text-2xl font-black text-primary-500">لوحة تحكم مقدم الخدمة</h2>
-              <p className="text-slate-500 text-sm">مرحباً {profile?.full_name?.split(' ')[0]}، إليك أداءك اليوم.</p>
+              <h2 className="text-2xl font-black text-slate-900">لوحة تحكم مقدم الخدمة</h2>
+              <p className="text-slate-600 text-sm font-medium">مرحباً <span className="text-primary-500 font-bold">{profile?.full_name?.split(' ')[0]}</span>، إليك أداءك اليوم.</p>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-slate-100 px-4 py-2.5 rounded-full border border-slate-200">

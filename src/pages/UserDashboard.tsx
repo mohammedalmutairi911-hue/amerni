@@ -331,7 +331,7 @@ export function UserDashboard() {
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex flex-col h-screen fixed right-0 border-l border-slate-200 bg-slate-900 w-64 z-50">
         <div className="p-6 border-b border-slate-800">
-          <h1 className="text-xl font-black text-amber-400">آمرني</h1>
+          <button onClick={() => navigate('landing')} className="text-xl font-black text-amber-400 hover:opacity-80 transition-opacity">آمرني</button>
         </div>
 
         {/* Profile */}
@@ -377,7 +377,7 @@ export function UserDashboard() {
 
         {/* Mobile header */}
         <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-slate-900 border-b border-slate-800">
-          <h1 className="text-lg font-black text-amber-400">آمرني</h1>
+          <button onClick={() => navigate('landing')} className="text-lg font-black text-amber-400 hover:opacity-80 transition-opacity">آمرني</button>
           <div className="flex items-center gap-2">
             <button onClick={() => setShowNew(true)} className="w-9 h-9 bg-amber-400 text-slate-900 rounded-xl flex items-center justify-center">
               <Plus size={16} />
@@ -393,7 +393,10 @@ export function UserDashboard() {
           {/* Hero */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
-              <h1 className="text-3xl font-black text-slate-900 leading-tight">ملخص نشاطك</h1>
+              <p className="text-slate-500 text-sm font-medium mb-1">مرحباً بك 👋</p>
+              <h1 className="text-3xl font-black text-slate-900 leading-tight">
+                {profile?.full_name?.split(' ')[0] || 'ملخص نشاطك'}
+              </h1>
               <p className="text-slate-500 mt-1">تتبع طلباتك الحالية، ورصيد محفظتك، واكتشف الخدمات الأكثر طلباً اليوم.</p>
             </div>
             <div className="bg-white border border-slate-200 rounded-xl px-6 py-4 text-center shadow-sm min-w-[140px]">
