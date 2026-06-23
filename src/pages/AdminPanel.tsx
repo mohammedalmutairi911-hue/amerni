@@ -15,6 +15,7 @@ export function AdminPanel() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [fetchErrors, setFetchErrors] = useState<string[]>([])
 
   useEffect(() => {
     fetchAll()
@@ -57,9 +58,11 @@ export function AdminPanel() {
       supabase.from('tasks').select('*, profiles(full_name, email)').order('created_at', { ascending: false }),
       supabase.from('profiles').select('*').order('created_at', { ascending: false })
     ])
-    if (wRes.error) console.error('[Admin] workers error:', wRes.error)
-    if (tRes.error) console.error('[Admin] tasks error:', tRes.error)
-    if (uRes.error) console.error('[Admin] users error:', uRes.error)
+    const errs: string[] = []
+    if (wRes.error) { console.error('[Admin] workers:', wRes.error); errs.push('العمال: ' + wRes.error.message) }
+    if (tRes.error) { console.error('[Admin] tasks:', tRes.error); errs.push('الطلبات: ' + tRes.error.message) }
+    if (uRes.error) { console.error('[Admin] users:', uRes.error); errs.push('المستخدمون: ' + uRes.error.message) }
+    setFetchErrors(errs)
     setWorkers(wRes.data || [])
     setTasks(tRes.data || [])
     setUsers(uRes.data || [])
@@ -165,6 +168,16 @@ export function AdminPanel() {
           </div>
         </div>
       </div>
+
+      {/* Error banner */}
+      {fetchErrors.length > 0 && (
+        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-xs font-bold text-red-600 mb-1">⚠️ خطأ في تحميل البيانات:</p>
+            {fetchErrors.map((e, i) => <p key={i} className="text-xs text-red-500 font-mono">{e}</p>)}
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="border-b border-slate-200 bg-white sticky top-14 z-10">
