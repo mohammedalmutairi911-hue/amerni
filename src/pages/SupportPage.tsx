@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { Send, Loader2, Bot, User, Headphones, ArrowLeft } from 'lucide-react'
+import { Send, Loader2, Headphones, ArrowLeft } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 
 interface Msg {
   role: 'user' | 'assistant'
@@ -35,25 +36,13 @@ export function SupportPage() {
     setLoading(true)
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 400,
-          system: SYSTEM,
-          messages: newMsgs.map(m => ({ role: m.role, content: m.content })).slice(-10)
-        })
+      const { data, error } = await supabase.functions.invoke('support-chat', {
+        body: { messages: newMsgs.map(m => ({ role: m.role, content: m.content })) }
       })
-      if (res.ok) {
-        const data = await res.json()
-        const reply = data.content?.[0]?.text || 'عذراً، ما قدرت أساعدك الحين. سيتواصل معك الفريق قريباً.'
-        setMsgs(p => [...p, { role: 'assistant', content: reply }])
-      } else {
-        setMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت. سيتواصل معك الفريق قريباً.' }])
-      }
+      if (error) throw error
+      setMsgs(p => [...p, { role: 'assistant', content: data.reply }])
     } catch {
-      setMsgs(p => [...p, { role: 'assistant', content: 'عذراً، ما قدرت أتصل بالسيرفر. تواصل معنا على support@amerniksa.com' }])
+      setMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت. تواصل معنا على support@amerniksa.com' }])
     }
     setLoading(false)
   }
