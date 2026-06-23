@@ -189,7 +189,7 @@ export function AdminPanel() {
               }`}>
               <Icon size={14} /> {label}
               {id === 'workers' && stats.pending > 0 && (
-                <span className="bg-primary-500 text-slate-900 text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{stats.pending}</span>
+                <span className="bg-primary-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{stats.pending}</span>
               )}
               {id === 'conversations' && stats.disputed > 0 && (
                 <span className="bg-red-500 text-slate-900 text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{stats.disputed}</span>

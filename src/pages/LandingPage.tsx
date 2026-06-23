@@ -108,11 +108,11 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
       {mode === 'register' && (
         <div className="flex gap-1 bg-white rounded-xl p-1 mb-1">
           <button onClick={() => setRole('client')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'client' ? 'bg-primary-500 text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'client' ? 'bg-primary-500 text-white' : 'text-slate-500 hover:text-slate-900'}`}>
             🙋 أبي أطلب خدمة
           </button>
           <button onClick={() => setRole('worker')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'worker' ? 'bg-primary-500 text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
+            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'worker' ? 'bg-primary-500 text-white' : 'text-slate-500 hover:text-slate-900'}`}>
             🔧 أبي أقدم خدمة
           </button>
         </div>
@@ -184,7 +184,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
         <>
           {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-xl">{error}</p>}
           <button onClick={handle} disabled={loading}
-            className="w-full bg-primary-500 text-slate-900 font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             {loading && <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />}
             {mode === 'login' ? 'دخول' : 'إنشاء حساب'}
           </button>
@@ -315,13 +315,13 @@ export function LandingPage() {
             ))}
           </div>
           {user ? (
-            <button onClick={() => navigate('dashboard')} className="bg-primary-500 text-slate-900 font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
+            <button onClick={() => navigate('dashboard')} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
               حسابي
             </button>
           ) : (
             <div className="flex items-center gap-2">
               <button onClick={() => { setAuthDirectMode('login'); setShowAuthDirect(true) }} className="text-slate-500 hover:text-slate-900 text-sm transition-colors">دخول</button>
-              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-slate-900 font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">سجّل</button>
+              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">سجّل</button>
             </div>
           )}
         </div>
@@ -329,7 +329,7 @@ export function LandingPage() {
         <div className="md:hidden flex gap-1 px-4 pb-2 overflow-x-auto">
           {TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
-              className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500 text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-900'}`}>
+              className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500 text-white font-bold' : 'text-slate-400 hover:text-slate-900'}`}>
               {tab.label}
             </button>
           ))}
@@ -380,7 +380,7 @@ export function LandingPage() {
                       className="flex-1 text-right bg-transparent text-slate-900 placeholder-slate-400 text-sm outline-none"
                     />
                     <button onClick={handleStart}
-                      className="bg-primary-500 text-slate-900 text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-colors flex-shrink-0 flex items-center gap-1.5">
+                      className="bg-primary-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-colors flex-shrink-0 flex items-center gap-1.5">
                       بحث <ArrowLeft size={14} />
                     </button>
                   </div>
@@ -468,7 +468,7 @@ export function LandingPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-slate-400">يبدأ من <span className="text-slate-900 font-bold">{price} ر.س</span></span>
                         <button onClick={() => setShowNewTask(true)}
-                          className="text-xs bg-primary-500 text-slate-900 px-3 py-1.5 rounded-lg hover:bg-primary-700 transition-colors font-bold">
+                          className="text-xs bg-primary-500 text-white px-3 py-1.5 rounded-lg hover:bg-primary-700 transition-colors font-bold">
                           احجز الآن
                         </button>
                       </div>
@@ -804,7 +804,7 @@ export function LandingPage() {
                           className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors resize-none" />
                       </div>
                       <button onClick={sendContact} disabled={contactLoading || !contactForm.name || !contactForm.email || !contactForm.message}
-                        className="w-full bg-primary-500 text-slate-900 font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+                        className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
                         {contactLoading ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                         إرسال الرسالة
                       </button>
@@ -879,7 +879,7 @@ export function LandingPage() {
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${m.role === 'assistant' ? 'bg-primary-500/10 border border-primary-500/20' : 'bg-slate-100'}`}>
                         {m.role === 'assistant' ? <Bot size={13} className="text-primary-500" /> : <span className="text-xs">أ</span>}
                       </div>
-                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === 'user' ? 'bg-primary-500 text-slate-900 rounded-tr-sm' : 'bg-slate-100 text-slate-800 rounded-tl-sm'}`}>
+                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === 'user' ? 'bg-primary-500 text-white rounded-tr-sm' : 'bg-slate-100 text-slate-800 rounded-tl-sm'}`}>
                         {m.content}
                       </div>
                     </div>
@@ -1010,7 +1010,7 @@ export function LandingPage() {
             <div className="flex gap-1 bg-white rounded-xl p-1 mb-5">
               {[{ v: 'login', l: 'دخول' }, { v: 'register', l: 'حساب جديد' }].map(({ v, l }) => (
                 <button key={v} onClick={() => setAuthDirectMode(v as any)}
-                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${authDirectMode === v ? 'bg-primary-500 text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
+                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${authDirectMode === v ? 'bg-primary-500 text-white' : 'text-slate-500 hover:text-slate-900'}`}>
                   {l}
                 </button>
               ))}
@@ -1024,7 +1024,7 @@ export function LandingPage() {
       <footer className="border-t border-slate-200 py-8 px-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-primary-500 flex items-center justify-center text-xs font-black text-slate-900">أ</div>
+            <div className="w-6 h-6 rounded-md bg-primary-500 flex items-center justify-center text-xs font-black text-white">أ</div>
             <span className="text-slate-500 text-sm font-bold">أمرني</span>
           </div>
           <p className="text-slate-400 text-xs">© ٢٠٢٦ أمرني — جميع الحقوق محفوظة</p>

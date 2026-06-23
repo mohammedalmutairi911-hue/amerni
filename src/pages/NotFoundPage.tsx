@@ -9,7 +9,7 @@ export function NotFoundPage() {
         <h1 className="text-2xl font-bold text-slate-900 mb-3">الصفحة غير موجودة</h1>
         <p className="text-slate-400 mb-8">يبدو إن الصفحة اللي تبحث عنها ما موجودة</p>
         <button onClick={() => navigate('landing')}
-          className="bg-primary-500 text-slate-900 font-bold px-8 py-3 rounded-xl hover:bg-primary-400 transition-colors">
+          className="bg-primary-500 text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-400 transition-colors">
           ارجع للرئيسية
         </button>
       </div>

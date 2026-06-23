@@ -92,7 +92,7 @@ export function WorkerProfile({ workerId }: Props) {
 
         {/* CTA */}
         <button onClick={() => navigate('dashboard')}
-          className="w-full bg-primary-500 text-slate-900 font-bold py-4 rounded-2xl text-base hover:bg-primary-400 transition-colors flex items-center justify-center gap-2 mb-3">
+          className="w-full bg-primary-500 text-white font-bold py-4 rounded-2xl text-base hover:bg-primary-400 transition-colors flex items-center justify-center gap-2 mb-3">
           <MessageSquare size={18} /> اطلب من {worker.full_name.split(' ')[0]}
         </button>
 

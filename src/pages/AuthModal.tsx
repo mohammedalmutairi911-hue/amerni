@@ -60,7 +60,7 @@ export function AuthModal() {
           {(['login', 'signup'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                tab === t ? 'bg-primary-500 text-slate-900' : 'text-slate-500 hover:text-slate-900'
+                tab === t ? 'bg-primary-500 text-white' : 'text-slate-500 hover:text-slate-900'
               }`}>
               {t === 'login' ? 'دخول' : 'حساب جديد'}
             </button>
@@ -138,7 +138,7 @@ export function AuthModal() {
             <>
               {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-lg">{error}</p>}
               <button onClick={submit} disabled={loading}
-                className="w-full bg-primary-500 text-slate-900 font-bold py-2.5 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                className="w-full bg-primary-500 text-white font-bold py-2.5 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading && <Loader2 size={15} className="animate-spin" />}
                 {tab === 'login' ? 'دخول' : 'إنشاء حساب'}
               </button>

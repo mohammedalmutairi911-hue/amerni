@@ -338,7 +338,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
 
             <button onClick={handleNext} disabled={loading}
-              className="w-full bg-primary-500 hover:bg-primary-400 text-slate-900 font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
+              className="w-full bg-primary-500 hover:bg-primary-400 text-white font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
               {loading ? <Loader2 size={18} className="animate-spin" /> : null}
               {user ? 'نشر الطلب' : 'التالي — إنشاء حساب'} <ArrowLeft size={16} />
             </button>
@@ -391,7 +391,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             <div className="flex gap-1 bg-white rounded-2xl p-1">
               {[{ v: true, l: 'حساب جديد' }, { v: false, l: 'عندي حساب' }].map(({ v, l }) => (
                 <button key={l} onClick={() => { setIsNew(v); setError('') }}
-                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${isNew === v ? 'bg-primary-500 text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
+                  className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${isNew === v ? 'bg-primary-500 text-white' : 'text-slate-500 hover:text-slate-900'}`}>
                   {l}
                 </button>
               ))}
@@ -478,7 +478,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                 <>
                   {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
                   <button onClick={handleAuth} disabled={loading}
-                    className="w-full bg-primary-500 hover:bg-primary-400 text-slate-900 font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
+                    className="w-full bg-primary-500 hover:bg-primary-400 text-white font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
                     {loading && <Loader2 size={18} className="animate-spin" />}
                     {isNew ? '✅ سجّل وانشر الطلب' : 'دخول ونشر الطلب'}
                   </button>

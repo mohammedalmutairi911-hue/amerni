@@ -65,7 +65,7 @@ export function BountiesPage() {
             <p className="text-slate-400">طلبات حية من عملاء ينتظرون — اقبل وابدأ</p>
           </div>
           <button onClick={() => navigate('dashboard')}
-            className="flex items-center gap-2 bg-primary-500 text-slate-900 font-bold px-4 py-2 rounded-xl text-sm hover:bg-primary-400 transition-colors">
+            className="flex items-center gap-2 bg-primary-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-primary-400 transition-colors">
             <Plus size={15} /> أضف طلب
           </button>
         </div>
@@ -105,7 +105,7 @@ export function BountiesPage() {
                     </div>
                   </div>
                   <button onClick={() => applyTask(task)} disabled={applying === task.id || applied.has(task.id)}
-                    className="bg-primary-500 hover:bg-primary-400 disabled:opacity-50 text-slate-900 font-bold px-5 py-2.5 rounded-xl text-sm transition-colors flex-shrink-0 flex items-center gap-1.5">
+                    className="bg-primary-500 hover:bg-primary-400 disabled:opacity-50 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors flex-shrink-0 flex items-center gap-1.5">
                     {applying === task.id ? <Loader2 size={14} className="animate-spin" /> : applied.has(task.id) ? <><CheckCircle size={14} /> قبلت</> : <><Zap size={14} /> اقبل</>}
                   </button>
                 </div>

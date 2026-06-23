@@ -66,7 +66,7 @@ export function ServiceBrowsePage({ onClose }: { onClose: () => void }) {
         <div className="flex gap-2 px-4 pb-3 overflow-x-auto">
           {CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setActiveCategory(cat)}
-              className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${activeCategory === cat ? 'bg-primary-500 text-slate-900 shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+              className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${activeCategory === cat ? 'bg-primary-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
               {cat}
             </button>
           ))}
@@ -128,7 +128,7 @@ export function ServiceBrowsePage({ onClose }: { onClose: () => void }) {
                   <span className="text-xs text-slate-400"> ر.س/ساعة</span>
                 </div>
                 <button onClick={() => setShowBooking(true)}
-                  className="bg-primary-500 text-slate-900 text-sm font-bold px-4 py-2 rounded-xl hover:bg-primary-700 transition-colors flex items-center gap-1.5">
+                  className="bg-primary-500 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-primary-700 transition-colors flex items-center gap-1.5">
                   احجز الآن <ArrowLeft size={13} />
                 </button>
               </div>

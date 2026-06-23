@@ -78,7 +78,7 @@ export function InstallPrompt() {
           </div>
         ) : deferredPrompt ? (
           <button onClick={handleInstall}
-            className="w-full bg-primary-500 text-slate-900 font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors flex items-center justify-center gap-2">
+            className="w-full bg-primary-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors flex items-center justify-center gap-2">
             <Download size={15} /> تثبيت التطبيق
           </button>
         ) : (

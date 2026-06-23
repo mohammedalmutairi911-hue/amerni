@@ -88,7 +88,7 @@ export function ReferralPage() {
           </div>
           <div className="flex gap-2">
             <button onClick={shareLink}
-              className="flex-1 flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-400 text-slate-900 font-bold py-3 rounded-xl text-sm transition-colors">
+              className="flex-1 flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-400 text-white font-bold py-3 rounded-xl text-sm transition-colors">
               <Share2 size={16} /> شارك الرابط
             </button>
             <button onClick={copyLink}
@@ -109,7 +109,7 @@ export function ReferralPage() {
               { n: '٤', text: 'ما في حد أقصى — كلما أحلت أكثر كسبت أكثر' },
             ].map(({ n, text }) => (
               <div key={n} className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0 text-slate-900 text-xs font-black">{n}</div>
+                <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0 text-white text-xs font-black">{n}</div>
                 <p className="text-sm text-slate-600">{text}</p>
               </div>
             ))}

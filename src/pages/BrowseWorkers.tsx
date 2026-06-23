@@ -97,7 +97,7 @@ export function BrowseWorkers() {
 
         {/* CTA */}
         <button onClick={() => { if (user) navigate('dashboard'); else navigate('landing') }}
-          className="w-full bg-primary-500 text-slate-900 font-bold py-4 rounded-2xl text-base hover:bg-primary-400 transition-colors flex items-center justify-center gap-2">
+          className="w-full bg-primary-500 text-white font-bold py-4 rounded-2xl text-base hover:bg-primary-400 transition-colors flex items-center justify-center gap-2">
           <MessageSquare size={18} /> اطلب من {selectedWorker.full_name.split(' ')[0]}
         </button>
       </div>
@@ -126,7 +126,7 @@ export function BrowseWorkers() {
             </div>
             {SKILLS.map(s => (
               <button key={s} onClick={() => setSkillFilter(s)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${skillFilter === s ? 'bg-primary-500 text-slate-900' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${skillFilter === s ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
                 {s}
               </button>
             ))}

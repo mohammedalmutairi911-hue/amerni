@@ -173,7 +173,7 @@ export function WorkerRegister({ onSuccess }: Props) {
             <div key={i} className="flex items-center gap-1">
               <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 i + 1 < step ? 'bg-secondary-500/20 text-secondary-400' :
-                i + 1 === step ? 'bg-primary-500 text-slate-900' :
+                i + 1 === step ? 'bg-primary-500 text-white' :
                 'bg-slate-100 text-slate-400'
               }`}>
                 {i + 1 < step ? <CheckCircle size={12} /> : <span>{i + 1}</span>}
@@ -332,12 +332,12 @@ export function WorkerRegister({ onSuccess }: Props) {
             )}
             {step < 4 ? (
               <button onClick={next}
-                className="flex-1 bg-primary-500 text-slate-900 font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors">
+                className="flex-1 bg-primary-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors">
                 التالي
               </button>
             ) : (
               <button onClick={submit} disabled={loading}
-                className="flex-1 bg-primary-500 text-slate-900 font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                className="flex-1 bg-primary-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading && <Loader2 size={15} className="animate-spin" />}
                 أرسل طلب التسجيل
               </button>

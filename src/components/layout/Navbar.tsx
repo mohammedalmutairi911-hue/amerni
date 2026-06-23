@@ -98,7 +98,7 @@ export function Navbar() {
                 دخول
               </button>
               <button onClick={() => openAuth('signup')}
-                className="text-sm bg-primary-500 text-slate-900 font-bold px-4 py-1.5 rounded-lg hover:bg-primary-600 transition-colors">
+                className="text-sm bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg hover:bg-primary-600 transition-colors">
                 سجّل
               </button>
               <button onClick={() => navigate('join')}

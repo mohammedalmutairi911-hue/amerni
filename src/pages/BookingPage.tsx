@@ -55,7 +55,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
           </div>
         </div>
         <button onClick={() => { navigate('dashboard'); onClose() }}
-          className="w-full bg-primary-500 text-slate-900 font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors">
+          className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors">
           متابعة الطلب
         </button>
       </div>
@@ -84,7 +84,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
         <div className="max-w-2xl mx-auto flex justify-between text-xs">
           {['تفاصيل الخدمة', 'الموقع والتواصل', 'الدفع والتأكيد'].map((s, i) => (
             <div key={s} className={`flex items-center gap-1.5 ${i+1 === step ? 'text-primary-500 font-bold' : i+1 < step ? 'text-secondary-500' : 'text-slate-400'}`}>
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i+1 === step ? 'bg-primary-500 text-slate-900' : i+1 < step ? 'bg-secondary-500 text-slate-900' : 'bg-slate-200 text-slate-400'}`}>
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i+1 === step ? 'bg-primary-500 text-white' : i+1 < step ? 'bg-secondary-500 text-slate-900' : 'bg-slate-200 text-slate-400'}`}>
                 {i+1 < step ? '✓' : i+1}
               </div>
               <span className="hidden sm:block">{s}</span>
@@ -105,7 +105,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
               <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
                 {DAYS.map((d, i) => (
                   <button key={d} onClick={() => setSelectedDay(i)}
-                    className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-medium transition-all ${selectedDay === i ? 'bg-primary-500 text-slate-900' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                    className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-medium transition-all ${selectedDay === i ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
                     {d}
                   </button>
                 ))}
@@ -115,7 +115,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
               <div className="flex flex-wrap gap-2 mb-5">
                 {DATES.map((d, i) => (
                   <button key={d} onClick={() => setSelectedDate(i)}
-                    className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${selectedDate === i ? 'bg-primary-500 text-slate-900' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                    className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${selectedDate === i ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
                     {d}
                   </button>
                 ))}
@@ -126,7 +126,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
               <div className="grid grid-cols-3 gap-2">
                 {TIMES.map(t => (
                   <button key={t} onClick={() => setSelectedTime(t)}
-                    className={`py-2.5 rounded-xl text-sm font-medium transition-all text-center ${selectedTime === t ? 'bg-primary-500 text-slate-900' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                    className={`py-2.5 rounded-xl text-sm font-medium transition-all text-center ${selectedTime === t ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
                     {t}
                   </button>
                 ))}
@@ -134,7 +134,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
             </div>
 
             <button onClick={() => setStep(2)} disabled={!selectedTime}
-              className="w-full bg-primary-500 text-slate-900 font-bold py-4 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+              className="w-full bg-primary-500 text-white font-bold py-4 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
               المتابعة للموقع <ArrowLeft size={16} />
             </button>
           </div>
@@ -182,7 +182,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
                 <ArrowRight size={16} /> العودة
               </button>
               <button onClick={() => setStep(3)} disabled={!name || !phone}
-                className="flex-[2] bg-primary-500 text-slate-900 font-bold py-4 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+                className="flex-[2] bg-primary-500 text-white font-bold py-4 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
                 مراجعة الحجز <ArrowLeft size={16} />
               </button>
             </div>
@@ -270,7 +270,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
                 <ArrowRight size={16} /> العودة
               </button>
               <button onClick={() => setConfirmed(true)}
-                className="flex-[2] bg-primary-500 text-slate-900 font-bold py-4 rounded-xl hover:bg-primary-700 transition-colors flex items-center justify-center gap-2">
+                className="flex-[2] bg-primary-500 text-white font-bold py-4 rounded-xl hover:bg-primary-700 transition-colors flex items-center justify-center gap-2">
                 تأكيد الحجز النهائي <CheckCircle size={16} />
               </button>
             </div>
