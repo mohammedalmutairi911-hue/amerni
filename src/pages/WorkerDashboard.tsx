@@ -344,7 +344,9 @@ export function WorkerDashboard() {
             <button onClick={() => navigate('landing')} className="md:hidden text-lg font-black text-primary-500 hover:opacity-80 transition-opacity">آمرني</button>
             <div className="hidden md:block">
               <h2 className="text-2xl font-black text-slate-900">لوحة تحكم مقدم الخدمة</h2>
-              <p className="text-slate-600 text-sm font-medium">مرحباً <span className="text-primary-500 font-bold">{profile?.full_name?.split(' ')[0]}</span>، إليك أداءك اليوم.</p>
+              <p className="text-slate-600 text-sm font-medium mt-0.5">
+                مرحباً <span className="text-primary-500 font-bold">{profile?.full_name?.split(' ')[0]}</span> 👋 — إليك أداءك اليوم
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-slate-100 px-4 py-2.5 rounded-full border border-slate-200">
@@ -361,6 +363,13 @@ export function WorkerDashboard() {
         </header>
 
         <div className="p-4 md:p-8 space-y-6">
+
+          {/* Mobile Welcome */}
+          <div className="md:hidden bg-primary-50 border border-primary-100 rounded-2xl px-5 py-4">
+            <p className="text-slate-500 text-xs mb-0.5">مرحباً 👋</p>
+            <h2 className="text-xl font-black text-slate-900">{profile?.full_name?.split(' ')[0]}</h2>
+            <p className="text-slate-500 text-xs mt-0.5">إليك أداءك اليوم</p>
+          </div>
 
           {/* Overview Tab */}
           {tab === 'overview' && (
