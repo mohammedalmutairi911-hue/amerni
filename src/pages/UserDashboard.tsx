@@ -28,6 +28,10 @@ const QUICK_SERVICES = [
   { icon: '🚗', label: 'توصيل' },
   { icon: '📸', label: 'تصوير' },
   { icon: '🛍️', label: 'تسوق' },
+  { icon: '📚', label: 'تعليم' },
+  { icon: '⚖️', label: 'استشارات' },
+  { icon: '🎉', label: 'تنسيق حفلات' },
+  { icon: '🤝', label: 'مساعدة إدارية' },
   { icon: '✨', label: 'أخرى' },
 ]
 
@@ -455,12 +459,12 @@ export function UserDashboard() {
                   {/* Quick Services */}
                   <div>
                     <p className="text-xs text-slate-400 mb-2 font-medium">خدمات سريعة</p>
-                    <div className="grid grid-cols-4 gap-3">
+                    <div className="grid grid-cols-4 gap-2">
                       {QUICK_SERVICES.map(({ icon, label }) => (
                         <button key={label} onClick={() => setShowNew(true)}
-                          className="bg-white border border-slate-200 rounded-2xl p-4 text-center hover:border-primary-500 hover:shadow-md transition-all group">
-                          <div className="text-2xl mb-1.5 group-hover:scale-110 transition-transform">{icon}</div>
-                          <p className="text-xs font-semibold text-slate-700">{label}</p>
+                          className="bg-white border border-slate-200 rounded-xl p-3 text-center hover:border-primary-500 hover:shadow-md transition-all group">
+                          <div className="text-2xl mb-1 group-hover:scale-110 transition-transform">{icon}</div>
+                          <p className="text-xs font-semibold text-slate-700 leading-tight">{label}</p>
                         </button>
                       ))}
                     </div>
