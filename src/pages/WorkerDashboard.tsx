@@ -5,6 +5,7 @@ import { requestNotificationPermission, sendLocalNotification, registerServiceWo
 import { useAuth } from '../contexts/AuthContext'
 import { Task, WorkerProfile } from '../types'
 import { Chat } from '../components/chat/Chat'
+import { useToast } from '../components/Toast'
 
 const STATUS_LABEL: Record<string, string> = { open: 'مفتوح', in_progress: 'جاري', pending_confirmation: 'بانتظار تأكيد العميل', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع' }
 const STATUS_COLOR: Record<string, string> = {
@@ -18,6 +19,7 @@ const STATUS_COLOR: Record<string, string> = {
 
 export function WorkerDashboard() {
   const { user, profile } = useAuth()
+  const { toast } = useToast()
   const [tab, setTab] = useState<'overview' | 'feed' | 'my-tasks' | 'chat' | 'profile'>('overview')
   const [workerProfile, setWorkerProfile] = useState<WorkerProfile | null>(null)
   const [feedTasks, setFeedTasks] = useState<Task[]>([])
@@ -83,14 +85,14 @@ export function WorkerDashboard() {
       p_task_id: pendingTask.id,
       p_worker_price: (pendingTask as any).price_suggested || null,
     })
-    if (error) { alert('خطأ: ' + error.message); setAccepting(null); setPendingTask(null); return }
+    if (error) { toast('خطأ في قبول الطلب: ' + error.message, 'error'); setAccepting(null); setPendingTask(null); return }
     await fetchFeedTasks(); await fetchMyTasks()
     setAccepting(null); setPendingTask(null); setTab('my-tasks')
   }
 
   const submitCompletion = async () => {
     if (!completingTask) return
-    if (!priceOffer || Number(priceOffer) <= 0) { alert('أضف السعر أولاً'); return }
+    if (!priceOffer || Number(priceOffer) <= 0) { toast('أضف السعر أولاً', 'warning'); return }
     setUploadingProof(true)
 
     const { error } = await supabase.rpc('submit_task_completion', {
@@ -98,7 +100,7 @@ export function WorkerDashboard() {
       p_completion_note: proofNote || 'تم الإنجاز',
       p_completion_proof: proofUrl || null,
     })
-    if (error) { alert('خطأ: ' + error.message); setUploadingProof(false); return }
+    if (error) { toast('خطأ: ' + error.message, 'error'); setUploadingProof(false); return }
 
     // اقتراح السعر
     await supabase.rpc('propose_price', {

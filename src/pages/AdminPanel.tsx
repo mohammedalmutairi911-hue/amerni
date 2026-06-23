@@ -187,22 +187,45 @@ export function AdminPanel() {
         {/* Overview */}
         {tab === 'overview' && (
           <div className="space-y-6">
+            {/* KPI Cards */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { label: 'المستخدمون', value: stats.users, color: 'text-slate-900' },
-                { label: 'عمال نشطون', value: stats.workers, color: 'text-secondary-400' },
-                { label: 'بانتظار موافقة', value: stats.pending, color: 'text-primary-400' },
-                { label: 'طلبات جارية', value: stats.activeTasks, color: 'text-blue-400' },
-                { label: 'طلبات مفتوحة', value: stats.openTasks, color: 'text-primary-400' },
-                { label: 'طلبات مكتملة', value: stats.completed, color: 'text-secondary-400' },
-                { label: 'نزاعات', value: stats.disputed, color: 'text-red-400' },
-                { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-slate-900' },
-              ].map(({ label, value, color }) => (
-                <div key={label} className="bg-white border border-slate-200 rounded-xl p-5">
-                  <div className={`text-2xl font-black mb-1 ${color}`}>{value}</div>
+                { label: 'إجمالي المستخدمين', value: stats.users, color: 'text-slate-900', bg: 'bg-white', icon: '👥' },
+                { label: 'عمال نشطون', value: stats.workers, color: 'text-secondary-500', bg: 'bg-secondary-50', icon: '✅' },
+                { label: 'بانتظار موافقة', value: stats.pending, color: 'text-amber-500', bg: 'bg-amber-50', icon: '⏳' },
+                { label: 'نزاعات مفتوحة', value: stats.disputed, color: 'text-red-500', bg: 'bg-red-50', icon: '⚠️' },
+                { label: 'طلبات مفتوحة', value: stats.openTasks, color: 'text-blue-500', bg: 'bg-blue-50', icon: '📬' },
+                { label: 'طلبات جارية', value: stats.activeTasks, color: 'text-primary-500', bg: 'bg-primary-50', icon: '⚡' },
+                { label: 'طلبات مكتملة', value: stats.completed, color: 'text-green-500', bg: 'bg-green-50', icon: '✔️' },
+                { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-slate-900', bg: 'bg-slate-50', icon: '📊' },
+              ].map(({ label, value, color, bg, icon }) => (
+                <div key={label} className={`${bg} border border-slate-200 rounded-2xl p-5 shadow-sm`}>
+                  <div className="text-2xl mb-2">{icon}</div>
+                  <div className={`text-3xl font-black mb-1 ${color}`}>{value}</div>
                   <div className="text-sm text-slate-500">{label}</div>
                 </div>
               ))}
+            </div>
+
+            {/* Revenue Analytics */}
+            <div className="grid sm:grid-cols-3 gap-4">
+              {(() => {
+                const completed = tasks.filter(t => t.status === 'completed')
+                const totalRevenue = completed.reduce((s, t) => s + (t.price_final || t.price_suggested || 0), 0)
+                const totalCommission = totalRevenue * 0.02
+                const avgOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0
+                return [
+                  { label: 'إجمالي قيمة الخدمات', value: `${totalRevenue.toLocaleString()} ر.س`, color: 'text-slate-900', icon: '💰' },
+                  { label: 'عمولة المنصة (2%)', value: `${totalCommission.toFixed(0)} ر.س`, color: 'text-primary-500', icon: '🏦' },
+                  { label: 'متوسط قيمة الطلب', value: `${avgOrderValue.toFixed(0)} ر.س`, color: 'text-secondary-500', icon: '📈' },
+                ].map(({ label, value, color, icon }) => (
+                  <div key={label} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div className="text-3xl mb-3">{icon}</div>
+                    <div className={`text-2xl font-black ${color}`}>{value}</div>
+                    <div className="text-sm text-slate-500 mt-1">{label}</div>
+                  </div>
+                ))
+              })()}
             </div>
 
             {/* Top cities & categories */}

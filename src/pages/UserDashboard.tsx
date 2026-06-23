@@ -6,6 +6,7 @@ import { useApp } from '../contexts/AppContext'
 import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
 import { Chat } from '../components/chat/Chat'
+import { useToast } from '../components/Toast'
 
 const STATUS_LABEL: Record<string, string> = {
   open: 'بانتظار مقدم خدمة',
@@ -38,6 +39,7 @@ const QUICK_SERVICES = [
 export function UserDashboard() {
   const { user, profile } = useAuth()
   const { navigate } = useApp()
+  const { toast } = useToast()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [showNew, setShowNew] = useState(false)
@@ -93,7 +95,7 @@ export function UserDashboard() {
     setConfirmingPayment(true)
     const { error } = await supabase.rpc('confirm_task_completion', { p_task_id: taskId })
     if (error) {
-      alert('خطأ: ' + error.message)
+      toast('خطأ: ' + error.message, 'error')
     } else {
       await fetchTasks()
       // لو الطلب مفتوح في التفاصيل — نحدثه ونعرض الفاتورة
@@ -594,6 +596,23 @@ export function UserDashboard() {
                 <p className="text-blue-100 text-sm mb-1">إجمالي ما صرفته</p>
                 <p className="text-4xl font-black">{totalSpent.toLocaleString()} <span className="text-xl">ر.س</span></p>
                 <p className="text-blue-100 text-xs mt-2">على {completedTasks.length} طلب مكتمل</p>
+              </div>
+
+              {/* Referral */}
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-5">
+                <h3 className="font-bold text-slate-900 mb-1">🎁 ادعُ أصدقاءك</h3>
+                <p className="text-slate-500 text-sm mb-3">شارك رابط الدعوة واكسب مكافأة على كل طلب يكملونه</p>
+                <div className="flex gap-2">
+                  <div className="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-slate-600 font-mono truncate">
+                    amerniksa.com?ref={user?.id?.slice(0,8)}
+                  </div>
+                  <button onClick={() => {
+                    navigator.clipboard.writeText(`https://amerniksa.com?ref=${user?.id?.slice(0,8)}`)
+                    toast('✅ تم نسخ الرابط!', 'success')
+                  }} className="bg-amber-400 text-slate-900 font-bold px-4 py-2 rounded-xl text-sm hover:bg-amber-500 transition-colors flex-shrink-0">
+                    نسخ
+                  </button>
+                </div>
               </div>
 
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">

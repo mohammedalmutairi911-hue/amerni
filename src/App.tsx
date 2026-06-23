@@ -19,6 +19,7 @@ import { WorkerProfile } from './pages/WorkerProfile'
 import { InstallPrompt } from './components/InstallPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { ToastProvider } from './components/Toast'
 
 // Handle worker profile URL param
 const urlParams = new URLSearchParams(window.location.search)
@@ -72,14 +73,7 @@ export default function App() {
 
   useEffect(() => {
     if (!user || !profile) { setWorkerApproved(null); setWorkerExists(null); return }
-    
-    // أدمن — روح للوحة الإدارة تلقائياً من أي صفحة
-    if (profile.role === 'admin' && page !== 'landing' && page !== 'admin') {
-      navigate('admin')
-      return
-    }
-    
-    // عامل — تحقق من البروفايل
+    if (profile.role === 'admin' && page !== 'landing' && page !== 'admin') { navigate('admin'); return }
     if (profile.role === 'worker') {
       setChecking(true)
       supabase.from('worker_profiles').select('id, is_approved').eq('user_id', user.id).maybeSingle()
@@ -92,57 +86,51 @@ export default function App() {
     }
   }, [user?.id, profile?.role])
 
-  // Timeout fallback for mobile - if loading too long, show landing page
   if (loading || (profile?.role === 'worker' && checking)) return <PageLoader />
 
-  if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
+  const renderContent = () => {
+    if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
 
-  // صفحات مشتركة
-  if (page === 'support') return <><Navbar /><SupportPage /></>
-  if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
-  if (page === 'bounties') return <><Navbar /><BountiesPage /></>
-  if (page === 'referral') return <><Navbar /><ReferralPage /></>
-  if (page === 'join') return <JoinPage />
-  if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
+    if (page === 'support') return <><Navbar /><SupportPage /></>
+    if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
+    if (page === 'bounties') return <><Navbar /><BountiesPage /></>
+    if (page === 'referral') return <><Navbar /><ReferralPage /></>
+    if (page === 'join') return <JoinPage />
+    if (page === 'earn') return <><Navbar /><JoinPage /></>
+    if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
 
-  // أدمن — دائماً يروح لوحة الإدارة
-  if (profile.role === 'admin') {
-    if (page === 'landing') return <><Navbar /><LandingPage /></>
-    return <><Navbar /><AdminPanel /></>
-  }
+    if (profile.role === 'admin') {
+      if (page === 'landing') return <><Navbar /><LandingPage /></>
+      return <><Navbar /><AdminPanel /></>
+    }
 
-  // عامل
-  if (profile.role === 'worker') {
-    if (!workerExists) return (
-      <><Navbar /><WorkerRegister onSuccess={async () => {
-        await refreshProfile()
-        setWorkerExists(true)
-        setWorkerApproved(false)
-      }} /></>
-    )
-    if (!workerApproved) return (
-      <div className="min-h-screen bg-slate-50 pt-14 flex items-center justify-center px-4">
-        <div className="max-w-sm text-center bg-white border border-slate-200 rounded-2xl p-10">
-          <div className="text-5xl mb-5">⏳</div>
-          <h2 className="text-xl font-bold mb-3">طلبك قيد المراجعة</h2>
-          <p className="text-slate-400 text-sm leading-relaxed mb-6">فريق أمرني راح يراجع بياناتك ويوافق عليك قريباً.</p>
-          <button onClick={async () => {
-            setChecking(true)
-            const { data } = await supabase.from('worker_profiles').select('is_approved').eq('user_id', user.id).single()
-            setWorkerApproved(data?.is_approved || false)
-            if (data?.is_approved) navigate('worker')
-            setChecking(false)
-          }} className="text-sm text-primary-400 border border-primary-500/30 px-5 py-2 rounded-xl hover:bg-primary-500/10 transition-colors">
-            {checking ? 'جاري التحقق...' : 'تحقق من الحالة'}
-          </button>
+    if (profile.role === 'worker') {
+      if (!workerExists) return <><Navbar /><WorkerRegister onSuccess={async () => { await refreshProfile(); setWorkerExists(true); setWorkerApproved(false) }} /></>
+      if (!workerApproved) return (
+        <div className="min-h-screen bg-slate-50 pt-14 flex items-center justify-center px-4">
+          <div className="max-w-sm text-center bg-white border border-slate-200 rounded-2xl p-10 shadow-sm">
+            <div className="text-5xl mb-5">⏳</div>
+            <h2 className="text-xl font-bold text-slate-900 mb-3">طلبك قيد المراجعة</h2>
+            <p className="text-slate-400 text-sm leading-relaxed mb-6">فريق آمرني سيراجع بياناتك ويوافق عليك قريباً.</p>
+            <button onClick={async () => {
+              setChecking(true)
+              const { data } = await supabase.from('worker_profiles').select('is_approved').eq('user_id', user.id).single()
+              setWorkerApproved(data?.is_approved || false)
+              if (data?.is_approved) navigate('worker')
+              setChecking(false)
+            }} className="text-sm text-primary-500 border border-primary-200 px-5 py-2 rounded-xl hover:bg-primary-50 transition-colors">
+              {checking ? 'جاري التحقق...' : 'تحقق من الحالة'}
+            </button>
+          </div>
         </div>
-      </div>
-    )
-    if (page === 'dashboard') return <><Navbar /><UserDashboard /></>
-    return <><Navbar /><WorkerDashboard /></>
+      )
+      if (page === 'dashboard') return <><Navbar /><UserDashboard /></>
+      return <><Navbar /><WorkerDashboard /></>
+    }
+
+    if (page === 'landing') return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
+    return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
   }
 
-  // عميل
-  if (page === 'landing') return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
-  return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
+  return <ToastProvider>{renderContent()}</ToastProvider>
 }

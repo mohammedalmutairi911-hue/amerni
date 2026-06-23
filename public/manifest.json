@@ -1,28 +1,16 @@
 {
-  "name": "أمرني",
-  "short_name": "أمرني",
-  "description": "اطلب أي شيء — ننجزه لك",
+  "name": "آمرني — اطلب أي خدمة",
+  "short_name": "آمرني",
+  "description": "منصة سعودية تربطك بمقدمي خدمات موثوقين",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#080808",
-  "theme_color": "#f59e0b",
+  "background_color": "#ffffff",
+  "theme_color": "#1E3A8A",
   "orientation": "portrait",
   "lang": "ar",
   "dir": "rtl",
   "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "categories": ["lifestyle", "productivity"],
-  "screenshots": []
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
 }
