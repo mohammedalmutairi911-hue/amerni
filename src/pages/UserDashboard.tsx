@@ -37,7 +37,7 @@ const QUICK_SERVICES = [
 ]
 
 export function UserDashboard() {
-  const { user, profile } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const { navigate } = useApp()
   const { toast } = useToast()
   const [tasks, setTasks] = useState<Task[]>([])
@@ -361,8 +361,8 @@ export function UserDashboard() {
             className="w-full bg-amber-400 text-slate-900 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-amber-500 transition-colors text-sm">
             <Plus size={16} /> طلب خدمة جديدة
           </button>
-          <button onClick={() => navigate('landing')} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-slate-500 hover:text-slate-300 transition-colors text-sm">
-            <LogOut size={15} /> خروج
+          <button onClick={async () => { await signOut(); navigate('landing') }} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-slate-500 hover:text-red-400 transition-colors text-sm">
+            <LogOut size={15} /> تسجيل الخروج
           </button>
         </div>
       </aside>
@@ -657,6 +657,11 @@ export function UserDashboard() {
             {badge > 0 && <span className="absolute top-0 right-2 w-4 h-4 bg-purple-500 text-white rounded-full text-[9px] flex items-center justify-center font-bold">{badge}</span>}
           </button>
         ))}
+        <button onClick={async () => { await signOut(); navigate('landing') }}
+          className="flex flex-col items-center gap-1 px-4 py-1 text-red-400 transition-all">
+          <LogOut size={20} />
+          <span className="text-[10px] font-medium">خروج</span>
+        </button>
       </nav>
     </div>
   )

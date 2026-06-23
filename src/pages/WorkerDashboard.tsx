@@ -18,7 +18,7 @@ const STATUS_COLOR: Record<string, string> = {
 }
 
 export function WorkerDashboard() {
-  const { user, profile } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const { toast } = useToast()
   const [tab, setTab] = useState<'overview' | 'feed' | 'my-tasks' | 'chat' | 'profile'>('overview')
   const [workerProfile, setWorkerProfile] = useState<WorkerProfile | null>(null)
@@ -327,10 +327,12 @@ export function WorkerDashboard() {
             }`}>
             {toggling ? <Loader2 size={14} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={14} /> متاح الآن</> : <><WifiOff size={14} /> غير متاح</>}
           </button>
-          <div className="flex gap-2 text-xs text-slate-400 justify-center">
-            <button className="hover:text-slate-600">مركز المساعدة</button>
-            <span>•</span>
-            <button className="hover:text-slate-600">تسجيل الخروج</button>
+          <div className="flex gap-2 text-xs justify-center">
+            <button onClick={() => navigate('support')} className="text-slate-400 hover:text-slate-600">مركز المساعدة</button>
+            <span className="text-slate-300">•</span>
+            <button onClick={async () => { await signOut(); navigate('landing') }} className="text-red-400 hover:text-red-500 font-medium flex items-center gap-1">
+              <LogOut size={11} /> تسجيل الخروج
+            </button>
           </div>
         </div>
       </aside>
@@ -678,7 +680,6 @@ export function WorkerDashboard() {
           { id: 'feed', icon: Zap, label: 'متاحة' },
           { id: 'my-tasks', icon: Briefcase, label: 'طلباتي' },
           { id: 'chat', icon: MessageSquare, label: 'المحادثات' },
-          { id: 'profile', icon: User, label: 'حسابي' },
         ].map(({ id, icon: Icon, label }) => (
           <button key={id} onClick={() => setTab(id as any)}
             className={`flex flex-col items-center gap-1 px-2 transition-all ${tab === id ? 'text-primary-500' : 'text-slate-400'}`}>
@@ -686,6 +687,11 @@ export function WorkerDashboard() {
             <span className="text-[10px] font-medium">{label}</span>
           </button>
         ))}
+        <button onClick={async () => { await signOut(); navigate('landing') }}
+          className="flex flex-col items-center gap-1 px-2 text-red-400">
+          <LogOut size={20} />
+          <span className="text-[10px] font-medium">خروج</span>
+        </button>
       </nav>
     </div>
   )
