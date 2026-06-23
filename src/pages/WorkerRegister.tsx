@@ -134,8 +134,8 @@ export function WorkerRegister({ onSuccess }: Props) {
 
       if (err) throw new Error(err.message)
 
-      // Update role to worker - user can only update their own role
-      await supabase.from('profiles').update({ role: 'worker' }).eq('id', user!.id).eq('role', 'client')
+      // Update role to worker via secure RPC
+      await supabase.rpc('set_role_to_worker')
       
       // إشعار الأدمن بعامل جديد
       const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
