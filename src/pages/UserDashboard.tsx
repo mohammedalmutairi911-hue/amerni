@@ -73,7 +73,10 @@ export function UserDashboard() {
     if (!selectedTask || !user) return
     setConfirmingPayment(true)
     const { error } = await supabase.rpc('confirm_task_completion', { p_task_id: selectedTask.id })
-    if (!error) {
+    if (error) {
+      alert('خطأ: ' + error.message)
+      console.error('confirm error full:', error)
+    } else {
       setSelectedTask(p => p ? { ...p, status: 'completed' } : null)
       fetchTasks()
     }
@@ -343,9 +346,13 @@ export function UserDashboard() {
                             <button onClick={async (e) => {
                               e.stopPropagation()
                               setConfirmingPayment(true)
-                              const { error } = await supabase.rpc('confirm_task_completion', { p_task_id: task.id })
-                              if (!error) {
+                              const { data, error } = await supabase.rpc('confirm_task_completion', { p_task_id: task.id })
+                              if (error) {
+                                alert('خطأ: ' + error.message)
+                                console.error('confirm error:', error)
+                              } else {
                                 setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: 'completed' } : t))
+                                alert('✅ تم تأكيد استلام الخدمة!')
                               }
                               setConfirmingPayment(false)
                             }} disabled={confirmingPayment}
