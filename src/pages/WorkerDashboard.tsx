@@ -31,6 +31,7 @@ export function WorkerDashboard() {
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
   const [proofUrl, setProofUrl] = useState('')
   const [proofNote, setProofNote] = useState('')
+  const [priceOffer, setPriceOffer] = useState('')
   const [uploadingProof, setUploadingProof] = useState(false)
   const [cityFilter, setCityFilter] = useState('smart')
 
@@ -89,12 +90,29 @@ export function WorkerDashboard() {
 
   const submitCompletion = async () => {
     if (!completingTask) return
+    if (!priceOffer || Number(priceOffer) <= 0) { alert('أضف السعر أولاً'); return }
     setUploadingProof(true)
+
     const { error } = await supabase.rpc('submit_task_completion', {
-      p_task_id: completingTask.id, p_completion_note: proofNote, p_completion_proof: proofUrl || null,
+      p_task_id: completingTask.id,
+      p_completion_note: proofNote || 'تم الإنجاز',
+      p_completion_proof: proofUrl || null,
     })
     if (error) { alert('خطأ: ' + error.message); setUploadingProof(false); return }
-    await fetchMyTasks(); setUploadingProof(false); setCompletingTask(null); setProofUrl(''); setProofNote('')
+
+    // اقتراح السعر
+    await supabase.rpc('propose_price', {
+      p_task_id: completingTask.id,
+      p_price: Number(priceOffer),
+      p_note: proofNote || null,
+    })
+
+    await fetchMyTasks()
+    setUploadingProof(false)
+    setCompletingTask(null)
+    setProofUrl('')
+    setProofNote('')
+    setPriceOffer('')
   }
 
   const toggleOnline = async () => {
@@ -178,18 +196,73 @@ export function WorkerDashboard() {
   if (completingTask) return (
     <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4">
       <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl">
-        <h3 className="text-lg font-bold text-slate-900 mb-1">إنهاء الطلب</h3>
-        <p className="text-slate-500 text-sm mb-4">أضف ملاحظة كدليل على الإنجاز</p>
+        <h3 className="text-lg font-bold text-slate-900 mb-1">إنهاء الطلب وتسليمه</h3>
+        <p className="text-slate-500 text-sm mb-4">أضف السعر وملاحظة وارفع إثبات الإنجاز</p>
+
+        {/* السعر - إلزامي */}
+        <div className="mb-3">
+          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+            💰 السعر المقترح <span className="text-red-400">*</span>
+          </label>
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus-within:border-primary-500 transition-colors">
+            <input
+              type="number" min="1"
+              value={priceOffer} onChange={e => setPriceOffer(e.target.value)}
+              placeholder="0"
+              className="flex-1 bg-transparent text-sm outline-none font-bold text-slate-900"
+            />
+            <span className="text-slate-400 text-sm">ريال</span>
+          </div>
+          {completingTask.price_suggested && (
+            <p className="text-xs text-slate-400 mt-1">سعر العميل المقترح: {completingTask.price_suggested} ريال</p>
+          )}
+        </div>
+
         <textarea value={proofNote} onChange={e => setProofNote(e.target.value)}
-          placeholder="ملاحظة للعميل..." rows={3}
+          placeholder="ملاحظة للعميل — صف ما أنجزته..." rows={3}
           className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none resize-none mb-3 focus:border-primary-500 transition-colors" />
-        <input value={proofUrl} onChange={e => setProofUrl(e.target.value)}
-          placeholder="رابط صورة الإنجاز (اختياري)"
-          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none mb-4 focus:border-primary-500 transition-colors" />
+
+        {/* File/Image upload */}
+        <div className="mb-4">
+          <label className="block text-xs font-semibold text-slate-600 mb-2">إرفاق صورة أو ملف (اختياري)</label>
+          <div className="flex gap-2">
+            <label className="flex-1 flex items-center justify-center gap-2 bg-slate-50 border-2 border-dashed border-slate-300 hover:border-primary-500 rounded-xl py-3 cursor-pointer transition-colors">
+              <input type="file" accept="image/*,.pdf,.doc,.docx" className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  const ext = file.name.split('.').pop()
+                  const path = `completions/${completingTask.id}/${Date.now()}.${ext}`
+                  const { error } = await supabase.storage.from('chat-media').upload(path, file)
+                  if (!error) {
+                    const { data } = supabase.storage.from('chat-media').getPublicUrl(path)
+                    setProofUrl(data.publicUrl)
+                  }
+                }} />
+              {proofUrl ? (
+                <span className="text-green-600 text-sm font-bold">✅ تم رفع الملف</span>
+              ) : (
+                <>
+                  <Upload size={16} className="text-slate-400" />
+                  <span className="text-slate-400 text-sm">صورة أو PDF أو Word</span>
+                </>
+              )}
+            </label>
+            {proofUrl && (
+              <button onClick={() => setProofUrl('')} className="px-3 py-2 text-red-400 border border-red-200 rounded-xl hover:bg-red-50 text-xs">
+                حذف
+              </button>
+            )}
+          </div>
+          {proofUrl && proofUrl.match(/\.(jpg|jpeg|png|gif|webp)/i) && (
+            <img src={proofUrl} alt="إثبات الإنجاز" className="mt-2 w-full h-32 object-cover rounded-xl border border-slate-200" />
+          )}
+        </div>
+
         <div className="flex gap-3">
-          <button onClick={() => { setCompletingTask(null); setProofUrl(''); setProofNote('') }}
+          <button onClick={() => { setCompletingTask(null); setProofUrl(''); setProofNote(''); setPriceOffer('') }}
             className="flex-1 border border-slate-200 text-slate-600 py-3 rounded-xl text-sm hover:bg-slate-50">إلغاء</button>
-          <button onClick={submitCompletion} disabled={uploadingProof}
+          <button onClick={submitCompletion} disabled={uploadingProof || !priceOffer || Number(priceOffer) <= 0}
             className="flex-1 bg-secondary-500 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-secondary-600">
             {uploadingProof ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
             أرسل للعميل

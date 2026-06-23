@@ -6,6 +6,7 @@ import { useApp } from '../contexts/AppContext'
 import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
 import { Chat } from '../components/chat/Chat'
+import { TaskReceipt } from '../components/TaskReceipt'
 
 const STATUS_LABEL: Record<string, string> = {
   open: 'بانتظار مقدم خدمة', in_progress: 'قيد التنفيذ',
@@ -41,6 +42,7 @@ export function UserDashboard() {
   const [confirmingPayment, setConfirmingPayment] = useState(false)
   const [rating, setRating] = useState(0)
   const [ratingDone, setRatingDone] = useState(false)
+  const [showReceipt, setShowReceipt] = useState(false)
   const [activeSection, setActiveSection] = useState<'dashboard' | 'orders' | 'wallet'>('dashboard')
   const channelRef = useRef<any>(null)
 
@@ -78,6 +80,7 @@ export function UserDashboard() {
       console.error('confirm error full:', error)
     } else {
       setSelectedTask(p => p ? { ...p, status: 'completed' } : null)
+      setShowReceipt(true)
       fetchTasks()
     }
     setConfirmingPayment(false)
@@ -167,6 +170,45 @@ export function UserDashboard() {
           </div>
         )}
 
+        {/* فاتورة ما بعد الاستلام */}
+        {showReceipt && selectedTask && (
+          <div className="mb-4">
+            <TaskReceipt
+              task={selectedTask}
+              workerName={workerName}
+              onRate={() => { setShowReceipt(false) }}
+              onClose={() => { setSelectedTask(null); setShowReceipt(false) }}
+            />
+          </div>
+        )}
+
+        {/* التفاوض على السعر */}
+        {selectedTask.status === 'pending_confirmation' && (selectedTask as any).negotiation_status === 'pending' && (selectedTask as any).worker_price_offer && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-4">
+            <p className="font-bold text-amber-700 mb-1">💰 مقدم الخدمة اقترح سعراً</p>
+            <p className="text-3xl font-black text-amber-600 my-2">{(selectedTask as any).worker_price_offer} ريال</p>
+            {(selectedTask as any).price_offer_note && (
+              <p className="text-sm text-amber-600 mb-3 bg-amber-100 rounded-xl p-3">{(selectedTask as any).price_offer_note}</p>
+            )}
+            <div className="flex gap-3">
+              <button onClick={async () => {
+                const { error } = await supabase.rpc('reject_price', { p_task_id: selectedTask.id })
+                if (!error) setSelectedTask(p => p ? { ...p, negotiation_status: 'rejected' } as any : null)
+              }} className="flex-1 border-2 border-red-200 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition-colors">
+                ❌ رفض
+              </button>
+              <button onClick={async () => {
+                const { error } = await supabase.rpc('accept_price', { p_task_id: selectedTask.id })
+                if (!error) {
+                  setSelectedTask(p => p ? { ...p, negotiation_status: 'accepted', price_final: (p as any).worker_price_offer } as any : null)
+                }
+              }} className="flex-1 bg-secondary-500 text-white font-bold py-3 rounded-xl hover:bg-secondary-600 transition-colors">
+                ✅ موافق على السعر
+              </button>
+            </div>
+          </div>
+        )}
+
         {selectedTask.status === 'pending_confirmation' && (
           <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5 mb-4">
             <p className="font-bold text-purple-700 mb-1">المقدم أكمل الطلب — راجع وأكّد</p>
@@ -179,21 +221,83 @@ export function UserDashboard() {
           </div>
         )}
 
-        {selectedTask.status === 'completed' && !ratingDone && (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-5 mb-4">
-            <p className="font-bold text-green-700 mb-3">✅ اكتملت الخدمة — قيّم المقدم</p>
-            <div className="flex gap-2 mb-4 justify-center">
-              {[1,2,3,4,5].map(s => (
-                <button key={s} onClick={() => setRating(s)}>
-                  <Star size={28} className={s <= rating ? 'text-amber-400 fill-amber-400' : 'text-slate-300'} />
-                </button>
-              ))}
+        {selectedTask.status === 'completed' && (
+          <div className="space-y-4 mb-4">
+            {/* Invoice / Summary */}
+            <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                  <CheckCircle size={24} className="text-green-500" />
+                </div>
+                <div>
+                  <p className="font-black text-green-700 text-lg">اكتملت الخدمة بنجاح! 🎉</p>
+                  <p className="text-green-600 text-xs">شكراً لاستخدامك آمرني</p>
+                </div>
+              </div>
+
+              {/* Invoice */}
+              <div className="bg-white rounded-xl border border-green-100 p-4 mb-4">
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                  <span className="font-black text-slate-900 text-sm">آمرني</span>
+                  <span className="text-xs text-slate-400">{new Date(selectedTask.updated_at || selectedTask.created_at).toLocaleDateString('ar-SA')}</span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-900 font-medium truncate flex-1 ml-4">{selectedTask.title}</span>
+                    <span className="text-slate-500 text-xs">الخدمة</span>
+                  </div>
+                  {selectedTask.category && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-700">{selectedTask.category}</span>
+                      <span className="text-slate-500 text-xs">التصنيف</span>
+                    </div>
+                  )}
+                  {selectedTask.city && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-700">{selectedTask.city}</span>
+                      <span className="text-slate-500 text-xs">المنطقة</span>
+                    </div>
+                  )}
+                  {(selectedTask.price_final || selectedTask.price_suggested) && (
+                    <>
+                      <div className="border-t border-slate-100 pt-2 mt-2" />
+                      <div className="flex justify-between">
+                        <span className="font-black text-slate-900 text-base">{selectedTask.price_final || selectedTask.price_suggested} ر.س</span>
+                        <span className="text-slate-500 text-xs">إجمالي الخدمة</span>
+                      </div>
+                      <div className="flex justify-between text-xs text-slate-400">
+                        <span>{((selectedTask.price_final || selectedTask.price_suggested || 0) * 0.02).toFixed(2)} ر.س</span>
+                        <span>عمولة المنصة (2%)</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Rating */}
+              {!ratingDone ? (
+                <div>
+                  <p className="text-sm font-bold text-slate-700 mb-2 text-center">قيّم مقدم الخدمة</p>
+                  <div className="flex gap-2 mb-3 justify-center">
+                    {[1,2,3,4,5].map(s => (
+                      <button key={s} onClick={() => setRating(s)}>
+                        <Star size={30} className={s <= rating ? 'text-amber-400 fill-amber-400' : 'text-slate-200'} />
+                      </button>
+                    ))}
+                  </div>
+                  {rating > 0 && (
+                    <button onClick={submitRating}
+                      className="w-full bg-amber-400 text-slate-900 font-bold py-2.5 rounded-xl hover:bg-amber-500 transition-colors text-sm">
+                      إرسال التقييم ⭐
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-2">
+                  <p className="text-green-600 font-bold text-sm">✅ شكراً على تقييمك!</p>
+                </div>
+              )}
             </div>
-            {rating > 0 && (
-              <button onClick={submitRating} className="w-full bg-green-500 text-white font-bold py-2.5 rounded-xl hover:bg-green-600 transition-colors">
-                إرسال التقييم
-              </button>
-            )}
           </div>
         )}
 
