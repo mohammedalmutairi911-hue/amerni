@@ -769,41 +769,21 @@ export function LandingPage() {
                   </div>
                 </div>
 
-                {/* Contact form */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-6">
-                  <h3 className="font-bold text-lg mb-5">أرسل رسالة</h3>
-                  {contactSent ? (
-                    <div className="text-center py-10">
-                      <div className="text-4xl mb-4">✅</div>
-                      <h4 className="font-bold text-slate-900 mb-2">وصلتنا رسالتك!</h4>
-                      <p className="text-slate-400 text-sm">سنرد عليك خلال 24 ساعة على بريدك الإلكتروني</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {[
-                        { k: 'name', label: 'الاسم', ph: 'محمد العتيبي', type: 'text' },
-                        { k: 'email', label: 'البريد الإلكتروني', ph: 'example@gmail.com', type: 'email' },
-                      ].map(({ k, label, ph, type }) => (
-                        <div key={k}>
-                          <label className="block text-xs text-slate-400 mb-1.5">{label}</label>
-                          <input type={type} placeholder={ph} value={(contactForm as any)[k]}
-                            onChange={e => setContactForm(f => ({ ...f, [k]: e.target.value }))}
-                            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
-                        </div>
-                      ))}
-                      <div>
-                        <label className="block text-xs text-slate-400 mb-1.5">رسالتك</label>
-                        <textarea value={contactForm.message} onChange={e => setContactForm(f => ({ ...f, message: e.target.value }))}
-                          placeholder="اكتب رسالتك هنا..." rows={4}
-                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors resize-none" />
-                      </div>
-                      <button onClick={sendContact} disabled={contactLoading || !contactForm.name || !contactForm.email || !contactForm.message}
-                        className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
-                        {contactLoading ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
-                        إرسال الرسالة
-                      </button>
-                    </div>
-                  )}
+                {/* Contact - direct email */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-5">
+                  <div className="w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center">
+                    <Mail size={28} className="text-primary-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-slate-900 mb-2">راسلنا مباشرة</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">اكتب لنا على بريدنا وسنرد عليك خلال ٢٤ ساعة</p>
+                  </div>
+                  <a href="mailto:support@amerniksa.com"
+                    className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors flex items-center justify-center gap-2">
+                    <Mail size={16} />
+                    support@amerniksa.com
+                  </a>
+                  <p className="text-xs text-slate-400">سنرد عليك خلال ٢٤ ساعة في أيام العمل</p>
                 </div>
               </div>
             </div>
