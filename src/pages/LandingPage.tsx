@@ -235,18 +235,12 @@ export function LandingPage() {
     if (!contactForm.name || !contactForm.email || !contactForm.message) return
     setContactLoading(true)
     try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer re_XEdF7Kwq_A8TqvJyANz1RyLJFwGoT1oi3'
-        },
-        body: JSON.stringify({
-          from: 'onboarding@resend.dev',
-          to: 'support@amerniksa.com',
-          subject: `رسالة من ${contactForm.name} — أمرني`,
-          html: `<div dir="rtl"><h3>رسالة جديدة من موقع أمرني</h3><p><strong>الاسم:</strong> ${contactForm.name}</p><p><strong>البريد:</strong> ${contactForm.email}</p><p><strong>الرسالة:</strong></p><p>${contactForm.message}</p></div>`
-        })
+      await supabase.functions.invoke('send-contact-email', {
+        body: {
+          name: contactForm.name,
+          email: contactForm.email,
+          message: contactForm.message,
+        }
       })
     } catch {}
     setContactSent(true)
@@ -399,7 +393,7 @@ export function LandingPage() {
 
                 {/* Stats */}
                 <div className="flex justify-center gap-6 sm:gap-12 text-center mb-8">
-                  {[['١٠٬٠٠٠+', 'طلب منجز'], ['٢٤٠٠+', 'عامل موثوق'], ['٩٨٪', 'نسبة الرضا'], ['٢٤/٧', 'دعم متواصل']].map(([v, l]) => (
+                  {[['جديد', 'قيد الإطلاق'], ['موثوق', 'عمال معتمدون'], ['آمن', 'دفع مضمون'], ['٢٤/٧', 'دعم متواصل']].map(([v, l]) => (
                     <div key={l}>
                       <div className="text-2xl sm:text-3xl font-black text-primary-500">{v}</div>
                       <div className="text-xs text-slate-400 mt-1">{l}</div>
@@ -536,7 +530,7 @@ export function LandingPage() {
                     <h3 className="font-black text-lg text-slate-900 mb-1">المساعد الشخصي للتسوق</h3>
                     <p className="text-slate-500 text-sm mb-4">اترك عنك عناء الزحام، فريقنا جاهز لشراء كافة مستلزماتك وتوصيلها لباب بيتك.</p>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs bg-primary-50 text-primary-500 font-bold px-3 py-1 rounded-full">+٢٤٠٠ عامل</span>
+                      <span className="text-xs bg-primary-50 text-primary-500 font-bold px-3 py-1 rounded-full">قيد الإطلاق</span>
                     </div>
                   </div>
                 </div>
@@ -559,7 +553,7 @@ export function LandingPage() {
                   </div>
                 </div>
                 <div className="border-t border-slate-800 mt-6 pt-6 text-center text-slate-500 text-xs">
-                  © ٢٠٢٤ آمرني — جميع الحقوق محفوظة
+                  © ٢٠٢٦ آمرني — جميع الحقوق محفوظة
                 </div>
               </div>
             </footer>
@@ -750,7 +744,7 @@ export function LandingPage() {
                   <h3 className="font-bold text-lg mb-4">معلومات التواصل</h3>
                   {[
                     { icon: Mail, label: 'البريد الإلكتروني', value: 'support@amerniksa.com', color: 'text-primary-500' },
-                    { icon: Phone, label: 'واتساب', value: '+966 5X XXX XXXX', color: 'text-secondary-400' },
+                    { icon: Mail, label: 'البريد الإلكتروني', value: 'support@amerniksa.com', color: 'text-primary-500' },
                     { icon: MessageCircle, label: 'الدعم المباشر', value: 'متاح ٢٤/٧ عبر الدردشة', color: 'text-blue-400' },
                     { icon: Shield, label: 'الآيبان — بنك البلاد', value: 'SA54150009001465965400007', color: 'text-slate-700' },
                   ].map(({ icon: Icon, label, value, color }) => (
