@@ -3,6 +3,7 @@ import { Star, Clock, CheckCircle, Zap, Loader2, MessageSquare, Upload, DollarSi
 import { supabase } from '../lib/supabase'
 import { requestNotificationPermission, sendLocalNotification, registerServiceWorker } from '../lib/notifications'
 import { useAuth } from '../contexts/AuthContext'
+import { useApp } from '../contexts/AppContext'
 import { Task, WorkerProfile } from '../types'
 import { Chat } from '../components/chat/Chat'
 import { useToast } from '../components/Toast'
@@ -19,6 +20,7 @@ const STATUS_COLOR: Record<string, string> = {
 
 export function WorkerDashboard() {
   const { user, profile, signOut } = useAuth()
+  const { navigate } = useApp()
   const { toast } = useToast()
   const [tab, setTab] = useState<'overview' | 'feed' | 'my-tasks' | 'chat' | 'profile'>('overview')
   const [workerProfile, setWorkerProfile] = useState<WorkerProfile | null>(null)
