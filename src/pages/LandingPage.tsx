@@ -407,7 +407,7 @@ export function LandingPage() {
             <section className="py-16 px-4 bg-white">
               <div className="max-w-5xl mx-auto">
                 <h2 className="text-3xl font-black text-center text-slate-900 mb-3">لماذا تختار آمرني؟</h2>
-                <p className="text-slate-500 text-center mb-12">حلول متكاملة لكل ركن في منزلك</p>
+                <p className="text-slate-500 text-center mb-12">لأنه يجمع لك كل خدمة تحتاجها في مكان واحد</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[
                     { icon: UserCheck, color: 'text-primary-500', bg: 'bg-primary-50', title: 'محترفون معتمدون', desc: 'يخضع جميع مزودي الخدمة لدينا لعملية فحص وتدقيق صارمة لضمان أعلى معايير الجودة والأمان.' },
@@ -496,7 +496,7 @@ export function LandingPage() {
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <h2 className="text-2xl font-black text-slate-900">استكشف خدماتنا</h2>
-                    <p className="text-slate-500 text-sm mt-1">حلول متكاملة لكل ركن في منزلك</p>
+                    <p className="text-slate-500 text-sm mt-1">كل خدمة تحتاجها في مكان واحد</p>
                   </div>
                   <button onClick={() => setShowBrowse(true)} className="text-primary-500 text-sm font-semibold hover:underline">عرض الكل</button>
                 </div>
