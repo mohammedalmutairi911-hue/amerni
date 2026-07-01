@@ -62,6 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })
     if (!error && data.user) {
+      // TikTok Pixel - تسجيل ناجح
+      try { (window as any).ttq?.track('CompleteRegistration') } catch {}
       // انتظر شوي وبعدين احفظ البروفايل مع الـ role الصح
       // ملاحظة: الـtrigger handle_new_user في قاعدة البيانات يسوي هذا تلقائياً عند التسجيل،
       // هذا upsert احتياطي فقط لو تأخر الـtrigger أو لتحديث role بدقة بعد التسجيل

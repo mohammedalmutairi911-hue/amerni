@@ -115,6 +115,9 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       return false
     }
 
+    // TikTok Pixel - نشر طلب ناجح
+    try { (window as any).ttq?.track('SubmitForm') } catch {}
+
     return true
   }
 
