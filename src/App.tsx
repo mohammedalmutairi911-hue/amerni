@@ -21,6 +21,7 @@ import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { EnterprisesPage } from './pages/EnterprisesPage'
 import { ProviderDashboard } from './pages/ProviderDashboard'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastProvider } from './components/Toast'
 
 // Handle worker profile URL param
@@ -136,5 +137,5 @@ export default function App() {
     return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
   }
 
-  return <ToastProvider>{renderContent()}</ToastProvider>
+  return <ErrorBoundary><ToastProvider>{renderContent()}</ToastProvider></ErrorBoundary>
 }
