@@ -89,16 +89,62 @@ export function EnterprisesPage() {
     setError('')
   }
 
+  const sanitize = (s: string) => s.replace(/[<>"']/g, '').trim()
+
   const handleSubmit = async () => {
-    if (!form.company_name || !form.contact_name || !form.contact_email || !form.category || !form.description) {
+    if (!form.company_name.trim() || !form.contact_name.trim() || !form.contact_email.trim() || !form.category || !form.description.trim()) {
       setError('يرجى تعبئة جميع الحقول المطلوبة')
+      return
+    }
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRx.test(form.contact_email)) {
+      setError('يرجى إدخال بريد إلكتروني صحيح')
+      return
+    }
+    if (form.description.trim().length < 10) {
+      setError('يرجى كتابة وصف أكثر تفصيلاً (١٠ أحرف على الأقل)')
+      return
+    }
+    if (form.description.length > 3000) {
+      setError('الوصف طويل جداً — الحد الأقصى ٣٠٠٠ حرف')
       return
     }
     setSubmitting(true)
     setError('')
     try {
-      const { error: err } = await supabase.from('enterprise_leads').insert({ ...form, user_id: user?.id ?? null, status: 'new' })
-      if (err) throw err
+      const clean = {
+        company_name: sanitize(form.company_name),
+        contact_name: sanitize(form.contact_name),
+        contact_email: form.contact_email.trim().toLowerCase(),
+        contact_phone: sanitize(form.contact_phone),
+        company_size: form.company_size,
+        category: form.category,
+        description: sanitize(form.description),
+        budget_range: form.budget_range,
+        user_id: user?.id ?? null,
+        status: 'new'
+      }
+      const { error: err } = await supabase.from('enterprise_leads').insert(clean)
+      if (err) {
+        if (err.message?.includes('rate') || err.message?.includes('ساعة')) {
+          setError('تم إرسال عدد كبير من الطلبات — حاول مجدداً بعد ساعة')
+        } else if (err.message?.includes('سياسة')) {
+          setError('المحتوى يخالف سياسة المنصة — يرجى مراجعة النص')
+        } else {
+          setError('حدث خطأ، يرجى المحاولة مجدداً')
+        }
+        return
+      }
+      // إرسال إيميل تأكيد للعميل
+      try {
+        await supabase.functions.invoke('send-contact-email', {
+          body: {
+            name: clean.contact_name,
+            email: clean.contact_email,
+            message: 'تم استلام طلبكم بنجاح في أمرني للمنشآت. التخصص: ' + clean.category + ' | الشركة: ' + clean.company_name + ' | سيتواصل معكم فريقنا خلال ٢٤ ساعة. شكراً لثقتكم بأمرني.'
+          }
+        })
+      } catch {}
       setSuccess(true)
     } catch { setError('حدث خطأ، يرجى المحاولة مجدداً') }
     finally { setSubmitting(false) }
@@ -116,7 +162,7 @@ export function EnterprisesPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6', max_tokens: 400,
+          model: 'claude-sonnet-4-6', max_tokens: 800,
           system: SUPPORT_SYSTEM,
           messages: newMsgs.map(m => ({ role: m.role, content: m.content })).slice(-10)
         })

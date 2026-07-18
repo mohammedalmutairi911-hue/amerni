@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert } from 'lucide-react'
+import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { Chat } from '../components/chat/Chat'
 
-type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations'
+type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises'
 
 export function AdminPanel() {
   const [tab, setTab] = useState<Tab>('overview')
@@ -16,6 +16,8 @@ export function AdminPanel() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
+  const [leads, setLeads] = useState<any[]>([])
+  const [leadNote, setLeadNote] = useState<Record<string, string>>({})
 
   useEffect(() => {
     fetchAll()
@@ -53,10 +55,11 @@ export function AdminPanel() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const [wRes, tRes, uRes] = await Promise.all([
+    const [wRes, tRes, uRes, lRes] = await Promise.all([
       supabase.from('worker_profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('tasks').select('*').order('created_at', { ascending: false }),
-      supabase.from('profiles').select('*').order('created_at', { ascending: false })
+      supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+      supabase.from('enterprise_leads').select('*').order('created_at', { ascending: false })
     ])
     const errs: string[] = []
     if (wRes.error) { console.error('[Admin] workers:', wRes.error); errs.push('العمال: ' + wRes.error.message) }
@@ -66,6 +69,7 @@ export function AdminPanel() {
     setWorkers(wRes.data || [])
     setTasks(tRes.data || [])
     setUsers(uRes.data || [])
+    setLeads(lRes.data || [])
     setLoading(false)
   }
 
@@ -101,6 +105,17 @@ export function AdminPanel() {
     setTasks(p => p.map(t => t.id === taskId ? { ...t, status: status as any } : t))
   }
 
+  const updateLeadStatus = async (leadId: string, status: string) => {
+    await supabase.from('enterprise_leads').update({ status }).eq('id', leadId)
+    setLeads(p => p.map(l => l.id === leadId ? { ...l, status } : l))
+  }
+
+  const saveLeadNote = async (leadId: string) => {
+    const note = leadNote[leadId] || ''
+    await supabase.from('enterprise_leads').update({ notes: note }).eq('id', leadId)
+    setLeads(p => p.map(l => l.id === leadId ? { ...l, notes: note } : l))
+  }
+
   const stats = {
     users: users.length,
     workers: workers.filter(w => w.is_approved).length,
@@ -117,6 +132,7 @@ export function AdminPanel() {
     { id: 'tasks', icon: Briefcase, label: `الطلبات (${tasks.length})` },
     { id: 'conversations', icon: MessageSquare, label: `المحادثات` },
     { id: 'users', icon: Users, label: `المستخدمون (${users.length})` },
+    { id: 'enterprises', icon: Building2, label: `المنشآت (${leads.length})` },
   ]
 
   const STATUS_LABEL: Record<string, string> = {
@@ -547,6 +563,79 @@ export function AdminPanel() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* ENTERPRISES TAB */}
+        {tab === 'enterprises' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-bold text-slate-900">طلبات المنشآت</h2>
+              <span className="text-xs text-slate-400">{leads.length} طلب إجمالاً</span>
+            </div>
+
+            {leads.length === 0 ? (
+              <div className="text-center py-16 text-slate-400">
+                <Building2 size={40} className="mx-auto mb-3 opacity-30" />
+                <p>لا يوجد طلبات بعد</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {leads.map(lead => (
+                  <div key={lead.id} className="bg-white border border-slate-200 rounded-2xl p-5">
+                    <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                      <div>
+                        <p className="font-bold text-slate-900">{lead.company_name}</p>
+                        <p className="text-sm text-slate-500">{lead.contact_name} — {lead.contact_email}</p>
+                        {lead.contact_phone && <p className="text-xs text-slate-400">{lead.contact_phone}</p>}
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs bg-primary-50 text-primary-600 border border-primary-200 px-2 py-0.5 rounded-full">{lead.category}</span>
+                        {lead.company_size && <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{lead.company_size} موظف</span>}
+                        {lead.budget_range && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">{lead.budget_range}</span>}
+                        <select
+                          value={lead.status}
+                          onChange={e => updateLeadStatus(lead.id, e.target.value)}
+                          className={`text-xs px-2 py-0.5 rounded-full border font-medium cursor-pointer outline-none ${
+                            lead.status === 'new' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                            lead.status === 'reviewing' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                            lead.status === 'matched' ? 'bg-green-50 text-green-600 border-green-200' :
+                            'bg-slate-100 text-slate-500 border-slate-200'
+                          }`}>
+                          <option value="new">جديد</option>
+                          <option value="reviewing">قيد المراجعة</option>
+                          <option value="matched">تمت المطابقة</option>
+                          <option value="closed">مغلق</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-slate-600 leading-relaxed mb-3 bg-slate-50 rounded-xl px-4 py-3">{lead.description}</p>
+
+                    <div className="flex gap-2 items-end">
+                      <textarea
+                        value={leadNote[lead.id] !== undefined ? leadNote[lead.id] : (lead.notes || '')}
+                        onChange={e => setLeadNote(p => ({ ...p, [lead.id]: e.target.value }))}
+                        placeholder="ملاحظات داخلية..."
+                        rows={2}
+                        className="flex-1 text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-300 resize-none bg-slate-50"
+                      />
+                      <button
+                        onClick={() => saveLeadNote(lead.id)}
+                        className="text-xs bg-primary-500 text-white px-3 py-2 rounded-xl hover:bg-primary-600 transition-colors whitespace-nowrap">
+                        حفظ
+                      </button>
+                      <a href={`mailto:${lead.contact_email}?subject=أمرني للمنشآت — طلبك رقم ${lead.id.slice(0,8)}`}
+                        className="text-xs bg-slate-100 text-slate-600 px-3 py-2 rounded-xl hover:bg-slate-200 transition-colors flex items-center gap-1.5 whitespace-nowrap">
+                        <Mail size={12} /> راسل
+                      </a>
+                    </div>
+
+                    <p className="text-xs text-slate-400 mt-2">{new Date(lead.created_at).toLocaleString('ar-SA')}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
