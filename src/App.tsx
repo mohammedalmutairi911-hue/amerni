@@ -92,9 +92,9 @@ export default function App() {
 
   const renderContent = () => {
     if (page === 'enterprises') return <><Navbar /><EnterprisesPage /></>
-    if (page === 'provider-dashboard') return <ProviderDashboard />
 
     if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
+    if (page === 'provider-dashboard') return <ProviderDashboard />
     if (page === 'support') return <><Navbar /><SupportPage /></>
     if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
     if (page === 'bounties') return <><Navbar /><BountiesPage /></>
