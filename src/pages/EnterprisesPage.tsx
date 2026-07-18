@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { useApp } from '../contexts/AppContext'
 import {
   Building2, ChevronDown, ChevronUp, CheckCircle2, ArrowLeft,
   ShieldCheck, Scale, FileText, BadgeDollarSign, Award,
@@ -108,8 +109,24 @@ export function EnterprisesPage() {
     { q: 'كم يستغرق الرد؟', a: 'الرد الأولي خلال ٢٤ ساعة، والمطابقة مع مزود مناسب خلال ٧٢ ساعة كحد أقصى.' },
   ]
 
+  const { navigate } = useApp()
+
   return (
     <div className="min-h-screen bg-white" dir="rtl">
+
+      {/* Top bar */}
+      <div className="bg-slate-900 px-4 py-2 flex items-center justify-between">
+        <button onClick={() => navigate('landing')} className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm transition-colors">
+          <ArrowLeft size={14} />
+          <span>تغيير الوجهة</span>
+        </button>
+        <div className="flex items-center gap-2">
+          <span className="text-white font-black text-sm">أمرني</span>
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-accent-500/20 text-accent-300 border border-accent-500/30">
+            منشآت
+          </span>
+        </div>
+      </div>
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-slate-900 via-primary-900 to-slate-900 text-white py-20 px-4">

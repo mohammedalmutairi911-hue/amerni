@@ -200,9 +200,8 @@ export function LandingPage() {
 
   // ── Gateway: أفراد أو منشآت ──────────────────
   // المستخدم المسجل يتجاوز الشاشة مباشرة
-  const savedMode = typeof window !== 'undefined' ? localStorage.getItem('amerni_mode') : null
   const [mode, setMode] = useState<'individuals' | 'enterprises' | null>(
-    user ? 'individuals' : (savedMode as any) || null
+    user ? 'individuals' : null
   )
   const [activeTab, setActiveTab] = useState<Tab>('home')
   const [idx, setIdx] = useState(0)
@@ -214,7 +213,6 @@ export function LandingPage() {
   const [authDirectMode, setAuthDirectMode] = useState<'login'|'register'>('login')
 
   const chooseMode = (m: 'individuals' | 'enterprises') => {
-    localStorage.setItem('amerni_mode', m)
     if (m === 'enterprises') { navigate('enterprises'); return }
     setMode(m)
   }
@@ -361,7 +359,12 @@ export function LandingPage() {
       {/* Navbar */}
       <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/95 backdrop-blur border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <button onClick={() => setActiveTab('home')} className="text-xl font-black text-primary-500">أمرني</button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setMode(null)} className="text-xl font-black text-primary-500">أمرني</button>
+            <button onClick={() => setMode(null)} className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary-100 text-primary-600 border border-primary-200 hover:bg-primary-200 transition-colors">
+              أفراد ↕
+            </button>
+          </div>
           <div className="hidden md:flex items-center gap-1 overflow-x-auto">
             {TABS.slice(1).map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
