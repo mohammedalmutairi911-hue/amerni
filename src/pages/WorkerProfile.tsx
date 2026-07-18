@@ -12,7 +12,7 @@ export function WorkerProfile({ workerId }: Props) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.from('worker_profiles').select('*').eq('user_id', workerId).single()
+    supabase.from('workers_public').select('*').eq('user_id', workerId).single()
       .then(({ data }) => { setWorker(data); setLoading(false) })
   }, [workerId])
 
