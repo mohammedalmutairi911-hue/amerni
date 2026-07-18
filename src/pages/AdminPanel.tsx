@@ -573,6 +573,13 @@ export function AdminPanel() {
               <h2 className="text-lg font-bold text-slate-900">طلبات المنشآت</h2>
               <span className="text-xs text-slate-400">{leads.length} طلب إجمالاً</span>
             </div>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4 flex items-start gap-3">
+              <span className="text-amber-500 text-lg">💡</span>
+              <div>
+                <p className="text-sm font-bold text-amber-800">نظام العمولة المؤقت</p>
+                <p className="text-xs text-amber-700 leading-relaxed mt-0.5">العمولة الحالية: <strong>١٪ من قيمة العقد</strong> تُحوَّل لـ IBAN: SA54150009001465965400007 (بنك البلاد) — ساري حتى إطلاق نظام الاشتراك الشهري</p>
+              </div>
+            </div>
 
             {leads.length === 0 ? (
               <div className="text-center py-16 text-slate-400">
@@ -595,7 +602,10 @@ export function AdminPanel() {
                         {lead.budget_range && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">{lead.budget_range}</span>}
                         <select
                           value={lead.status}
-                          onChange={e => updateLeadStatus(lead.id, e.target.value)}
+                          onChange={e => {
+                            updateLeadStatus(lead.id, e.target.value)
+                            if (e.target.value === 'matched') alert('تذكير: أبلغ مزود الخدمة بعمولة ١٪ من قيمة العقد المستحقة خلال ٧٢ ساعة — IBAN: SA54150009001465965400007')
+                          }}
                           className={`text-xs px-2 py-0.5 rounded-full border font-medium cursor-pointer outline-none ${
                             lead.status === 'new' ? 'bg-blue-50 text-blue-600 border-blue-200' :
                             lead.status === 'reviewing' ? 'bg-amber-50 text-amber-600 border-amber-200' :

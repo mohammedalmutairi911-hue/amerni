@@ -243,7 +243,7 @@ export function EnterprisesPage() {
                   منصة أمرني تربطك بمزودي خدمات B2B محترفين في ١٨ تخصصاً — من الحوكمة والسعودة حتى الاستدامة وإدارة المشاريع.
                 </p>
                 <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-400 mb-10">
-                  {['مطابقة خلال ٢٤ ساعة', 'مزودون موثّقون', 'تعاقد مباشر بدون عمولة'].map(t => (
+                  {['مطابقة خلال ٢٤ ساعة', 'مزودون موثّقون', 'عمولة ١٪ مؤقتاً'].map(t => (
                     <div key={t} className="flex items-center gap-1.5">
                       <CheckCircle2 size={14} className="text-primary-400" />
                       <span>{t}</span>
@@ -324,7 +324,7 @@ export function EnterprisesPage() {
                 {[
                   { n: '١', icon: FileText, title: 'أرسل طلبك', desc: 'اختر التخصص واملأ تفاصيل احتياج منشأتك في دقيقتين' },
                   { n: '٢', icon: Users, title: 'نوصّلك بالمناسب', desc: 'فريقنا يراجع طلبك ويختار أفضل مزود خدمة معتمد يناسبك' },
-                  { n: '٣', icon: Zap, title: 'تعاقد مباشر', desc: 'تتواصل مع المزود وتوقع العقد بينكم — بدون عمولة من أمرني' },
+                  { n: '٣', icon: Zap, title: 'تعاقد وعمولة رمزية', desc: 'تتواصل مع المزود وتوقع العقد مباشرة — عمولة ١٪ فقط من قيمة العقد مؤقتاً حتى إطلاق نظام الاشتراك' },
                 ].map(({ n, icon: Icon, title, desc }) => (
                   <div key={n} className="bg-white border border-slate-200 rounded-2xl p-7 hover:shadow-md transition-all">
                     <div className="text-5xl font-black text-slate-100 mb-4">{n}</div>
@@ -354,6 +354,7 @@ export function EnterprisesPage() {
               </div>
               <div className="mt-10 bg-primary-500 rounded-2xl p-8 text-center">
                 <h3 className="text-2xl font-bold text-slate-900 mb-3">جاهز للبدء؟</h3>
+                <p className="text-blue-100 text-sm mb-2">عمولة ١٪ فقط من قيمة العقد — مؤقتاً حتى إطلاق نظام الاشتراك الشهري</p>
                 <button onClick={() => { setActiveTab('home'); setShowForm(true) }} className="bg-white text-primary-500 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
                   أرسل طلبك الآن
                 </button>
@@ -374,7 +375,7 @@ export function EnterprisesPage() {
                 {[
                   { icon: ShieldCheck, title: 'مزودون موثّقون', desc: 'كل مزود خدمة خضع لعملية تحقق من السجل التجاري والخبرات والمؤهلات قبل القبول في المنصة', color: 'text-primary-500', bg: 'bg-primary-500/10 border-primary-500/20' },
                   { icon: Zap, title: 'مطابقة سريعة', desc: 'رد أولي خلال ٢٤ ساعة ومطابقة مع مزود مناسب خلال ٧٢ ساعة كحد أقصى', color: 'text-blue-500', bg: 'bg-blue-500/10 border-blue-500/20' },
-                  { icon: BadgeDollarSign, title: 'بدون عمولة', desc: 'التعاقد والدفع يتم مباشرة بينك وبين مزود الخدمة — أمرني لا تأخذ عمولة على العقود', color: 'text-green-500', bg: 'bg-green-500/10 border-green-500/20' },
+                  { icon: BadgeDollarSign, title: 'عمولة ١٪ مؤقتاً', desc: 'عمولة رمزية ١٪ من قيمة العقد حتى إطلاق نظام الاشتراك الشهري — أرخص بكثير من البديل التقليدي', color: 'text-green-500', bg: 'bg-green-500/10 border-green-500/20' },
                   { icon: BarChart2, title: 'تخصصات متعددة', desc: '١٨ تخصصاً تغطي جميع احتياجات المنشأة — من الحوكمة والسعودة حتى الاستدامة وإدارة المشاريع', color: 'text-purple-500', bg: 'bg-purple-500/10 border-purple-500/20' },
                   { icon: Bot, title: 'دعم ذكي', desc: 'مساعد ذكاء اصطناعي متاح ٢٤/٧ للإجابة على استفساراتك ومساعدتك في تحديد احتياجاتك', color: 'text-orange-500', bg: 'bg-orange-500/10 border-orange-500/20' },
                   { icon: Star, title: 'تقييمات موثوقة', desc: 'كل مزود خدمة لديه تقييمات حقيقية من منشآت سابقة تساعدك في اتخاذ القرار الأنسب', color: 'text-yellow-500', bg: 'bg-yellow-500/10 border-yellow-500/20' },
@@ -658,7 +659,7 @@ export function EnterprisesPage() {
                 { title: '٢. خدمة المطابقة ⭐', body: 'أمرني تقدم خدمة مطابقة مجانية بين المنشأة ومزودي الخدمة. إذا لم يناسب المزود المقترح احتياجاتك، نعيد البحث مجاناً حتى تجد الأنسب.' },
                 { title: '٣. إخلاء مسؤولية المنصة', body: 'أمرني غير مسؤولة عن جودة الخدمة المُقدَّمة، أي احتيال أو تقصير من مزود الخدمة، أو أي نزاعات تنشأ خارج المنصة.' },
                 { title: '٤. التزامات المنشأة', body: 'تلتزم المنشأة بتقديم معلومات صحيحة عن احتياجاتها، والتعامل بمهنية مع مزودي الخدمة، والتفاوض بحسن نية.' },
-                { title: '٥. التزامات مزود الخدمة', body: 'يلتزم مزود الخدمة بتقديم بيانات صحيحة، والحفاظ على سرية معلومات المنشأة، وتقديم الخدمة بالمستوى المتفق عليه.' },
+                { title: '٥. التزامات مزود الخدمة', body: 'يلتزم مزود الخدمة بتقديم بيانات صحيحة، والحفاظ على سرية معلومات المنشأة، وتقديم الخدمة بالمستوى المتفق عليه، ودفع عمولة ١٪ من قيمة العقد المُبرم عبر المنصة خلال ٧٢ ساعة من التعاقد.' },
                 { title: '٦. القانون المطبّق', body: 'تخضع هذه الشروط لأنظمة المملكة العربية السعودية.' },
               ].map(({ title, body }) => (
                 <div key={title} className={`bg-white border rounded-2xl p-6 shadow-sm ${title.includes('⭐') ? 'border-primary-200 bg-primary-50/30' : 'border-slate-200'}`}>
