@@ -374,55 +374,28 @@ export function EnterprisesPage() {
                   </div>
                 </div>
 
-                {/* Search results */}
-                {filteredCats !== null ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {filteredCats.length === 0 ? (
-                      <p className="col-span-full text-center text-slate-400 py-8">لا توجد نتائج</p>
-                    ) : filteredCats.map(cat => (
-                      <button key={cat.id} onClick={() => openForm(cat.id)}
-                        className="group bg-slate-50 border border-slate-200 rounded-2xl p-4 text-right hover:border-primary-400 hover:shadow-md transition-all flex flex-col gap-2">
-                        <p className="text-sm font-bold text-slate-900">{cat.label}</p>
-                        <p className="text-xs text-slate-400">{cat.desc}</p>
-                        <span className="text-xs text-primary-500 font-medium opacity-0 group-hover:opacity-100 transition-opacity">اختر ←</span>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  /* Grouped view */
-                  <div className="space-y-4">
-                    {CATEGORY_GROUPS.map(group => {
-                      const Icon = group.icon
-                      const isOpen = expandedGroup === group.id
-                      return (
-                        <div key={group.id} className="border border-slate-200 rounded-2xl overflow-hidden bg-white">
-                          <button onClick={() => setExpandedGroup(isOpen ? null : group.id)}
-                            className="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-50 transition-colors">
-                            <div className={`w-9 h-9 rounded-xl ${group.bg} flex items-center justify-center flex-shrink-0`}>
-                              <Icon size={18} className={group.color} />
-                            </div>
-                            <div className="flex-1 text-right">
-                              <p className="font-bold text-slate-900 text-sm">{group.label}</p>
-                              <p className="text-xs text-slate-400">{group.items.length} تخصصات</p>
-                            </div>
-                            {isOpen ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
-                          </button>
-                          {isOpen && (
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 px-4 pb-4">
-                              {group.items.map(cat => (
-                                <button key={cat.id} onClick={() => openForm(cat.id)}
-                                  className="group bg-slate-50 border border-slate-200 rounded-xl p-3 text-right hover:border-primary-400 transition-all">
-                                  <p className="text-xs font-bold text-slate-900 mb-1">{cat.label}</p>
-                                  <p className="text-xs text-slate-400 leading-relaxed">{cat.desc}</p>
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                {(catSearch.trim() ? ALL_CATEGORIES.filter(c => c.label.includes(catSearch) || c.desc.includes(catSearch)) : ALL_CATEGORIES).map(cat => {
+                  const group = CATEGORY_GROUPS.find(g => g.items.some(i => i.id === cat.id))
+                  const Icon = group?.icon || Building2
+                  return (
+                    <button key={cat.id} onClick={() => openForm(cat.id)}
+                      className="group bg-white border border-slate-200 rounded-2xl p-4 text-right hover:border-primary-400 hover:shadow-md transition-all duration-200 flex flex-col gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-primary-50 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
+                        <Icon size={18} className="text-primary-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 leading-tight mb-0.5">{cat.label}</p>
+                        <p className="text-xs text-slate-400 leading-relaxed">{cat.desc}</p>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-primary-500 font-medium mt-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span>أرسل طلبك</span>
+                        <ArrowLeft size={11} />
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
               </div>
             </section>
 
