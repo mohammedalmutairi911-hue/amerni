@@ -5,7 +5,7 @@ import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { Chat } from '../components/chat/Chat'
 
-type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises'
+type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises' | 'providers'
 
 export function AdminPanel() {
   const [tab, setTab] = useState<Tab>('overview')
@@ -18,6 +18,8 @@ export function AdminPanel() {
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
   const [leads, setLeads] = useState<any[]>([])
   const [leadNote, setLeadNote] = useState<Record<string, string>>({})
+  const [providers, setProviders] = useState<any[]>([])
+  const [overdueLeads, setOverdueLeads] = useState<any[]>([])
 
   useEffect(() => {
     fetchAll()
@@ -55,11 +57,13 @@ export function AdminPanel() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const [wRes, tRes, uRes, lRes] = await Promise.all([
+    const [wRes, tRes, uRes, lRes, pRes, oRes] = await Promise.all([
       supabase.from('worker_profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('tasks').select('*').order('created_at', { ascending: false }),
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-      supabase.from('enterprise_leads').select('*').order('created_at', { ascending: false })
+      supabase.from('enterprise_leads').select('*').order('created_at', { ascending: false }),
+      supabase.from('enterprise_providers').select('*').order('created_at', { ascending: false }),
+      supabase.rpc('get_overdue_enterprise_leads')
     ])
     const errs: string[] = []
     if (wRes.error) { console.error('[Admin] workers:', wRes.error); errs.push('العمال: ' + wRes.error.message) }
@@ -70,6 +74,8 @@ export function AdminPanel() {
     setTasks(tRes.data || [])
     setUsers(uRes.data || [])
     setLeads(lRes.data || [])
+    setProviders(pRes.data || [])
+    setOverdueLeads(oRes.data || [])
     setLoading(false)
   }
 
@@ -105,6 +111,11 @@ export function AdminPanel() {
     setTasks(p => p.map(t => t.id === taskId ? { ...t, status: status as any } : t))
   }
 
+  const approveProvider = async (id: string, approved: boolean) => {
+    await supabase.from('enterprise_providers').update({ is_approved: approved }).eq('id', id)
+    setProviders(p => p.map(x => x.id === id ? { ...x, is_approved: approved } : x))
+  }
+
   const updateLeadStatus = async (leadId: string, status: string) => {
     await supabase.from('enterprise_leads').update({ status }).eq('id', leadId)
     setLeads(p => p.map(l => l.id === leadId ? { ...l, status } : l))
@@ -133,6 +144,7 @@ export function AdminPanel() {
     { id: 'conversations', icon: MessageSquare, label: `المحادثات` },
     { id: 'users', icon: Users, label: `المستخدمون (${users.length})` },
     { id: 'enterprises', icon: Building2, label: `المنشآت (${leads.length})` },
+    { id: 'providers', icon: Users, label: `مزودو خدمة (${providers.length})` },
   ]
 
   const STATUS_LABEL: Record<string, string> = {
@@ -642,6 +654,90 @@ export function AdminPanel() {
                     </div>
 
                     <p className="text-xs text-slate-400 mt-2">{new Date(lead.created_at).toLocaleString('ar-SA')}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PROVIDERS TAB */}
+        {tab === 'providers' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-slate-900">مزودو الخدمة B2B</h2>
+              <span className="text-xs text-slate-400">{providers.length} مزود</span>
+            </div>
+
+            {overdueLeads.length > 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                <p className="text-sm font-bold text-red-700 mb-2">⚠️ طلبات متأخرة أكثر من ٢٤ ساعة ({overdueLeads.length})</p>
+                {overdueLeads.map((l: any) => (
+                  <div key={l.id} className="text-xs text-red-600 mb-1">
+                    {l.company_name} — {l.contact_email} — {new Date(l.created_at).toLocaleString('ar-SA')}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {providers.length === 0 ? (
+              <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl text-slate-400">
+                <Users size={40} className="mx-auto mb-3 opacity-30" />
+                <p>لا يوجد مزودون مسجلون بعد</p>
+                <p className="text-xs mt-1">ستظهر الطلبات هنا عند تسجيل مزودي الخدمة</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {providers.map((prov: any) => (
+                  <div key={prov.id} className="bg-white border border-slate-200 rounded-2xl p-5">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div>
+                        <p className="font-bold text-slate-900">{prov.company_name}</p>
+                        <p className="text-sm text-slate-500">{prov.contact_name} — {prov.contact_email}</p>
+                        {prov.city && <p className="text-xs text-slate-400">{prov.city}</p>}
+                      </div>
+                      <div className="flex gap-2">
+                        <span className={`text-xs font-bold px-3 py-1 rounded-full border ${prov.is_approved ? 'bg-green-50 text-green-600 border-green-200' : 'bg-amber-50 text-amber-600 border-amber-200'}`}>
+                          {prov.is_approved ? 'معتمد' : 'بانتظار المراجعة'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {prov.categories?.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {prov.categories.map((cat: string) => (
+                          <span key={cat} className="text-xs bg-primary-50 text-primary-600 border border-primary-200 px-2 py-0.5 rounded-full">{cat}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    {prov.description && <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 leading-relaxed mb-3">{prov.description}</p>}
+
+                    <div className="flex flex-wrap gap-2 text-xs text-slate-400 mb-3">
+                      {prov.cr_number && <span>سجل تجاري: {prov.cr_number}</span>}
+                      {prov.linkedin_url && <a href={prov.linkedin_url} target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">LinkedIn</a>}
+                      {prov.website_url && <a href={prov.website_url} target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">الموقع</a>}
+                    </div>
+
+                    <div className="flex gap-2">
+                      {!prov.is_approved && (
+                        <button onClick={() => approveProvider(prov.id, true)}
+                          className="flex-1 bg-green-500 text-white text-xs font-bold py-2 rounded-xl hover:bg-green-600 transition-colors">
+                          ✓ اعتماد
+                        </button>
+                      )}
+                      {prov.is_approved && (
+                        <button onClick={() => approveProvider(prov.id, false)}
+                          className="text-xs text-amber-600 border border-amber-200 px-3 py-2 rounded-xl hover:bg-amber-50 transition-colors">
+                          إلغاء الاعتماد
+                        </button>
+                      )}
+                      <a href={`mailto:${prov.contact_email}`}
+                        className="flex items-center gap-1.5 text-xs bg-slate-100 text-slate-600 px-3 py-2 rounded-xl hover:bg-slate-200 transition-colors">
+                        <Mail size={12} /> راسل
+                      </a>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-2">{new Date(prov.created_at).toLocaleString('ar-SA')}</p>
                   </div>
                 ))}
               </div>
