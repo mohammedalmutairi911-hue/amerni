@@ -204,13 +204,6 @@ export function LandingPage() {
   const [mode, setMode] = useState<'individuals' | 'enterprises' | null>(
     user ? 'individuals' : (savedMode as any) || null
   )
-
-  const chooseMode = (m: 'individuals' | 'enterprises') => {
-    localStorage.setItem('amerni_mode', m)
-    if (m === 'enterprises') { navigate('enterprises'); return }
-    setMode(m)
-  }
-
   const [activeTab, setActiveTab] = useState<Tab>('home')
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -219,6 +212,12 @@ export function LandingPage() {
   const [showBrowse, setShowBrowse] = useState(false)
   const [showAuthDirect, setShowAuthDirect] = useState(false)
   const [authDirectMode, setAuthDirectMode] = useState<'login'|'register'>('login')
+
+  const chooseMode = (m: 'individuals' | 'enterprises') => {
+    localStorage.setItem('amerni_mode', m)
+    if (m === 'enterprises') { navigate('enterprises'); return }
+    setMode(m)
+  }
 
   // إذا لم يختر وجهة — اعرض شاشة الاختيار
   if (!mode && !user) {
