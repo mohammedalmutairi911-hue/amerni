@@ -45,6 +45,8 @@ export interface Task {
   price_final?: number
   worker_price?: number
   negotiation_status?: 'pending' | 'accepted' | 'rejected'
+  completion_proof?: string
+  completion_note?: string
   use_ai: boolean
   created_at: string
   profiles?: Profile
