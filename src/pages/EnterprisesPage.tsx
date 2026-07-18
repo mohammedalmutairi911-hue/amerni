@@ -360,6 +360,12 @@ export function EnterprisesPage() {
               className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${activeTab === 'provider-register' ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 text-slate-600 hover:border-slate-400'}`}>
               سجّل كمزود
             </button>
+            {user && (
+              <button onClick={() => navigate('provider-dashboard')}
+                className="text-xs px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-white hover:bg-slate-700 transition-colors">
+                لوحة المزود
+              </button>
+            )}
             <button onClick={() => { setSelectedCat(null); setForm(savedDraft || EMPTY_FORM); setSuccess(false); setShowForm(true) }}
               className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-xs hover:bg-primary-600 transition-colors">
               أرسل طلبك

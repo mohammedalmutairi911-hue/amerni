@@ -20,6 +20,7 @@ import { InstallPrompt } from './components/InstallPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { EnterprisesPage } from './pages/EnterprisesPage'
+import { ProviderDashboard } from './pages/ProviderDashboard'
 import { ToastProvider } from './components/Toast'
 
 // Handle worker profile URL param
@@ -91,6 +92,7 @@ export default function App() {
 
   const renderContent = () => {
     if (page === 'enterprises') return <><Navbar /><EnterprisesPage /></>
+    if (page === 'provider-dashboard') return <ProviderDashboard />
 
     if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
     if (page === 'support') return <><Navbar /><SupportPage /></>
