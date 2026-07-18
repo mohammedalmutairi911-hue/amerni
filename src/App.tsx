@@ -90,9 +90,9 @@ export default function App() {
   if (loading || (profile?.role === 'worker' && checking)) return <PageLoader />
 
   const renderContent = () => {
-    if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
-
     if (page === 'enterprises') return <><Navbar /><EnterprisesPage /></>
+
+    if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
     if (page === 'support') return <><Navbar /><SupportPage /></>
     if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
     if (page === 'bounties') return <><Navbar /><BountiesPage /></>
