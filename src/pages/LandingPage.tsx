@@ -229,6 +229,14 @@ export function LandingPage() {
     setMode(m)
   }
 
+  useEffect(() => {
+    const t = setInterval(() => {
+      setVisible(false)
+      setTimeout(() => { setIdx(i => (i + 1) % EXAMPLES.length); setVisible(true) }, 300)
+    }, 3000)
+    return () => clearInterval(t)
+  }, [])
+
   // إذا لم يختر وجهة — اعرض شاشة الاختيار
   if (!mode && !user) {
     return (
@@ -277,14 +285,6 @@ export function LandingPage() {
       </div>
     )
   }
-
-  useEffect(() => {
-    const t = setInterval(() => {
-      setVisible(false)
-      setTimeout(() => { setIdx(i => (i + 1) % EXAMPLES.length); setVisible(true) }, 300)
-    }, 3000)
-    return () => clearInterval(t)
-  }, [])
 
   const handleStart = () => {
     if (!taskInput.trim() && user) { navigate('dashboard'); return }
