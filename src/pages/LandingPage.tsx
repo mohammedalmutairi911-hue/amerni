@@ -315,17 +315,14 @@ export function LandingPage() {
     setSupportMsgs(newMsgs)
     setSupportLoading(true)
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514', max_tokens: 400,
-          system: SUPPORT_SYSTEM,
+      const { data, error } = await supabase.functions.invoke('support-chat', {
+        body: {
+          context: 'individuals',
           messages: newMsgs.map(m => ({ role: m.role, content: m.content })).slice(-10)
-        })
+        }
       })
-      const data = await res.json()
-      const reply = data.content?.[0]?.text || 'عذراً، حدث خطأ. تواصل معنا على support@amerniksa.com'
+      if (error) throw error
+      const reply = data?.reply || 'عذراً، حدث خطأ. تواصل معنا على support@amerniksa.com'
       setSupportMsgs(p => [...p, { role: 'assistant', content: reply }])
     } catch {
       setSupportMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت. تواصل معنا على support@amerniksa.com' }])
@@ -876,16 +873,10 @@ export function LandingPage() {
                     // Auto send
                     const msgs: SupportMsg[] = [...supportMsgs, { role: 'user', content: q }]
                     setSupportLoading(true)
-                    fetch('https://api.anthropic.com/v1/messages', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        model: 'claude-sonnet-4-20250514', max_tokens: 400,
-                        system: SUPPORT_SYSTEM,
-                        messages: msgs.map(m => ({ role: m.role, content: m.content }))
-                      })
-                    }).then(r => r.json()).then(data => {
-                      setSupportMsgs(p => [...p, { role: 'assistant', content: data.content?.[0]?.text || 'عذراً، حدث خطأ.' }])
+                    supabase.functions.invoke('support-chat', {
+                      body: { context: 'individuals', messages: msgs.map(m => ({ role: m.role, content: m.content })) }
+                    }).then(({ data }) => {
+                      setSupportMsgs(p => [...p, { role: 'assistant', content: data?.reply || 'عذراً، حدث خطأ.' }])
                       setSupportLoading(false)
                     }).catch(() => {
                       setSupportMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت.' }])

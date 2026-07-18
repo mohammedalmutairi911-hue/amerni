@@ -299,19 +299,16 @@ export function EnterprisesPage() {
     setSupportMsgs(newMsgs)
     setSupportLoading(true)
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6', max_tokens: 800,
-          system: SUPPORT_SYSTEM,
+      const { data, error } = await supabase.functions.invoke('support-chat', {
+        body: {
+          context: 'enterprises',
           messages: newMsgs.map(m => ({ role: m.role, content: m.content })).slice(-10)
-        })
+        }
       })
-      const data = await res.json()
-      setSupportMsgs(p => [...p, { role: 'assistant', content: data.content?.[0]?.text || 'عذراً، حدث خطأ. تواصل معنا على support@amerniksa.com' }])
+      if (error) throw error
+      setSupportMsgs(p => [...p, { role: 'assistant', content: data?.reply || 'عذراً، حدث خطأ. تواصل معنا على support@amerniksa.com' }])
     } catch {
-      setSupportMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت.' }])
+      setSupportMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت. تواصل معنا على support@amerniksa.com' }])
     }
     setSupportLoading(false)
   }
