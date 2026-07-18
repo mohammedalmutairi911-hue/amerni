@@ -65,8 +65,9 @@ export function ProviderDashboard() {
   }
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-slate-50" dir="rtl">
       <Loader2 size={32} className="animate-spin text-primary-500" />
+      <p className="text-slate-400 text-sm">جاري تحميل لوحة التحكم...</p>
     </div>
   )
 

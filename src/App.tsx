@@ -9,18 +9,20 @@ import { LandingPage } from './pages/LandingPage'
 import { UserDashboard } from './pages/UserDashboard'
 import { WorkerDashboard } from './pages/WorkerDashboard'
 import { WorkerRegister } from './pages/WorkerRegister'
-import { AdminPanel } from './pages/AdminPanel'
-import { SupportPage } from './pages/SupportPage'
-import { BrowseWorkers } from './pages/BrowseWorkers'
-import { BountiesPage } from './pages/BountiesPage'
-import { ReferralPage } from './pages/ReferralPage'
-import { JoinPage } from './pages/JoinPage'
-import { WorkerProfile } from './pages/WorkerProfile'
 import { InstallPrompt } from './components/InstallPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
-import { EnterprisesPage } from './pages/EnterprisesPage'
-import { ProviderDashboard } from './pages/ProviderDashboard'
+
+// Lazy-loaded pages — code splitting لتسريع التحميل الأول
+const AdminPanel = React.lazy(() => import('./pages/AdminPanel').then(m => ({ default: m.AdminPanel })))
+const SupportPage = React.lazy(() => import('./pages/SupportPage').then(m => ({ default: m.SupportPage })))
+const BrowseWorkers = React.lazy(() => import('./pages/BrowseWorkers').then(m => ({ default: m.BrowseWorkers })))
+const BountiesPage = React.lazy(() => import('./pages/BountiesPage').then(m => ({ default: m.BountiesPage })))
+const ReferralPage = React.lazy(() => import('./pages/ReferralPage').then(m => ({ default: m.ReferralPage })))
+const JoinPage = React.lazy(() => import('./pages/JoinPage').then(m => ({ default: m.JoinPage })))
+const WorkerProfile = React.lazy(() => import('./pages/WorkerProfile').then(m => ({ default: m.WorkerProfile })))
+const EnterprisesPage = React.lazy(() => import('./pages/EnterprisesPage').then(m => ({ default: m.EnterprisesPage })))
+const ProviderDashboard = React.lazy(() => import('./pages/ProviderDashboard').then(m => ({ default: m.ProviderDashboard })))
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastProvider } from './components/Toast'
 
@@ -134,8 +136,9 @@ export default function App() {
     }
 
     if (page === 'landing') return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
-    return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
+    if (page === 'dashboard') return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
+    return <><Navbar /><NotFoundPage /></>
   }
 
-  return <ErrorBoundary><ToastProvider>{renderContent()}</ToastProvider></ErrorBoundary>
+  return <ErrorBoundary><ToastProvider><React.Suspense fallback={<PageLoader />}>{renderContent()}</React.Suspense></ToastProvider></ErrorBoundary>
 }

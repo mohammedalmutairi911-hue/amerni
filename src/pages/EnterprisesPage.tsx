@@ -175,6 +175,19 @@ export function EnterprisesPage() {
 
   const clearDraft = () => { try { localStorage.removeItem(DRAFT_KEY) } catch {} }
 
+  // SEO — تحديث العنوان والوصف لصفحة المنشآت
+  useEffect(() => {
+    const prevTitle = document.title
+    document.title = 'أمرني للمنشآت — خدمات B2B للشركات السعودية'
+    const meta = document.querySelector('meta[name="description"]')
+    const prevDesc = meta?.getAttribute('content') || ''
+    meta?.setAttribute('content', 'منصة B2B سعودية تربط شركتك بمزودي خدمات معتمدين في ١٨ تخصصاً — حوكمة، سعودة، قانوني، مالي، جودة، تقنية والمزيد. مطابقة خلال ٢٤ ساعة.')
+    return () => {
+      document.title = prevTitle
+      meta?.setAttribute('content', prevDesc)
+    }
+  }, [])
+
   // Load my leads when tab opens
   useEffect(() => {
     if (activeTab === 'my-requests' && user) {
@@ -1342,7 +1355,7 @@ export function EnterprisesPage() {
                   {savedDraft && !success ? '📝 مسودة محفوظة' : 'سيصلك رد خلال ٢٤ ساعة'}
                 </p>
               </div>
-              <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors"><X size={14} /></button>
+              <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors" aria-label="إغلاق"><X size={14} /></button>
             </div>
             {success ? (
               <div className="p-8 text-center">

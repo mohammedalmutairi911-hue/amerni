@@ -256,7 +256,7 @@ export function Chat({ taskId, taskTitle }: Props) {
         <div className="mx-3 mb-2 relative inline-flex">
           <img src={imagePreview} alt="" className="h-16 w-16 object-cover rounded-xl border border-slate-200" />
           <button onClick={() => { setImagePreview(null); setImageFile(null) }}
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs">
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs" aria-label="إغلاق">
             <X size={10} />
           </button>
         </div>
@@ -266,7 +266,7 @@ export function Chat({ taskId, taskTitle }: Props) {
       {audioURL && !recording && (
         <div className="mx-3 mb-2 flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-xl px-3 py-2">
           <audio src={audioURL} controls className="h-8 flex-1" />
-          <button onClick={() => { setAudioBlob(null); setAudioURL(null) }} className="text-red-400 hover:text-red-500">
+          <button onClick={() => { setAudioBlob(null); setAudioURL(null) }} className="text-red-400 hover:text-red-500" aria-label="إغلاق">
             <X size={14} />
           </button>
         </div>
