@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { COMPANY } from '../lib/constants'
 import { Send, Loader2, Headphones, ArrowLeft, MessageCircle } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
@@ -212,7 +213,7 @@ export function SupportPage() {
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
               </button>
             </div>
-            <p className="text-[10px] text-slate-300 text-center mt-2">support@amerniksa.com</p>
+            <p className="text-[10px] text-slate-300 text-center mt-2">{COMPANY.email}</p>
           </div>
         </div>
       </div>

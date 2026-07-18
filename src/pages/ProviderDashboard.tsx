@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { COMPANY } from '../lib/constants'
 import { Star, CheckCircle, Zap, Loader2, DollarSign, Home, List,
   User, LogOut, BarChart2, Briefcase, MessageSquare,
   Wifi, WifiOff, ChevronRight, Building2, Clock, AlertCircle,
@@ -292,7 +293,7 @@ export function ProviderDashboard() {
                     <p className="text-xs text-slate-400 mb-1">نظام العمولة الحالي</p>
                     <p className="text-2xl font-black text-primary-400">١٪</p>
                     <p className="text-xs text-slate-300 mt-1">من قيمة العقد خلال ٧٢ ساعة</p>
-                    <p className="text-xs text-slate-400 mt-2">SA54150009001465965400007</p>
+                    <p className="text-xs text-slate-400 mt-2">{COMPANY.iban}</p>
                   </div>
                 </div>
               </div>
@@ -345,7 +346,7 @@ export function ProviderDashboard() {
                             </div>
                             <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                               <p className="text-xs text-amber-700 font-bold">⚠️ تذكير العمولة</p>
-                              <p className="text-xs text-amber-600 mt-0.5">بعد توقيع العقد، حوّل ١٪ من قيمته لـ IBAN: SA54150009001465965400007 (بنك البلاد) خلال ٧٢ ساعة</p>
+                              <p className="text-xs text-amber-600 mt-0.5">بعد توقيع العقد، حوّل ١٪ من قيمته لـ IBAN: {COMPANY.iban} (بنك البلاد) خلال ٧٢ ساعة</p>
                             </div>
                           </div>
                         )}
@@ -450,7 +451,7 @@ export function ProviderDashboard() {
                     عمولة <span className="text-primary-400 font-black text-lg">١٪</span> من قيمة كل عقد تُبرمه مع شركة عبر أمرني — تُحوَّل خلال ٧٢ ساعة من التوقيع.
                   </p>
                   <div className="mt-3 bg-slate-800 rounded-xl p-3 font-mono text-xs text-slate-400">
-                    SA54150009001465965400007 • بنك البلاد
+                    {COMPANY.iban} • بنك البلاد
                   </div>
                 </div>
               </div>

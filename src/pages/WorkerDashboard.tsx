@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { COMPANY } from '../lib/constants'
 import { Star, Clock, CheckCircle, Zap, Loader2, MessageSquare, Upload, DollarSign, Home, List, Calendar, User, LogOut, MapPin, Copy, Wifi, WifiOff, BarChart2, Briefcase, TrendingUp, Plus, ChevronRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { requestNotificationPermission, sendLocalNotification, registerServiceWorker } from '../lib/notifications'
@@ -171,7 +172,7 @@ export function WorkerDashboard() {
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 leading-loose">
             أتعهد بتحويل عمولة <span className="font-bold text-primary-500">2%</span> من قيمة الطلب إلى حساب المنصة خلال <span className="font-bold">٧٢ ساعة</span> من الإتمام.
             <div className="mt-3 bg-white border border-slate-200 rounded-xl p-3 space-y-2 text-xs">
-              {[['البنك','بنك البلاد'],['المستفيد','مؤسسة حلول الغد'],['الآيبان','SA54150009001465965400007']].map(([k,v]) => (
+              {[['البنك','بنك البلاد'],['المستفيد','مؤسسة حلول الغد'],['الآيبان',COMPANY.iban]].map(([k,v]) => (
                 <div key={k} className="flex justify-between border-b border-slate-100 pb-1.5 last:border-0">
                   <span className="text-slate-400">{k}</span>
                   <span className="text-slate-700 font-medium">{v}</span>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { COMPANY } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
@@ -1152,7 +1153,7 @@ export function EnterprisesPage() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                   <h3 className="font-bold text-slate-900 mb-4">عن المؤسسة</h3>
                   <div className="space-y-3 text-sm">
-                    {[['اسم المؤسسة','مؤسسة حلول الغد للخدمات الإلكترونية'],['البنك','بنك البلاد'],['رقم الآيبان','SA54150009001465965400007'],['البريد','support@amerniksa.com']].map(([k,v]) => (
+                    {[['اسم المؤسسة','مؤسسة حلول الغد للخدمات الإلكترونية'],['البنك','بنك البلاد'],['رقم الآيبان',COMPANY.iban],['البريد',COMPANY.email]].map(([k,v]) => (
                       <div key={k} className="flex justify-between border-b border-slate-100 pb-3 last:border-0 last:pb-0">
                         <span className="text-slate-900 font-medium">{v}</span>
                         <span className="text-slate-400">{k}</span>
@@ -1176,9 +1177,9 @@ export function EnterprisesPage() {
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-5">
                   {[
-                    { icon: Mail, label:'البريد الإلكتروني', value:'support@amerniksa.com', color:'text-primary-500' },
+                    { icon: Mail, label:'البريد الإلكتروني', value:COMPANY.email, color:'text-primary-500' },
                     { icon: MessageCircle, label:'الدعم المباشر', value:'متاح ٢٤/٧ عبر الدردشة', color:'text-blue-400' },
-                    { icon: Shield, label:'الآيبان — بنك البلاد', value:'SA54150009001465965400007', color:'text-slate-700' },
+                    { icon: Shield, label:'الآيبان — بنك البلاد', value:COMPANY.iban, color:'text-slate-700' },
                   ].map(({ icon: Icon, label, value, color }) => (
                     <div key={label} className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-4">
                       <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0"><Icon size={18} className={color} /></div>
@@ -1197,8 +1198,8 @@ export function EnterprisesPage() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-5">
                   <div className="w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center"><Mail size={28} className="text-primary-500" /></div>
                   <div><h3 className="font-bold text-lg text-slate-900 mb-2">راسلنا مباشرة</h3><p className="text-slate-400 text-sm">سنرد خلال ٢٤ ساعة</p></div>
-                  <a href="mailto:support@amerniksa.com" className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-600 transition-colors flex items-center justify-center gap-2">
-                    <Mail size={16} />support@amerniksa.com
+                  <a href="mailto:${COMPANY.email}" className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-600 transition-colors flex items-center justify-center gap-2">
+                    <Mail size={16} />{COMPANY.email}
                   </a>
                 </div>
               </div>
@@ -1253,7 +1254,7 @@ export function EnterprisesPage() {
                   </div>
                 </div>
               </div>
-              <p className="mt-5 text-center text-sm text-slate-400">للتواصل المباشر: <a href="mailto:support@amerniksa.com" className="text-primary-500 hover:underline">support@amerniksa.com</a></p>
+              <p className="mt-5 text-center text-sm text-slate-400">للتواصل المباشر: <a href="mailto:${COMPANY.email}" className="text-primary-500 hover:underline">{COMPANY.email}</a></p>
             </div>
           </section>
         )}
@@ -1293,7 +1294,7 @@ export function EnterprisesPage() {
             <div className="space-y-4">
               {[
                 { t:'١. طبيعة المنصة', b:'أمرني للمنشآت وسيطة تربط الشركات بمزودي الخدمات. العلاقة التعاقدية تنشأ مباشرة بين الطرفين.' },
-                { t:'٢. العمولة الحالية ⭐', b:'العمولة الحالية ١٪ من قيمة العقد المُبرم، تُحوَّل لـ IBAN: SA54150009001465965400007 (بنك البلاد) خلال ٧٢ ساعة من التعاقد. هذا النظام مؤقت حتى إطلاق نظام الاشتراك الشهري.' },
+                { t:'٢. العمولة الحالية ⭐', b:'العمولة الحالية ١٪ من قيمة العقد المُبرم، تُحوَّل لـ IBAN: ' + COMPANY.iban + ' (بنك البلاد) خلال ٧٢ ساعة من التعاقد. هذا النظام مؤقت حتى إطلاق نظام الاشتراك الشهري.' },
                 { t:'٣. نظام الاشتراك المستقبلي', b:'تعمل أمرني على إطلاق نظام اشتراك شهري (Starter / Pro / Enterprise). سيتم إبلاغ جميع المستخدمين قبل التحول بـ ٣٠ يوماً.' },
                 { t:'٤. إقرار السرية', b:'كل مزود خدمة يوقع إقرار سرية ملزم قانونياً قبل الاطلاع على بيانات الشركة.' },
                 { t:'٥. التزامات مزود الخدمة', b:'يلتزم المزود بالسرية التامة، وتقديم بيانات صحيحة، ودفع العمولة المستحقة، والتعامل بمهنية مع الشركات.' },
@@ -1307,7 +1308,7 @@ export function EnterprisesPage() {
               ))}
               <div className="bg-primary-500/5 border border-primary-500/20 rounded-2xl p-6">
                 <p className="text-primary-500 font-semibold mb-2">باستخدام المنصة أنت توافق على هذه الشروط</p>
-                <p className="text-slate-400 text-sm">للاستفسار: <a href="mailto:support@amerniksa.com" className="text-primary-500 hover:underline">support@amerniksa.com</a></p>
+                <p className="text-slate-400 text-sm">للاستفسار: <a href="mailto:${COMPANY.email}" className="text-primary-500 hover:underline">{COMPANY.email}</a></p>
               </div>
             </div>
           </div>
