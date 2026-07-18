@@ -23,7 +23,6 @@ const JoinPage = React.lazy(() => import('./pages/JoinPage').then(m => ({ defaul
 const WorkerProfile = React.lazy(() => import('./pages/WorkerProfile').then(m => ({ default: m.WorkerProfile })))
 const EnterprisesPage = React.lazy(() => import('./pages/EnterprisesPage').then(m => ({ default: m.EnterprisesPage })))
 const ProviderDashboard = React.lazy(() => import('./pages/ProviderDashboard').then(m => ({ default: m.ProviderDashboard })))
-import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastProvider } from './components/Toast'
 
 // Handle worker profile URL param
