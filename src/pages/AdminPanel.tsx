@@ -711,12 +711,66 @@ export function AdminPanel() {
                       </div>
                     )}
 
-                    {prov.description && <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 leading-relaxed mb-3">{prov.description}</p>}
+                    {/* تفاصيل التحقق */}
+                    {(() => {
+                      let details: any = {}
+                      try { details = JSON.parse(prov.description || '{}') } catch {}
+                      return (
+                        <div className="space-y-2 mb-3">
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            {details.provider_type && (
+                              <div className="bg-slate-50 rounded-lg px-3 py-2">
+                                <span className="text-slate-400">النوع: </span>
+                                <span className="font-medium">{details.provider_type === 'company' ? '🏢 شركة/مؤسسة' : '👤 فرد مستقل'}</span>
+                              </div>
+                            )}
+                            {details.years_experience && (
+                              <div className="bg-slate-50 rounded-lg px-3 py-2">
+                                <span className="text-slate-400">الخبرة: </span>
+                                <span className="font-medium">{details.years_experience} سنوات</span>
+                              </div>
+                            )}
+                            {(details.cr_number || prov.cr_number) && (
+                              <div className="bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                <span className="text-blue-500">س.ت: </span>
+                                <span className="font-medium font-mono">{details.cr_number || prov.cr_number}</span>
+                                {details.cr_expiry && <span className="text-slate-400 mr-1">| ينتهي: {details.cr_expiry}</span>}
+                              </div>
+                            )}
+                            {details.freelance_doc && (
+                              <div className="bg-blue-50 rounded-lg px-3 py-2 border border-blue-100">
+                                <span className="text-blue-500">وثيقة عمل حر: </span>
+                                <span className="font-medium font-mono">{details.freelance_doc}</span>
+                              </div>
+                            )}
+                            {details.vat_number && (
+                              <div className="bg-slate-50 rounded-lg px-3 py-2">
+                                <span className="text-slate-400">الرقم الضريبي: </span>
+                                <span className="font-medium font-mono">{details.vat_number}</span>
+                              </div>
+                            )}
+                            {details.certifications && (
+                              <div className="bg-green-50 rounded-lg px-3 py-2 border border-green-100 col-span-2">
+                                <span className="text-green-600">الشهادات: </span>
+                                <span className="font-medium">{details.certifications}</span>
+                              </div>
+                            )}
+                            {details.prev_clients && (
+                              <div className="bg-green-50 rounded-lg px-3 py-2 border border-green-100 col-span-2">
+                                <span className="text-green-600">عملاء سابقون: </span>
+                                <span className="font-medium">{details.prev_clients}</span>
+                              </div>
+                            )}
+                          </div>
+                          {details.bio && <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 leading-relaxed">{details.bio}</p>}
+                        </div>
+                      )
+                    })()}
 
                     <div className="flex flex-wrap gap-2 text-xs text-slate-400 mb-3">
-                      {prov.cr_number && <span>سجل تجاري: {prov.cr_number}</span>}
-                      {prov.linkedin_url && <a href={prov.linkedin_url} target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">LinkedIn</a>}
-                      {prov.website_url && <a href={prov.website_url} target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">الموقع</a>}
+                      {prov.city && <span>📍 {prov.city}</span>}
+                      {prov.linkedin_url && <a href={prov.linkedin_url} target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">LinkedIn ↗</a>}
+                      {prov.website_url && <a href={prov.website_url} target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">الموقع ↗</a>}
                     </div>
 
                     <div className="flex gap-2">

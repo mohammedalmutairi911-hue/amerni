@@ -128,7 +128,25 @@ export function EnterprisesPage() {
   const [leadsLoading, setLeadsLoading] = useState(false)
 
   // Provider register
-  const [provForm, setProvForm] = useState({ company_name: '', contact_name: '', contact_email: '', contact_phone: '', cr_number: '', categories: [] as string[], description: '', city: '', linkedin_url: '', website_url: '' })
+  const [provForm, setProvForm] = useState({
+    // بيانات أساسية
+    company_name: '', contact_name: '', contact_email: '', contact_phone: '', city: '',
+    // وثائق التحقق
+    cr_number: '',           // رقم السجل التجاري
+    cr_expiry: '',           // تاريخ انتهاء السجل
+    freelance_doc: '',       // رقم وثيقة العمل الحر (للأفراد)
+    vat_number: '',          // الرقم الضريبي
+    provider_type: 'company' as 'company' | 'freelancer', // نوع المزود
+    // المؤهلات
+    years_experience: '',    // سنوات الخبرة
+    certifications: '',      // الشهادات المهنية (PMP، ISO Lead Auditor، إلخ)
+    prev_clients: '',        // عملاء سابقون (شركات مرجعية)
+    // التخصصات
+    categories: [] as string[],
+    description: '',
+    // روابط
+    linkedin_url: '', website_url: '',
+  })
   const [provSubmitting, setProvSubmitting] = useState(false)
   const [provSuccess, setProvSuccess] = useState(false)
   const [provError, setProvError] = useState('')
@@ -223,19 +241,45 @@ export function EnterprisesPage() {
     if (!provForm.company_name || !provForm.contact_name || !provForm.contact_email || provForm.categories.length === 0) {
       setProvError('يرجى تعبئة جميع الحقول المطلوبة واختيار تخصص واحد على الأقل'); return
     }
+    if (provForm.provider_type === 'company' && !provForm.cr_number) {
+      setProvError('رقم السجل التجاري مطلوب للشركات'); return
+    }
+    if (provForm.provider_type === 'freelancer' && !provForm.freelance_doc) {
+      setProvError('رقم وثيقة العمل الحر مطلوب للأفراد'); return
+    }
+    if (!provForm.years_experience) {
+      setProvError('يرجى تحديد سنوات الخبرة'); return
+    }
     if (!ndaAccepted) { setProvError('يرجى الموافقة على إقرار السرية'); return }
     setProvSubmitting(true); setProvError('')
     try {
-      const { error: err } = await supabase.from('enterprise_providers').insert({
-        ...provForm,
+      const payload = {
         company_name: sanitize(provForm.company_name),
         contact_name: sanitize(provForm.contact_name),
         contact_email: provForm.contact_email.trim().toLowerCase(),
-        description: sanitize(provForm.description),
+        contact_phone: sanitize(provForm.contact_phone),
+        city: sanitize(provForm.city),
+        cr_number: sanitize(provForm.cr_number),
+        description: JSON.stringify({
+          provider_type: provForm.provider_type,
+          cr_number: provForm.cr_number,
+          cr_expiry: provForm.cr_expiry,
+          freelance_doc: provForm.freelance_doc,
+          vat_number: provForm.vat_number,
+          years_experience: provForm.years_experience,
+          certifications: sanitize(provForm.certifications),
+          prev_clients: sanitize(provForm.prev_clients),
+          bio: sanitize(provForm.description),
+        }),
+        categories: provForm.categories,
+        linkedin_url: provForm.linkedin_url,
+        website_url: provForm.website_url,
         user_id: user?.id ?? null,
         is_approved: false,
         nda_accepted: ndaAccepted,
-      })
+        nda_accepted_at: new Date().toISOString(),
+      }
+      const { error: err } = await supabase.from('enterprise_providers').insert(payload)
       if (err) throw err
       setProvSuccess(true)
     } catch { setProvError('حدث خطأ، يرجى المحاولة مجدداً') }
@@ -501,92 +545,198 @@ export function EnterprisesPage() {
                 </div>
               ) : (
                 <div className="space-y-5">
-                  {/* NDA first */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
-                    <h3 className="font-bold text-amber-800 mb-2 flex items-center gap-2"><Shield size={16} />إقرار السرية — مطلوب</h3>
-                    <p className="text-sm text-amber-700 leading-relaxed mb-4">
-                      بتسجيلك كمزود خدمة في أمرني للمنشآت، تتعهد بالحفاظ على سرية بيانات الشركات التي تُطابق معها، وعدم استخدامها لأي غرض خارج نطاق الخدمة المتفق عليها، وعدم التواصل مع الشركات خارج المنصة.
-                    </p>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input type="checkbox" checked={ndaAccepted} onChange={e => setNdaAccepted(e.target.checked)}
-                        className="w-4 h-4 rounded text-primary-500" />
-                      <span className="text-sm font-bold text-amber-800">أوافق على إقرار السرية</span>
-                    </label>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    {[['اسم الشركة *','company_name','شركة المستقبل'],['اسم المسؤول *','contact_name','محمد العبدالله']].map(([lbl,key,ph]) => (
-                      <div key={key}>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">{lbl}</label>
-                        <input value={(provForm as any)[key]} onChange={e => setProvForm(f => ({ ...f, [key]: e.target.value }))}
-                          placeholder={ph} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" />
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">البريد الإلكتروني *</label>
-                      <input type="email" value={provForm.contact_email} onChange={e => setProvForm(f => ({ ...f, contact_email: e.target.value }))}
-                        placeholder="info@company.com" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال</label>
-                      <input value={provForm.contact_phone} onChange={e => setProvForm(f => ({ ...f, contact_phone: e.target.value }))}
-                        placeholder="05xxxxxxxx" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">رقم السجل التجاري</label>
-                      <input value={provForm.cr_number} onChange={e => setProvForm(f => ({ ...f, cr_number: e.target.value }))}
-                        placeholder="1010xxxxxx" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">المدينة</label>
-                      <input value={provForm.city} onChange={e => setProvForm(f => ({ ...f, city: e.target.value }))}
-                        placeholder="الرياض" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" />
-                    </div>
-                  </div>
-
+                  {/* ① نوع المزود */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-2">التخصصات *</label>
-                    <div className="space-y-2">
-                      {CATEGORY_GROUPS.map(g => (
-                        <div key={g.id} className="border border-slate-200 rounded-xl p-3">
-                          <p className="text-xs font-bold text-slate-600 mb-2">{g.label}</p>
-                          <div className="flex flex-wrap gap-2">
-                            {g.items.map(cat => (
-                              <button key={cat.id} type="button" onClick={() => toggleProvCat(cat.id)}
-                                className={`text-xs px-2.5 py-1 rounded-lg border transition-all ${provForm.categories.includes(cat.id) ? 'bg-primary-500 text-white border-primary-500' : 'border-slate-200 text-slate-600 hover:border-primary-300'}`}>
-                                {cat.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">نوع المزود *</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[['company','شركة / مؤسسة','سجل تجاري'],['freelancer','فرد / مستقل','وثيقة عمل حر']].map(([v,l,s]) => (
+                        <button key={v} type="button" onClick={() => setProvForm(f => ({ ...f, provider_type: v as any }))}
+                          className={`flex flex-col items-center gap-1 py-4 rounded-2xl border-2 transition-all ${provForm.provider_type === v ? 'border-primary-500 bg-primary-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                          <span className="text-2xl">{v === 'company' ? '🏢' : '👤'}</span>
+                          <span className={`text-sm font-bold ${provForm.provider_type === v ? 'text-primary-600' : 'text-slate-700'}`}>{l}</span>
+                          <span className="text-xs text-slate-400">{s}</span>
+                        </button>
                       ))}
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">نبذة عن خبراتك</label>
-                    <textarea value={provForm.description} onChange={e => setProvForm(f => ({ ...f, description: e.target.value }))}
-                      rows={3} placeholder="اكتب نبذة عن خبراتك ومؤهلاتك..."
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50 resize-none" />
+                  {/* ② بيانات أساسية */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">البيانات الأساسية</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">{provForm.provider_type === 'company' ? 'اسم الشركة / المؤسسة *' : 'الاسم التجاري *'}</label>
+                        <input value={provForm.company_name} onChange={e => setProvForm(f => ({ ...f, company_name: e.target.value }))}
+                          placeholder={provForm.provider_type === 'company' ? 'شركة المستقبل' : 'محمد للاستشارات'}
+                          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">اسم المسؤول *</label>
+                        <input value={provForm.contact_name} onChange={e => setProvForm(f => ({ ...f, contact_name: e.target.value }))}
+                          placeholder="محمد العبدالله"
+                          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">البريد الإلكتروني *</label>
+                        <input type="email" value={provForm.contact_email} onChange={e => setProvForm(f => ({ ...f, contact_email: e.target.value }))}
+                          placeholder="info@company.com"
+                          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" dir="ltr" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال *</label>
+                        <input value={provForm.contact_phone} onChange={e => setProvForm(f => ({ ...f, contact_phone: e.target.value }))}
+                          placeholder="05xxxxxxxx"
+                          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" dir="ltr" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">المدينة</label>
+                      <select value={provForm.city} onChange={e => setProvForm(f => ({ ...f, city: e.target.value }))}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white">
+                        <option value="">اختر المدينة</option>
+                        {['الرياض','جدة','مكة المكرمة','المدينة المنورة','الدمام','الخبر','الأحساء','تبوك','أبها','بريدة','حائل','نجران','جازان'].map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
                   </div>
 
+                  {/* ③ وثائق التحقق */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-3">
+                    <p className="text-xs font-bold text-blue-600 uppercase tracking-wide flex items-center gap-1.5">
+                      <Shield size={12} /> وثائق التحقق — مطلوبة للاعتماد
+                    </p>
+
+                    {provForm.provider_type === 'company' ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">رقم السجل التجاري *</label>
+                          <input value={provForm.cr_number} onChange={e => setProvForm(f => ({ ...f, cr_number: e.target.value }))}
+                            placeholder="1010xxxxxx" maxLength={10}
+                            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" dir="ltr" />
+                          <p className="text-xs text-slate-400 mt-1">١٠ أرقام من وزارة التجارة</p>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">تاريخ انتهاء السجل</label>
+                          <input type="date" value={provForm.cr_expiry} onChange={e => setProvForm(f => ({ ...f, cr_expiry: e.target.value }))}
+                            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" dir="ltr" />
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">رقم وثيقة العمل الحر *</label>
+                        <input value={provForm.freelance_doc} onChange={e => setProvForm(f => ({ ...f, freelance_doc: e.target.value }))}
+                          placeholder="رقم الوثيقة من منصة freelance.sa"
+                          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" dir="ltr" />
+                        <p className="text-xs text-slate-400 mt-1">وثيقة العمل الحر من وزارة الموارد البشرية</p>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">الرقم الضريبي (VAT) — إن وجد</label>
+                      <input value={provForm.vat_number} onChange={e => setProvForm(f => ({ ...f, vat_number: e.target.value }))}
+                        placeholder="300xxxxxxxxx" maxLength={15}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" dir="ltr" />
+                      <p className="text-xs text-slate-400 mt-1">١٥ رقم من هيئة الزكاة والضريبة والجمارك</p>
+                    </div>
+                  </div>
+
+                  {/* ④ المؤهلات والخبرة */}
+                  <div className="bg-green-50 border border-green-200 rounded-2xl p-4 space-y-3">
+                    <p className="text-xs font-bold text-green-700 uppercase tracking-wide flex items-center gap-1.5">
+                      <Star size={12} /> المؤهلات والخبرة
+                    </p>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">سنوات الخبرة في التخصص *</label>
+                      <select value={provForm.years_experience} onChange={e => setProvForm(f => ({ ...f, years_experience: e.target.value }))}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white">
+                        <option value="">اختر</option>
+                        <option value="1-3">١ – ٣ سنوات</option>
+                        <option value="3-5">٣ – ٥ سنوات</option>
+                        <option value="5-10">٥ – ١٠ سنوات</option>
+                        <option value="10+">أكثر من ١٠ سنوات</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">الشهادات المهنية</label>
+                      <input value={provForm.certifications} onChange={e => setProvForm(f => ({ ...f, certifications: e.target.value }))}
+                        placeholder="مثال: PMP، ISO 9001 Lead Auditor، CPA، زمالة هيئة المحاسبين..."
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white" />
+                      <p className="text-xs text-slate-400 mt-1">شهادات معتمدة محلياً أو دولياً</p>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">عملاء سابقون (مراجع)</label>
+                      <input value={provForm.prev_clients} onChange={e => setProvForm(f => ({ ...f, prev_clients: e.target.value }))}
+                        placeholder="مثال: أرامكو السعودية، البنك الأهلي، وزارة التجارة..."
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white" />
+                      <p className="text-xs text-slate-400 mt-1">شركات أو جهات سبق التعاون معها</p>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">نبذة تعريفية *</label>
+                      <textarea value={provForm.description} onChange={e => setProvForm(f => ({ ...f, description: e.target.value }))}
+                        rows={3} placeholder="اكتب نبذة مختصرة عن خبراتك وما تقدمه من خدمات..."
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 bg-white resize-none" />
+                    </div>
+                  </div>
+
+                  {/* ⑤ التخصصات */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">التخصصات التي تقدمها *</label>
+                    <div className="space-y-2">
+                      {CATEGORY_GROUPS.map(g => {
+                        const GIcon = g.icon
+                        return (
+                          <div key={g.id} className="border border-slate-200 rounded-xl overflow-hidden">
+                            <div className={`flex items-center gap-2 px-3 py-2 ${g.bg}`}>
+                              <GIcon size={14} className={g.color} />
+                              <p className="text-xs font-bold text-slate-700">{g.label}</p>
+                            </div>
+                            <div className="flex flex-wrap gap-2 p-3">
+                              {g.items.map(cat => (
+                                <button key={cat.id} type="button" onClick={() => toggleProvCat(cat.id)}
+                                  className={`text-xs px-2.5 py-1 rounded-lg border transition-all ${provForm.categories.includes(cat.id) ? 'bg-primary-500 text-white border-primary-500' : 'border-slate-200 text-slate-600 hover:border-primary-300'}`}>
+                                  {cat.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {provForm.categories.length > 0 && (
+                      <p className="text-xs text-primary-500 mt-2">✓ {provForm.categories.length} تخصص محدد</p>
+                    )}
+                  </div>
+
+                  {/* ⑥ روابط اختيارية */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">LinkedIn (اختياري)</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">LinkedIn</label>
                       <input value={provForm.linkedin_url} onChange={e => setProvForm(f => ({ ...f, linkedin_url: e.target.value }))}
-                        placeholder="linkedin.com/in/..." className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
+                        placeholder="linkedin.com/in/..." className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">الموقع الإلكتروني (اختياري)</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">الموقع الإلكتروني</label>
                       <input value={provForm.website_url} onChange={e => setProvForm(f => ({ ...f, website_url: e.target.value }))}
-                        placeholder="www.company.com" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
+                        placeholder="www.company.com" className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
                     </div>
+                  </div>
+
+                  {/* ⑦ إقرار السرية */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                    <h3 className="font-bold text-amber-800 mb-2 flex items-center gap-2 text-sm"><Shield size={14} />إقرار السرية — مطلوب</h3>
+                    <p className="text-xs text-amber-700 leading-relaxed mb-3">
+                      بتسجيلك كمزود خدمة في أمرني للمنشآت، تتعهد بـ:
+                      <br/>• الحفاظ على سرية بيانات الشركات التي تُطابق معها
+                      <br/>• عدم استخدام البيانات لأي غرض خارج الخدمة المتفق عليها
+                      <br/>• عدم التواصل مع الشركات خارج المنصة
+                      <br/>• دفع عمولة ١٪ من قيمة العقد المُبرم خلال ٧٢ ساعة
+                    </p>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input type="checkbox" checked={ndaAccepted} onChange={e => setNdaAccepted(e.target.checked)} className="w-4 h-4 rounded" />
+                      <span className="text-sm font-bold text-amber-800">أقر بقراءة وموافقة هذا الإقرار</span>
+                    </label>
                   </div>
 
                   {provError && <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl border border-red-100">{provError}</div>}
@@ -595,6 +745,7 @@ export function EnterprisesPage() {
                     className="w-full bg-slate-800 hover:bg-slate-900 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
                     {provSubmitting ? <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" /> : <><Send size={15} /><span>تقديم طلب التسجيل</span></>}
                   </button>
+                  <p className="text-xs text-slate-400 text-center">سيراجع فريقنا طلبك ويتواصل معك خلال ٤٨ ساعة</p>
                 </div>
               )}
             </div>
