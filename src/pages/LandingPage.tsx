@@ -212,6 +212,18 @@ export function LandingPage() {
   const [showAuthDirect, setShowAuthDirect] = useState(false)
   const [authDirectMode, setAuthDirectMode] = useState<'login'|'register'>('login')
 
+  // Contact form
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' })
+  const [contactSent, setContactSent] = useState(false)
+  const [contactLoading, setContactLoading] = useState(false)
+
+  // Support chat
+  const [supportMsgs, setSupportMsgs] = useState<SupportMsg[]>([
+    { role: 'assistant', content: 'أهلاً! أنا مساعد أمرني. كيف أقدر أساعدك اليوم؟ 😊' }
+  ])
+  const [supportInput, setSupportInput] = useState('')
+  const [supportLoading, setSupportLoading] = useState(false)
+
   const chooseMode = (m: 'individuals' | 'enterprises') => {
     if (m === 'enterprises') { navigate('enterprises'); return }
     setMode(m)
@@ -265,18 +277,6 @@ export function LandingPage() {
       </div>
     )
   }
-
-  // Contact form
-  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' })
-  const [contactSent, setContactSent] = useState(false)
-  const [contactLoading, setContactLoading] = useState(false)
-
-  // Support chat
-  const [supportMsgs, setSupportMsgs] = useState<SupportMsg[]>([
-    { role: 'assistant', content: 'أهلاً! أنا مساعد أمرني. كيف أقدر أساعدك اليوم؟ 😊' }
-  ])
-  const [supportInput, setSupportInput] = useState('')
-  const [supportLoading, setSupportLoading] = useState(false)
 
   useEffect(() => {
     const t = setInterval(() => {
