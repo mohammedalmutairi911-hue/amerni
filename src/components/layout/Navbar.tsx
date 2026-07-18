@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown, Users, Gift } from 'lucide-react'
+import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown, Users, Gift, Building2 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
 import { getAvatar } from '../../lib/supabase'
@@ -28,7 +28,10 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-6 text-sm text-slate-500">
             <button onClick={() => scrollTo('how-it-works')} className="hover:text-slate-900 transition-colors">كيف تشتغل</button>
             <button onClick={() => scrollTo('features')} className="hover:text-slate-900 transition-colors">المميزات</button>
-            <button onClick={() => scrollTo('trust')} className="hover:text-slate-900 transition-colors">الثقة والأمان</button>
+            <button onClick={() => navigate('enterprises')} className="flex items-center gap-1.5 text-primary-500 font-semibold hover:text-primary-600 transition-colors">
+              <Building2 size={14} />
+              <span>المنشآت</span>
+            </button>
           </div>
         )}
 
@@ -83,6 +86,10 @@ export function Navbar() {
                         <Shield size={15} /> الإدارة
                       </button>
                     )}
+                    <button onClick={() => { navigate('enterprises'); setDropOpen(false) }}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-primary-500 hover:bg-primary-50 rounded-lg transition-colors font-medium">
+                      <Building2 size={15} /> المنشآت
+                    </button>
                     <button onClick={() => { signOut(); setDropOpen(false) }}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-950/30 rounded-lg transition-colors">
                       <LogOut size={15} /> خروج

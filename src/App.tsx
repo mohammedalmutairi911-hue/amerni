@@ -19,6 +19,7 @@ import { WorkerProfile } from './pages/WorkerProfile'
 import { InstallPrompt } from './components/InstallPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { EnterprisesPage } from './pages/EnterprisesPage'
 import { ToastProvider } from './components/Toast'
 
 // Handle worker profile URL param
@@ -91,6 +92,7 @@ export default function App() {
   const renderContent = () => {
     if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
 
+    if (page === 'enterprises') return <><Navbar /><EnterprisesPage /></>
     if (page === 'support') return <><Navbar /><SupportPage /></>
     if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
     if (page === 'bounties') return <><Navbar /><BountiesPage /></>
