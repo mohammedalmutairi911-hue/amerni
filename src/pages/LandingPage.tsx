@@ -113,7 +113,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
           </button>
           <button onClick={() => setRole('worker')}
             className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'worker' ? 'bg-primary-500 text-white' : 'text-slate-500 hover:text-slate-900'}`}>
-            🔧 أبي أقدم خدمة
+            🔧 سجّل كمزود خدمة
           </button>
         </div>
       )}
@@ -545,7 +545,7 @@ export function LandingPage() {
                 <div className="flex flex-wrap justify-center gap-3">
                   <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }}
                     className="bg-white text-primary-500 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
-                    سجّل الآن كمحترف
+                    سجّل كمزود خدمة
                   </button>
                   <button onClick={() => setActiveTab('how')}
                     className="border-2 border-white text-slate-900 font-bold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors">
@@ -867,7 +867,7 @@ export function LandingPage() {
               {/* FAQ quick */}
               <div className="grid grid-cols-2 gap-2 mb-6">
                 {[
-                  'كيف أتابع طلبي؟', 'كيف أنضم كعامل؟',
+                  'كيف أتابع طلبي؟', 'كيف أسجّل كمزود خدمة؟',
                   'فيه مشكلة في طلب', 'كيف يتم الدفع؟'
                 ].map(q => (
                   <button key={q} onClick={() => {

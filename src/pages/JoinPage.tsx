@@ -10,7 +10,7 @@ export function JoinPage() {
           <div className="w-16 h-16 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-slate-900 text-3xl font-black">أ</span>
           </div>
-          <h1 className="text-3xl font-black text-slate-900 mb-2">انضم كمُنجز في أمرني</h1>
+          <h1 className="text-3xl font-black text-slate-900 mb-2">سجّل كمزود خدمة في أمرني</h1>
           <p className="text-slate-500">اكسب من وقتك الحر بدون رأس مال</p>
         </div>
 
@@ -33,7 +33,7 @@ export function JoinPage() {
 
         <button onClick={() => { openAuth('signup'); navigate('landing') }}
           className="w-full bg-primary-500 hover:bg-primary-400 text-white font-black py-4 rounded-2xl text-lg transition-colors mb-3">
-          سجّل كمُنجز — مجاناً
+          سجّل كمزود خدمة — مجاناً
         </button>
         <button onClick={() => navigate('landing')}
           className="w-full text-slate-400 hover:text-slate-600 py-3 text-sm transition-colors">

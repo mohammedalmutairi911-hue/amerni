@@ -110,7 +110,7 @@ export function Navbar() {
               </button>
               <button onClick={() => navigate('join')}
                 className="text-sm bg-secondary-500 text-slate-900 font-bold px-4 py-1.5 rounded-lg hover:bg-secondary-600 transition-colors hidden sm:block">
-                سجّل للعمل معنا
+                سجّل كمزود خدمة
               </button>
             </div>
           )}
