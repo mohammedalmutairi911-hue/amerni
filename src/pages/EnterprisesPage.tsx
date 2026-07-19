@@ -215,6 +215,12 @@ export function EnterprisesPage() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contact_email)) {
       setError('يرجى إدخال بريد إلكتروني صحيح'); return
     }
+    if (form.contact_name.trim().length < 2) {
+      setError('يرجى إدخال اسم صحيح'); return
+    }
+    if (form.contact_phone.trim() && !/^[0-9+\-() ]{9,20}$/.test(form.contact_phone.trim())) {
+      setError('رقم الجوال غير صحيح — أدخل أرقاماً فقط (9 إلى 20 خانة)'); return
+    }
     if (form.description.trim().length < 10) {
       setError('يرجى كتابة وصف أكثر تفصيلاً'); return
     }
@@ -260,6 +266,18 @@ export function EnterprisesPage() {
     }
     if (provForm.provider_type === 'company' && !provForm.cr_number) {
       setProvError('رقم السجل التجاري مطلوب للشركات'); return
+    }
+    if (provForm.provider_type === 'company' && provForm.cr_number && !/^[0-9]{10}$/.test(provForm.cr_number.trim())) {
+      setProvError('رقم السجل التجاري يجب أن يكون 10 أرقام'); return
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(provForm.contact_email)) {
+      setProvError('يرجى إدخال بريد إلكتروني صحيح'); return
+    }
+    if (provForm.contact_name.trim().length < 2) {
+      setProvError('يرجى إدخال اسم صحيح'); return
+    }
+    if (provForm.contact_phone.trim() && !/^[0-9+\-() ]{9,20}$/.test(provForm.contact_phone.trim())) {
+      setProvError('رقم الجوال غير صحيح — أدخل أرقاماً فقط (9 إلى 20 خانة)'); return
     }
     if (provForm.provider_type === 'freelancer' && !provForm.freelance_doc) {
       setProvError('رقم وثيقة العمل الحر مطلوب للأفراد'); return
@@ -886,7 +904,7 @@ export function EnterprisesPage() {
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال *</label>
-                        <input value={provForm.contact_phone} onChange={e => setProvForm(f => ({ ...f, contact_phone: e.target.value }))}
+                        <input value={provForm.contact_phone} maxLength={20} inputMode="tel" onChange={e => setProvForm(f => ({ ...f, contact_phone: e.target.value.replace(/[^0-9+\-() ]/g, '') }))}
                           placeholder="05xxxxxxxx"
                           className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" dir="ltr" />
                       </div>
@@ -911,7 +929,7 @@ export function EnterprisesPage() {
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-semibold text-slate-700 mb-1">رقم السجل التجاري *</label>
-                          <input value={provForm.cr_number} onChange={e => setProvForm(f => ({ ...f, cr_number: e.target.value }))}
+                          <input value={provForm.cr_number} maxLength={10} inputMode="numeric" onChange={e => setProvForm(f => ({ ...f, cr_number: e.target.value.replace(/[^0-9]/g, '').slice(0,10) }))}
                             placeholder="1010xxxxxx" maxLength={10}
                             className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" dir="ltr" />
                           <p className="text-xs text-slate-400 mt-1">١٠ أرقام من وزارة التجارة</p>
@@ -1427,7 +1445,7 @@ export function EnterprisesPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال</label>
-                    <input value={form.contact_phone} onChange={e => setF('contact_phone', e.target.value)}
+                    <input value={form.contact_phone} maxLength={20} inputMode="tel" onChange={e => setF('contact_phone', e.target.value.replace(/[^0-9+\-() ]/g, ''))}
                       placeholder="05xxxxxxxx" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
                   </div>
                 </div>
