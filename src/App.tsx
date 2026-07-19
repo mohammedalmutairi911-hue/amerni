@@ -77,7 +77,7 @@ export default function App() {
 
   useEffect(() => {
     if (!user || !profile) { setWorkerApproved(null); setWorkerExists(null); return }
-    if (profile.role === 'admin' && page !== 'landing' && page !== 'admin') { navigate('admin'); return }
+    if (profile.role === 'admin' && page !== 'landing' && page !== 'admin' && page !== 'enterprises' && page !== 'provider-dashboard') { navigate('admin'); return }
     if (profile.role === 'worker') {
       setChecking(true)
       supabase.from('worker_profiles').select('id, is_approved').eq('user_id', user.id).maybeSingle()
