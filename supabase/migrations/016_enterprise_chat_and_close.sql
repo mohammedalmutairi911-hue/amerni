@@ -1,0 +1,1 @@
+-- migration 016_enterprise_chat_and_close (مطبّق عبر MCP على القاعدة)

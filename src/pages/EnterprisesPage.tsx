@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { COMPANY } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -747,6 +748,32 @@ export function EnterprisesPage() {
                                   <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-800">
                                     <p className="font-bold mb-1 flex items-center gap-1.5"><CheckCircle2 size={14} />رسالة من الفريق:</p>
                                     <p className="leading-relaxed">{lead.notes}</p>
+                                  </div>
+                                )}
+
+                                {lead.status === 'matched' && (
+                                  <div className="mt-3 space-y-3">
+                                    <EnterpriseChat leadId={lead.id} senderRole="company" />
+                                    <button
+                                      onClick={async () => {
+                                        const val = prompt('قيمة العقد المتفق عليها (ريال) — لحساب العمولة ١٪:')
+                                        if (val === null) return
+                                        const num = parseFloat(val) || null
+                                        const { data, error } = await supabase.rpc('close_enterprise_lead', { p_lead_id: lead.id, p_contract_value: num })
+                                        if (error) { alert('خطأ: ' + error.message); return }
+                                        alert('تم إغلاق الطلب بنجاح' + (data?.commission ? ` — العمولة المستحقة: ${data.commission} ريال` : ''))
+                                        setMyLeads(p => p.map(l => l.id === lead.id ? { ...l, status: 'closed' } : l))
+                                      }}
+                                      className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">
+                                      إغلاق الطلب (تم التعاقد)
+                                    </button>
+                                  </div>
+                                )}
+
+                                {lead.status === 'closed' && (
+                                  <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-2 rounded-xl">
+                                    <CheckCircle2 size={12} />
+                                    <span>تم إغلاق الطلب — شكراً لاستخدامك أمرني للمنشآت</span>
                                   </div>
                                 )}
 

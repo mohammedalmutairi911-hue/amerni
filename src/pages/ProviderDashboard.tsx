@@ -5,6 +5,7 @@ import { Star, CheckCircle, Zap, Loader2, DollarSign, Home, List,
   Wifi, WifiOff, ChevronRight, Building2, Clock, AlertCircle,
   Shield, Phone, Mail, Globe, Linkedin, MapPin } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 
@@ -349,6 +350,13 @@ export function ProviderDashboard() {
                               <p className="text-xs text-amber-700 font-bold">⚠️ تذكير العمولة</p>
                               <p className="text-xs text-amber-600 mt-0.5">بعد توقيع العقد، حوّل ١٪ من قيمته لـ IBAN: {COMPANY.iban} (بنك البلاد) خلال ٧٢ ساعة</p>
                             </div>
+                          </div>
+                        )}
+
+                        {/* Chat with company when matched */}
+                        {lead.status === 'matched' && (
+                          <div className="mt-4">
+                            <EnterpriseChat leadId={lead.id} senderRole="provider" />
                           </div>
                         )}
                       </div>

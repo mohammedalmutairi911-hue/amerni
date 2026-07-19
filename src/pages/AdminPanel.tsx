@@ -122,6 +122,19 @@ export function AdminPanel() {
     setLeads(p => p.map(l => l.id === leadId ? { ...l, status } : l))
   }
 
+  const assignProvider = async (leadId: string, providerId: string) => {
+    // نربط الطلب بالمزود عبر user_id الخاص به (اللي يقرأه داشبورد المزود)
+    const prov = providers.find(p => p.id === providerId)
+    if (!prov) return
+    await supabase.from('enterprise_leads').update({
+      provider_id: prov.user_id,
+      matched_provider_id: providerId,
+      status: 'matched'
+    }).eq('id', leadId)
+    setLeads(p => p.map(l => l.id === leadId ? { ...l, provider_id: prov.user_id, matched_provider_id: providerId, status: 'matched' } : l))
+    alert('تم ربط الطلب بالمزود: ' + prov.company_name + ' — سيظهر في لوحته فوراً')
+  }
+
   const saveLeadNote = async (leadId: string) => {
     const note = leadNote[leadId] || ''
     await supabase.from('enterprise_leads').update({ notes: note }).eq('id', leadId)
@@ -634,6 +647,32 @@ export function AdminPanel() {
                     </div>
 
                     <p className="text-sm text-slate-600 leading-relaxed mb-3 bg-slate-50 rounded-xl px-4 py-3">{lead.description}</p>
+
+                    {/* اختيار المزود للمطابقة */}
+                    <div className="mb-3 bg-primary-50 border border-primary-200 rounded-xl p-3">
+                      <label className="text-xs font-bold text-primary-700 mb-1.5 block">ربط الطلب بمزود خدمة معتمد</label>
+                      <div className="flex gap-2">
+                        <select
+                          defaultValue={lead.matched_provider_id || ''}
+                          onChange={e => { if (e.target.value) assignProvider(lead.id, e.target.value) }}
+                          className="flex-1 text-xs border border-primary-200 rounded-lg px-2 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary-300">
+                          <option value="">— اختر مزود معتمد —</option>
+                          {providers.filter(p => p.is_approved).map(p => (
+                            <option key={p.id} value={p.id}>
+                              {p.company_name} {p.categories?.includes(lead.category) ? '✓ (متخصص)' : ''}
+                            </option>
+                          ))}
+                        </select>
+                        {lead.matched_provider_id && (
+                          <span className="text-xs bg-green-100 text-green-600 px-3 py-2 rounded-lg font-bold whitespace-nowrap flex items-center gap-1">
+                            <CheckCircle size={12} /> مربوط
+                          </span>
+                        )}
+                      </div>
+                      {providers.filter(p => p.is_approved).length === 0 && (
+                        <p className="text-xs text-amber-600 mt-1.5">⚠️ لا يوجد مزودون معتمدون بعد — اعتمد مزوداً من تاب "مزودو خدمة"</p>
+                      )}
+                    </div>
 
                     <div className="flex gap-2 items-end">
                       <textarea

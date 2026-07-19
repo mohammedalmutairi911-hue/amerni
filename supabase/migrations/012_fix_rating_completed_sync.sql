@@ -1,0 +1,1 @@
+-- migration 012_fix_rating_completed_sync (مطبّق عبر MCP على القاعدة)
