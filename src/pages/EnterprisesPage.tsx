@@ -268,6 +268,11 @@ export function EnterprisesPage() {
   }
 
   const handleProvSubmit = async () => {
+    if (!user) {
+      setProvError('يرجى تسجيل الدخول أولاً للتسجيل كمزود')
+      openAuth('signup')
+      return
+    }
     if (!provForm.company_name || !provForm.contact_name || !provForm.contact_email || provForm.categories.length === 0) {
       setProvError('يرجى تعبئة جميع الحقول المطلوبة واختيار تخصص واحد على الأقل'); return
     }
@@ -316,7 +321,7 @@ export function EnterprisesPage() {
         categories: provForm.categories,
         linkedin_url: provForm.linkedin_url,
         website_url: provForm.website_url,
-        user_id: user?.id ?? null,
+        user_id: user.id,
         is_approved: false,
         nda_accepted: ndaAccepted,
         nda_accepted_at: new Date().toISOString(),
@@ -324,8 +329,14 @@ export function EnterprisesPage() {
       const { error: err } = await supabase.from('enterprise_providers').insert(payload)
       if (err) throw err
       setProvSuccess(true)
-    } catch { setProvError('حدث خطأ، يرجى المحاولة مجدداً') }
-    finally { setProvSubmitting(false) }
+    } catch (e: any) {
+      const msg = e?.message || ''
+      if (msg.includes('phone')) setProvError('رقم الجوال غير صحيح — استخدم صيغة 05XXXXXXXX أو رقم دولي يبدأ بـ +')
+      else if (msg.includes('email')) setProvError('البريد الإلكتروني غير صحيح')
+      else if (msg.includes('cr_')) setProvError('رقم السجل التجاري يجب أن يكون 10 أرقام')
+      else if (msg.includes('duplicate') || msg.includes('unique')) setProvError('أنت مسجّل كمزود مسبقاً')
+      else setProvError('حدث خطأ: ' + (msg || 'يرجى المحاولة مجدداً'))
+    } finally { setProvSubmitting(false) }
   }
 
   const toggleProvCat = (id: string) =>
