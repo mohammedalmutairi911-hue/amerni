@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { EnterpriseChat } from '../components/chat/EnterpriseChat'
+import { ReviewBox, VerificationBadge, StarDisplay } from '../components/enterprise/ReviewBox'
+import { ProviderProfileCard } from '../components/enterprise/ProviderProfileCard'
 import { COMPANY } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -216,12 +218,14 @@ export function EnterprisesPage() {
   }, [])
 
   // Load my leads when tab opens
+  const fetchMyLeads = () => {
+    if (!user) return
+    setLeadsLoading(true)
+    supabase.from('enterprise_leads').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+      .then(({ data }) => { setMyLeads(data || []); setLeadsLoading(false) })
+  }
   useEffect(() => {
-    if (activeTab === 'my-requests' && user) {
-      setLeadsLoading(true)
-      supabase.from('enterprise_leads').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
-        .then(({ data }) => { setMyLeads(data || []); setLeadsLoading(false) })
-    }
+    if (activeTab === 'my-requests' && user) fetchMyLeads()
   }, [activeTab, user])
 
   const openForm = (catId: string) => {
@@ -830,6 +834,7 @@ export function EnterprisesPage() {
 
                                 {lead.status === 'matched' && (
                                   <div className="mt-3 space-y-3">
+                                    {lead.provider_id && <ProviderProfileCard providerId={lead.provider_id} />}
                                     <EnterpriseChat leadId={lead.id} senderRole="company" />
                                     <button
                                       onClick={async () => {
@@ -859,9 +864,12 @@ export function EnterprisesPage() {
                                 )}
 
                                 {lead.status === 'closed' && (
-                                  <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-2 rounded-xl">
-                                    <CheckCircle2 size={12} />
-                                    <span>تم إغلاق الطلب — شكراً لاستخدامك أمرني للمنشآت</span>
+                                  <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-2 rounded-xl">
+                                      <CheckCircle2 size={12} />
+                                      <span>تم إغلاق الطلب — شكراً لاستخدامك أمرني للمنشآت</span>
+                                    </div>
+                                    {lead.provider_id && <ReviewBox leadId={lead.id} targetLabel="المزود" onDone={fetchMyLeads} />}
                                   </div>
                                 )}
 

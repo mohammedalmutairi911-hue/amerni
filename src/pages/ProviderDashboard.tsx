@@ -6,6 +6,8 @@ import { Star, CheckCircle, Zap, Loader2, DollarSign, Home, List,
   Shield, Phone, Mail, Globe, Linkedin, MapPin } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { EnterpriseChat } from '../components/chat/EnterpriseChat'
+import { ReviewBox, VerificationBadge, StarDisplay } from '../components/enterprise/ReviewBox'
+import { PortfolioManager } from '../components/enterprise/PortfolioManager'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 
@@ -128,9 +130,12 @@ export function ProviderDashboard() {
           </div>
           <div className="min-w-0">
             <p className="text-sm font-bold text-slate-900 truncate">{providerData.company_name}</p>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${providerData.is_approved ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}`}>
-              {providerData.is_approved ? 'معتمد ✓' : 'قيد المراجعة'}
-            </span>
+            <div className="flex items-center gap-2 flex-wrap mt-0.5">
+              {providerData.is_approved
+                ? <VerificationBadge level={providerData.verification_level || 'verified'} />
+                : <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-600">قيد المراجعة</span>}
+              {providerData.review_count > 0 && <StarDisplay rating={providerData.rating} count={providerData.review_count} />}
+            </div>
           </div>
         </div>
 
@@ -431,6 +436,12 @@ export function ProviderDashboard() {
                             <EnterpriseChat leadId={lead.id} senderRole="provider" />
                           </div>
                         )}
+
+                        {lead.status === 'closed' && (
+                          <div className="mt-4">
+                            <ReviewBox leadId={lead.id} targetLabel="العميل" onDone={fetchAll} />
+                          </div>
+                        )}
                       </div>
                     )
                   })}
@@ -503,6 +514,9 @@ export function ProviderDashboard() {
                     <p className="text-slate-600 text-sm leading-relaxed">{details.bio}</p>
                   </div>
                 )}
+
+                {/* Portfolio — الأعمال السابقة */}
+                <PortfolioManager providerId={user!.id} />
 
                 {/* Links */}
                 {(providerData.linkedin_url || providerData.website_url) && (
