@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase'
 import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { ReviewBox, VerificationBadge, StarDisplay } from '../components/enterprise/ReviewBox'
 import { PortfolioManager } from '../components/enterprise/PortfolioManager'
+import { ProviderReviews, ResponseSpeed } from '../components/enterprise/UXComponents'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 
@@ -135,6 +136,7 @@ export function ProviderDashboard() {
                 ? <VerificationBadge level={providerData.verification_level || 'verified'} />
                 : <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-600">قيد المراجعة</span>}
               {providerData.review_count > 0 && <StarDisplay rating={providerData.rating} count={providerData.review_count} />}
+              <ResponseSpeed minutes={providerData.avg_response_minutes} />
             </div>
           </div>
         </div>
@@ -517,6 +519,9 @@ export function ProviderDashboard() {
 
                 {/* Portfolio — الأعمال السابقة */}
                 <PortfolioManager providerId={user!.id} />
+
+                {/* تقييماتي مع إمكانية الرد */}
+                <ProviderReviews providerId={user!.id} />
 
                 {/* Links */}
                 {(providerData.linkedin_url || providerData.website_url) && (

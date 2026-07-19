@@ -3,6 +3,7 @@ import { Star, ChevronDown, ChevronUp, Building2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { VerificationBadge, StarDisplay } from './ReviewBox'
 import { PortfolioView } from './PortfolioManager'
+import { ResponseSpeed } from './UXComponents'
 
 // بطاقة ملف المزود المطابق — تظهر للشركة لتقييم المزود قبل الاستمرار
 export function ProviderProfileCard({ providerId }: { providerId: string }) {
@@ -35,6 +36,7 @@ export function ProviderProfileCard({ providerId }: { providerId: string }) {
             <div className="flex items-center gap-2 flex-wrap mt-1">
               <VerificationBadge level={provider.verification_level || 'verified'} />
               {provider.review_count > 0 && <StarDisplay rating={provider.rating} count={provider.review_count} />}
+              <ResponseSpeed minutes={provider.avg_response_minutes} />
             </div>
           </div>
         </div>
@@ -68,6 +70,12 @@ export function ProviderProfileCard({ providerId }: { providerId: string }) {
                     ))}
                   </div>
                   {r.comment && <p className="text-xs text-slate-600">{r.comment}</p>}
+                  {r.response && (
+                    <div className="mt-1.5 bg-slate-50 rounded px-2 py-1 border-r-2 border-primary-300">
+                      <p className="text-xs font-bold text-slate-500">رد المزود:</p>
+                      <p className="text-xs text-slate-600">{r.response}</p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

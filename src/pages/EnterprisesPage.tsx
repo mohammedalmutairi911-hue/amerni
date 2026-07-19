@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { ReviewBox, VerificationBadge, StarDisplay } from '../components/enterprise/ReviewBox'
 import { ProviderProfileCard } from '../components/enterprise/ProviderProfileCard'
+import { ResponseSpeed, StatusTimeline, SocialProofBar, EmptyRequests } from '../components/enterprise/UXComponents'
 import { COMPANY } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -508,6 +509,7 @@ export function EnterprisesPage() {
             {/* Search + Categories */}
             <section className="py-16 px-4 bg-white">
               <div className="max-w-6xl mx-auto">
+                <div className="mb-8"><SocialProofBar /></div>
                 <div className="text-center mb-8">
                   <h2 className="text-2xl font-black text-slate-900 mb-2">اختر التخصص</h2>
                   <p className="text-slate-500 mb-6">١٨ تخصصاً في ٥ مجموعات</p>
@@ -791,13 +793,8 @@ export function EnterprisesPage() {
                       {leadsLoading ? (
                         <div className="flex justify-center py-16"><Loader2 size={28} className="animate-spin text-primary-500" /></div>
                       ) : myLeads.length === 0 ? (
-                        <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl">
-                          <Package size={40} className="mx-auto mb-3 text-slate-300" />
-                          <p className="text-slate-600 font-medium mb-4">لا يوجد طلبات بعد</p>
-                          <button onClick={() => { setSelectedCat(null); setShowForm(true) }}
-                            className="bg-primary-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm hover:bg-primary-600 transition-colors">
-                            أرسل أول طلب
-                          </button>
+                        <div className="bg-white border border-slate-200 rounded-2xl">
+                          <EmptyRequests onCreate={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }} />
                         </div>
                       ) : (
                         <div className="space-y-4">
@@ -824,6 +821,12 @@ export function EnterprisesPage() {
                                   {lead.company_size && <span className="bg-slate-100 px-2 py-0.5 rounded">👥 {lead.company_size} موظف</span>}
                                   <span>{new Date(lead.created_at).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                 </div>
+
+                                {lead.status !== 'cancelled' && (
+                                  <div className="border-t border-slate-100 pt-1 mb-2">
+                                    <StatusTimeline status={lead.status} />
+                                  </div>
+                                )}
 
                                 {lead.status === 'matched' && lead.notes && (
                                   <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-800">
