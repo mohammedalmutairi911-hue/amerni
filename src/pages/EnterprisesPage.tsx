@@ -398,6 +398,12 @@ export function EnterprisesPage() {
             ))}
           </div>
           <div className="flex items-center gap-2">
+            {!user && (
+              <button onClick={() => openAuth('login')}
+                className="text-xs px-3 py-1.5 rounded-lg border border-primary-500 text-primary-500 font-bold hover:bg-primary-50 transition-colors">
+                تسجيل الدخول
+              </button>
+            )}
             {user && (
               <button onClick={() => setActiveTab('my-requests')}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${activeTab === 'my-requests' ? 'bg-primary-500 text-white border-primary-500' : 'border-slate-200 text-slate-600 hover:border-primary-300'}`}>
