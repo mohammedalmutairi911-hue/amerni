@@ -93,11 +93,11 @@ export default function App() {
   if (loading || (profile?.role === 'worker' && checking)) return <PageLoader />
 
   const renderContent = () => {
-    if (page === 'enterprises') return <><Navbar /><EnterprisesPage /></>
+    if (page === 'enterprises') return <><Navbar /><EnterprisesPage />{authOpen && <AuthModal />}</>
 
     if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
     if (page === 'landing') return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
-    if (page === 'provider-dashboard') return <ProviderDashboard />
+    if (page === 'provider-dashboard') return <><ProviderDashboard />{authOpen && <AuthModal />}</>
     if (page === 'support') return <><Navbar /><SupportPage /></>
     if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
     if (page === 'bounties') return <><Navbar /><BountiesPage /></>
