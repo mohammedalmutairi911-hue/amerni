@@ -127,6 +127,30 @@ export function EnterprisesPage() {
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [savedProfile, setSavedProfile] = useState<any>(null)
+  const [hasProfile, setHasProfile] = useState(false)
+
+  // تحميل بروفايل الشركة المحفوظ + الإيميل تلقائياً (تعبئة تلقائية)
+  useEffect(() => {
+    if (!user) return
+    supabase.from('company_profiles').select('*').eq('user_id', user.id).maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setSavedProfile(data)
+          setHasProfile(true)
+        }
+      })
+  }, [user?.id])
+
+  // دالة تجهيز نموذج جديد مع التعبئة التلقائية
+  const buildPrefilledForm = (): LeadForm => ({
+    company_name: savedProfile?.company_name || '',
+    contact_name: savedProfile?.contact_name || '',
+    contact_email: user?.email || '',
+    contact_phone: savedProfile?.contact_phone || '',
+    company_size: savedProfile?.company_size || '',
+    category: '', description: '', budget_range: ''
+  })
 
   // My requests
   const [myLeads, setMyLeads] = useState<any[]>([])
@@ -216,17 +240,26 @@ export function EnterprisesPage() {
       openAuth('signup')
       return
     }
-    if (!form.company_name.trim() || !form.contact_name.trim() || !form.contact_email.trim() || !form.category || !form.description.trim()) {
-      setError('يرجى تعبئة جميع الحقول المطلوبة'); return
+    // دمج البيانات المحفوظة مع الحقول الحالية
+    const effective = {
+      company_name: form.company_name.trim() || savedProfile?.company_name || '',
+      contact_name: form.contact_name.trim() || savedProfile?.contact_name || '',
+      contact_email: form.contact_email.trim() || user.email || '',
+      contact_phone: form.contact_phone.trim() || savedProfile?.contact_phone || '',
+      company_size: form.company_size || savedProfile?.company_size || '',
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contact_email)) {
-      setError('يرجى إدخال بريد إلكتروني صحيح'); return
+    if (!form.category || !form.description.trim()) {
+      setError('يرجى اختيار التخصص وكتابة وصف الاحتياج'); return
     }
-    if (form.contact_name.trim().length < 2) {
-      setError('يرجى إدخال اسم صحيح'); return
+    if (!effective.company_name || !effective.contact_name || !effective.contact_email) {
+      setHasProfile(false)
+      setError('يرجى تعبئة بيانات التواصل'); return
     }
-    if (form.contact_phone.trim() && !/^05[0-9]{8}$/.test(form.contact_phone.trim())) {
-      setError('رقم الجوال يجب أن يكون ١٠ أرقام يبدأ بـ 05'); return
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(effective.contact_email)) {
+      setHasProfile(false); setError('يرجى إدخال بريد إلكتروني صحيح'); return
+    }
+    if (effective.contact_phone && !/^05[0-9]{8}$/.test(effective.contact_phone)) {
+      setHasProfile(false); setError('رقم الجوال يجب أن يكون ١٠ أرقام يبدأ بـ 05'); return
     }
     if (form.description.trim().length < 10) {
       setError('يرجى كتابة وصف أكثر تفصيلاً'); return
@@ -234,11 +267,11 @@ export function EnterprisesPage() {
     setSubmitting(true); setError('')
     try {
       const clean = {
-        company_name: sanitize(form.company_name),
-        contact_name: sanitize(form.contact_name),
-        contact_email: form.contact_email.trim().toLowerCase(),
-        contact_phone: sanitize(form.contact_phone),
-        company_size: form.company_size,
+        company_name: sanitize(effective.company_name),
+        contact_name: sanitize(effective.contact_name),
+        contact_email: effective.contact_email.toLowerCase(),
+        contact_phone: sanitize(effective.contact_phone),
+        company_size: effective.company_size,
         category: form.category,
         description: sanitize(form.description),
         budget_range: form.budget_range,
@@ -262,6 +295,8 @@ export function EnterprisesPage() {
         })
       } catch {}
       clearDraft()
+      setSavedProfile({ company_name: clean.company_name, contact_name: clean.contact_name, contact_phone: clean.contact_phone, company_size: clean.company_size })
+      setHasProfile(true)
       setSuccess(true)
     } catch { setError('حدث خطأ، يرجى المحاولة مجدداً') }
     finally { setSubmitting(false) }
@@ -420,7 +455,7 @@ export function EnterprisesPage() {
                 لوحة المزود
               </button>
             )}
-            <button onClick={() => { setSelectedCat(null); setForm(savedDraft || EMPTY_FORM); setSuccess(false); setShowForm(true) }}
+            <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
               className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-xs hover:bg-primary-600 transition-colors">
               أرسل طلبك
             </button>
@@ -459,7 +494,7 @@ export function EnterprisesPage() {
                     <div key={t} className="flex items-center gap-1.5"><CheckCircle2 size={13} className="text-primary-400" /><span>{t}</span></div>
                   ))}
                 </div>
-                <button onClick={() => { setSelectedCat(null); setForm(savedDraft || EMPTY_FORM); setSuccess(false); setShowForm(true) }}
+                <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
                   className="bg-primary-500 hover:bg-primary-600 text-white font-bold px-8 py-3 rounded-2xl transition-colors">
                   أرسل طلبك الآن — مجاناً
                 </button>
@@ -518,7 +553,7 @@ export function EnterprisesPage() {
               <h2 className="text-2xl font-black mb-3">جاهز تبدأ؟</h2>
               <p className="text-primary-200 mb-2">أرسل طلبك الآن — الرد خلال ٢٤ ساعة</p>
               <p className="text-primary-300 text-xs mb-6">عمولة ١٪ مؤقتاً • قادم نظام اشتراك شهري</p>
-              <button onClick={() => { setSelectedCat(null); setForm(savedDraft || EMPTY_FORM); setSuccess(false); setShowForm(true) }}
+              <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
                 className="bg-white text-primary-900 font-bold px-8 py-3 rounded-2xl hover:bg-primary-50 transition-colors">
                 أرسل طلبك الآن
               </button>
@@ -556,7 +591,7 @@ export function EnterprisesPage() {
                     { id: 'new-request', icon: Plus, label: 'طلب جديد' },
                   ].map(({ id, icon: Icon, label, badge }: any) => (
                     <button key={id} onClick={() => {
-                      if (id === 'new-request') { setSelectedCat(null); setForm(savedDraft || EMPTY_FORM); setSuccess(false); setShowForm(true) }
+                      if (id === 'new-request') { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }
                       else setDashSection(id as any)
                     }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
@@ -583,7 +618,7 @@ export function EnterprisesPage() {
                 {/* Mobile Header */}
                 <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800">
                   <p className="text-white font-bold text-sm">{user.email}</p>
-                  <button onClick={() => { setSelectedCat(null); setForm(savedDraft || EMPTY_FORM); setSuccess(false); setShowForm(true) }}
+                  <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
                     className="flex items-center gap-1.5 bg-primary-500 text-white font-bold px-3 py-1.5 rounded-xl text-xs">
                     <Plus size={13} /> طلب جديد
                   </button>
@@ -1446,6 +1481,19 @@ export function EnterprisesPage() {
               </div>
             ) : (
               <div className="p-6 space-y-4">
+                {/* بيانات الشركة المحفوظة — مطوية لو موجودة */}
+                {hasProfile && (
+                  <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-sm text-green-700 min-w-0">
+                      <CheckCircle2 size={15} className="flex-shrink-0" />
+                      <span className="truncate">بيانات {form.company_name || 'شركتك'} محفوظة — {form.contact_email}</span>
+                    </div>
+                    <button type="button" onClick={() => setHasProfile(false)}
+                      className="text-xs text-green-600 underline flex-shrink-0 hover:text-green-800">تعديل</button>
+                  </div>
+                )}
+
+                {/* التخصص — أهم حقل، دائماً ظاهر */}
                 {!selectedCat && (
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">التخصص المطلوب *</label>
@@ -1460,57 +1508,67 @@ export function EnterprisesPage() {
                     </select>
                   </div>
                 )}
-                <div className="grid grid-cols-2 gap-3">
-                  {[['اسم الشركة *','company_name','شركة المستقبل'],['اسم المسؤول *','contact_name','محمد العبدالله']].map(([l,k,p]) => (
-                    <div key={k}>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">{l}</label>
-                      <input value={(form as any)[k]} onChange={e => setF(k as keyof LeadForm, e.target.value)}
-                        placeholder={p} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" />
-                    </div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">البريد الإلكتروني *</label>
-                    <input type="email" value={form.contact_email} onChange={e => setF('contact_email', e.target.value)}
-                      placeholder="info@company.com" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال</label>
-                    <input value={form.contact_phone} maxLength={10} inputMode="numeric" placeholder="05XXXXXXXX" onChange={e => setF('contact_phone', e.target.value.replace(/[^0-9]/g, '').slice(0,10))}
-                      placeholder="05xxxxxxxx" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">حجم الشركة</label>
-                    <select value={form.company_size} onChange={e => setF('company_size', e.target.value)}
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50">
-                      <option value="">اختر</option>
-                      {COMPANY_SIZES.map(s => <option key={s} value={s}>{s} موظف</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">الميزانية التقريبية</label>
-                    <select value={form.budget_range} onChange={e => setF('budget_range', e.target.value)}
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50">
-                      <option value="">اختر</option>
-                      {BUDGET_OPTIONS.map(b => <option key={b} value={b}>{b}</option>)}
-                    </select>
-                  </div>
-                </div>
+
+                {/* وصف الاحتياج — الحقل الرئيسي، مقدّم للأعلى */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    وصف الاحتياج * <span className="text-slate-400 font-normal">({form.description.length}/3000)</span>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    وصف الاحتياج * <span className="text-slate-400 font-normal text-xs">({form.description.length}/3000)</span>
                   </label>
                   <textarea value={form.description} onChange={e => setF('description', e.target.value)}
-                    rows={4} maxLength={3000} placeholder="اشرح احتياج منشأتك بإيجاز..."
+                    rows={4} maxLength={3000} placeholder="اشرح احتياج منشأتك بإيجاز — مثال: نحتاج مستشار حوكمة لتأسيس مجلس إدارة ولوائح داخلية..."
                     className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50 resize-none" />
                 </div>
+
+                {/* الميزانية — اختيارية بس مفيدة */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">الميزانية التقريبية (اختياري)</label>
+                  <select value={form.budget_range} onChange={e => setF('budget_range', e.target.value)}
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50">
+                    <option value="">اختر</option>
+                    {BUDGET_OPTIONS.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                </div>
+
+                {/* بيانات الشركة — تظهر فقط لو ما فيه بروفايل محفوظ أو ضغط تعديل */}
+                {!hasProfile && (
+                  <div className="border-t border-slate-100 pt-4 space-y-4">
+                    <p className="text-xs font-bold text-slate-400">بيانات التواصل (تُحفظ لطلباتك القادمة)</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[['اسم الشركة *','company_name','شركة المستقبل'],['اسم المسؤول *','contact_name','محمد العبدالله']].map(([l,k,p]) => (
+                        <div key={k}>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">{l}</label>
+                          <input value={(form as any)[k]} onChange={e => setF(k as keyof LeadForm, e.target.value)}
+                            placeholder={p} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">البريد الإلكتروني *</label>
+                        <input type="email" value={form.contact_email} onChange={e => setF('contact_email', e.target.value)}
+                          placeholder="info@company.com" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال</label>
+                        <input value={form.contact_phone} maxLength={10} inputMode="numeric" placeholder="05XXXXXXXX" onChange={e => setF('contact_phone', e.target.value.replace(/[^0-9]/g, '').slice(0,10))}
+                          className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">حجم الشركة</label>
+                      <select value={form.company_size} onChange={e => setF('company_size', e.target.value)}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50">
+                        <option value="">اختر</option>
+                        {COMPANY_SIZES.map(s => <option key={s} value={s}>{s} موظف</option>)}
+                      </select>
+                    </div>
+                  </div>
+                )}
+
                 {error && <div className="bg-red-50 text-red-600 text-sm px-4 py-2.5 rounded-xl border border-red-100">{error}</div>}
                 <button onClick={handleSubmit} disabled={submitting}
                   className="w-full bg-primary-500 hover:bg-primary-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
-                  {submitting ? <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" /> : <><Send size={15} /><span>إرسال الطلب</span></>}
+                  {submitting ? <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" /> : <><Send size={15} /><span>نشر الطلب</span></>}
                 </button>
                 <p className="text-xs text-slate-400 text-center">المسودة تُحفظ تلقائياً — يمكنك الإغلاق والرجوع لاحقاً</p>
               </div>
