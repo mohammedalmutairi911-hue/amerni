@@ -1430,10 +1430,12 @@ export function EnterprisesPage() {
               <div className="p-8 text-center">
                 <CheckCircle2 size={48} className="mx-auto mb-4 text-green-500" />
                 <h3 className="text-lg font-black text-slate-900 mb-2">تم نشر طلبك! 🚀</h3>
-                <p className="text-slate-500 text-sm mb-6">سيتواصل فريقنا معك خلال ٢٤ ساعة. تابع حالة طلبك من تبويب "طلباتي".</p>
+                <p className="text-slate-500 text-sm mb-6">طلبك الآن ظاهر لكل المزودين المعتمدين في التخصص. سيصلك إشعار فور قبول أحدهم.</p>
                 <div className="flex gap-3 justify-center">
-                  <button onClick={() => setShowForm(false)} className="bg-primary-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-primary-600 transition-colors">حسناً</button>
-                  {user && <button onClick={() => { setShowForm(false); setActiveTab('my-requests') }} className="border border-primary-500 text-primary-500 font-bold px-6 py-2.5 rounded-xl hover:bg-primary-50 transition-colors">طلباتي</button>}
+                  {user
+                    ? <button onClick={() => { setShowForm(false); setSuccess(false); setActiveTab('my-requests') }} className="bg-primary-500 text-white font-bold px-8 py-2.5 rounded-xl hover:bg-primary-600 transition-colors">عرض طلباتي ←</button>
+                    : <button onClick={() => setShowForm(false)} className="bg-primary-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-primary-600 transition-colors">حسناً</button>
+                  }
                 </div>
               </div>
             ) : (
