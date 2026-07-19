@@ -32,9 +32,11 @@ export function ProviderDashboard() {
   const { user, profile, signOut } = useAuth()
   const { navigate } = useApp()
 
-  const [tab, setTab] = useState<'overview' | 'leads' | 'profile'>('overview')
+  const [tab, setTab] = useState<'overview' | 'available' | 'leads' | 'profile'>('overview')
   const [providerData, setProviderData] = useState<any>(null)
   const [matchedLeads, setMatchedLeads] = useState<any[]>([])
+  const [availableLeads, setAvailableLeads] = useState<any[]>([])
+  const [accepting, setAccepting] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [isAvailable, setIsAvailable] = useState(true)
   const [toggling, setToggling] = useState(false)
@@ -45,16 +47,30 @@ export function ProviderDashboard() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const [provRes, leadsRes] = await Promise.all([
+    const [provRes, leadsRes, openRes] = await Promise.all([
       supabase.from('enterprise_providers').select('*').eq('user_id', user!.id).maybeSingle(),
-      supabase.from('enterprise_leads').select('*').eq('provider_id', user!.id).order('created_at', { ascending: false })
+      supabase.from('enterprise_leads').select('*').eq('provider_id', user!.id).order('created_at', { ascending: false }),
+      supabase.from('enterprise_leads').select('*').eq('status', 'open').order('created_at', { ascending: false })
     ])
     if (provRes.data) {
       setProviderData(provRes.data)
       setIsAvailable(provRes.data.is_approved)
     }
     setMatchedLeads(leadsRes.data || [])
+    setAvailableLeads(openRes.data || [])
     setLoading(false)
+  }
+
+  const acceptLead = async (leadId: string) => {
+    setAccepting(leadId)
+    const { error } = await supabase.rpc('provider_accept_lead', { p_lead_id: leadId })
+    if (error) {
+      alert(error.message.includes('قبله مزود') ? 'عذراً، قبِل هذا الطلب مزود آخر قبلك' : 'خطأ: ' + error.message)
+    } else {
+      alert('✅ قبلت الطلب! تواصل مع الشركة الآن من تبويب "طلباتي"')
+    }
+    await fetchAll()
+    setAccepting(null)
   }
 
   const toggleAvailable = async () => {
@@ -121,7 +137,8 @@ export function ProviderDashboard() {
         <nav className="flex-1 p-3 space-y-1">
           {[
             { id: 'overview', icon: BarChart2, label: 'نظرة عامة' },
-            { id: 'leads', icon: Briefcase, label: 'الطلبات المطابقة', badge: matchedLeads.length },
+            { id: 'available', icon: Zap, label: 'الطلبات المتاحة', badge: availableLeads.length },
+            { id: 'leads', icon: Briefcase, label: 'طلباتي', badge: matchedLeads.length },
             { id: 'profile', icon: User, label: 'ملفي الشخصي' },
           ].map(({ id, icon: Icon, label, badge }: any) => (
             <button key={id} onClick={() => setTab(id as any)}
@@ -302,6 +319,61 @@ export function ProviderDashboard() {
             </>
           )}
 
+          {/* ─── AVAILABLE (سوق مفتوح) ─── */}
+          {tab === 'available' && (
+            <div>
+              <div className="mb-5">
+                <h3 className="font-bold text-slate-900 text-lg">الطلبات المتاحة في تخصصك</h3>
+                <p className="text-slate-500 text-sm mt-1">أول من يقبل يفوز بالطلب — كن سريعاً ⚡</p>
+              </div>
+
+              {!providerData.is_approved ? (
+                <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6 text-center">
+                  <Clock size={32} className="text-amber-400 mx-auto mb-2" />
+                  <p className="text-amber-800 font-bold">حسابك قيد المراجعة</p>
+                  <p className="text-amber-600 text-sm mt-1">ستتمكن من استقبال الطلبات فور اعتماد حسابك</p>
+                </div>
+              ) : availableLeads.length === 0 ? (
+                <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
+                  <Zap size={40} className="text-slate-200 mx-auto mb-3" />
+                  <p className="text-slate-500">لا توجد طلبات متاحة حالياً في تخصصك</p>
+                  <p className="text-slate-400 text-sm mt-1">سيصلك إشعار فور نشر طلب جديد</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {availableLeads.map(lead => (
+                    <div key={lead.id} className="bg-white border-2 border-primary-100 rounded-2xl p-5 hover:border-primary-300 hover:shadow-md transition-all">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div>
+                          <p className="font-bold text-slate-900 text-lg">{lead.company_name}</p>
+                          <p className="text-sm text-slate-500">{CATEGORY_LABELS[lead.category] || lead.category}</p>
+                        </div>
+                        <span className="text-xs font-bold px-3 py-1.5 rounded-full border bg-blue-50 text-blue-600 border-blue-200 flex items-center gap-1">
+                          <Zap size={11} /> متاح
+                        </span>
+                      </div>
+
+                      <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 leading-relaxed mb-3">{lead.description}</p>
+
+                      <div className="flex flex-wrap gap-3 text-xs text-slate-400 mb-4">
+                        {lead.budget_range && <span className="bg-slate-100 px-2 py-0.5 rounded">💰 {lead.budget_range}</span>}
+                        {lead.company_size && <span className="bg-slate-100 px-2 py-0.5 rounded">👥 {lead.company_size} موظف</span>}
+                        <span>{new Date(lead.created_at).toLocaleDateString('ar-SA', { month: 'long', day: 'numeric' })}</span>
+                      </div>
+
+                      <button
+                        onClick={() => acceptLead(lead.id)}
+                        disabled={accepting === lead.id}
+                        className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 rounded-xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                        {accepting === lead.id ? <Loader2 size={16} className="animate-spin" /> : <><CheckCircle size={16} /> اقبل الطلب</>}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* ─── LEADS ─── */}
           {tab === 'leads' && (
             <div>
@@ -474,7 +546,8 @@ export function ProviderDashboard() {
       <nav className="md:hidden fixed bottom-0 right-0 w-full flex justify-around items-center h-16 bg-white border-t border-slate-200 z-50 shadow-lg">
         {[
           { id: 'overview', icon: Home, label: 'الرئيسية' },
-          { id: 'leads', icon: Briefcase, label: 'الطلبات', badge: matchedLeads.length },
+          { id: 'available', icon: Zap, label: 'المتاحة', badge: availableLeads.length },
+          { id: 'leads', icon: Briefcase, label: 'طلباتي', badge: matchedLeads.length },
           { id: 'profile', icon: User, label: 'ملفي' },
         ].map(({ id, icon: Icon, label, badge }: any) => (
           <button key={id} onClick={() => setTab(id as any)}

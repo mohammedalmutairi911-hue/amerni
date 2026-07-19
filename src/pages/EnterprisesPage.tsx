@@ -103,15 +103,17 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
-  new:       { label: 'جديد', color: 'bg-blue-50 text-blue-600 border-blue-200', icon: Clock },
-  reviewing: { label: 'قيد المراجعة', color: 'bg-amber-50 text-amber-600 border-amber-200', icon: AlertCircle },
-  matched:   { label: 'تمت المطابقة', color: 'bg-green-50 text-green-600 border-green-200', icon: CheckCircle },
-  closed:    { label: 'مغلق', color: 'bg-slate-100 text-slate-500 border-slate-200', icon: X },
+  open:      { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', icon: Clock },
+  new:       { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', icon: Clock },
+  reviewing: { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', icon: Clock },
+  matched:   { label: 'مزود قبِل — جاري التنفيذ', color: 'bg-green-50 text-green-600 border-green-200', icon: CheckCircle },
+  closed:    { label: 'مكتمل', color: 'bg-slate-100 text-slate-500 border-slate-200', icon: CheckCircle },
+  cancelled: { label: 'ملغى', color: 'bg-red-50 text-red-500 border-red-200', icon: X },
 }
 
 export function EnterprisesPage() {
   const { user } = useAuth()
-  const { navigate } = useApp()
+  const { navigate, openAuth } = useApp()
 
   const [activeTab, setActiveTab] = useState<Tab>('home')
   const [selectedCat, setSelectedCat] = useState<string | null>(null)
@@ -209,6 +211,11 @@ export function EnterprisesPage() {
   const sanitize = (s: string) => s.replace(/[<>"']/g, '').trim()
 
   const handleSubmit = async () => {
+    if (!user) {
+      setError('يرجى تسجيل الدخول أولاً لإرسال الطلب ومتابعته')
+      openAuth('signup')
+      return
+    }
     if (!form.company_name.trim() || !form.contact_name.trim() || !form.contact_email.trim() || !form.category || !form.description.trim()) {
       setError('يرجى تعبئة جميع الحقول المطلوبة'); return
     }
@@ -235,8 +242,8 @@ export function EnterprisesPage() {
         category: form.category,
         description: sanitize(form.description),
         budget_range: form.budget_range,
-        user_id: user?.id ?? null,
-        status: 'new'
+        user_id: user.id,
+        status: 'open'
       }
       const { error: err } = await supabase.from('enterprise_leads').insert(clean)
       if (err) {
@@ -250,7 +257,7 @@ export function EnterprisesPage() {
           body: {
             name: clean.contact_name,
             email: clean.contact_email,
-            message: 'تم استلام طلبكم في أمرني للمنشآت. التخصص: ' + clean.category + ' | الشركة: ' + clean.company_name + ' | سيتواصل معكم فريقنا خلال ٢٤ ساعة.'
+            message: 'تم نشر طلبكم في أمرني للمنشآت. التخصص: ' + clean.category + ' | الشركة: ' + clean.company_name + ' | سيصلكم إشعار فور قبول أحد المزودين المعتمدين.'
           }
         })
       } catch {}
@@ -581,7 +588,7 @@ export function EnterprisesPage() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                         {[
                           { label: 'إجمالي الطلبات', value: myLeads.length, color: 'text-slate-900', bg: 'bg-white' },
-                          { label: 'قيد المراجعة', value: myLeads.filter(l => l.status === 'new' || l.status === 'reviewing').length, color: 'text-blue-600', bg: 'bg-blue-50' },
+                          { label: 'منشور — بانتظار مزود', value: myLeads.filter(l => ['open','new','reviewing'].includes(l.status)).length, color: 'text-blue-600', bg: 'bg-blue-50' },
                           { label: 'تمت المطابقة', value: myLeads.filter(l => l.status === 'matched').length, color: 'text-green-600', bg: 'bg-green-50' },
                           { label: 'مغلقة', value: myLeads.filter(l => l.status === 'closed').length, color: 'text-slate-500', bg: 'bg-slate-100' },
                         ].map(({ label, value, color, bg }) => (
@@ -785,6 +792,17 @@ export function EnterprisesPage() {
                                       className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">
                                       إغلاق الطلب (تم التعاقد)
                                     </button>
+                                    <button
+                                      onClick={async () => {
+                                        if (!confirm('تغيير المزود؟ سيُستبعد المزود الحالي نهائياً ويعود طلبك متاحاً لباقي المزودين.')) return
+                                        const { error } = await supabase.rpc('company_change_provider', { p_lead_id: lead.id })
+                                        if (error) { alert('خطأ: ' + error.message); return }
+                                        alert('تم — طلبك الآن متاح لمزودين آخرين')
+                                        setMyLeads(p => p.map(l => l.id === lead.id ? { ...l, status: 'open', provider_id: null } : l))
+                                      }}
+                                      className="w-full border border-red-200 text-red-500 hover:bg-red-50 font-bold py-2.5 rounded-xl text-sm transition-colors">
+                                      تغيير المزود
+                                    </button>
                                   </div>
                                 )}
 
@@ -795,19 +813,14 @@ export function EnterprisesPage() {
                                   </div>
                                 )}
 
-                                {lead.status === 'new' && (
+                                {(lead.status === 'open' || lead.status === 'new' || lead.status === 'reviewing') && (
                                   <div className="flex items-center gap-2 text-xs text-blue-500 bg-blue-50 px-3 py-2 rounded-xl">
                                     <Clock size={12} className="animate-pulse" />
-                                    <span>الفريق يراجع طلبك — الرد خلال ٢٤ ساعة</span>
+                                    <span>طلبك منشور لكل المزودين المعتمدين في التخصص — سيصلك إشعار فور القبول</span>
                                   </div>
                                 )}
 
-                                {lead.status === 'reviewing' && (
-                                  <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-xl">
-                                    <AlertCircle size={12} />
-                                    <span>نبحث عن أفضل مزود لاحتياجاتك</span>
-                                  </div>
-                                )}
+
                               </div>
                             )
                           })}
@@ -857,7 +870,7 @@ export function EnterprisesPage() {
               {provSuccess ? (
                 <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl">
                   <CheckCircle2 size={48} className="mx-auto mb-4 text-green-500" />
-                  <h3 className="text-xl font-black text-slate-900 mb-2">تم استلام طلبك!</h3>
+                  <h3 className="text-xl font-black text-slate-900 mb-2">تم نشر طلبك! 🚀</h3>
                   <p className="text-slate-500">سيراجع فريقنا طلبك ويتواصل معك خلال ٤٨ ساعة</p>
                 </div>
               ) : (
@@ -1405,7 +1418,7 @@ export function EnterprisesPage() {
             {success ? (
               <div className="p-8 text-center">
                 <CheckCircle2 size={48} className="mx-auto mb-4 text-green-500" />
-                <h3 className="text-lg font-black text-slate-900 mb-2">تم استلام طلبك!</h3>
+                <h3 className="text-lg font-black text-slate-900 mb-2">تم نشر طلبك! 🚀</h3>
                 <p className="text-slate-500 text-sm mb-6">سيتواصل فريقنا معك خلال ٢٤ ساعة. تابع حالة طلبك من تبويب "طلباتي".</p>
                 <div className="flex gap-3 justify-center">
                   <button onClick={() => setShowForm(false)} className="bg-primary-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-primary-600 transition-colors">حسناً</button>
