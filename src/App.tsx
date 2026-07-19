@@ -96,6 +96,7 @@ export default function App() {
     if (page === 'enterprises') return <><Navbar /><EnterprisesPage /></>
 
     if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
+    if (page === 'landing') return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
     if (page === 'provider-dashboard') return <ProviderDashboard />
     if (page === 'support') return <><Navbar /><SupportPage /></>
     if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
@@ -118,15 +119,21 @@ export default function App() {
             <div className="text-5xl mb-5">⏳</div>
             <h2 className="text-xl font-bold text-slate-900 mb-3">طلبك قيد المراجعة</h2>
             <p className="text-slate-400 text-sm leading-relaxed mb-6">فريق آمرني سيراجع بياناتك ويوافق عليك قريباً.</p>
-            <button onClick={async () => {
-              setChecking(true)
-              const { data } = await supabase.from('worker_profiles').select('is_approved').eq('user_id', user.id).single()
-              setWorkerApproved(data?.is_approved || false)
-              if (data?.is_approved) navigate('worker')
-              setChecking(false)
-            }} className="text-sm text-primary-500 border border-primary-200 px-5 py-2 rounded-xl hover:bg-primary-50 transition-colors">
-              {checking ? 'جاري التحقق...' : 'تحقق من الحالة'}
-            </button>
+            <div className="flex flex-col gap-2">
+              <button onClick={async () => {
+                setChecking(true)
+                const { data } = await supabase.from('worker_profiles').select('is_approved').eq('user_id', user.id).single()
+                setWorkerApproved(data?.is_approved || false)
+                if (data?.is_approved) navigate('worker')
+                setChecking(false)
+              }} className="text-sm text-primary-500 border border-primary-200 px-5 py-2 rounded-xl hover:bg-primary-50 transition-colors">
+                {checking ? 'جاري التحقق...' : 'تحقق من الحالة'}
+              </button>
+              <button onClick={() => navigate('landing')}
+                className="text-sm text-slate-500 border border-slate-200 px-5 py-2 rounded-xl hover:bg-slate-50 transition-colors">
+                الصفحة الرئيسية
+              </button>
+            </div>
           </div>
         </div>
       )
