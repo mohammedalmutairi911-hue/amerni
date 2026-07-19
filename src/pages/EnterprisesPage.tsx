@@ -225,8 +225,8 @@ export function EnterprisesPage() {
     if (form.contact_name.trim().length < 2) {
       setError('يرجى إدخال اسم صحيح'); return
     }
-    if (form.contact_phone.trim() && !/^[0-9+\-() ]{9,20}$/.test(form.contact_phone.trim())) {
-      setError('رقم الجوال غير صحيح — أدخل أرقاماً فقط (9 إلى 20 خانة)'); return
+    if (form.contact_phone.trim() && !/^05[0-9]{8}$/.test(form.contact_phone.trim())) {
+      setError('رقم الجوال يجب أن يكون ١٠ أرقام يبدأ بـ 05'); return
     }
     if (form.description.trim().length < 10) {
       setError('يرجى كتابة وصف أكثر تفصيلاً'); return
@@ -283,8 +283,8 @@ export function EnterprisesPage() {
     if (provForm.contact_name.trim().length < 2) {
       setProvError('يرجى إدخال اسم صحيح'); return
     }
-    if (provForm.contact_phone.trim() && !/^[0-9+\-() ]{9,20}$/.test(provForm.contact_phone.trim())) {
-      setProvError('رقم الجوال غير صحيح — أدخل أرقاماً فقط (9 إلى 20 خانة)'); return
+    if (provForm.contact_phone.trim() && !/^05[0-9]{8}$/.test(provForm.contact_phone.trim())) {
+      setProvError('رقم الجوال يجب أن يكون ١٠ أرقام يبدأ بـ 05'); return
     }
     if (provForm.provider_type === 'freelancer' && !provForm.freelance_doc) {
       setProvError('رقم وثيقة العمل الحر مطلوب للأفراد'); return
@@ -917,7 +917,7 @@ export function EnterprisesPage() {
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال *</label>
-                        <input value={provForm.contact_phone} maxLength={20} inputMode="tel" onChange={e => setProvForm(f => ({ ...f, contact_phone: e.target.value.replace(/[^0-9+\-() ]/g, '') }))}
+                        <input value={provForm.contact_phone} maxLength={10} inputMode="numeric" placeholder="05XXXXXXXX" onChange={e => setProvForm(f => ({ ...f, contact_phone: e.target.value.replace(/[^0-9]/g, '').slice(0,10) }))}
                           placeholder="05xxxxxxxx"
                           className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" dir="ltr" />
                       </div>
@@ -1458,7 +1458,7 @@ export function EnterprisesPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال</label>
-                    <input value={form.contact_phone} maxLength={20} inputMode="tel" onChange={e => setF('contact_phone', e.target.value.replace(/[^0-9+\-() ]/g, ''))}
+                    <input value={form.contact_phone} maxLength={10} inputMode="numeric" placeholder="05XXXXXXXX" onChange={e => setF('contact_phone', e.target.value.replace(/[^0-9]/g, '').slice(0,10))}
                       placeholder="05xxxxxxxx" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
                   </div>
                 </div>
