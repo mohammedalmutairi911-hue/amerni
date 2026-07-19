@@ -1,0 +1,22 @@
+-- إزالة السياسات المفتوحة الخطيرة (true) — بقايا من التطوير الأولي
+drop policy if exists "profiles_read_all" on public.profiles;
+drop policy if exists "admin_all_workers" on public.worker_profiles;
+create policy "admin_all_workers_real" on public.worker_profiles for all using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+drop policy if exists "tasks_open" on public.tasks;
+drop policy if exists "client_own_tasks" on public.tasks;
+create policy "client_own_tasks" on public.tasks for all using (auth.uid() = user_id or auth.uid() = client_id);
+drop policy if exists "worker_see_tasks" on public.tasks;
+create policy "worker_see_tasks" on public.tasks for select using (status in ('open','waiting_for_worker') or worker_id = auth.uid());
+drop policy if exists "worker_update_tasks" on public.tasks;
+create policy "worker_update_tasks" on public.tasks for update using (worker_id = auth.uid());
+drop policy if exists "admin_all_tasks" on public.tasks;
+create policy "admin_all_tasks" on public.tasks for all using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+drop policy if exists "messages_open" on public.task_messages;
+drop policy if exists "task_participants_messages" on public.task_messages;
+create policy "task_participants_messages" on public.task_messages for all using (exists (select 1 from public.tasks t where t.id = task_id and (t.user_id = auth.uid() or t.worker_id = auth.uid() or t.client_id = auth.uid())));
+drop policy if exists "admin_all_messages" on public.task_messages;
+create policy "admin_all_messages" on public.task_messages for all using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+drop policy if exists "read_categories" on public.category_requests;
+drop policy if exists "update_categories" on public.category_requests;
+create policy "authenticated_read_categories" on public.category_requests for select using (auth.role() = 'authenticated');
+create policy "admin_update_categories" on public.category_requests for update using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
