@@ -8,7 +8,8 @@ interface AuthCtx {
   session: Session | null
   profile: Profile | null
   loading: boolean
-  signUp: (email: string, password: string, fullName: string, role: string) => Promise<{ error: any }>
+  signUp: (email: string, password: string, fullName: string, role: string, platform?: string) => Promise<{ error: any }>
+  signUpPlatform?: string
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
@@ -52,28 +53,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signUp = async (email: string, password: string, fullName: string, role: string) => {
+  const signUp = async (email: string, password: string, fullName: string, role: string, platform: string = 'individuals') => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: 'https://amerniksa.com',
-        data: { full_name: fullName, role }
+        data: { full_name: fullName, role, platform }
       }
     })
     if (!error && data.user) {
       // TikTok Pixel - تسجيل ناجح
       try { (window as any).ttq?.track('CompleteRegistration') } catch {}
-      // انتظر شوي وبعدين احفظ البروفايل مع الـ role الصح
-      // ملاحظة: الـtrigger handle_new_user في قاعدة البيانات يسوي هذا تلقائياً عند التسجيل،
-      // هذا upsert احتياطي فقط لو تأخر الـtrigger أو لتحديث role بدقة بعد التسجيل
       setTimeout(async () => {
         try {
           await supabase.from('profiles').upsert({
-            id: data.user!.id, email, full_name: fullName, role, phone_verified: false
+            id: data.user!.id, email, full_name: fullName, role, platform, phone_verified: false
           })
         } catch {
-          // تجاهل الخطأ بصمت — الـtrigger في قاعدة البيانات غالباً أنشأ البروفايل أصلاً
+          // تجاهل الخطأ بصمت
         }
         await fetchProfile(data.user!.id)
       }, 500)

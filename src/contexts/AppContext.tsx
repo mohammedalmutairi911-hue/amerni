@@ -20,7 +20,9 @@ interface AppCtx {
   navigate: (p: Page) => void
   authOpen: boolean
   authTab: 'login' | 'signup'
-  openAuth: (tab?: 'login' | 'signup') => void
+  authPlatform: 'individuals' | 'enterprises'
+  authPrefill: { name?: string; email?: string } | null
+  openAuth: (tab?: 'login' | 'signup', platform?: 'individuals' | 'enterprises', prefill?: { name?: string; email?: string }) => void
   closeAuth: () => void
 }
 
@@ -33,6 +35,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => setTheme(t => { const n = t==='dark'?'light':'dark'; localStorage.setItem('theme', n); return n })
   const [authOpen, setAuthOpen] = useState(false)
   const [authTab, setAuthTab] = useState<'login' | 'signup'>('login')
+  const [authPlatform, setAuthPlatform] = useState<'individuals' | 'enterprises'>('individuals')
+  const [authPrefill, setAuthPrefill] = useState<{ name?: string; email?: string } | null>(null)
 
   // Sync page when browser back/forward buttons used
   useEffect(() => {
@@ -52,7 +56,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       navigate,
       authOpen,
       authTab,
-      openAuth: (tab = 'login') => { setAuthTab(tab); setAuthOpen(true) },
+      authPlatform,
+      authPrefill,
+      openAuth: (tab = 'login', platform = 'individuals', prefill = null) => { setAuthTab(tab); setAuthPlatform(platform); setAuthPrefill(prefill); setAuthOpen(true) },
       closeAuth: () => setAuthOpen(false)
     }}>
       {children}

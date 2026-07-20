@@ -6,15 +6,16 @@ import { supabase } from '../lib/supabase'
 
 export function AuthModal() {
   const { signIn, signUp } = useAuth()
-  const { authTab, closeAuth, navigate } = useApp()
+  const { authTab, authPlatform, authPrefill, closeAuth, navigate } = useApp()
   const [tab, setTab] = useState<'login' | 'signup'>(authTab)
   const [role, setRole] = useState<'client' | 'worker'>('client')
-  const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [form, setForm] = useState({ name: authPrefill?.name || '', email: authPrefill?.email || '', password: '' })
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [resendDone, setResendDone] = useState(false)
 
+  const isEnterprise = authPlatform === 'enterprises'
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
   const submit = async () => {
@@ -35,12 +36,17 @@ export function AuthModal() {
         return
       }
     } else {
-      const { error } = await signUp(form.email, form.password, form.name, role)
+      // في المنشآت الدور دائماً client (الشركة)، الفصل عبر platform
+      const signupRole = isEnterprise ? 'client' : role
+      const { error } = await signUp(form.email, form.password, form.name, signupRole, authPlatform)
       if (error) { setError(error.message); setLoading(false); return }
     }
     setLoading(false)
     closeAuth()
-    if (tab === 'signup') {
+    // التوجيه حسب المنصة
+    if (isEnterprise) {
+      navigate('enterprises')
+    } else if (tab === 'signup') {
       if (role === 'worker') navigate('worker')
       else navigate('dashboard')
     } else {
@@ -77,7 +83,8 @@ export function AuthModal() {
                   className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
               </div>
 
-              {/* Role selection */}
+              {/* Role selection — للأفراد فقط، المنشآت شركات */}
+              {!isEnterprise && (
               <div>
                 <label className="block text-xs text-slate-400 mb-2">أنا</label>
                 <div className="grid grid-cols-2 gap-2">
@@ -95,6 +102,7 @@ export function AuthModal() {
                   ))}
                 </div>
               </div>
+              )}
             </>
           )}
 

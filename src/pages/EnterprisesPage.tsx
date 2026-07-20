@@ -168,7 +168,7 @@ export function EnterprisesPage() {
     cr_expiry: '',           // تاريخ انتهاء السجل
     freelance_doc: '',       // رقم وثيقة العمل الحر (للأفراد)
     vat_number: '',          // الرقم الضريبي
-    provider_type: 'company' as 'company' | 'freelancer', // نوع المزود
+    provider_type: 'company' as const, // المنشآت شركات فقط
     // المؤهلات
     years_experience: '',    // سنوات الخبرة
     certifications: '',      // الشهادات المهنية (PMP، ISO Lead Auditor، إلخ)
@@ -241,8 +241,8 @@ export function EnterprisesPage() {
 
   const handleSubmit = async () => {
     if (!user) {
-      setError('يرجى تسجيل الدخول أولاً لإرسال الطلب ومتابعته')
-      openAuth('signup')
+      setError('')
+      openAuth('signup', 'enterprises', { name: form.contact_name, email: form.contact_email })
       return
     }
     // دمج البيانات المحفوظة مع الحقول الحالية
@@ -309,17 +309,17 @@ export function EnterprisesPage() {
 
   const handleProvSubmit = async () => {
     if (!user) {
-      setProvError('يرجى تسجيل الدخول أولاً للتسجيل كمزود')
-      openAuth('signup')
+      setProvError('')
+      openAuth('signup', 'enterprises', { name: provForm.contact_name, email: provForm.contact_email })
       return
     }
     if (!provForm.company_name || !provForm.contact_name || !provForm.contact_email || provForm.categories.length === 0) {
       setProvError('يرجى تعبئة جميع الحقول المطلوبة واختيار تخصص واحد على الأقل'); return
     }
-    if (provForm.provider_type === 'company' && !provForm.cr_number) {
-      setProvError('رقم السجل التجاري مطلوب للشركات'); return
+    if (!provForm.cr_number) {
+      setProvError('رقم السجل التجاري مطلوب'); return
     }
-    if (provForm.provider_type === 'company' && provForm.cr_number && !/^[0-9]{10}$/.test(provForm.cr_number.trim())) {
+    if (!/^[0-9]{10}$/.test(provForm.cr_number.trim())) {
       setProvError('رقم السجل التجاري يجب أن يكون 10 أرقام'); return
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(provForm.contact_email)) {
@@ -330,9 +330,6 @@ export function EnterprisesPage() {
     }
     if (provForm.contact_phone.trim() && !/^05[0-9]{8}$/.test(provForm.contact_phone.trim())) {
       setProvError('رقم الجوال يجب أن يكون ١٠ أرقام يبدأ بـ 05'); return
-    }
-    if (provForm.provider_type === 'freelancer' && !provForm.freelance_doc) {
-      setProvError('رقم وثيقة العمل الحر مطلوب للأفراد'); return
     }
     if (!provForm.years_experience) {
       setProvError('يرجى تحديد سنوات الخبرة'); return
@@ -439,7 +436,7 @@ export function EnterprisesPage() {
           </div>
           <div className="flex items-center gap-2">
             {!user && (
-              <button onClick={() => openAuth('login')}
+              <button onClick={() => openAuth('login', 'enterprises')}
                 className="text-xs px-3 py-1.5 rounded-lg border border-primary-500 text-primary-500 font-bold hover:bg-primary-50 transition-colors">
                 تسجيل الدخول
               </button>
@@ -939,18 +936,12 @@ export function EnterprisesPage() {
               ) : (
                 <div className="space-y-5">
 
-                  {/* ① نوع المزود */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-2">نوع المزود *</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      {[['company','شركة / مؤسسة','سجل تجاري'],['freelancer','فرد / مستقل','وثيقة عمل حر']].map(([v,l,s]) => (
-                        <button key={v} type="button" onClick={() => setProvForm(f => ({ ...f, provider_type: v as any }))}
-                          className={`flex flex-col items-center gap-1 py-4 rounded-2xl border-2 transition-all ${provForm.provider_type === v ? 'border-primary-500 bg-primary-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
-                          <span className="text-2xl">{v === 'company' ? '🏢' : '👤'}</span>
-                          <span className={`text-sm font-bold ${provForm.provider_type === v ? 'text-primary-600' : 'text-slate-700'}`}>{l}</span>
-                          <span className="text-xs text-slate-400">{s}</span>
-                        </button>
-                      ))}
+                  {/* المنشآت للشركات فقط */}
+                  <div className="bg-primary-50 border border-primary-200 rounded-2xl p-4 flex items-center gap-3">
+                    <span className="text-2xl">🏢</span>
+                    <div>
+                      <p className="text-sm font-bold text-primary-700">التسجيل كمزود خدمات للشركات</p>
+                      <p className="text-xs text-slate-500 mt-0.5">أمرني للمنشآت مخصص للشركات والمؤسسات المرخّصة — يتطلب سجلاً تجارياً سارياً</p>
                     </div>
                   </div>
 
