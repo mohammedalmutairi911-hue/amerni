@@ -6,18 +6,23 @@ const VALID_PAGES: Page[] = ['landing', 'dashboard', 'worker', 'admin', 'admin-e
 
 function getPageFromHash(): Page {
   const hash = window.location.hash.replace('#/', '').replace('#', '').trim()
-  if (hash && VALID_PAGES.includes(hash as Page)) return hash as Page
-  // backup: لو الـ hash ضاع عند التحديث، ارجع للصفحة المحفوظة
-  const saved = sessionStorage.getItem('current_page') as Page
-  if (saved && VALID_PAGES.includes(saved) && saved !== 'landing') return saved
+  // المسار الكامل (مثل lead-detail/uuid) — خذ الجزء الأول
+  const basePage = hash.split('/')[0]
+  if (basePage && VALID_PAGES.includes(basePage as Page)) return basePage as Page
+  // backup من sessionStorage — نأخذ الـ basePage منه أيضاً
+  const saved = sessionStorage.getItem('current_page') || ''
+  const savedBase = saved.split('/')[0] as Page
+  if (savedBase && VALID_PAGES.includes(savedBase) && savedBase !== 'landing') return savedBase
   return 'landing'
 }
 
 function setHash(p: string) {
   const hash = p === 'landing' ? '' : `#/${p}`
   window.history.replaceState(null, '', hash || window.location.pathname)
-  const basePage = p.split('/')[0]
-  if (basePage !== 'landing') sessionStorage.setItem('current_page', p)
+  // احفظ المسار الكامل في sessionStorage كـ backup
+  if (p !== 'landing') sessionStorage.setItem('current_page', p)
+  else sessionStorage.removeItem('current_page')
+}
   else sessionStorage.removeItem('current_page')
 }
 
