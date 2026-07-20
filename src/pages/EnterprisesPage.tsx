@@ -979,9 +979,10 @@ export function EnterprisesPage() {
 
               {provSuccess ? (
                 <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl">
-                  <CheckCircle2 size={48} className="mx-auto mb-4 text-green-500 animate-scale-in" />
-                  <h3 className="text-xl font-black text-slate-900 mb-2">تم نشر طلبك! 🚀</h3>
-                  <p className="text-slate-500">سيراجع فريقنا طلبك ويتواصل معك خلال ٤٨ ساعة</p>
+                  <CheckCircle2 size={48} className="mx-auto mb-4 text-primary-500 animate-scale-in" />
+                  <h3 className="text-xl font-black text-slate-900 mb-2">تم تقديم طلب الانضمام ✅</h3>
+                  <p className="text-slate-500 text-sm mb-1">سيراجع فريقنا بياناتك وسجلك التجاري</p>
+                  <p className="text-slate-400 text-xs">يصلك إشعار بالقبول خلال ٢٤-٤٨ ساعة على إيميلك</p>
                 </div>
               ) : (
                 <div className="space-y-5">
