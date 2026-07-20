@@ -78,6 +78,15 @@ export default function App() {
   useEffect(() => {
     if (!user || !profile) { setWorkerApproved(null); setWorkerExists(null); return }
     if (profile.role === 'admin' && page !== 'landing' && page !== 'admin' && page !== 'enterprises' && page !== 'provider-dashboard') { navigate('admin'); return }
+
+    // فصل المنصات: حساب المنشآت يبقى في المنشآت، حساب الأفراد في الأفراد
+    if (profile.role !== 'admin') {
+      const individualPages = ['dashboard', 'worker', 'browse', 'bounties', 'referral', 'earn', 'join', 'worker-profile']
+      const enterprisePages = ['enterprises', 'provider-dashboard']
+      if (profile.platform === 'enterprises' && individualPages.includes(page)) { navigate('enterprises'); return }
+      if (profile.platform === 'individuals' && enterprisePages.includes(page)) { navigate('dashboard'); return }
+    }
+
     if (profile.role === 'worker') {
       setChecking(true)
       supabase.from('worker_profiles').select('id, is_approved').eq('user_id', user.id).maybeSingle()
@@ -88,7 +97,7 @@ export default function App() {
           setChecking(false)
         })
     }
-  }, [user?.id, profile?.role])
+  }, [user?.id, profile?.role, profile?.platform, page])
 
   if (loading || (profile?.role === 'worker' && checking)) return <PageLoader />
 
