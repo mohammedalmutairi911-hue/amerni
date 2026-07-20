@@ -690,148 +690,181 @@ export function EnterprisesPage() {
 
                   {/* ─── DASHBOARD HOME ─── */}
                   {dashSection === 'dashboard' && (
-                    <>
-                      {/* Welcome */}
-                      <div className="mb-6">
-                        <p className="text-slate-500 text-sm font-medium">مرحباً بك 👋</p>
-                        <h1 className="text-3xl font-black text-slate-900 mt-0.5">لوحة التحكم</h1>
-                        <p className="text-slate-400 text-sm mt-1">تتبع طلباتك وتواصل مع فريقنا</p>
+                    <div className="space-y-5 animate-fade-in">
+                      {/* Header Row */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-slate-500 text-sm font-medium flex items-center gap-1.5">
+                            👋 صباح الخير، {profile?.full_name || user.email?.split('@')[0]}
+                          </p>
+                          <h1 className="text-2xl font-black text-slate-900 mt-0.5">لوحة التحكم</h1>
+                          <p className="text-slate-400 text-sm mt-1">تتبع طلباتك وتواصل مع فريقنا بسهولة واحترافية.</p>
+                        </div>
+                        <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : EMPTY_FORM); setSuccess(false); setShowForm(true) }}
+                          className="flex-shrink-0 bg-primary-500 hover:bg-primary-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-colors btn-press shadow-lg shadow-primary-500/20">
+                          <Plus size={16} /> إضافة طلب جديد
+                        </button>
                       </div>
 
-                      {/* Stats */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                      {/* KPI Cards */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {[
-                          { label: 'إجمالي الطلبات', value: myLeads.length, color: 'text-slate-900', bg: 'bg-white' },
-                          { label: 'منشور — بانتظار مزود', value: myLeads.filter(l => ['open','new','reviewing'].includes(l.status)).length, color: 'text-blue-600', bg: 'bg-blue-50' },
-                          { label: 'تمت المطابقة', value: myLeads.filter(l => l.status === 'matched').length, color: 'text-green-600', bg: 'bg-green-50' },
-                          { label: 'مغلقة', value: myLeads.filter(l => l.status === 'closed').length, color: 'text-slate-500', bg: 'bg-slate-100' },
-                        ].map(({ label, value, color, bg }) => (
-                          <div key={label} className={`${bg} border border-slate-200 rounded-2xl p-4 shadow-sm`}>
-                            <div className={`text-3xl font-black ${color}`}>{value}</div>
-                            <div className="text-xs text-slate-500 mt-1">{label}</div>
+                          {
+                            label: 'إجمالي الطلبات',
+                            value: myLeads.length,
+                            sub: myLeads.length > 0 ? `+${myLeads.filter(l => {
+                              const d = new Date(l.created_at); const m = new Date(); m.setDate(m.getDate()-30);
+                              return d > m
+                            }).length} هذا الشهر` : 'لا يوجد طلبات بعد',
+                            color: 'text-slate-900', bg: 'bg-white', iconBg: 'bg-slate-100',
+                            icon: List
+                          },
+                          {
+                            label: 'بانتظار المورد',
+                            value: myLeads.filter(l => ['open','new','reviewing'].includes(l.status)).length,
+                            sub: 'جاري مراجعة العروض المقدمة',
+                            color: 'text-blue-600', bg: 'bg-white', iconBg: 'bg-blue-50',
+                            icon: Clock
+                          },
+                          {
+                            label: 'تمت المطابقة',
+                            value: myLeads.filter(l => l.status === 'matched').length,
+                            sub: myLeads.filter(l=>l.status==='matched').length > 0 ? 'سيتم البدء في التنفيذ قريباً' : 'لا يوجد مطابقات بعد',
+                            color: 'text-green-600', bg: 'bg-white', iconBg: 'bg-green-50',
+                            icon: CheckCircle2
+                          },
+                          {
+                            label: 'طلبات مغلقة',
+                            value: myLeads.filter(l => l.status === 'closed').length,
+                            sub: 'أرشيف الطلبات المكتملة',
+                            color: 'text-slate-500', bg: 'bg-white', iconBg: 'bg-slate-50',
+                            icon: Package
+                          },
+                        ].map(({ label, value, sub, color, bg, iconBg, icon: Icon }) => (
+                          <div key={label} className={`${bg} border border-slate-200 rounded-2xl p-4 shadow-sm card-hover`}>
+                            <div className={`w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center mb-3`}>
+                              <Icon size={18} className={color} />
+                            </div>
+                            <div className={`text-3xl font-black ${color} mb-1`}>{value}</div>
+                            <div className="text-xs text-slate-500 font-medium">{label}</div>
+                            {sub && <div className={`text-xs mt-1 ${value > 0 ? 'text-green-500' : 'text-slate-400'}`}>{sub}</div>}
                           </div>
                         ))}
                       </div>
 
-                      {/* Matched alert */}
+                      {/* Matched Alert Banner */}
                       {myLeads.filter(l => l.status === 'matched').length > 0 && (
-                        <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-4 mb-5 flex items-center justify-between gap-3">
-                          <div>
-                            <p className="font-bold text-green-700">✅ تمت مطابقتك مع مزود خدمة!</p>
-                            <p className="text-xs text-green-600 mt-0.5">راجع التفاصيل في طلباتي</p>
+                        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center justify-between gap-3 animate-fade-up">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+                              <CheckCircle2 size={20} className="text-green-600" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-green-800">تمت مطابقتك مع مزود خدمة بنجاح!</p>
+                              <p className="text-xs text-green-600 mt-0.5">راجع تفاصيل العقد والجدول الزمني في قسم طلباتي.</p>
+                            </div>
                           </div>
                           <button onClick={() => navigateTab('my-requests')}
-                            className="flex-shrink-0 bg-green-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-green-600 transition-colors">
+                            className="flex-shrink-0 bg-green-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-green-600 transition-colors whitespace-nowrap btn-press">
                             عرض الآن
                           </button>
                         </div>
                       )}
 
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-                        {/* Left — Active requests */}
-                        <div className="md:col-span-8 space-y-5">
-                          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover stagger-item">
-                            <div className="flex items-center justify-between mb-4">
+                      {/* Two Column Layout */}
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+                        {/* الطلبات النشطة — اليمين (واسع) */}
+                        <div className="md:col-span-8">
+                          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                               <h3 className="font-bold text-slate-900">الطلبات النشطة</h3>
-                              <button onClick={() => navigateTab('my-requests')} className="text-primary-500 text-sm font-semibold">عرض الكل ←</button>
+                              <button onClick={() => navigateTab('my-requests')}
+                                className="text-primary-500 text-sm font-semibold hover:text-primary-700 flex items-center gap-1">
+                                عرض الكل <ArrowLeft size={14} />
+                              </button>
                             </div>
                             {leadsLoading ? (
-                              <div className="flex justify-center py-8"><Loader2 size={24} className="animate-spin text-primary-300" /></div>
+                              <div className="p-6"><SkeletonList count={2} /></div>
                             ) : myLeads.filter(l => ['open','new','reviewing','matched'].includes(l.status)).length === 0 ? (
-                              <div className="text-center py-8">
-                                <Package size={28} className="text-slate-200 mx-auto mb-2" />
+                              <div className="p-8 text-center">
+                                <Package size={32} className="text-slate-200 mx-auto mb-2" />
                                 <p className="text-slate-400 text-sm mb-3">ما في طلبات نشطة</p>
-                                <button onClick={() => { setSelectedCat(null); setShowForm(true) }}
-                                  className="bg-primary-500 text-white font-bold px-5 py-2 rounded-xl text-sm hover:bg-primary-600">
+                                <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : EMPTY_FORM); setSuccess(false); setShowForm(true) }}
+                                  className="bg-primary-500 text-white font-bold px-5 py-2 rounded-xl text-sm hover:bg-primary-600 btn-press">
                                   أرسل طلبك الآن
                                 </button>
                               </div>
                             ) : (
-                              <div className="space-y-2">
-                                {myLeads.filter(l => ['open','new','reviewing','matched'].includes(l.status)).slice(0, 4).map(lead => {
+                              <div className="divide-y divide-slate-50">
+                                {myLeads.filter(l => ['open','new','reviewing','matched'].includes(l.status)).slice(0, 5).map(lead => {
                                   const st = STATUS_MAP[lead.status] || STATUS_MAP.new
-                                  const StIcon = st.icon
                                   const catLabel = ALL_CATEGORIES.find(cc => cc.id === lead.category)?.label || lead.category
+                                  const daysDiff = Math.floor((Date.now() - new Date(lead.created_at).getTime()) / 86400000)
                                   return (
-                                    <button key={lead.id} onClick={() => navigateTab('my-requests')}
-                                      className="w-full flex items-center gap-3 p-3.5 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 hover:border-primary-300 transition-all text-right">
-                                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold border ${st.color}`}>
-                                        <StIcon size={16} />
+                                    <button key={lead.id} onClick={() => navigate(`lead-detail/${lead.id}`)}
+                                      className="w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors text-right group">
+                                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${st.bg || 'bg-slate-100'}`}>
+                                        <Building2 size={18} className={st.color?.split(' ')[1] || 'text-slate-500'} />
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <p className="font-bold text-slate-900 text-sm truncate">{lead.company_name}</p>
-                                        <p className="text-xs text-slate-400">{catLabel} • {st.label}</p>
+                                        <p className="text-xs text-slate-400 mt-0.5">{catLabel} • {st.label}</p>
                                       </div>
-                                      <ChevronRight size={16} className="text-slate-300 flex-shrink-0" />
+                                      <div className="text-left flex-shrink-0">
+                                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${st.color}`}>{st.label.split('—')[0].trim()}</span>
+                                        <p className="text-xs text-slate-300 mt-1">منذ {daysDiff === 0 ? 'اليوم' : daysDiff + ' أيام'}</p>
+                                      </div>
+                                      <ChevronRight size={16} className="text-slate-200 group-hover:text-slate-400 transition-colors flex-shrink-0" />
                                     </button>
                                   )
                                 })}
                               </div>
                             )}
                           </div>
+                        </div>
 
-                          {/* Quick categories */}
-                          <div>
-                            <p className="text-xs text-slate-400 mb-2 font-medium">طلب تخصص سريع</p>
-                            <div className="grid grid-cols-4 gap-2">
-                              {CATEGORY_GROUPS.map(g => {
-                                const GIcon = g.icon
+                        {/* آخر الطلبات — اليسار (ضيق) */}
+                        <div className="md:col-span-4">
+                          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm h-full">
+                            <div className="px-4 py-4 border-b border-slate-100">
+                              <h3 className="font-bold text-slate-900 text-sm">آخر الطلبات</h3>
+                            </div>
+                            <div className="p-3 space-y-1">
+                              {myLeads.slice(0, 6).map(lead => {
+                                const st = STATUS_MAP[lead.status] || STATUS_MAP.new
                                 return (
-                                  <button key={g.id} onClick={() => { setSelectedCat(null); setForm(f => ({ ...f, category: '' })); setShowForm(true) }}
-                                    className={`${g.bg} border border-slate-200 rounded-xl p-3 text-center hover:border-primary-400 hover:shadow-md transition-all group`}>
-                                    <GIcon size={20} className={`${g.color} mx-auto mb-1 group-hover:scale-110 transition-transform`} />
-                                    <p className="text-xs font-semibold text-slate-700 leading-tight">{g.label.split(' ')[0]}</p>
+                                  <button key={lead.id} onClick={() => navigate(`lead-detail/${lead.id}`)}
+                                    className="w-full flex gap-2.5 items-start py-2.5 px-2 hover:bg-slate-50 rounded-xl transition-colors text-right">
+                                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
+                                      lead.status === 'matched' ? 'bg-green-400' :
+                                      lead.status === 'closed' ? 'bg-slate-300' : 'bg-blue-400'
+                                    }`} />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs font-bold text-slate-800 truncate">{lead.company_name}</p>
+                                      <p className="text-xs text-slate-400 mt-0.5 truncate">{st.label}</p>
+                                    </div>
+                                    <p className="text-xs text-slate-300 flex-shrink-0">{new Date(lead.created_at).toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' })}</p>
                                   </button>
                                 )
                               })}
+                              {myLeads.length === 0 && (
+                                <p className="text-slate-400 text-xs text-center py-6">لا توجد طلبات بعد</p>
+                              )}
                             </div>
-                          </div>
-                        </div>
-
-                        {/* Right — Recent */}
-                        <div className="md:col-span-4">
-                          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover stagger-item">
-                            <h3 className="font-bold text-slate-900 mb-4">آخر الطلبات</h3>
-                            {myLeads.slice(0, 6).map(lead => {
-                              const st = STATUS_MAP[lead.status] || STATUS_MAP.new
-                              return (
-                                <button key={lead.id} onClick={() => navigate(`lead-detail/${lead.id}`)}
-                                  className="w-full flex gap-3 items-start py-3 border-b border-slate-100 last:border-0 text-right hover:bg-slate-50 -mx-2 px-2 rounded-lg transition-colors">
-                                  <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                                    lead.status === 'matched' ? 'bg-green-400' :
-                                    lead.status === 'reviewing' ? 'bg-amber-400' :
-                                    lead.status === 'closed' ? 'bg-slate-300' : 'bg-blue-400'
-                                  }`} />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-slate-900 truncate">{lead.company_name}</p>
-                                    <p className="text-xs text-slate-400 mt-0.5">{st.label}</p>
-                                  </div>
-                                  <p className="text-xs text-slate-400 flex-shrink-0">{new Date(lead.created_at).toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' })}</p>
+                            {myLeads.length > 0 && (
+                              <div className="px-4 pb-4">
+                                <button onClick={() => navigateTab('my-requests')}
+                                  className="w-full border border-slate-200 text-slate-500 hover:border-primary-300 hover:text-primary-500 text-xs font-bold py-2 rounded-xl transition-colors">
+                                  استعراض السجل الكامل
                                 </button>
-                              )
-                            })}
-                            {myLeads.length === 0 && (
-                              <p className="text-slate-400 text-sm text-center py-6">لا توجد طلبات بعد</p>
+                              </div>
                             )}
                           </div>
                         </div>
                       </div>
-
-                      {/* Promo */}
-                      <div className="mt-5 rounded-2xl p-6 bg-gradient-to-l from-slate-900 to-primary-700 flex items-center justify-between gap-4">
-                        <div>
-                          <span className="inline-block bg-primary-400 text-white font-black text-xs px-2.5 py-0.5 rounded-full mb-2">١٨ تخصصاً</span>
-                          <h2 className="text-xl font-black text-white mb-1">مزودون معتمدون في انتظارك</h2>
-                          <p className="text-white/70 text-sm">مطابقة خلال ٢٤ ساعة — عمولة ١٪ فقط</p>
-                        </div>
-                        <button onClick={() => { setSelectedCat(null); setShowForm(true) }}
-                          className="flex-shrink-0 bg-white text-slate-900 font-bold px-5 py-2.5 rounded-xl hover:bg-primary-100 transition-colors text-sm">
-                          أرسل طلبك
-                        </button>
-                      </div>
-                    </>
+                    </div>
                   )}
-
                   {/* ─── ORDERS ─── */}
                   {dashSection === 'orders' && (
                     <>
