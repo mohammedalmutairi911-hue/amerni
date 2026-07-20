@@ -117,7 +117,7 @@ const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = 
 }
 
 export function EnterprisesPage() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { navigate, openAuth } = useApp()
 
   const [activeTab, setActiveTab] = useState<Tab>(() => {
