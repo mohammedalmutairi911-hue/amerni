@@ -134,7 +134,6 @@ export function EnterprisesPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   const [savedProfile, setSavedProfile] = useState<any>(null)
-  const [hasProfile, setHasProfile] = useState(false)
 
   // تحميل بروفايل الشركة المحفوظ + الإيميل تلقائياً (تعبئة تلقائية)
   // فتح تبويب "طلباتي" تلقائياً بعد تسجيل الشركة
@@ -150,12 +149,7 @@ export function EnterprisesPage() {
   useEffect(() => {
     if (!user) return
     supabase.from('company_profiles').select('*').eq('user_id', user.id).maybeSingle()
-      .then(({ data }) => {
-        if (data) {
-          setSavedProfile(data)
-          setHasProfile(true)
-        }
-      })
+      .then(({ data }) => { if (data) setSavedProfile(data) })
   }, [user?.id])
 
   // دالة تجهيز نموذج جديد مع التعبئة التلقائية
@@ -275,14 +269,13 @@ export function EnterprisesPage() {
       setError('يرجى اختيار التخصص وكتابة وصف الاحتياج'); return
     }
     if (!effective.company_name || !effective.contact_name || !effective.contact_email) {
-      setHasProfile(false)
       setError('يرجى تعبئة بيانات التواصل'); return
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(effective.contact_email)) {
-      setHasProfile(false); setError('يرجى إدخال بريد إلكتروني صحيح'); return
+      setError('يرجى إدخال بريد إلكتروني صحيح'); return
     }
     if (effective.contact_phone && !/^05[0-9]{8}$/.test(effective.contact_phone)) {
-      setHasProfile(false); setError('رقم الجوال يجب أن يكون ١٠ أرقام يبدأ بـ 05'); return
+      setError('رقم الجوال يجب أن يكون ١٠ أرقام يبدأ بـ 05'); return
     }
     if (form.description.trim().length < 10) {
       setError('يرجى كتابة وصف أكثر تفصيلاً'); return
@@ -319,8 +312,7 @@ export function EnterprisesPage() {
       } catch {}
       clearDraft()
       setSavedProfile({ company_name: clean.company_name, contact_name: clean.contact_name, contact_phone: clean.contact_phone, company_size: clean.company_size })
-      setHasProfile(true)
-      setSuccess(true)
+            setSuccess(true)
     } catch { setError('حدث خطأ، يرجى المحاولة مجدداً') }
     finally { setSubmitting(false) }
   }
@@ -357,8 +349,7 @@ export function EnterprisesPage() {
           setShowForm(false)
           setSuccess(true)
           setSavedProfile({ company_name: effectiveData.company_name, contact_name: effectiveData.contact_name, contact_phone: effectiveData.contact_phone, company_size: effectiveData.company_size })
-          setHasProfile(true)
-          setTimeout(fetchMyLeads, 500)
+                    setTimeout(fetchMyLeads, 500)
         }
       }, 1000)
       return () => clearTimeout(t)
@@ -1543,13 +1534,13 @@ export function EnterprisesPage() {
             ) : (
               <div className="p-6 space-y-4">
                 {/* بيانات الشركة المحفوظة — مطوية لو موجودة */}
-                {hasProfile && (
+                {savedProfile && (
                   <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2 text-sm text-green-700 min-w-0">
                       <CheckCircle2 size={15} className="flex-shrink-0" />
                       <span className="truncate">بيانات {form.company_name || 'شركتك'} محفوظة — {form.contact_email}</span>
                     </div>
-                    <button type="button" onClick={() => setHasProfile(false)}
+                    <button type="button" onClick={() => setSavedProfile(null)}
                       className="text-xs text-green-600 underline flex-shrink-0 hover:text-green-800">تعديل</button>
                   </div>
                 )}
@@ -1591,7 +1582,7 @@ export function EnterprisesPage() {
                 </div>
 
                 {/* بيانات الشركة — تظهر فقط لو ما فيه بروفايل محفوظ أو ضغط تعديل */}
-                {!hasProfile && (
+                {!savedProfile && (
                   <div className="border-t border-slate-100 pt-4 space-y-4">
                     <p className="text-xs font-bold text-slate-400">بيانات التواصل (تُحفظ لطلباتك القادمة)</p>
                     <div className="grid grid-cols-2 gap-3">
