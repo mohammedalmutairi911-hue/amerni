@@ -9,7 +9,7 @@ export function ProviderProfileCard({ providerId }: { providerId: string }) {
   const [provider, setProvider] = useState<any>(null)
   const [reviews, setReviews] = useState<any[]>([])
   const [portfolio, setPortfolio] = useState<any[]>([])
-  const [expanded, setExpanded] = useState(true) // مفتوح افتراضياً
+  const [expanded, setExpanded] = useState(true) // مفتوح دائماً // مفتوح افتراضياً
 
   useEffect(() => {
     if (!providerId) return
@@ -115,7 +115,7 @@ export function ProviderProfileCard({ providerId }: { providerId: string }) {
                 <p className="font-bold text-slate-700 font-mono">{details.vat_number}</p>
               </div>
             )}
-            {details.years_experience && (
+            {details.years_experience && details.years_experience !== '' && (
               <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">
                 <p className="text-slate-400 mb-0.5 flex items-center gap-1"><Clock size={10} /> سنوات الخبرة</p>
                 <p className="font-bold text-slate-700">{details.years_experience} سنوات</p>
@@ -144,7 +144,7 @@ export function ProviderProfileCard({ providerId }: { providerId: string }) {
           )}
 
           {/* الشهادات والمؤهلات */}
-          {details.certifications && (
+          {(details.certifications && details.certifications.trim()) && (
             <div className="bg-green-50 border border-green-100 rounded-xl p-3">
               <p className="text-xs font-bold text-green-600 mb-1 flex items-center gap-1">
                 <Award size={12} /> الشهادات والمؤهلات
@@ -154,7 +154,7 @@ export function ProviderProfileCard({ providerId }: { providerId: string }) {
           )}
 
           {/* عملاء سابقون */}
-          {details.prev_clients && (
+          {(details.prev_clients && details.prev_clients.trim()) && (
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
               <p className="text-xs font-bold text-slate-500 mb-1">عملاء سابقون</p>
               <p className="text-sm text-slate-700">{details.prev_clients}</p>
@@ -162,7 +162,7 @@ export function ProviderProfileCard({ providerId }: { providerId: string }) {
           )}
 
           {/* النبذة */}
-          {details.bio && (
+          {(details.bio && details.bio.trim()) && (
             <div>
               <p className="text-xs font-bold text-slate-500 mb-1.5">نبذة تعريفية</p>
               <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 rounded-xl px-4 py-3">{details.bio}</p>

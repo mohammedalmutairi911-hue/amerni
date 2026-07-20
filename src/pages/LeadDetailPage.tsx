@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 import { ArrowRight, CheckCircle2, Clock, X, Loader2, AlertCircle, MessageSquare, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
@@ -26,6 +27,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function LeadDetailPage() {
   const { navigate } = useApp()
+  const { user } = useAuth()
   const [lead, setLead] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [closing, setClosing] = useState(false)
@@ -49,7 +51,7 @@ export function LeadDetailPage() {
     await supabase.from('enterprise_leads').update({ company_accepted: true }).eq('id', lead.id)
     // رسالة نظام في الشات
     await supabase.from('enterprise_messages').insert({
-      lead_id: lead.id, sender_id: null, sender_role: 'admin',
+      lead_id: lead.id, sender_id: user?.id, sender_role: 'company',
       content: '✅ وافقت الشركة على المزود — يمكنكم الآن بدء التواصل', is_system: true
     })
     setLead((l: any) => ({ ...l, company_accepted: true }))
@@ -141,7 +143,7 @@ export function LeadDetailPage() {
         )}
 
         {/* مزود قبل — انتظار موافقة الشركة */}
-        {lead.status === 'matched' && lead.provider_id && !lead.company_accepted && (
+        {lead.status === 'matched' && lead.provider_id && lead.company_accepted !== true && (
           <div className="space-y-4">
             {/* إشعار القبول */}
             <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 flex items-start gap-3">
@@ -174,7 +176,7 @@ export function LeadDetailPage() {
         )}
 
         {/* وافقت — شات + إجراءات */}
-        {lead.status === 'matched' && lead.provider_id && lead.company_accepted && (
+        {lead.status === 'matched' && lead.provider_id && lead.company_accepted === true && (
           <div className="space-y-4">
             <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-2">
               <CheckCircle2 size={16} className="text-green-500" />
