@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
       options: {
-        emailRedirectTo: 'https://amerniksa.com',
+        emailRedirectTo: `https://amerniksa.com?platform=${platform}`,
         data: { full_name: fullName, role, platform }
       }
     })

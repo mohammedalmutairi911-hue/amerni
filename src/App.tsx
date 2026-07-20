@@ -32,6 +32,17 @@ if (workerParam) {
   ;(window as any).__workerProfileId = workerParam
 }
 
+// التوجيه حسب platform من رابط التحقق بالإيميل
+const platformParam = urlParams.get('platform')
+if (platformParam) {
+  // احفظ المنصة مؤقتاً، App سيستخدمها لما يتحمّل البروفايل
+  sessionStorage.setItem('pending_platform', platformParam)
+  // نظّف الرابط (ما يبقى ?platform= في URL)
+  const clean = new URL(window.location.href)
+  clean.searchParams.delete('platform')
+  window.history.replaceState({}, '', clean.toString())
+}
+
 // التقاط رابط الإحالة (?ref=xxxxxxxx) وحفظه محلياً —
 // كان هذا الجزء مفقوداً بالكامل، مما يجعل نظام الإحالة في ReferralPage.tsx
 // لا يعمل أبداً لأن referred_by لا يُحفظ في أي مكان عند التسجيل
@@ -77,6 +88,18 @@ export default function App() {
 
   useEffect(() => {
     if (!user || !profile) { setWorkerApproved(null); setWorkerExists(null); return }
+
+    // توجيه بعد التحقق من الإيميل — platform من sessionStorage
+    const pendingPlatform = sessionStorage.getItem('pending_platform')
+    if (pendingPlatform) {
+      sessionStorage.removeItem('pending_platform')
+      if (pendingPlatform === 'enterprises') {
+        navigate('enterprises')
+        setTimeout(() => window.dispatchEvent(new CustomEvent('enterprises:open-my-requests')), 600)
+        return
+      }
+    }
+
     if (profile.role === 'admin' && page !== 'landing' && page !== 'admin' && page !== 'enterprises' && page !== 'provider-dashboard') { navigate('admin'); return }
 
     // فصل المنصات: حساب المنشآت يبقى في المنشآت، حساب الأفراد في الأفراد
