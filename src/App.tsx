@@ -15,6 +15,7 @@ import { NotFoundPage } from './pages/NotFoundPage'
 
 // Lazy-loaded pages — code splitting لتسريع التحميل الأول
 const AdminPanel = React.lazy(() => import('./pages/AdminPanel').then(m => ({ default: m.AdminPanel })))
+const AdminEnterprisesPanel = React.lazy(() => import('./pages/AdminEnterprisesPanel').then(m => ({ default: m.AdminEnterprisesPanel })))
 const SupportPage = React.lazy(() => import('./pages/SupportPage').then(m => ({ default: m.SupportPage })))
 const BrowseWorkers = React.lazy(() => import('./pages/BrowseWorkers').then(m => ({ default: m.BrowseWorkers })))
 const BountiesPage = React.lazy(() => import('./pages/BountiesPage').then(m => ({ default: m.BountiesPage })))
@@ -141,6 +142,9 @@ export default function App() {
     if (profile.role === 'admin') {
       if (page === 'landing') return <><Navbar /><LandingPage /></>
       return <><Navbar /><AdminPanel /></>
+    }
+    if (page === 'admin-enterprises') {
+      return <AdminEnterprisesPanel />
     }
 
     if (profile.role === 'worker') {

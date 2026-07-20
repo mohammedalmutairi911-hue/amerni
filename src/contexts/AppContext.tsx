@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
-export type Page = 'landing' | 'dashboard' | 'worker' | 'admin' | 'support' | 'browse' | 'bounties' | 'earn' | 'referral' | 'worker-profile' | 'join' | 'enterprises' | 'provider-dashboard'
+export type Page = 'landing' | 'dashboard' | 'worker' | 'admin' | 'admin-enterprises' | 'support' | 'browse' | 'bounties' | 'earn' | 'referral' | 'worker-profile' | 'join' | 'enterprises' | 'provider-dashboard'
 
-const VALID_PAGES: Page[] = ['landing', 'dashboard', 'worker', 'admin', 'support', 'browse', 'bounties', 'earn', 'referral', 'worker-profile', 'join', 'enterprises', 'provider-dashboard']
+const VALID_PAGES: Page[] = ['landing', 'dashboard', 'worker', 'admin', 'admin-enterprises', 'support', 'browse', 'bounties', 'earn', 'referral', 'worker-profile', 'join', 'enterprises', 'provider-dashboard']
 
 function getPageFromHash(): Page {
   const hash = window.location.hash.replace('#/', '').replace('#', '').trim()

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { useApp } from '../contexts/AppContext'
 import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { Chat } from '../components/chat/Chat'
@@ -9,6 +10,7 @@ import { Chat } from '../components/chat/Chat'
 type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises' | 'providers'
 
 export function AdminPanel() {
+  const { navigate } = useApp()
   const [tab, setTab] = useState<Tab>('overview')
   const [workers, setWorkers] = useState<WorkerProfile[]>([])
   const [tasks, setTasks] = useState<Task[]>([])
@@ -193,6 +195,10 @@ export function AdminPanel() {
             </div>
           </div>
           <div className="flex gap-2">
+            <button onClick={() => navigate('admin-enterprises')}
+              className="flex items-center gap-2 text-sm text-white bg-primary-500 hover:bg-primary-600 px-3 py-1.5 rounded-lg transition-colors font-bold">
+              🏢 إدارة المنشآت
+            </button>
             <button onClick={refresh} disabled={refreshing}
               className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors">
               <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} /> تحديث
