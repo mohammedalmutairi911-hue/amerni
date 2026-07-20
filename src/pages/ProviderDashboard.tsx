@@ -9,6 +9,7 @@ import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { ReviewBox, VerificationBadge, StarDisplay } from '../components/enterprise/ReviewBox'
 import { PortfolioManager } from '../components/enterprise/PortfolioManager'
 import { ProviderReviews, ResponseSpeed } from '../components/enterprise/UXComponents'
+import { NotificationBell } from '../components/ui/NotificationBell'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 
@@ -192,6 +193,7 @@ export function ProviderDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <NotificationBell />
             {!providerData.is_approved && (
               <span className="text-xs bg-amber-50 text-amber-600 border border-amber-200 px-3 py-1.5 rounded-full font-bold">
                 ⏳ قيد المراجعة

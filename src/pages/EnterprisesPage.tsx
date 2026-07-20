@@ -4,6 +4,7 @@ import { ReviewBox, VerificationBadge, StarDisplay } from '../components/enterpr
 import { ProviderProfileCard } from '../components/enterprise/ProviderProfileCard'
 import { ResponseSpeed, StatusTimeline, SocialProofBar, EmptyRequests } from '../components/enterprise/UXComponents'
 import { SkeletonList } from '../components/ui/Skeleton'
+import { NotificationBell } from '../components/ui/NotificationBell'
 import { COMPANY } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -436,6 +437,7 @@ export function EnterprisesPage() {
             ))}
           </div>
           <div className="flex items-center gap-2">
+            {user && <NotificationBell />}
             {!user && (
               <button onClick={() => openAuth('login', 'enterprises')}
                 className="text-xs px-3 py-1.5 rounded-lg border border-primary-500 text-primary-500 font-bold hover:bg-primary-50 transition-colors">
