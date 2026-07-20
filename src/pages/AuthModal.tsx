@@ -45,7 +45,12 @@ export function AuthModal() {
     closeAuth()
     // التوجيه حسب المنصة
     if (isEnterprise) {
+      // بعد التسجيل كشركة — روح لطلباتي مباشرة
       navigate('enterprises')
+      // نستخدم event عشان EnterprisesPage يفتح تبويب طلباتي
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('enterprises:open-my-requests'))
+      }, 600)
     } else if (tab === 'signup') {
       if (role === 'worker') navigate('worker')
       else navigate('dashboard')

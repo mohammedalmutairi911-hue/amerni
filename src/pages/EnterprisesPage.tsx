@@ -137,6 +137,17 @@ export function EnterprisesPage() {
   const [hasProfile, setHasProfile] = useState(false)
 
   // تحميل بروفايل الشركة المحفوظ + الإيميل تلقائياً (تعبئة تلقائية)
+  // فتح تبويب "طلباتي" تلقائياً بعد تسجيل الشركة
+  useEffect(() => {
+    const handler = () => {
+      setActiveTab('my-requests')
+      setShowForm(false)
+      setPendingSubmit(false)
+    }
+    window.addEventListener('enterprises:open-my-requests', handler)
+    return () => window.removeEventListener('enterprises:open-my-requests', handler)
+  }, [])
+
   useEffect(() => {
     if (!user) return
     supabase.from('company_profiles').select('*').eq('user_id', user.id).maybeSingle()
@@ -313,13 +324,15 @@ export function EnterprisesPage() {
 
   // إكمال إرسال الطلب تلقائياً بعد تسجيل الدخول
   useEffect(() => {
-    if (user && pendingSubmit && showForm) {
-      setPendingSubmit(false)
-      // ننتظر لحظة حتى يكتمل تحميل البروفايل
+    if (!user || !pendingSubmit) return
+    setPendingSubmit(false)
+    if (showForm) {
+      // النموذج مفتوح — أكمل الإرسال
       const t = setTimeout(() => { handleSubmit() }, 800)
       return () => clearTimeout(t)
     }
-  }, [user?.id, pendingSubmit, showForm])
+    // النموذج مغلق (وجّهه AuthModal لـ my-requests) — لا تعيد فتحه
+  }, [user?.id, pendingSubmit])
 
   const handleProvSubmit = async () => {
     if (!user) {
