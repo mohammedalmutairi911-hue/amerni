@@ -101,7 +101,7 @@ export default function App() {
       }
     }
 
-    if (profile.role === 'admin' && page !== 'admin') { navigate('admin'); return }
+    if (profile.role === 'admin' && page !== 'admin' && page !== 'admin-enterprises') { navigate('admin'); return }
 
     // فصل المنصات: حساب المنشآت يبقى في المنشآت، حساب الأفراد في الأفراد
     if (profile.role !== 'admin') {

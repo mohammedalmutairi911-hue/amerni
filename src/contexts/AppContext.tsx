@@ -6,13 +6,19 @@ const VALID_PAGES: Page[] = ['landing', 'dashboard', 'worker', 'admin', 'admin-e
 
 function getPageFromHash(): Page {
   const hash = window.location.hash.replace('#/', '').replace('#', '').trim()
-  if (!hash || hash === '/') return 'landing'
-  return VALID_PAGES.includes(hash as Page) ? (hash as Page) : 'landing'
+  if (hash && VALID_PAGES.includes(hash as Page)) return hash as Page
+  // backup: لو الـ hash ضاع عند التحديث، ارجع للصفحة المحفوظة
+  const saved = sessionStorage.getItem('current_page') as Page
+  if (saved && VALID_PAGES.includes(saved) && saved !== 'landing') return saved
+  return 'landing'
 }
 
 function setHash(p: Page) {
   const hash = p === 'landing' ? '' : `#/${p}`
   window.history.replaceState(null, '', hash || window.location.pathname)
+  // حفظ الصفحة كـ backup
+  if (p !== 'landing') sessionStorage.setItem('current_page', p)
+  else sessionStorage.removeItem('current_page')
 }
 
 interface AppCtx {
