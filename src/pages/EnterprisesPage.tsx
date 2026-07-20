@@ -120,7 +120,10 @@ export function EnterprisesPage() {
   const { user } = useAuth()
   const { navigate, openAuth } = useApp()
 
-  const [activeTab, setActiveTab] = useState<Tab>('home')
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    const saved = sessionStorage.getItem('enterprises_tab') as Tab
+    return saved && ['home','my-requests','provider-register'].includes(saved) ? saved : 'home'
+  })
   const [selectedCat, setSelectedCat] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const PENDING_LEAD_KEY = 'amerni_pending_lead'
@@ -139,7 +142,7 @@ export function EnterprisesPage() {
   // فتح تبويب "طلباتي" تلقائياً بعد تسجيل الشركة
   useEffect(() => {
     const handler = () => {
-      setActiveTab('my-requests')
+      navigateTab('my-requests')
       setShowForm(false)
     }
     window.addEventListener('enterprises:open-my-requests', handler)
@@ -226,6 +229,12 @@ export function EnterprisesPage() {
   }, [])
 
   // Load my leads when tab opens
+  // حفظ التبويب الحالي عند كل تغيير
+  const navigateTab = (tab: Tab) => {
+    setActiveTab(tab)
+    sessionStorage.setItem('enterprises_tab', tab)
+  }
+
   const fetchMyLeads = () => {
     if (!user) return
     setLeadsLoading(true)
@@ -492,7 +501,7 @@ export function EnterprisesPage() {
               </button>
             )}
             {user && (
-              <button onClick={() => setActiveTab('my-requests')}
+              <button onClick={() => navigateTab('my-requests')}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${activeTab === 'my-requests' ? 'bg-primary-500 text-white border-primary-500' : 'border-slate-200 text-slate-600 hover:border-primary-300'}`}>
                 طلباتي
               </button>
@@ -711,7 +720,7 @@ export function EnterprisesPage() {
                             <p className="font-bold text-green-700">✅ تمت مطابقتك مع مزود خدمة!</p>
                             <p className="text-xs text-green-600 mt-0.5">راجع التفاصيل في طلباتي</p>
                           </div>
-                          <button onClick={() => setDashSection('orders')}
+                          <button onClick={() => navigateTab('my-requests')}
                             className="flex-shrink-0 bg-green-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-green-600 transition-colors">
                             عرض الآن
                           </button>
@@ -724,7 +733,7 @@ export function EnterprisesPage() {
                           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover stagger-item">
                             <div className="flex items-center justify-between mb-4">
                               <h3 className="font-bold text-slate-900">الطلبات النشطة</h3>
-                              <button onClick={() => setDashSection('orders')} className="text-primary-500 text-sm font-semibold">عرض الكل ←</button>
+                              <button onClick={() => navigateTab('my-requests')} className="text-primary-500 text-sm font-semibold">عرض الكل ←</button>
                             </div>
                             {leadsLoading ? (
                               <div className="flex justify-center py-8"><Loader2 size={24} className="animate-spin text-primary-300" /></div>
@@ -744,7 +753,7 @@ export function EnterprisesPage() {
                                   const StIcon = st.icon
                                   const catLabel = ALL_CATEGORIES.find(cc => cc.id === lead.category)?.label || lead.category
                                   return (
-                                    <button key={lead.id} onClick={() => setDashSection('orders')}
+                                    <button key={lead.id} onClick={() => navigateTab('my-requests')}
                                       className="w-full flex items-center gap-3 p-3.5 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 hover:border-primary-300 transition-all text-right">
                                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-bold border ${st.color}`}>
                                         <StIcon size={16} />
@@ -1505,7 +1514,7 @@ export function EnterprisesPage() {
                 <p className="text-slate-500 text-sm mb-6">طلبك الآن ظاهر لكل المزودين المعتمدين في التخصص. سيصلك إشعار فور قبول أحدهم.</p>
                 <div className="flex gap-3 justify-center">
                   {user
-                    ? <button onClick={() => { setShowForm(false); setSuccess(false); setActiveTab('my-requests') }} className="bg-primary-500 text-white font-bold px-8 py-2.5 rounded-xl hover:bg-primary-600 transition-colors">عرض طلباتي ←</button>
+                    ? <button onClick={() => { setShowForm(false); setSuccess(false); navigateTab('my-requests') }} className="bg-primary-500 text-white font-bold px-8 py-2.5 rounded-xl hover:bg-primary-600 transition-colors">عرض طلباتي ←</button>
                     : <button onClick={() => setShowForm(false)} className="bg-primary-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-primary-600 transition-colors">حسناً</button>
                   }
                 </div>

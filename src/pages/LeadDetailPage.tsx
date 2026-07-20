@@ -65,6 +65,8 @@ export function LeadDetailPage() {
     setChanging(false)
     if (error) { alert('خطأ: ' + error.message); return }
     setLead((l: any) => ({ ...l, status: 'open', provider_id: null, company_accepted: false }))
+    // رجوع لطلباتي بعد ثانيتين
+    setTimeout(() => { sessionStorage.setItem('enterprises_tab', 'my-requests'); navigate('enterprises') }, 1500)
   }
 
   const closeLead = async () => {
@@ -97,7 +99,10 @@ export function LeadDetailPage() {
     <div className="min-h-screen bg-slate-50" dir="rtl">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3 shadow-sm">
-        <button onClick={() => navigate('enterprises')}
+        <button onClick={() => {
+          sessionStorage.setItem('enterprises_tab', 'my-requests')
+          navigate('enterprises')
+        }}
           className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors">
           <ArrowRight size={16} /> طلباتي
         </button>
