@@ -728,7 +728,7 @@ export function EnterprisesPage() {
                             </div>
                             {leadsLoading ? (
                               <div className="flex justify-center py-8"><Loader2 size={24} className="animate-spin text-primary-300" /></div>
-                            ) : myLeads.filter(l => ['new','reviewing','matched'].includes(l.status)).length === 0 ? (
+                            ) : myLeads.filter(l => ['open','new','reviewing','matched'].includes(l.status)).length === 0 ? (
                               <div className="text-center py-8">
                                 <Package size={28} className="text-slate-200 mx-auto mb-2" />
                                 <p className="text-slate-400 text-sm mb-3">ما في طلبات نشطة</p>
@@ -739,7 +739,7 @@ export function EnterprisesPage() {
                               </div>
                             ) : (
                               <div className="space-y-2">
-                                {myLeads.filter(l => ['new','reviewing','matched'].includes(l.status)).slice(0, 4).map(lead => {
+                                {myLeads.filter(l => ['open','new','reviewing','matched'].includes(l.status)).slice(0, 4).map(lead => {
                                   const st = STATUS_MAP[lead.status] || STATUS_MAP.new
                                   const StIcon = st.icon
                                   const catLabel = ALL_CATEGORIES.find(cc => cc.id === lead.category)?.label || lead.category
