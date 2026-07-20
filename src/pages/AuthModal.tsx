@@ -57,7 +57,7 @@ export function AuthModal() {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
       <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 relative">
-        <button onClick={closeAuth} className="absolute top-4 left-4 text-slate-400 hover:text-slate-900">
+        <button onClick={closeAuth} aria-label="إغلاق نافذة التسجيل" className="absolute top-4 left-4 text-slate-400 hover:text-slate-900">
           <X size={18} />
         </button>
 

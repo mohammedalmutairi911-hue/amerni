@@ -3,6 +3,7 @@ import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { ReviewBox, VerificationBadge, StarDisplay } from '../components/enterprise/ReviewBox'
 import { ProviderProfileCard } from '../components/enterprise/ProviderProfileCard'
 import { ResponseSpeed, StatusTimeline, SocialProofBar, EmptyRequests } from '../components/enterprise/UXComponents'
+import { SkeletonList } from '../components/ui/Skeleton'
 import { COMPANY } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -788,7 +789,7 @@ export function EnterprisesPage() {
                       </div>
 
                       {leadsLoading ? (
-                        <div className="flex justify-center py-16"><Loader2 size={28} className="animate-spin text-primary-500" /></div>
+                        <SkeletonList count={3} />
                       ) : myLeads.length === 0 ? (
                         <div className="bg-white border border-slate-200 rounded-2xl">
                           <EmptyRequests onCreate={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }} />
