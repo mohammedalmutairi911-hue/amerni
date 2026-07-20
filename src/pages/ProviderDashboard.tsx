@@ -351,7 +351,7 @@ export function ProviderDashboard() {
               ) : (
                 <div className="space-y-4">
                   {availableLeads.map(lead => (
-                    <div key={lead.id} className="bg-white border-2 border-primary-100 rounded-2xl p-5 hover:border-primary-300 hover:shadow-md transition-all">
+                    <div key={lead.id} className="bg-white border-2 border-primary-100 rounded-2xl p-5 card-hover stagger-item">
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div>
                           <p className="font-bold text-slate-900 text-lg">{lead.company_name}</p>
@@ -373,7 +373,7 @@ export function ProviderDashboard() {
                       <button
                         onClick={() => acceptLead(lead.id)}
                         disabled={accepting === lead.id}
-                        className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 rounded-xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                        className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 rounded-xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 btn-press">
                         {accepting === lead.id ? <Loader2 size={16} className="animate-spin" /> : <><CheckCircle size={16} /> اقبل الطلب</>}
                       </button>
                     </div>

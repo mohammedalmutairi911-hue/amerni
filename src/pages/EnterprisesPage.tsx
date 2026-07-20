@@ -483,7 +483,7 @@ export function EnterprisesPage() {
 
         {/* ══ HOME ══ */}
         {activeTab === 'home' && (
-          <div>
+          <div className="animate-fade-in">
             <section className="bg-gradient-to-br from-slate-900 via-primary-900 to-slate-900 text-white py-20 px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <div className="inline-flex items-center gap-2 bg-primary-500/20 border border-primary-500/30 rounded-full px-4 py-1.5 text-primary-300 text-sm mb-6">
@@ -500,7 +500,7 @@ export function EnterprisesPage() {
                   ))}
                 </div>
                 <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
-                  className="bg-primary-500 hover:bg-primary-600 text-white font-bold px-8 py-3 rounded-2xl transition-colors">
+                  className="bg-primary-500 hover:bg-primary-600 text-white font-bold px-8 py-3 rounded-2xl transition-colors btn-press animate-pulse-glow">
                   أرسل طلبك الآن — مجاناً
                 </button>
               </div>
@@ -674,7 +674,7 @@ export function EnterprisesPage() {
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
                         {/* Left — Active requests */}
                         <div className="md:col-span-8 space-y-5">
-                          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover stagger-item">
                             <div className="flex items-center justify-between mb-4">
                               <h3 className="font-bold text-slate-900">الطلبات النشطة</h3>
                               <button onClick={() => setDashSection('orders')} className="text-primary-500 text-sm font-semibold">عرض الكل ←</button>
@@ -734,7 +734,7 @@ export function EnterprisesPage() {
 
                         {/* Right — Recent */}
                         <div className="md:col-span-4">
-                          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover stagger-item">
                             <h3 className="font-bold text-slate-900 mb-4">آخر الطلبات</h3>
                             {myLeads.slice(0, 6).map(lead => {
                               const st = STATUS_MAP[lead.status] || STATUS_MAP.new
@@ -932,7 +932,7 @@ export function EnterprisesPage() {
 
               {provSuccess ? (
                 <div className="text-center py-12 bg-white border border-slate-200 rounded-2xl">
-                  <CheckCircle2 size={48} className="mx-auto mb-4 text-green-500" />
+                  <CheckCircle2 size={48} className="mx-auto mb-4 text-green-500 animate-scale-in" />
                   <h3 className="text-xl font-black text-slate-900 mb-2">تم نشر طلبك! 🚀</h3>
                   <p className="text-slate-500">سيراجع فريقنا طلبك ويتواصل معك خلال ٤٨ ساعة</p>
                 </div>
@@ -1474,7 +1474,7 @@ export function EnterprisesPage() {
             </div>
             {success ? (
               <div className="p-8 text-center">
-                <CheckCircle2 size={48} className="mx-auto mb-4 text-green-500" />
+                <CheckCircle2 size={48} className="mx-auto mb-4 text-green-500 animate-scale-in" />
                 <h3 className="text-lg font-black text-slate-900 mb-2">تم نشر طلبك! 🚀</h3>
                 <p className="text-slate-500 text-sm mb-6">طلبك الآن ظاهر لكل المزودين المعتمدين في التخصص. سيصلك إشعار فور قبول أحدهم.</p>
                 <div className="flex gap-3 justify-center">
