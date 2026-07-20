@@ -786,7 +786,7 @@ export function EnterprisesPage() {
                             {myLeads.slice(0, 6).map(lead => {
                               const st = STATUS_MAP[lead.status] || STATUS_MAP.new
                               return (
-                                <button key={lead.id} onClick={() => setDashSection('orders')}
+                                <button key={lead.id} onClick={() => navigate(`lead-detail/${lead.id}`)}
                                   className="w-full flex gap-3 items-start py-3 border-b border-slate-100 last:border-0 text-right hover:bg-slate-50 -mx-2 px-2 rounded-lg transition-colors">
                                   <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
                                     lead.status === 'matched' ? 'bg-green-400' :
@@ -850,7 +850,7 @@ export function EnterprisesPage() {
                             const StIcon = st.icon
                             const catLabel = ALL_CATEGORIES.find(cc => cc.id === lead.category)?.label || lead.category
                             return (
-                              <div key={lead.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-shadow">
+                              <div key={lead.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`lead-detail/${lead.id}`)}>
                                 <div className="flex items-start justify-between gap-3 mb-3">
                                   <div>
                                     <p className="font-bold text-slate-900 text-lg">{lead.company_name}</p>

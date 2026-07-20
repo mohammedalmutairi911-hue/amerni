@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
-export type Page = 'landing' | 'dashboard' | 'worker' | 'admin' | 'admin-enterprises' | 'support' | 'browse' | 'bounties' | 'earn' | 'referral' | 'worker-profile' | 'join' | 'enterprises' | 'provider-dashboard'
+export type Page = 'landing' | 'dashboard' | 'worker' | 'admin' | 'admin-enterprises' | 'support' | 'browse' | 'bounties' | 'earn' | 'referral' | 'worker-profile' | 'join' | 'enterprises' | 'provider-dashboard' | 'lead-detail'
 
-const VALID_PAGES: Page[] = ['landing', 'dashboard', 'worker', 'admin', 'admin-enterprises', 'support', 'browse', 'bounties', 'earn', 'referral', 'worker-profile', 'join', 'enterprises', 'provider-dashboard']
+const VALID_PAGES: Page[] = ['landing', 'dashboard', 'worker', 'admin', 'admin-enterprises', 'support', 'browse', 'bounties', 'earn', 'referral', 'worker-profile', 'join', 'enterprises', 'provider-dashboard', 'lead-detail']
 
 function getPageFromHash(): Page {
   const hash = window.location.hash.replace('#/', '').replace('#', '').trim()
@@ -13,11 +13,11 @@ function getPageFromHash(): Page {
   return 'landing'
 }
 
-function setHash(p: Page) {
+function setHash(p: string) {
   const hash = p === 'landing' ? '' : `#/${p}`
   window.history.replaceState(null, '', hash || window.location.pathname)
-  // حفظ الصفحة كـ backup
-  if (p !== 'landing') sessionStorage.setItem('current_page', p)
+  const basePage = p.split('/')[0]
+  if (basePage !== 'landing') sessionStorage.setItem('current_page', p)
   else sessionStorage.removeItem('current_page')
 }
 
@@ -51,9 +51,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
-  const navigate = (p: Page) => {
+  const navigate = (p: string) => {
+    const basePage = p.split('/')[0] as Page
     setHash(p)
-    setPage(p)
+    setPage(VALID_PAGES.includes(basePage) ? basePage : 'landing')
   }
 
   return (
