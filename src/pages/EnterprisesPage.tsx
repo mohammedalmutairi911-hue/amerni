@@ -123,7 +123,7 @@ export function EnterprisesPage() {
   const [activeTab, setActiveTab] = useState<Tab>('home')
   const [selectedCat, setSelectedCat] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
-  const [pendingSubmit, setPendingSubmit] = useState(false)
+  const PENDING_LEAD_KEY = 'amerni_pending_lead'
   const [catSearch, setCatSearch] = useState('')
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null)
 
@@ -142,7 +142,6 @@ export function EnterprisesPage() {
     const handler = () => {
       setActiveTab('my-requests')
       setShowForm(false)
-      setPendingSubmit(false)
     }
     window.addEventListener('enterprises:open-my-requests', handler)
     return () => window.removeEventListener('enterprises:open-my-requests', handler)
@@ -163,7 +162,7 @@ export function EnterprisesPage() {
   const buildPrefilledForm = (): LeadForm => ({
     company_name: savedProfile?.company_name || '',
     contact_name: savedProfile?.contact_name || '',
-    contact_email: user?.email || '',
+    contact_email: savedProfile?.contact_email || user?.email || '',
     contact_phone: savedProfile?.contact_phone || '',
     company_size: savedProfile?.company_size || '',
     category: '', description: '', budget_range: ''
@@ -256,7 +255,11 @@ export function EnterprisesPage() {
   const handleSubmit = async () => {
     if (!user) {
       setError('')
-      setPendingSubmit(true)
+      // احفظ بيانات الطلب الكاملة عشان نرسلها بعد التسجيل
+      localStorage.setItem('amerni_pending_lead', JSON.stringify({
+        form: { ...form },
+        savedProfile: savedProfile
+      }))
       openAuth('signup', 'enterprises', { name: form.contact_name, email: form.contact_email })
       return
     }
@@ -324,15 +327,43 @@ export function EnterprisesPage() {
 
   // إكمال إرسال الطلب تلقائياً بعد تسجيل الدخول
   useEffect(() => {
-    if (!user || !pendingSubmit) return
-    setPendingSubmit(false)
-    if (showForm) {
-      // النموذج مفتوح — أكمل الإرسال
-      const t = setTimeout(() => { handleSubmit() }, 800)
+    if (!user) return
+    const pending = localStorage.getItem('amerni_pending_lead')
+    if (!pending) return
+    try {
+      const { form: savedForm, savedProfile: sp } = JSON.parse(pending)
+      localStorage.removeItem('amerni_pending_lead')
+      // نملأ النموذج بالبيانات المحفوظة ونرسل بعد 1 ثانية
+      setForm(savedForm)
+      if (sp) setSavedProfile(sp)
+      setShowForm(true)
+      const t = setTimeout(async () => {
+        // نرسل مباشرة عبر supabase بدون ما نعتمد على state
+        const effectiveData = {
+          company_name: savedForm.company_name || sp?.company_name || '',
+          contact_name: savedForm.contact_name || sp?.contact_name || '',
+          contact_email: savedForm.contact_email || user.email || '',
+          contact_phone: savedForm.contact_phone || sp?.contact_phone || '',
+          company_size: savedForm.company_size || sp?.company_size || '',
+          category: savedForm.category,
+          description: savedForm.description,
+          budget_range: savedForm.budget_range,
+          user_id: user.id,
+          status: 'open'
+        }
+        if (!effectiveData.category || !effectiveData.description) return
+        const { error } = await supabase.from('enterprise_leads').insert(effectiveData)
+        if (!error) {
+          setShowForm(false)
+          setSuccess(true)
+          setSavedProfile({ company_name: effectiveData.company_name, contact_name: effectiveData.contact_name, contact_phone: effectiveData.contact_phone, company_size: effectiveData.company_size })
+          setHasProfile(true)
+          setTimeout(fetchMyLeads, 500)
+        }
+      }, 1000)
       return () => clearTimeout(t)
-    }
-    // النموذج مغلق (وجّهه AuthModal لـ my-requests) — لا تعيد فتحه
-  }, [user?.id, pendingSubmit])
+    } catch { localStorage.removeItem('amerni_pending_lead') }
+  }, [user?.id])
 
   const handleProvSubmit = async () => {
     if (!user) {
