@@ -17,7 +17,7 @@ import {
   Leaf, Umbrella, ClipboardCheck, Send, X, Bot, Loader2,
   Mail, Shield, Star, Zap, Users, MessageCircle, Search,
   Clock, CheckCircle, AlertCircle, Package, ChevronRight,
-  LogOut, List, LayoutDashboard, Plus, Bell
+  LogOut, List, LayoutDashboard, Plus, Bell, MessageSquare
 } from 'lucide-react'
 
 // ── تجميع التخصصات في ٥ مجموعات ──
@@ -883,32 +883,10 @@ export function EnterprisesPage() {
                                 )}
 
                                 {lead.status === 'matched' && (
-                                  <div className="mt-3 space-y-3">
-                                    {lead.provider_id && <ProviderProfileCard providerId={lead.provider_id} />}
-                                    <EnterpriseChat leadId={lead.id} senderRole="company" />
-                                    <button
-                                      onClick={async () => {
-                                        const val = prompt('قيمة العقد المتفق عليها (ريال) — لحساب العمولة ١٪:')
-                                        if (val === null) return
-                                        const num = parseFloat(val) || null
-                                        const { data, error } = await supabase.rpc('close_enterprise_lead', { p_lead_id: lead.id, p_contract_value: num })
-                                        if (error) { alert('خطأ: ' + error.message); return }
-                                        alert('تم إغلاق الطلب بنجاح' + (data?.commission ? ` — العمولة المستحقة: ${data.commission} ريال` : ''))
-                                        setMyLeads(p => p.map(l => l.id === lead.id ? { ...l, status: 'closed' } : l))
-                                      }}
-                                      className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">
-                                      إغلاق الطلب (تم التعاقد)
-                                    </button>
-                                    <button
-                                      onClick={async () => {
-                                        if (!confirm('تغيير المزود؟ سيُستبعد المزود الحالي نهائياً ويعود طلبك متاحاً لباقي المزودين.')) return
-                                        const { error } = await supabase.rpc('company_change_provider', { p_lead_id: lead.id })
-                                        if (error) { alert('خطأ: ' + error.message); return }
-                                        alert('تم — طلبك الآن متاح لمزودين آخرين')
-                                        setMyLeads(p => p.map(l => l.id === lead.id ? { ...l, status: 'open', provider_id: null } : l))
-                                      }}
-                                      className="w-full border border-red-200 text-red-500 hover:bg-red-50 font-bold py-2.5 rounded-xl text-sm transition-colors">
-                                      تغيير المزود
+                                  <div className="mt-3">
+                                    <button onClick={() => navigate(`lead-detail/${lead.id}`)}
+                                      className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
+                                      <MessageSquare size={15} /> عرض تفاصيل الطلب والتواصل مع المزود
                                     </button>
                                   </div>
                                 )}

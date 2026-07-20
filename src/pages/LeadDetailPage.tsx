@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ArrowRight, CheckCircle2, Clock, X, Loader2, AlertCircle } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Clock, X, Loader2, AlertCircle, MessageSquare, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import { ProviderProfileCard } from '../components/enterprise/ProviderProfileCard'
@@ -9,7 +9,7 @@ import { ReviewBox } from '../components/enterprise/ReviewBox'
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
   open:      { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', icon: Clock },
-  matched:   { label: 'مزود قبِل — جاري التنفيذ', color: 'bg-green-50 text-green-600 border-green-200', icon: CheckCircle2 },
+  matched:   { label: 'مزود قبِل — بانتظار موافقتك', color: 'bg-amber-50 text-amber-600 border-amber-200', icon: Clock },
   closed:    { label: 'مكتمل', color: 'bg-slate-100 text-slate-500 border-slate-200', icon: CheckCircle2 },
   cancelled: { label: 'ملغى', color: 'bg-red-50 text-red-500 border-red-200', icon: X },
   new:       { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', icon: Clock },
@@ -30,8 +30,8 @@ export function LeadDetailPage() {
   const [loading, setLoading] = useState(true)
   const [closing, setClosing] = useState(false)
   const [changing, setChanging] = useState(false)
+  const [accepting, setAccepting] = useState(false)
 
-  // نقرأ الـ leadId من hash: #/lead-detail/ID
   const leadId = window.location.hash.split('/')[2]
 
   useEffect(() => {
@@ -43,6 +43,27 @@ export function LeadDetailPage() {
         setLoading(false)
       })
   }, [leadId])
+
+  const acceptProvider = async () => {
+    setAccepting(true)
+    await supabase.from('enterprise_leads').update({ company_accepted: true }).eq('id', lead.id)
+    // رسالة نظام في الشات
+    await supabase.from('enterprise_messages').insert({
+      lead_id: lead.id, sender_id: null, sender_role: 'admin',
+      content: '✅ وافقت الشركة على المزود — يمكنكم الآن بدء التواصل', is_system: true
+    })
+    setLead((l: any) => ({ ...l, company_accepted: true }))
+    setAccepting(false)
+  }
+
+  const changeProvider = async () => {
+    if (!confirm('تغيير المزود؟ سيُستبعد الحالي نهائياً ويعود طلبك لباقي المزودين.')) return
+    setChanging(true)
+    const { error } = await supabase.rpc('company_change_provider', { p_lead_id: lead.id })
+    setChanging(false)
+    if (error) { alert('خطأ: ' + error.message); return }
+    setLead((l: any) => ({ ...l, status: 'open', provider_id: null, company_accepted: false }))
+  }
 
   const closeLead = async () => {
     const val = prompt('قيمة العقد المتفق عليها (ريال) — لحساب العمولة ١٪:')
@@ -57,15 +78,6 @@ export function LeadDetailPage() {
     setLead((l: any) => ({ ...l, status: 'closed' }))
   }
 
-  const changeProvider = async () => {
-    if (!confirm('تغيير المزود؟ سيُستبعد الحالي نهائياً ويعود طلبك لباقي المزودين.')) return
-    setChanging(true)
-    const { error } = await supabase.rpc('company_change_provider', { p_lead_id: lead.id })
-    setChanging(false)
-    if (error) { alert('خطأ: ' + error.message); return }
-    setLead((l: any) => ({ ...l, status: 'open', provider_id: null }))
-  }
-
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <Loader2 size={28} className="animate-spin text-primary-400" />
@@ -73,8 +85,11 @@ export function LeadDetailPage() {
   )
   if (!lead) return null
 
-  const st = STATUS_MAP[lead.status] || STATUS_MAP.open
-  const StIcon = st.icon
+  // حالة الشارة: لو matched وقبلت الشركة → "جاري التنفيذ"
+  const displayStatus = lead.status === 'matched' && lead.company_accepted
+    ? { label: 'جاري التنفيذ', color: 'bg-green-50 text-green-600 border-green-200', icon: CheckCircle2 }
+    : STATUS_MAP[lead.status] || STATUS_MAP.open
+  const StIcon = displayStatus.icon
 
   return (
     <div className="min-h-screen bg-slate-50" dir="rtl">
@@ -85,86 +100,120 @@ export function LeadDetailPage() {
           <ArrowRight size={16} /> طلباتي
         </button>
         <span className="text-slate-300">/</span>
-        <p className="font-bold text-slate-800 truncate">{lead.company_name}</p>
-        <span className={`mr-auto text-xs font-bold px-3 py-1 rounded-full border flex items-center gap-1 ${st.color}`}>
-          <StIcon size={11} /> {st.label}
+        <p className="font-bold text-slate-800 truncate flex-1">{lead.company_name}</p>
+        <span className={`text-xs font-bold px-3 py-1 rounded-full border flex items-center gap-1 ${displayStatus.color}`}>
+          <StIcon size={11} /> {displayStatus.label}
         </span>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
 
         {/* خط زمني */}
         {lead.status !== 'cancelled' && <StatusTimeline status={lead.status} />}
 
         {/* تفاصيل الطلب */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5">
-          <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="flex items-start justify-between gap-3 mb-3">
             <div>
               <h1 className="text-xl font-black text-slate-900">{lead.company_name}</h1>
               <p className="text-sm text-slate-500 mt-0.5">{CATEGORY_LABELS[lead.category] || lead.category}</p>
             </div>
-            <span className={`text-xs font-bold px-3 py-1.5 rounded-full border ${st.color}`}>
-              {st.label}
-            </span>
           </div>
-
-          <div className="bg-slate-50 rounded-xl px-4 py-3 mb-4">
+          <div className="bg-slate-50 rounded-xl px-4 py-3 mb-3">
             <p className="text-sm text-slate-700 leading-relaxed">{lead.description}</p>
           </div>
-
           <div className="flex flex-wrap gap-2 text-xs text-slate-500">
             {lead.budget_range && <span className="bg-slate-100 px-2.5 py-1 rounded-lg">💰 {lead.budget_range}</span>}
             {lead.company_size && <span className="bg-slate-100 px-2.5 py-1 rounded-lg">👥 {lead.company_size} موظف</span>}
             <span className="bg-slate-100 px-2.5 py-1 rounded-lg">
-              🗓 {new Date(lead.created_at).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' })}
+              🗓 {new Date(lead.created_at).toLocaleDateString('ar-SA', { month: 'long', day: 'numeric' })}
             </span>
           </div>
         </div>
 
-        {/* طلب مفتوح - بانتظار مزود */}
+        {/* بانتظار مزود */}
         {(lead.status === 'open' || lead.status === 'new') && (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 text-center">
-            <Clock size={32} className="text-blue-400 mx-auto mb-2 animate-pulse" />
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center">
+            <Clock size={36} className="text-blue-400 mx-auto mb-2 animate-pulse" />
             <p className="font-bold text-blue-700">طلبك منشور لكل المزودين المعتمدين</p>
             <p className="text-sm text-blue-500 mt-1">ستصلك إشعار فوراً عند قبول أحدهم</p>
           </div>
         )}
 
-        {/* مزود قبل الطلب */}
-        {lead.status === 'matched' && lead.provider_id && (
-          <>
-            <div>
-              <h2 className="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-green-500" /> مزود الخدمة
-              </h2>
-              <ProviderProfileCard providerId={lead.provider_id} />
+        {/* مزود قبل — انتظار موافقة الشركة */}
+        {lead.status === 'matched' && lead.provider_id && !lead.company_accepted && (
+          <div className="space-y-4">
+            {/* إشعار القبول */}
+            <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 flex items-start gap-3">
+              <span className="text-2xl">🎉</span>
+              <div>
+                <p className="font-bold text-amber-800">مزود خدمة قبِل طلبك!</p>
+                <p className="text-sm text-amber-700 mt-0.5">راجع ملفه أدناه وأكّد موافقتك للبدء في التواصل</p>
+              </div>
             </div>
 
-            <EnterpriseChat leadId={lead.id} senderRole="company" />
+            {/* ملف المزود كامل */}
+            <ProviderProfileCard providerId={lead.provider_id} />
 
+            {/* أزرار الموافقة */}
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={acceptProvider} disabled={accepting}
+                className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                {accepting
+                  ? <Loader2 size={16} className="animate-spin" />
+                  : <><ThumbsUp size={18} /> نعم، أوافق على المزود</>}
+              </button>
+              <button onClick={changeProvider} disabled={changing}
+                className="bg-white border-2 border-red-200 text-red-500 hover:bg-red-50 font-bold py-4 rounded-2xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                {changing
+                  ? <Loader2 size={16} className="animate-spin" />
+                  : <><ThumbsDown size={18} /> لا، أريد مزوداً آخر</>}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* وافقت — شات + إجراءات */}
+        {lead.status === 'matched' && lead.provider_id && lead.company_accepted && (
+          <div className="space-y-4">
+            <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-green-500" />
+              <p className="text-sm font-bold text-green-700">وافقت على المزود — تواصل معه الآن</p>
+            </div>
+
+            {/* ملف المزود (مطوي) */}
+            <ProviderProfileCard providerId={lead.provider_id} />
+
+            {/* الشات */}
+            <div>
+              <h3 className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
+                <MessageSquare size={15} /> المحادثة مع المزود
+              </h3>
+              <EnterpriseChat leadId={lead.id} senderRole="company" />
+            </div>
+
+            {/* الإجراءات */}
             <div className="flex gap-3">
               <button onClick={closeLead} disabled={closing}
                 className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {closing ? <Loader2 size={15} className="animate-spin" /> : <><CheckCircle2 size={15} /> إغلاق الطلب (تم التعاقد)</>}
               </button>
               <button onClick={changeProvider} disabled={changing}
-                className="border border-red-200 text-red-500 hover:bg-red-50 font-bold px-4 py-3 rounded-xl text-sm transition-colors disabled:opacity-50 flex items-center gap-2">
+                className="border border-red-200 text-red-500 hover:bg-red-50 px-4 py-3 rounded-xl text-sm transition-colors disabled:opacity-50">
                 {changing ? <Loader2 size={15} className="animate-spin" /> : 'تغيير المزود'}
               </button>
             </div>
-          </>
+          </div>
         )}
 
-        {/* مغلق - تقييم */}
+        {/* مغلق */}
         {lead.status === 'closed' && (
           <div className="space-y-4">
             <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3">
               <CheckCircle2 size={20} className="text-green-500 flex-shrink-0" />
-              <p className="text-green-700 font-bold">تم إغلاق الطلب بنجاح — شكراً لاستخدامك أمرني للمنشآت</p>
+              <p className="text-green-700 font-bold">تم إغلاق الطلب — شكراً لاستخدامك أمرني للمنشآت</p>
             </div>
-            {lead.provider_id && (
-              <ReviewBox leadId={lead.id} targetLabel="المزود" />
-            )}
+            {lead.provider_id && <ReviewBox leadId={lead.id} targetLabel="المزود" />}
           </div>
         )}
 
