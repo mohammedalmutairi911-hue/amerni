@@ -23,8 +23,6 @@ function setHash(p: string) {
   if (p !== 'landing') sessionStorage.setItem('current_page', p)
   else sessionStorage.removeItem('current_page')
 }
-  else sessionStorage.removeItem('current_page')
-}
 
 interface AppCtx {
   page: Page
