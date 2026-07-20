@@ -123,6 +123,7 @@ export function EnterprisesPage() {
   const [activeTab, setActiveTab] = useState<Tab>('home')
   const [selectedCat, setSelectedCat] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [pendingSubmit, setPendingSubmit] = useState(false)
   const [catSearch, setCatSearch] = useState('')
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null)
 
@@ -244,6 +245,7 @@ export function EnterprisesPage() {
   const handleSubmit = async () => {
     if (!user) {
       setError('')
+      setPendingSubmit(true)
       openAuth('signup', 'enterprises', { name: form.contact_name, email: form.contact_email })
       return
     }
@@ -308,6 +310,16 @@ export function EnterprisesPage() {
     } catch { setError('حدث خطأ، يرجى المحاولة مجدداً') }
     finally { setSubmitting(false) }
   }
+
+  // إكمال إرسال الطلب تلقائياً بعد تسجيل الدخول
+  useEffect(() => {
+    if (user && pendingSubmit && showForm) {
+      setPendingSubmit(false)
+      // ننتظر لحظة حتى يكتمل تحميل البروفايل
+      const t = setTimeout(() => { handleSubmit() }, 800)
+      return () => clearTimeout(t)
+    }
+  }, [user?.id, pendingSubmit, showForm])
 
   const handleProvSubmit = async () => {
     if (!user) {
