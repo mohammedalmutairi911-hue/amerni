@@ -525,44 +525,162 @@ export function AdminPanel() {
 
         {/* Conversations */}
         {tab === 'conversations' && (
-          <div className="grid lg:grid-cols-3 gap-4" dir="rtl">
-            {/* قائمة الطلبات - يمين */}
-            <div className="lg:col-span-1 space-y-2">
-              <p className="text-xs text-slate-400 mb-3">اختر طلباً لمشاهدة المحادثة</p>
-              {tasks.map(task => (
-                <button key={task.id} onClick={() => setSelectedTask(task)}
-                  className={`w-full text-right p-3 rounded-xl border transition-all ${
-                    selectedTask?.id === task.id ? 'border-primary-500 bg-primary-50' : 'border-slate-200 bg-white hover:border-slate-300'
-                  }`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-medium truncate flex-1">{task.title}</p>
-                    {task.status === 'disputed' && <AlertTriangle size={12} className="text-red-400 flex-shrink-0" />}
-                  </div>
-                  <p className="text-xs text-slate-400">
-                    {task.status === 'disputed' ? '⚠️ نزاع' :
-                     task.status === 'pending_confirmation' ? '⏳ بانتظار تأكيد' :
-                     task.status === 'in_progress' ? '🔄 جاري' :
-                     task.status === 'completed' ? '✅ مكتمل' :
-                     task.status === 'open' ? '📬 مفتوح' : task.status}
-                  </p>
-                </button>
-              ))}
-              {tasks.length === 0 && (
-                <p className="text-slate-400 text-sm text-center py-8">ما في طلبات بعد</p>
-              )}
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            {/* Header */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">نظام حل النزاعات</h2>
+                <p className="text-slate-400 text-sm mt-0.5">إدارة ومتابعة الخلافات النشطة بين الشركات والموردين لضمان استمرارية العمل.</p>
+              </div>
+              <button className="flex items-center gap-2 bg-primary-600 text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-primary-700 transition-colors shadow-sm">
+                <span className="text-lg">+</span> فتح نزاع جديد
+              </button>
             </div>
-            {/* المحادثة - يسار */}
-            <div className="lg:col-span-2" dir="rtl">
-              {selectedTask ? (
-                <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
-              ) : (
-                <div className="flex items-center justify-center h-80 border border-slate-200 rounded-2xl bg-white text-slate-400">
-                  <div className="text-center">
-                    <MessageSquare size={32} className="mx-auto mb-2 opacity-30" />
-                    <p>اختر محادثة من القائمة</p>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'إجمالي النزاعات',      value: tasks.filter(t=>t.status==='disputed').length + stats.completed,  growth: '+12%', icon: null },
+                { label: 'تمت التسوية (هذا الشهر)', value: stats.completed,  icon: '✓', iconColor: 'text-slate-400' },
+                { label: 'نزاعات مفتوحة',          value: tasks.filter(t=>t.status==='disputed').length, highlight: true, icon: '!' },
+                { label: 'تحت المراجعة',            value: tasks.filter(t=>t.status==='in_progress').length, icon: '—' },
+              ].map(({ label, value, growth, highlight, icon, iconColor }) => (
+                <div key={label} className={`bg-white border-2 rounded-2xl p-5 shadow-sm ${highlight ? 'border-red-300' : 'border-slate-200'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    {icon && <span className={`text-lg font-black ${highlight ? 'text-red-400' : iconColor || 'text-slate-400'}`}>{icon}</span>}
+                    {growth && <span className="text-xs text-green-500 font-bold flex items-center gap-0.5">↗ {growth}</span>}
+                    {!icon && !growth && <span/>}
                   </div>
+                  <p className={`text-4xl font-black ${highlight ? 'text-red-500' : 'text-slate-900'}`}>{value}</p>
+                  <p className="text-xs text-slate-400 mt-1">{label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Filters */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3">
+              <button className="w-9 h-9 border border-slate-200 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50 flex-shrink-0">
+                <AlertTriangle size={15} />
+              </button>
+              <input type="date" className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-300" placeholder="mm/dd/yyyy" />
+              <select className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white min-w-[100px]">
+                <option>الكل</option>
+                <option>مفتوح</option>
+                <option>تحت المراجعة</option>
+                <option>تم الحل</option>
+              </select>
+              <input placeholder="رقم النزاع، اسم الشركة..." dir="rtl"
+                className="flex-1 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
+            </div>
+
+            {/* Table */}
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              <table className="w-full text-sm" dir="rtl">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50">
+                    {['رقم النزاع','الأطراف المعنية','السبب','التاريخ','الحالة','الإجراءات'].map(h => (
+                      <th key={h} className="px-5 py-3.5 text-right text-xs font-bold text-slate-400">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {tasks.filter(t => t.status === 'disputed').slice(0,10).map((t, i) => (
+                    <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                      <td className="px-5 py-4 font-black text-slate-700">DIS-{8821 - i}#</td>
+                      <td className="px-5 py-4">
+                        <p className="font-bold text-slate-800 text-sm">{t.title?.slice(0,16) || 'شركة —'}</p>
+                        <p className="text-xs text-slate-400">ضد: مورد الخدمة</p>
+                      </td>
+                      <td className="px-5 py-4 text-slate-600 text-sm max-w-[180px] truncate">{t.description?.slice(0,30) || 'خلاف في الخدمة'}</td>
+                      <td className="px-5 py-4 text-slate-400 whitespace-nowrap text-xs">
+                        {new Date(t.created_at).toLocaleDateString('ar-SA', { day:'numeric', month:'long', year:'numeric' })}
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border bg-red-50 text-red-500 border-red-200">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> مفتوح
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => setSelectedTask(t)}
+                            className="text-primary-500 hover:text-primary-700 transition-colors p-1.5 rounded-lg hover:bg-primary-50">
+                            <Eye size={16} />
+                          </button>
+                          <button onClick={() => updateTaskStatus(t.id, 'completed')}
+                            className="text-xs bg-primary-700 text-white font-bold px-3 py-1.5 rounded-lg hover:bg-primary-800 transition-colors">
+                            توسط
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {tasks.filter(t=>t.status==='disputed').length === 0 && (
+                    <tr><td colSpan={6} className="px-5 py-12 text-center text-slate-400 text-sm">
+                      <AlertTriangle size={28} className="mx-auto mb-2 opacity-30" />
+                      لا توجد نزاعات مفتوحة
+                    </td></tr>
+                  )}
+                </tbody>
+              </table>
+              {tasks.filter(t=>t.status==='disputed').length > 0 && (
+                <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                  <div className="flex items-center gap-1">
+                    {[1,2,3].map(n => (
+                      <button key={n} className={`w-7 h-7 rounded-lg font-bold ${n===1?'bg-primary-600 text-white':'hover:bg-slate-100 text-slate-500'}`}>{n}</button>
+                    ))}
+                  </div>
+                  <span>عرض 1-{Math.min(10, tasks.filter(t=>t.status==='disputed').length)} من أصل {tasks.filter(t=>t.status==='disputed').length} نزاع</span>
                 </div>
               )}
+            </div>
+
+            {/* Bottom: Performance + Activity */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+              {/* أداء فريق التسوية */}
+              <div className="md:col-span-4 bg-primary-700 rounded-2xl p-6 text-white">
+                <h3 className="text-lg font-black mb-1">أداء فريق التسوية</h3>
+                <p className="text-primary-200 text-sm mb-5">متوسط وقت حل النزاعات انخفض بنسبة 14% هذا الشهر.</p>
+                <p className="text-5xl font-black mb-1">48 <span className="text-2xl font-bold">ساعة</span></p>
+                <p className="text-primary-300 text-xs mb-3">الوقت المستهدف</p>
+                <div className="w-full bg-primary-600 rounded-full h-2 mb-2">
+                  <div className="bg-white h-2 rounded-full" style={{width:'82%'}}/>
+                </div>
+                <p className="text-primary-200 text-xs mb-5">تم حل 82% من النزاعات خلال الوقت المحدد.</p>
+                <button onClick={() => exportCSV('tasks')}
+                  className="w-full bg-white text-primary-700 font-bold py-2.5 rounded-xl text-sm hover:bg-primary-50 transition-colors">
+                  تحميل التقارير الشهرية
+                </button>
+              </div>
+
+              {/* آخر الأنشطة والوساطات */}
+              <div className="md:col-span-8 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className="px-5 py-4 border-b border-slate-100">
+                  <h3 className="font-bold text-slate-900">آخر الأنشطة والوساطات</h3>
+                </div>
+                <div className="divide-y divide-slate-50">
+                  {[
+                    { icon: MessageSquare, color: 'bg-primary-50 text-primary-500', text: 'تم تقديم حل مقترح للنزاع #DIS-8819 من قبل فريق الوساطة.', time: 'منذ 45 دقيقة' },
+                    { icon: AlertTriangle, color: 'bg-red-50 text-red-400', text: 'رسالة جديدة من شركة الأفق حول النزاع #DIS-8821.', time: 'منذ ساعتين' },
+                    { icon: CheckCircle, color: 'bg-green-50 text-green-500', text: 'تم حل النزاع #DIS-8790 بنجاح.', time: 'منذ 5 ساعات' },
+                  ].map(({ icon: Icon, color, text, time }, i) => (
+                    <div key={i} className="px-5 py-4 flex items-start gap-4 hover:bg-slate-50 transition-colors">
+                      <div className={`w-9 h-9 rounded-full ${color} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                        <Icon size={16} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-slate-700 leading-relaxed">{text}</p>
+                        <p className="text-xs text-slate-400 mt-1">{time}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {selectedTask && (
+                    <div className="p-5">
+                      <p className="text-xs font-bold text-slate-500 mb-3">محادثة الطلب: {selectedTask.title}</p>
+                      <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
