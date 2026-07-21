@@ -1,4 +1,4 @@
-import { Logo } from './Logo'
+import { Logo } from '../Logo'
 import { useState } from 'react'
 import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown, Users, Gift, Building2 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
