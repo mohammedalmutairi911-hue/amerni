@@ -96,20 +96,20 @@ export default function App() {
     if (pendingPlatform) {
       sessionStorage.removeItem('pending_platform')
       if (pendingPlatform === 'enterprises') {
-        navigate('enterprises')
+        navigate('enterprises', { replace: true })
         setTimeout(() => window.dispatchEvent(new CustomEvent('enterprises:open-my-requests')), 600)
         return
       }
     }
 
-    if (profile.role === 'admin' && page !== 'admin' && page !== 'admin-enterprises') { navigate('admin'); return }
+    if (profile.role === 'admin' && page !== 'admin' && page !== 'admin-enterprises') { navigate('admin', { replace: true }); return }
 
     // فصل المنصات: حساب المنشآت يبقى في المنشآت، حساب الأفراد في الأفراد
     if (profile.role !== 'admin') {
       const individualPages = ['dashboard', 'worker', 'browse', 'bounties', 'referral', 'earn', 'join', 'worker-profile']
       const enterprisePages = ['enterprises', 'provider-dashboard']
-      if (profile.platform === 'enterprises' && individualPages.includes(page)) { navigate('enterprises'); return }
-      if (profile.platform === 'individuals' && enterprisePages.includes(page)) { navigate('dashboard'); return }
+      if (profile.platform === 'enterprises' && individualPages.includes(page)) { navigate('enterprises', { replace: true }); return }
+      if (profile.platform === 'individuals' && enterprisePages.includes(page)) { navigate('dashboard', { replace: true }); return }
     }
 
     if (profile.role === 'worker') {
@@ -118,7 +118,7 @@ export default function App() {
         .then(({ data }) => {
           setWorkerExists(!!data)
           setWorkerApproved(data?.is_approved || false)
-          if (data?.is_approved && page === 'landing') navigate('worker')
+          if (data?.is_approved && page === 'landing') navigate('worker', { replace: true })
           setChecking(false)
         })
     }

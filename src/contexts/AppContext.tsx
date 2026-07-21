@@ -16,9 +16,20 @@ function getPageFromHash(): Page {
   return 'landing'
 }
 
-function setHash(p: string) {
-  const hash = p === 'landing' ? '' : `#/${p}`
-  window.history.replaceState(null, '', hash || window.location.pathname)
+function setHash(p: string, replace = false) {
+  const hash = p === 'landing' ? window.location.pathname : `#/${p}`
+  // pushState يضيف entry جديد في history — عشان زر رجوع في المتصفح يشتغل داخل الموقع
+  // replaceState فقط في التحميل الأولي أو الـ redirects التلقائية عشان ما يضيف entries زيادة
+  if (replace) {
+    window.history.replaceState({ page: p }, '', hash)
+  } else {
+    // ما نضيف entry جديد لو نفس الصفحة الحالية
+    const currentHash = window.location.hash
+    const newHash = p === 'landing' ? '' : `#/${p}`
+    if (currentHash !== newHash) {
+      window.history.pushState({ page: p }, '', hash)
+    }
+  }
   // احفظ المسار الكامل في sessionStorage كـ backup
   if (p !== 'landing') sessionStorage.setItem('current_page', p)
   else sessionStorage.removeItem('current_page')
@@ -26,7 +37,7 @@ function setHash(p: string) {
 
 interface AppCtx {
   page: Page
-  navigate: (p: Page) => void
+  navigate: (p: Page | string, options?: { replace?: boolean }) => void
   authOpen: boolean
   authTab: 'login' | 'signup'
   authPlatform: 'individuals' | 'enterprises'
@@ -50,13 +61,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Sync page when browser back/forward buttons used
   useEffect(() => {
     const onHashChange = () => setPage(getPageFromHash())
+    const onPopState = () => setPage(getPageFromHash())
     window.addEventListener('hashchange', onHashChange)
-    return () => window.removeEventListener('hashchange', onHashChange)
+    window.addEventListener('popstate', onPopState)
+    return () => {
+      window.removeEventListener('hashchange', onHashChange)
+      window.removeEventListener('popstate', onPopState)
+    }
   }, [])
 
-  const navigate = (p: string) => {
+  const navigate = (p: string, options?: { replace?: boolean }) => {
     const basePage = p.split('/')[0] as Page
-    setHash(p)
+    setHash(p, options?.replace)
     setPage(VALID_PAGES.includes(basePage) ? basePage : 'landing')
   }
 

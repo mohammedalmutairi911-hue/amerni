@@ -246,9 +246,9 @@ export function LandingPage() {
     return () => clearInterval(t)
   }, [])
 
-  // لو وضع 'enterprises' محفوظ لكن المستخدم غير مسجل — روّحه لصفحة الشركات
+  // لو وضع 'enterprises' محفوظ لكن المستخدم غير مسجل — روّحه لصفحة الشركات (بدون تلويث history)
   useEffect(() => {
-    if (!user && mode === 'enterprises') navigate('enterprises')
+    if (!user && mode === 'enterprises') navigate('enterprises', { replace: true })
   }, [mode, user, navigate])
 
   // إذا لم يختر وجهة — اعرض شاشة الاختيار
