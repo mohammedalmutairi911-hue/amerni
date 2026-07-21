@@ -540,77 +540,75 @@ export function EnterprisesPage() {
 
         {/* ══ HOME ══ */}
         {activeTab === 'home' && (
-          <div className="animate-fade-in">
-            <section className="relative bg-[#07101f] text-white py-24 px-4 overflow-hidden">
-              {/* Grid */}
+          <div>
+            {/* ══ HERO ══ */}
+            <section className="relative bg-[#07101f] text-white overflow-hidden" style={{minHeight:'100vh',display:'flex',flexDirection:'column',justifyContent:'center'}}>
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:60px_60px]" />
-              {/* Glow */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/8 blur-3xl pointer-events-none" />
-
-              <div className="relative max-w-5xl mx-auto text-center">
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 bg-blue-500/15 border border-blue-500/30 rounded-full px-4 py-1.5 text-blue-300 text-sm mb-8">
-                  <Building2 size={14} /><span>المنصة السعودية الأولى لخدمات المنشآت</span>
+              <div className="relative max-w-6xl mx-auto w-full px-4 py-20">
+                <div className="text-center mb-10">
+                  <div className="inline-flex items-center gap-2 bg-blue-500/15 border border-blue-500/30 rounded-full px-4 py-1.5 text-blue-300 text-sm mb-8">
+                    <Building2 size={14} /><span>المنصة السعودية الأولى لخدمات المنشآت</span>
+                  </div>
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
+                    حوّل رؤيتك إلى واقع مع<br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-cyan-300">خبرات عند الطلب</span>
+                  </h1>
+                  <p className="text-slate-400 text-base sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
+                    المنصة السعودية الأول لتمكين النمو من خلال ربط المنشآت بنخبة من المستشارين والخبراء المعتمدين في أكثر من 18 تخصصاً استراتيجياً.
+                  </p>
                 </div>
-
-                {/* Headline */}
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-tight">
-                  حوّل رؤيتك إلى واقع مع
-                  <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-cyan-300">
-                    خبرات عند الطلب
-                  </span>
-                </h1>
-                <p className="text-slate-400 text-base sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
-                  المنصة السعودية الأول لتمكين النمو من خلال ربط المنشآت والأفراد بنخبة من المستشارين والخبراء المعتمدين في أكثر من 18 تخصصاً استراتيجياً.
-                </p>
-
-                {/* Trust chips */}
-                <div className="flex flex-wrap justify-center gap-3 text-sm text-slate-400 mb-10">
-                  {['مطابقة خلال ٢٤ ساعة','مزودون موثّقون','عمولة ١٪ مؤقتاً','تعاقد مباشر'].map(t => (
-                    <div key={t} className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-                      <CheckCircle2 size={12} className="text-blue-400" /><span>{t}</span>
+                {/* بطاقتان */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto mb-10">
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors group cursor-pointer"
+                    onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center"><Building2 size={20} className="text-blue-400" /></div>
+                      <span className="text-blue-400 text-xs font-bold group-hover:text-blue-300">حول المنشأت ←</span>
                     </div>
-                  ))}
+                    <h3 className="text-white font-black text-lg mb-1">نمو المنشآت</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">حلول مؤسسية متكاملة (B2B) لتطوير نمو أعمالك وضمن استمرارية المنشأة من خلال شبكة الخبراء الاستراتيجيين.</p>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors group cursor-pointer"
+                    onClick={() => setActiveTab('provider-register')}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center"><Users size={20} className="text-purple-400" /></div>
+                      <span className="text-purple-400 text-xs font-bold group-hover:text-purple-300">اكتشف المزيد ←</span>
+                    </div>
+                    <h3 className="text-white font-black text-lg mb-1">سجّل كمزود خدمة</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">انضم لشبكة المزودين المعتمدين واحصل على طلبات من الشركات في 18 تخصصاً.</p>
+                  </div>
                 </div>
-
-                {/* CTAs */}
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-lg shadow-blue-500/20 btn-press">
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg shadow-blue-500/20 btn-press">
                     ابدأ رحلة التحول الآن
                   </button>
                   <button onClick={() => setActiveTab('features')}
-                    className="bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold px-8 py-3.5 rounded-xl transition-colors">
+                    className="bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold px-8 py-3.5 rounded-xl text-base transition-colors">
                     استكشف الحلول
                   </button>
                 </div>
               </div>
             </section>
 
-            {/* Search + Categories */}
-            <section className="py-16 px-4 bg-white">
+            {/* ══ SERVICES / CATEGORIES ══ */}
+            <section className="py-20 px-4 bg-white">
               <div className="max-w-6xl mx-auto">
                 <div className="mb-8"><SocialProofBar /></div>
-
-                {/* Header */}
-                <div className="text-center mb-10">
-                  <h2 className="text-3xl font-black text-slate-900 mb-2">اختر التخصص</h2>
-                  <p className="text-slate-500 text-sm">١٨ تخصصاً في ٥ مجموعات</p>
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-3">أبشر بالفزعة.. خبراتنا في خدمتك</h2>
+                  <p className="text-slate-400">أكثر من 18 مجال تطبق فيها إلى التي يحتاجها العمل بكل احترافية</p>
                 </div>
-
-                {/* Search */}
-                <div className="relative max-w-xl mx-auto mb-10">
+                <div className="relative max-w-lg mx-auto mb-10">
                   <Search size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input value={catSearch} onChange={e => setCatSearch(e.target.value)}
-                    placeholder="ابحث عن تخصص..."
-                    className="w-full border-2 border-slate-200 focus:border-primary-400 rounded-2xl pr-11 pl-4 py-3.5 text-sm focus:outline-none bg-white transition-colors shadow-sm" />
+                    placeholder="ابحث عن التخصص أو الخدمة المطلوبة..."
+                    className="w-full pr-12 pl-4 py-3.5 border-2 border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors" />
                 </div>
-
-                {/* Categories Grid — بطاقات كبيرة مثل التصميم */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {(catSearch.trim()
-                    ? ALL_CATEGORIES.filter(c => c.label.includes(catSearch) || c.desc.includes(catSearch))
+                    ? ALL_CATEGORIES.filter(cat => cat.label.includes(catSearch) || cat.desc.includes(catSearch))
                     : ALL_CATEGORIES
                   ).map(cat => {
                     const group = CATEGORY_GROUPS.find(g => g.items.some(i => i.id === cat.id))
@@ -620,11 +618,9 @@ export function EnterprisesPage() {
                     return (
                       <button key={cat.id} onClick={() => openForm(cat.id)}
                         className="group bg-white border-2 border-slate-100 hover:border-primary-300 rounded-2xl p-6 text-right hover:shadow-lg transition-all duration-200 flex flex-col items-end gap-4">
-                        {/* أيقونة */}
                         <div className={`w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
                           <Icon size={22} className={iconColor} />
                         </div>
-                        {/* المحتوى */}
                         <div className="w-full">
                           <p className="font-black text-slate-900 text-base mb-1">{cat.label}</p>
                           <p className="text-xs text-slate-400 leading-relaxed">{cat.desc}</p>
@@ -636,17 +632,11 @@ export function EnterprisesPage() {
               </div>
             </section>
 
-            {/* Stats */}
-            {/* الإحصائيات */}
-            <section className="py-16 px-4 bg-slate-50 border-y border-slate-100">
+            {/* ══ STATS ══ */}
+            <section className="py-16 px-4 bg-slate-50 border-y border-slate-200">
               <div className="max-w-5xl mx-auto">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                  {[
-                    { value: '18+', label: 'تخصصاً توفره' },
-                    { value: '24س', label: 'سرعة الاستجابة' },
-                    { value: '100%', label: 'خبراء معتمدون' },
-                    { value: '1%', label: 'عمولة تنافسية' },
-                  ].map(({ value, label }) => (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                  {[{value:'18+',label:'تخصصاً توفره'},{value:'24س',label:'سرعة الاستجابة'},{value:'100%',label:'خبراء معتمدون'},{value:'1%',label:'عمولة تنافسية'}].map(({value,label}) => (
                     <div key={label}>
                       <p className="text-4xl sm:text-5xl font-black text-primary-700 mb-2">{value}</p>
                       <p className="text-sm text-slate-500 font-medium">{label}</p>
@@ -656,14 +646,54 @@ export function EnterprisesPage() {
               </div>
             </section>
 
-            {/* CTA */}
+            {/* ══ TRUST ══ */}
+            <section className="py-20 px-4 bg-white">
+              <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                  <div className="bg-[#07101f] rounded-2xl p-6 text-white">
+                    <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 rounded-full px-3 py-1 text-xs text-blue-300 mb-4">مؤشر الأداء 2024</div>
+                    <p className="text-5xl font-black text-white mb-1">%99.8</p>
+                    <p className="text-slate-400 text-sm mb-6">نسبة رضاء العملاء عن الحلول المقدمة</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[['+350','مورد'],['+140','عميل']].map(([v,l]) => (
+                        <div key={l} className="bg-white/10 rounded-xl p-3">
+                          <p className="text-xl font-black">{v}</p>
+                          <p className="text-xs text-slate-400">{l}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">منظومة ذكية قائمة على<span className="text-primary-600"> الثقة والابتكار</span></h2>
+                    <p className="text-slate-500 text-sm mb-6 leading-relaxed">نربطك بأفضل الخبراء المعتمدين بأسرع وقت وأعلى جودة وأقل تكلفة.</p>
+                    <div className="space-y-4">
+                      {[
+                        {icon:'🔍',title:'مطابقة معززة بالذكاء الاصطناعي',desc:'نحلل كل طلب لنقدم لك أنسب المتخصصين خلال دقائق توائم الحاجة والإنجاز.'},
+                        {icon:'🤝',title:'تحقق وتوثيق تدريجي',desc:'يخضع جميع المتخصصين لعملية تدقيق لضمان الجودة والاحترافية والإنجاز.'},
+                        {icon:'🔒',title:'حماية البيانات والخصوصية',desc:'بروتوكولات أمن متقدمة تصون معلومات منشأتك وعقودها وعلاقاتك الاستشارية.'},
+                      ].map(({icon,title,desc}) => (
+                        <div key={title} className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                          <span className="text-2xl flex-shrink-0">{icon}</span>
+                          <div>
+                            <p className="font-bold text-slate-900 text-sm">{title}</p>
+                            <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">{desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ══ FINAL CTA ══ */}
             <section className="py-20 px-4 bg-[#07101f] text-white text-center">
               <div className="max-w-2xl mx-auto">
-                <h2 className="text-3xl font-black mb-3">جاهز لبدء التحوّل؟</h2>
-                <p className="text-slate-400 mb-2">أرسل طلبك الآن — الرد خلال ٢٤ ساعة</p>
-                <p className="text-slate-500 text-xs mb-8">عمولة ١٪ مؤقتاً • +18 تخصص متاح • مزودون معتمدون</p>
+                <h2 className="text-3xl sm:text-4xl font-black mb-3">جاهز لبدء التحوّل؟</h2>
+                <p className="text-slate-400 mb-2">انضم لمئات المنشآت التي تنمو على "أمرني" في إدارة نموها الاستراتيجي.</p>
+                <p className="text-slate-500 text-xs mb-8">أكثر من 18 تخصص متاحة • مزودون معتمدون • عمولة ١٪ مؤقتاً</p>
                 <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-lg shadow-blue-500/20">
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg">
                   ابدأ رحلة التحول الآن
                 </button>
               </div>
