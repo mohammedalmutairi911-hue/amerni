@@ -314,23 +314,114 @@ export function WorkerDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]" dir="rtl">
+    <div className="min-h-screen bg-[#f8f9fa] flex" dir="rtl">
 
-      {/* ── Top App Bar ── */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm h-16 flex flex-row-reverse justify-between items-center px-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-black text-lg overflow-hidden">
-            {profile?.full_name?.[0] || '؟'}
-          </div>
-          <button className="relative w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 rounded-full">
-            🔔
+      {/* ── Sidebar Desktop ── */}
+      <aside className="hidden lg:flex flex-col h-screen sticky top-0 bg-white border-l border-slate-200 w-64 flex-shrink-0 shadow-sm z-40">
+        {/* Logo */}
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <button onClick={() => navigate('landing')} className="text-xl font-black text-primary-700 hover:opacity-80">أمرني</button>
+          <button onClick={toggleOnline} disabled={toggling}
+            className={`text-xs font-bold px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${workerProfile?.is_online ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
+            {toggling ? <Loader2 size={10} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={10} /> متاح</> : <><WifiOff size={10} /> غير متاح</>}
           </button>
         </div>
-        <h1 className="text-xl font-black text-primary-700">أمرني</h1>
-      </header>
 
-      {/* ── Main ── */}
-      <main className="pt-20 pb-24 px-4 max-w-2xl mx-auto">
+        {/* Profile */}
+        <div className="px-4 py-4 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-primary-600 flex items-center justify-center text-white font-black text-lg flex-shrink-0">
+              {profile?.full_name?.[0] || '؟'}
+            </div>
+            <div className="min-w-0">
+              <p className="font-bold text-slate-900 text-sm truncate">{profile?.full_name}</p>
+              <p className="text-xs text-slate-400">مقدم خدمة</p>
+            </div>
+          </div>
+          {/* Stats mini */}
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            {[
+              { label: 'مكتمل', value: completedTasks.length },
+              { label: 'تقييم', value: `${workerProfile?.rating?.toFixed(1) || '0'}⭐` },
+              { label: 'نشط', value: activeTasks.length },
+            ].map(s => (
+              <div key={s.label} className="text-center bg-slate-50 rounded-xl py-2">
+                <p className="text-sm font-black text-slate-900">{s.value}</p>
+                <p className="text-xs text-slate-400">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+          {[
+            { id: 'overview',      emoji: '🏠', label: 'الرئيسية' },
+            { id: 'shifts',        emoji: '🕐', label: 'سوق الشفتات' },
+            { id: 'my-tasks',      emoji: '📋', label: 'الطلبات',     badge: activeTasks.length },
+            { id: 'analytics',     emoji: '📊', label: 'التحليلات الاستباقية' },
+            { id: 'achievements',  emoji: '⭐', label: 'الإنجازات والالتزام' },
+          ].map(({ id, emoji, label, badge }) => (
+            <button key={id} onClick={() => setTab(id as any)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                tab === id ? 'bg-primary-700 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+              }`}>
+              <span className="text-base">{emoji}</span>
+              <span className="flex-1 text-right">{label}</span>
+              {badge !== undefined && badge > 0 && (
+                <span className={`text-xs font-black w-5 h-5 rounded-full flex items-center justify-center ${tab === id ? 'bg-white text-primary-700' : 'bg-red-500 text-white'}`}>
+                  {badge > 9 ? '9+' : badge}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-slate-100 space-y-2">
+          <button onClick={() => navigate('support')} className="w-full text-xs text-slate-400 hover:text-slate-600 py-1.5 transition-colors">مركز المساعدة</button>
+          <button onClick={async () => { await signOut(); navigate('landing') }}
+            className="w-full flex items-center justify-center gap-1.5 text-xs text-red-400 hover:text-red-600 py-1.5 transition-colors font-medium">
+            <LogOut size={12} /> تسجيل الخروج
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Right Column ── */}
+      <div className="flex-1 flex flex-col min-h-screen">
+
+        {/* ── Top Header ── */}
+        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3.5 flex items-center gap-4 shadow-sm">
+          {/* Mobile logo */}
+          <button onClick={() => navigate('landing')} className="lg:hidden text-xl font-black text-primary-700">أمرني</button>
+          <div className="hidden lg:block flex-1">
+            <h2 className="font-black text-slate-800 text-lg">
+              {tab === 'overview' ? 'لوحة العامل' : tab === 'shifts' ? 'سوق الشفتات' : tab === 'my-tasks' ? 'الطلبات' : tab === 'analytics' ? 'التحليلات الاستباقية' : 'الإنجازات والالتزام'}
+            </h2>
+          </div>
+          <div className="flex-1 lg:flex-none hidden lg:block">
+            <div className="relative max-w-xs">
+              <input placeholder="البحث عن طلبات أو زملاء..." dir="rtl"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 pr-9" />
+              <span className="absolute right-3 top-2.5 text-slate-300 text-sm">🔍</span>
+            </div>
+          </div>
+          <div className="mr-auto flex items-center gap-3">
+            {/* Online toggle - desktop */}
+            <button onClick={toggleOnline} disabled={toggling}
+              className={`hidden lg:flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl transition-all ${workerProfile?.is_online ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
+              {toggling ? <Loader2 size={12} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={12} /> متاح الآن</> : <><WifiOff size={12} /> غير متاح</>}
+            </button>
+            <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-white font-black text-sm">
+              {profile?.full_name?.[0] || '؟'}
+            </div>
+            <button className="relative w-9 h-9 flex items-center justify-center text-slate-400 hover:bg-slate-100 rounded-full transition-colors text-lg">🔔</button>
+          </div>
+        </header>
+
+        {/* ── Content ── */}
+        <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 overflow-auto">
+          <div className="max-w-5xl mx-auto">
 
         {/* Commission Modal */}
         {showCommission && pendingTask && (
@@ -753,10 +844,13 @@ export function WorkerDashboard() {
           </div>
         )}
 
-      </main>
+          </div>{/* max-w-5xl */}
+        </main>
 
-      {/* ── Bottom Navigation ── */}
-      <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-lg z-50 flex flex-row-reverse justify-around items-center py-2 px-2">
+      </div>{/* right column */}
+
+      {/* ── Bottom Navigation — Mobile Only ── */}
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-lg z-50 flex flex-row-reverse justify-around items-center py-2 px-2">
         {[
           { id: 'overview', icon: '🏠', label: 'الرئيسية' },
           { id: 'shifts', icon: '🕐', label: 'الورديات' },
