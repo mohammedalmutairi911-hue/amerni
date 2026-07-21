@@ -645,157 +645,50 @@ export function LandingPage() {
               </div>
             </section>
 
-            {/* Why Amerni section */}
-            <section className="py-16 px-4 bg-white">
-              <div className="max-w-5xl mx-auto">
-                <h2 className="text-3xl font-black text-center text-slate-900 mb-3">لماذا تختار آمرني؟</h2>
-                <p className="text-slate-500 text-center mb-12">لأنه يجمع لك كل خدمة تحتاجها في مكان واحد</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* ══ FOOTER ══ */}
+            <footer className="bg-[#07101f] text-white py-14 px-4">
+              <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
+                  {/* Brand */}
+                  <div className="col-span-2 md:col-span-1">
+                    <h3 className="text-xl font-black text-white mb-2">أمرني</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                      المنصة السعودية الرائدة في تقديم الخدمات والحلول المتكاملة للأفراد والمنشآت.
+                    </p>
+                    <div className="flex gap-3">
+                      {['𝕏','in','📘'].map(s => (
+                        <div key={s} className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center text-xs text-white hover:bg-white/20 cursor-pointer transition-colors">{s}</div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Links */}
                   {[
-                    { icon: UserCheck, color: 'text-primary-500', bg: 'bg-primary-50', title: 'محترفون معتمدون', desc: 'يخضع جميع مزودي الخدمة لدينا لعملية فحص وتدقيق صارمة لضمان أعلى معايير الجودة والأمان.' },
-                    { icon: Shield, color: 'text-accent-500', bg: 'bg-accent-50', title: 'مدفوعات آمنة', desc: 'احجز وادفع إلكترونياً بكل سهولة وأمان عبر مدى أو أبل باي. نضمن حقوقك المالية حتى اكتمال الخدمة.' },
-                    { icon: Star, color: 'text-secondary-500', bg: 'bg-secondary-50', title: 'دعم على مدار الساعة', desc: 'فريق خدمة العملاء لدينا جاهز لمساعدتك في أي وقت لضمان تجربة سلسة ومميزة.' },
-                  ].map(({ icon: Icon, color, bg, title, desc }) => (
-                    <div key={title} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                      <div className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center mb-4`}>
-                        <Icon size={22} className={color} />
-                      </div>
-                      <h3 className="font-bold text-slate-900 mb-2">{title}</h3>
-                      <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                    { title: 'المنصة', links: [['الحلول','features'],['كيف تعمل','how'],['الأسعار','trust'],['المميزات','features']] },
+                    { title: 'المنشآت', links: [['نمو المنشآت','enterprises'],['حول المنشآت','enterprises'],['اطلب الآن','enterprises']] },
+                    { title: 'الدعم', links: [['مركز المساعدة','support'],['تواصل معنا','contact'],['سياسة الخصوصية','privacy'],['الشروط','terms']] },
+                  ].map(({ title, links }) => (
+                    <div key={title}>
+                      <h4 className="text-sm font-bold text-white mb-3">{title}</h4>
+                      <ul className="space-y-2">
+                        {links.map(([label, id]) => (
+                          <li key={label}>
+                            <button onClick={() => id === 'enterprises' ? navigate('enterprises') : setActiveTab(id as Tab)}
+                              className="text-slate-400 hover:text-white text-sm transition-colors">
+                              {label}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   ))}
                 </div>
-              </div>
-            </section>
-
-            {/* Top rated professionals */}
-            <section className="py-16 px-4 bg-slate-50">
-              <div className="max-w-5xl mx-auto">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h2 className="text-2xl font-black text-slate-900">المحترفون الأعلى تقييماً</h2>
-                    <p className="text-slate-500 text-sm mt-1">اختر من بين نخبة الفنيين الذين حازوا على ثقة آلاف العملاء</p>
+                <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-slate-500">
+                  <p>© ٢٠٢٦ أمرني - المنصة السعودية الرائدة لتمكين النمو.</p>
+                  <div className="flex gap-4">
+                    <button onClick={() => setActiveTab('privacy')} className="hover:text-slate-300 transition-colors">سياسة الخصوصية</button>
+                    <span className="text-white/20">|</span>
+                    <button onClick={() => setActiveTab('support')} className="hover:text-slate-300 transition-colors">مركز الدعم</button>
                   </div>
-                  <button onClick={() => setShowNewTask(true)} className="text-primary-500 text-sm font-semibold hover:underline">عرض الكل</button>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {[
-                    { name: 'سارة المطيري', role: 'مساعدة إدارية وتنظيم', jobs: '+٣٠٠ مهمة', price: '٨٠', rating: '4.9' },
-                    { name: 'محمد الشهري', role: 'توصيل ومشاوير', jobs: '+٨٠٠ مهمة', price: '٥٠', rating: '4.8' },
-                    { name: 'نورة القحطاني', role: 'تصوير ومحتوى', jobs: '+٢٠٠ مهمة', price: '١٢٠', rating: '5.0' },
-                    { name: 'ريم الدوسري', role: 'استشارات تغذية وصحة', jobs: '+١٨٠ مهمة', price: '١٥٠', rating: '4.9' },
-                  ].map(({ name, role, jobs, price, rating }) => (
-                    <div key={name} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all group">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-primary-500 font-bold text-lg">
-                          {name[2]}
-                        </div>
-                        <span className="text-xs bg-green-100 text-green-600 font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                          <CheckCircle size={10} /> موثق
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-slate-900 text-sm mb-1">{name}</h4>
-                      <p className="text-slate-500 text-xs mb-2">{role}</p>
-                      <div className="flex items-center gap-1 mb-3">
-                        <Star size={11} className="text-accent-500 fill-accent-500" />
-                        <span className="text-xs font-bold text-slate-700">{rating}</span>
-                        <span className="text-xs text-slate-400 mr-1">• {jobs}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400">يبدأ من <span className="text-slate-900 font-bold">{price} ر.س</span></span>
-                        <button onClick={() => setShowNewTask(true)}
-                          className="text-xs bg-primary-500 text-white px-3 py-1.5 rounded-lg hover:bg-primary-700 transition-colors font-bold">
-                          احجز الآن
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* CTA for workers */}
-            <section className="py-16 px-4 bg-primary-500">
-              <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-3xl font-black text-slate-900 mb-3">جاهز لتقديم خدماتك؟</h2>
-                <p className="text-blue-100 mb-8">انضم إلى آلاف المحترفين في آمرني وضاعف دخلك من خلال الوصول إلى آلاف العملاء في منطقتك.</p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }}
-                    className="bg-white text-primary-500 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
-                    سجّل كمزود خدمة
-                  </button>
-                  <button onClick={() => setActiveTab('how')}
-                    className="border-2 border-white text-slate-900 font-bold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors">
-                    تعرف على المزيد
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            {/* Explore services */}
-            <section className="py-16 px-4 bg-white">
-              <div className="max-w-5xl mx-auto">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h2 className="text-2xl font-black text-slate-900">استكشف خدماتنا</h2>
-                    <p className="text-slate-500 text-sm mt-1">كل خدمة تحتاجها في مكان واحد</p>
-                  </div>
-                  <button onClick={() => setShowBrowse(true)} className="text-primary-500 text-sm font-semibold hover:underline">عرض الكل</button>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-                  {[
-                    { icon: '🚗', label: 'توصيل' },
-                    { icon: '📸', label: 'تصوير' },
-                    { icon: '🔍', label: 'تحقق' },
-                    { icon: '🛍️', label: 'تسوق' },
-                    { icon: '📚', label: 'تعليم' },
-                    { icon: '⚖️', label: 'استشارات' },
-                  ].map(({ icon, label }) => (
-                    <button key={label} onClick={() => setShowBrowse(true)}
-                      className="bg-slate-50 border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-2xl p-4 text-center transition-all group">
-                      <div className="text-3xl mb-2">{icon}</div>
-                      <p className="text-sm font-semibold text-slate-700 group-hover:text-primary-500">{label}</p>
-                    </button>
-                  ))}
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl p-6 text-slate-900">
-                    <div className="text-2xl mb-3">🚗</div>
-                    <h3 className="font-black text-lg mb-1">خدمات التوصيل الفاخرة</h3>
-                    <p className="text-blue-100 text-sm mb-4">خدمات نقل وتوصيل خاصة بمهنية عالية وأمان تام، نضمن لك الوصول في الوقت المحدد بأفضل السيارات.</p>
-                    <button onClick={() => setShowNewTask(true)} className="bg-white text-primary-500 font-bold px-4 py-2 rounded-xl text-sm hover:bg-blue-50 transition-colors">
-                      اطلب الآن
-                    </button>
-                  </div>
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-                    <div className="text-2xl mb-3">🛍️</div>
-                    <h3 className="font-black text-lg text-slate-900 mb-1">المساعد الشخصي للتسوق</h3>
-                    <p className="text-slate-500 text-sm mb-4">اترك عنك عناء الزحام، فريقنا جاهز لشراء كافة مستلزماتك وتوصيلها لباب بيتك.</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs bg-primary-50 text-primary-500 font-bold px-3 py-1 rounded-full">قيد الإطلاق</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="bg-slate-900 text-slate-900 py-10 px-4">
-              <div className="max-w-5xl mx-auto">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                  <div>
-                    <p className="font-black text-xl text-slate-900 mb-1">آمرني</p>
-                    <p className="text-slate-400 text-sm">نظام الخدمات المنزلية الذكي</p>
-                  </div>
-                  <div className="flex flex-wrap gap-4 text-sm text-slate-400">
-                    <button onClick={() => setActiveTab('privacy')} className="hover:text-slate-900 transition-colors">سياسة الخصوصية</button>
-                    <button onClick={() => setActiveTab('terms')} className="hover:text-slate-900 transition-colors">الشروط والأحكام</button>
-                    <button onClick={() => setActiveTab('support')} className="hover:text-slate-900 transition-colors">الدعم الفني</button>
-                    <button onClick={() => setActiveTab('contact')} className="hover:text-slate-900 transition-colors">اتصل بنا</button>
-                  </div>
-                </div>
-                <div className="border-t border-slate-800 mt-6 pt-6 text-center text-slate-500 text-xs">
-                  © ٢٠٢٦ آمرني — جميع الحقوق محفوظة
                 </div>
               </div>
             </footer>

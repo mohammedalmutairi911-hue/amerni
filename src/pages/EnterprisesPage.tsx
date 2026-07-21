@@ -1537,17 +1537,35 @@ export function EnterprisesPage() {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 py-8 px-4">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-primary-500 flex items-center justify-center"><Building2 size={13} className="text-white" /></div>
-            <span className="text-slate-500 text-sm font-bold">أمرني للمنشآت</span>
-          </div>
-          <p className="text-slate-400 text-xs">© ٢٠٢٦ أمرني — جميع الحقوق محفوظة</p>
-          <div className="flex items-center gap-3 text-xs text-slate-400 flex-wrap justify-center">
-            {TABS.filter(t => !['home','my-requests','provider-register'].includes(t.id)).map(t => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)} className="hover:text-slate-700 transition-colors">{t.label}</button>
+      <footer className="bg-[#07101f] text-white py-12 px-4 mt-auto">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            <div className="col-span-2 md:col-span-1">
+              <h3 className="text-lg font-black text-white mb-2">أمرني</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">المنصة السعودية الأولى لخدمات B2B — نربط المنشآت بأفضل المستشارين في 18 تخصصاً.</p>
+            </div>
+            {[
+              { title: 'المنشآت', links: ['الحوكمة','السعودة','القانون','المالية'] },
+              { title: 'الدعم', links: ['الدعم الفني','سياسة الخصوصية','الشروط','اتصل بنا'] },
+              { title: 'التنقل', links: TABS.filter(t => !['my-requests','provider-register'].includes(t.id)).slice(0,4).map(t => t.label) },
+            ].map(({ title, links }) => (
+              <div key={title}>
+                <h4 className="text-sm font-bold text-white mb-3">{title}</h4>
+                <ul className="space-y-2">
+                  {links.map(l => (
+                    <li key={l}><span className="text-slate-400 text-sm hover:text-white cursor-pointer transition-colors">{l}</span></li>
+                  ))}
+                </ul>
+              </div>
             ))}
+          </div>
+          <div className="border-t border-white/10 pt-5 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-slate-500">
+            <p>© ٢٠٢٦ أمرني - المنصة السعودية الرائدة لتمكين النمو.</p>
+            <div className="flex gap-4">
+              <button onClick={() => setActiveTab('privacy')} className="hover:text-slate-300 transition-colors">سياسة الخصوصية</button>
+              <span className="text-white/20">|</span>
+              <button onClick={() => setActiveTab('support')} className="hover:text-slate-300 transition-colors">مركز الدعم</button>
+            </div>
           </div>
         </div>
       </footer>
