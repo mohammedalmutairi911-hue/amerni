@@ -1,3 +1,4 @@
+import { Logo } from '../components/Logo'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X } from 'lucide-react'
@@ -379,8 +380,8 @@ export function LandingPage() {
       <nav className="fixed top-0 inset-x-0 z-50 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-5 h-14 flex items-center justify-between gap-4">
           {/* Logo */}
-          <button onClick={() => setMode(null)} className="text-xl font-black text-white hover:text-blue-300 transition-colors flex-shrink-0">
-            أمرني
+          <button onClick={() => setMode(null)} className="flex items-center hover:opacity-80 transition-opacity">
+            <Logo size={30} dark={true} />
           </button>
           {/* Nav Links */}
           <div className="hidden md:flex items-center gap-1">
@@ -651,7 +652,7 @@ export function LandingPage() {
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
                   {/* Brand */}
                   <div className="col-span-2 md:col-span-1">
-                    <h3 className="text-xl font-black text-white mb-2">أمرني</h3>
+                    <Logo size={28} dark={true} className="mb-2" />
                     <p className="text-slate-400 text-sm leading-relaxed mb-4">
                       المنصة السعودية الرائدة في تقديم الخدمات والحلول المتكاملة للأفراد والمنشآت.
                     </p>

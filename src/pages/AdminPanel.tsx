@@ -1,3 +1,4 @@
+import { Logo } from '../components/Logo'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown } from 'lucide-react'
@@ -198,7 +199,7 @@ export function AdminPanel() {
       <aside className="hidden lg:flex flex-col h-screen sticky top-0 bg-white border-l border-slate-200 w-56 flex-shrink-0 shadow-sm">
         {/* Logo */}
         <div className="px-5 py-5 border-b border-slate-100">
-          <h1 className="text-xl font-black text-primary-700">أمرني</h1>
+          <h1 className="flex items-center"><Logo size={28} /></h1>
           <p className="text-xs text-slate-400 mt-0.5">لوحة التحكم الإدارية</p>
         </div>
 

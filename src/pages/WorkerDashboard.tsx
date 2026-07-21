@@ -1,3 +1,4 @@
+import { Logo } from '../components/Logo'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Star, Clock, CheckCircle, Zap, Loader2, MessageSquare, Upload, DollarSign, Home, List, Calendar, User, LogOut, MapPin, Copy, Wifi, WifiOff, BarChart2, Briefcase, TrendingUp, Plus, ChevronRight } from 'lucide-react'
@@ -324,7 +325,7 @@ export function WorkerDashboard() {
       <aside className="hidden lg:flex flex-col h-screen sticky top-0 bg-white border-l border-slate-200 w-64 flex-shrink-0 shadow-sm z-40">
         {/* Logo */}
         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-          <button onClick={() => navigate('landing')} className="text-xl font-black text-primary-700 hover:opacity-80">أمرني</button>
+          <button onClick={() => navigate('landing')} className="flex items-center hover:opacity-80"><Logo size={28} /></button>
           <button onClick={toggleOnline} disabled={toggling}
             className={`text-xs font-bold px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${workerProfile?.is_online ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
             {toggling ? <Loader2 size={10} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={10} /> متاح</> : <><WifiOff size={10} /> غير متاح</>}
@@ -397,7 +398,7 @@ export function WorkerDashboard() {
         {/* ── Top Header ── */}
         <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3.5 flex items-center gap-4 shadow-sm">
           {/* Mobile logo */}
-          <button onClick={() => navigate('landing')} className="lg:hidden text-xl font-black text-primary-700">أمرني</button>
+          <button onClick={() => navigate('landing')} className="lg:hidden flex items-center"><Logo size={26} /></button>
           <div className="hidden lg:block flex-1">
             <h2 className="font-black text-slate-800 text-lg">
               {tab === 'overview' ? 'لوحة العامل' : tab === 'shifts' ? 'سوق الشفتات' : tab === 'my-tasks' ? 'الطلبات' : tab === 'analytics' ? 'التحليلات الاستباقية' : 'الإنجازات والالتزام'}

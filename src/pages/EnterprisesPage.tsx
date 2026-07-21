@@ -1,3 +1,4 @@
+import { Logo } from '../components/Logo'
 import { useState, useEffect, useRef } from 'react'
 import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { ReviewBox, VerificationBadge, StarDisplay } from '../components/enterprise/ReviewBox'
@@ -481,7 +482,7 @@ export function EnterprisesPage() {
       <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/95 backdrop-blur border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate('landing')} className="text-xl font-black text-primary-500">أمرني</button>
+            <button onClick={() => navigate('landing')} className="flex items-center hover:opacity-80 transition-opacity"><Logo size={30} /></button>
             <button onClick={() => navigate('landing')} className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition-colors">منشآت ↕</button>
           </div>
           <div className="hidden md:flex items-center gap-0.5 overflow-x-auto">
@@ -1068,7 +1069,6 @@ export function EnterprisesPage() {
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال *</label>
                         <input value={provForm.contact_phone} maxLength={10} inputMode="numeric" placeholder="05XXXXXXXX" onChange={e => setProvForm(f => ({ ...f, contact_phone: e.target.value.replace(/[^0-9]/g, '').slice(0,10) }))}
-                          placeholder="05xxxxxxxx"
                           className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" dir="ltr" />
                       </div>
                     </div>
@@ -1093,7 +1093,7 @@ export function EnterprisesPage() {
                         <div>
                           <label className="block text-xs font-semibold text-slate-700 mb-1">رقم السجل التجاري *</label>
                           <input value={provForm.cr_number} maxLength={10} inputMode="numeric" onChange={e => setProvForm(f => ({ ...f, cr_number: e.target.value.replace(/[^0-9]/g, '').slice(0,10) }))}
-                            placeholder="1010xxxxxx" maxLength={10}
+                            placeholder="1010xxxxxx"
                             className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white" dir="ltr" />
                           <p className="text-xs text-slate-400 mt-1">١٠ أرقام من وزارة التجارة</p>
                         </div>
@@ -1541,7 +1541,7 @@ export function EnterprisesPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div className="col-span-2 md:col-span-1">
-              <h3 className="text-lg font-black text-white mb-2">أمرني</h3>
+              <Logo size={26} dark={true} className="mb-2" />
               <p className="text-slate-400 text-sm leading-relaxed">المنصة السعودية الأولى لخدمات B2B — نربط المنشآت بأفضل المستشارين في 18 تخصصاً.</p>
             </div>
             {[

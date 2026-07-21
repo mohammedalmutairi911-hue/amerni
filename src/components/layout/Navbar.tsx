@@ -1,3 +1,4 @@
+import { Logo } from './Logo'
 import { useState } from 'react'
 import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown, Users, Gift, Building2 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
@@ -21,7 +22,7 @@ export function Navbar() {
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
         <button onClick={() => navigate('landing')} className="text-xl font-black text-primary-400">
-          أمرني
+          <Logo size={28} />
         </button>
 
         {!user && (
