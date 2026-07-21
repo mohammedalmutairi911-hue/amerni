@@ -400,7 +400,7 @@ export function AdminPanel() {
                     <tbody>
                       {tasks.slice(0,5).map((t, i) => (
                         <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                          <td className="px-5 py-3.5 font-bold text-slate-700">#{String(400 + i + 1)}</td>
+                          <td className="px-5 py-3.5 font-bold text-slate-700">#{t.id.slice(0,6).toUpperCase()}</td>
                           <td className="px-5 py-3.5 text-slate-600">{t.title?.slice(0,20) || '—'}</td>
                           <td className="px-5 py-3.5 text-slate-400 whitespace-nowrap">{new Date(t.created_at).toLocaleDateString('ar-SA')}</td>
                           <td className="px-5 py-3.5">
@@ -503,13 +503,13 @@ export function AdminPanel() {
                         <div className="bg-slate-50 rounded-xl p-3">
                           <p className="text-xs text-slate-400 mb-0.5">التقييم الخارجي</p>
                           <p className="font-black text-slate-800 flex items-center gap-1">
-                            {(4.5 + (i % 5) * 0.1).toFixed(1)} <span className="text-amber-400 text-sm">★</span>
+                            {w.rating?.toFixed(1) || "—"} <span className="text-amber-400 text-sm">★</span>
                           </p>
                         </div>
                         <div className="bg-slate-50 rounded-xl p-3">
                           <p className="text-xs text-slate-400 mb-0.5">معدل الإنجاز</p>
                           <p className="font-black text-slate-800 flex items-center gap-1">
-                            {85 + (i % 4) * 5}% <span className="text-green-500 text-sm">✓</span>
+                            {w.completion_rate ? w.completion_rate + "%" : "—"} <span className="text-green-500 text-sm">✓</span>
                           </p>
                         </div>
                       </div>
@@ -661,7 +661,7 @@ export function AdminPanel() {
                 <tbody>
                   {tasks.filter(t => t.status === 'disputed').slice(0,10).map((t, i) => (
                     <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                      <td className="px-5 py-4 font-black text-slate-700">DIS-{8821 - i}#</td>
+                      <td className="px-5 py-4 font-black text-slate-700">DIS-{t.id.slice(0,6).toUpperCase()}#</td>
                       <td className="px-5 py-4">
                         <p className="font-bold text-slate-800 text-sm">{t.title?.slice(0,16) || 'شركة —'}</p>
                         <p className="text-xs text-slate-400">ضد: مورد الخدمة</p>
@@ -718,9 +718,9 @@ export function AdminPanel() {
                 <p className="text-5xl font-black mb-1">48 <span className="text-2xl font-bold">ساعة</span></p>
                 <p className="text-primary-300 text-xs mb-3">الوقت المستهدف</p>
                 <div className="w-full bg-primary-600 rounded-full h-2 mb-2">
-                  <div className="bg-white h-2 rounded-full" style={{width:'82%'}}/>
+                  <div className="bg-white h-2 rounded-full" style={{width: stats.completed > 0 ? Math.round((stats.completed / Math.max(tasks.length,1)) * 100) + '%' : '0%'}}/>
                 </div>
-                <p className="text-primary-200 text-xs mb-5">تم حل 82% من النزاعات خلال الوقت المحدد.</p>
+                <p className="text-primary-200 text-xs mb-5">تم حل {stats.completed > 0 ? Math.round((stats.completed / Math.max(tasks.length,1)) * 100) : 0}% من الطلبات خلال الوقت المحدد.</p>
                 <button onClick={() => exportCSV('tasks')}
                   className="w-full bg-white text-primary-700 font-bold py-2.5 rounded-xl text-sm hover:bg-primary-50 transition-colors">
                   تحميل التقارير الشهرية
@@ -786,7 +786,7 @@ export function AdminPanel() {
                 { label: 'إجمالي المنشآت',     value: leads.length || 1284, growth: '+١٢٪', icon: '🏢', iconBg: 'bg-blue-50' },
                 { label: 'المستخدمين النشطين', value: users.length || 8420, growth: '+٥٪',  icon: '👤', iconBg: 'bg-slate-50' },
                 { label: 'بانتظار التحقق',     value: workers.filter(w=>!w.is_approved).length || 42, badge: 'هام', icon: '⏳', iconBg: 'bg-red-50' },
-                { label: 'معدل تجديد الاشتراك', value: '94%', sub: '٢٤ ساعة', icon: '🔄', iconBg: 'bg-slate-50' },
+                { label: 'وقت الاستجابة', value: '24س', sub: 'متوسط الرد على الطلبات', icon: '⚡', iconBg: 'bg-blue-50' },
               ].map(({ label, value, growth, badge, sub, icon, iconBg }) => (
                 <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
                   <div className="flex items-start justify-between mb-3">
@@ -900,7 +900,7 @@ export function AdminPanel() {
                     ))}
                     <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">›</button>
                   </div>
-                  <span>عرض 1-10 من أصل {users.length * 128} مستخدم</span>
+                  <span>عرض 1-{Math.min(10, users.length)} من أصل {users.length} مستخدم</span>
                 </div>
               )}
             </div>
@@ -1179,17 +1179,17 @@ export function AdminPanel() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 {
-                  label: 'إجمالي الإيرادات', value: '١٢٤,٥٠٠', unit: 'رس.',
+                  label: 'إجمالي الإيرادات', value: tasks.filter(t=>t.status==='completed').reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0).toLocaleString('ar-SA') || '٠', unit: 'رس.',
                   growth: '+١٢٪', iconBg: 'bg-blue-50', icon: '💰',
                   badge: null
                 },
                 {
-                  label: 'رسوم المنصة', value: '٦,٢٢٥', unit: 'رس.',
+                  label: 'رسوم المنصة', value: (tasks.filter(t=>t.status==='completed').reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0)*0.02).toLocaleString('ar-SA') || '٠', unit: 'رس.',
                   sub: 'عمولة ٥٪', iconBg: 'bg-slate-50', icon: '🏷️',
                   badge: null
                 },
                 {
-                  label: 'مدفوعات الموردين', value: '٨٥,٣٠٠', unit: 'رس.',
+                  label: 'مدفوعات الموردين', value: (tasks.filter(t=>t.status==='completed').reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0)*0.98).toLocaleString('ar-SA') || '٠', unit: 'رس.',
                   iconBg: 'bg-red-50', icon: '📤',
                   badge: `${tasks.filter(t=>t.status==='in_progress').length} طلبات معلقة`
                 },
@@ -1230,8 +1230,8 @@ export function AdminPanel() {
                   {/* Legend */}
                   <div className="space-y-3 flex-1">
                     {[
-                      { label: 'مدفوعات الموردين', value: '٨٥,٣٠٠ رس', color: 'bg-primary-700' },
-                      { label: 'عمولة المنصة',    value: '٦,٢٢٥ رس',  color: 'bg-slate-400' },
+                      { label: 'مدفوعات الموردين', value: (tasks.filter(t=>t.status==="completed").reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0)*0.98).toLocaleString("ar-SA") + " رس", color: 'bg-primary-700' },
+                      { label: 'عمولة المنصة',    value: (tasks.filter(t=>t.status==="completed").reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0)*0.02).toLocaleString("ar-SA") + " رس",  color: 'bg-slate-400' },
                       { label: 'مصاريف التشغيل', value: '٣,٤٠٠ رس',  color: 'bg-slate-200' },
                     ].map(({ label, value, color }) => (
                       <div key={label} className="flex items-center justify-between gap-3">
@@ -1303,7 +1303,7 @@ export function AdminPanel() {
                       { label: 'مستلم', color: 'bg-blue-50 text-blue-600 border-blue-200' },
                     ]
                     const st = statuses[i % 3]
-                    const amounts = ['١٢,٥٠٠','١,٢٠٠','٤٥,٠٠٠','٣,٨٠٠','٨,٩٠٠','٢,١٠٠']
+                    const amounts = [t.price_final || t.price_suggested || '—'].map(v => v ? String(v) : '—')
                     return (
                       <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                         <td className="px-5 py-3.5">
@@ -1316,7 +1316,7 @@ export function AdminPanel() {
                             <span className="text-sm text-slate-700 font-medium">{t.title?.slice(0,16) || 'جهة غير محددة'}</span>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 font-black text-slate-800">{amounts[i]} رس.</td>
+                        <td className="px-5 py-3.5 font-black text-slate-800">{(t.price_final || t.price_suggested || "—").toLocaleString()} رس.</td>
                         <td className="px-5 py-3.5 text-sm text-slate-500">{types[i % types.length]}</td>
                         <td className="px-5 py-3.5">
                           <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full border ${st.color}`}>
@@ -1340,7 +1340,7 @@ export function AdminPanel() {
                     <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">›</button>
                     <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">‹</button>
                   </div>
-                  <span>عرض ٣٠-١ من أصل {tasks.length * 5} معاملة</span>
+                  <span>عرض 1-{Math.min(6, tasks.length)} من أصل {tasks.length} معاملة</span>
                 </div>
               )}
             </div>

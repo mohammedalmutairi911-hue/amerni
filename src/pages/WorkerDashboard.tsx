@@ -283,18 +283,22 @@ export function WorkerDashboard() {
     { icon: '🤝', label: 'المساعد المثالي', sub: 'تبادل ورديات مرن', locked: false },
     { icon: '🔒', label: 'منقذ الموقف', sub: 'قريباً...', locked: true },
   ]
+  // LEADERBOARD: يُبنى من بيانات حقيقية (العامل الحالي + إشارة لترتيبه)
+  const myRating = workerProfile?.rating || 0
+  const myCompleted = completedTasks.length
   const LEADERBOARD = [
-    { rank: 1, name: 'سارة حسن', dept: 'إدارة العمليات', score: '98%', me: false },
-    { rank: 2, name: 'ليلى مراد', dept: 'فريق التوزيع', score: '95%', me: false },
-    { rank: 3, name: profile?.full_name || 'أنت', dept: 'فريق الدعم', score: '90%', me: true },
-    { rank: 4, name: 'ياسين عمر', dept: 'قسم اللوجستيات', score: '88%', me: false },
+    { rank: 1, name: profile?.full_name || 'أنت', dept: workerProfile?.city || 'غير محدد', score: myRating > 0 ? `${myRating.toFixed(1)}⭐` : `${myCompleted} مكتمل`, me: true },
   ]
-  const SHIFTS = [
-    { name: 'سارة أحمد', role: 'ممرض أول', type: 'صباحي', typeIcon: '🌤️', date: 'الاثنين، 15 مايو 2024', time: '08:00 ص - 04:00 م' },
-    { name: 'محمد خالد', role: 'مشرف وردية', type: 'ليلي', typeIcon: '🌙', date: 'الثلاثاء، 16 مايو 2024', time: '12:00 ص - 08:00 ص' },
-    { name: 'ليلى عمر', role: 'فني مختبر', type: 'مسائي', typeIcon: '🌅', date: 'الأربعاء، 17 مايو 2024', time: '04:00 م - 12:00 ص' },
-    { name: 'أحمد محمود', role: 'أخصائي تقني', type: 'صباحي', typeIcon: '🌤️', date: 'الخميس، 18 مايو 2024', time: '08:00 ص - 04:00 م' },
-  ]
+  // SHIFTS: تُبنى من الطلبات المتاحة الحقيقية
+  const SHIFTS = filteredFeed.slice(0, 6).map(t => ({
+    name: t.client_name || 'عميل',
+    role: t.category || 'خدمة',
+    type: t.created_at && new Date(t.created_at).getHours() < 12 ? 'صباحي' : new Date(t.created_at).getHours() < 18 ? 'مسائي' : 'ليلي',
+    typeIcon: new Date(t.created_at).getHours() < 12 ? '🌤️' : new Date(t.created_at).getHours() < 18 ? '🌅' : '🌙',
+    date: new Date(t.created_at).toLocaleDateString('ar-SA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+    time: t.time_preference || 'مرن',
+    id: t.id,
+  }))
   const HEATMAP_DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس']
   const HEATMAP_DATA = [
     [1,2,3,4,3,2,1,1,1,1,1,1],
@@ -678,9 +682,9 @@ export function WorkerDashboard() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
                   <span className="text-xl">👥</span>
                   <p className="text-xs text-slate-400 mt-1">كفاءة التوزيع</p>
-                  <p className="text-2xl font-black text-primary-700 mt-1">82%</p>
+                  <p className="text-2xl font-black text-primary-700 mt-1">{myCompleted > 0 ? Math.round((myCompleted / Math.max(myCompleted + activeTasks.length, 1)) * 100) + "%" : "—"}</p>
                   <div className="w-full bg-slate-100 h-1.5 rounded-full mt-1">
-                    <div className="bg-primary-600 h-1.5 rounded-full" style={{width:'82%'}}/>
+                    <div className="bg-primary-600 h-1.5 rounded-full" style={{width: myCompleted > 0 ? Math.round((myCompleted / Math.max(myCompleted + activeTasks.length, 1)) * 100) + "%" : "0%"}}/>
                   </div>
                 </div>
               </div>
@@ -742,11 +746,11 @@ export function WorkerDashboard() {
                 <svg width="80" height="80" viewBox="0 0 80 80">
                   <circle cx="40" cy="40" r="34" fill="none" stroke="#e2e8f0" strokeWidth="6"/>
                   <circle cx="40" cy="40" r="34" fill="none" stroke="#1e3a8a" strokeWidth="6"
-                    strokeDasharray="213.6" strokeDashoffset="21.36" strokeLinecap="round"
+                    strokeDasharray="213.6" strokeDashoffset={String(213.6 - (myRating > 0 ? (myRating/5 * 213.6) : myCompleted > 0 ? 213.6 : 213.6))} strokeLinecap="round"
                     transform="rotate(-90 40 40)"/>
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-sm font-black text-primary-700">90%</span>
+                  <span className="text-sm font-black text-primary-700">{myRating > 0 ? (myRating / 5 * 100).toFixed(0) + "%" : myCompleted > 0 ? "100%" : "—"}</span>
                   <span className="text-xs text-slate-400">الالتزام</span>
                 </div>
               </div>
