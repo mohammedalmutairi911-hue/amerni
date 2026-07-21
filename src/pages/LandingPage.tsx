@@ -973,11 +973,10 @@ export function LandingPage() {
             </div>
           </section>
         )}
-      </div>
 
-      {/* PRIVACY */}
-      {activeTab === 'privacy' && (
-        <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+        {/* PRIVACY */}
+        {activeTab === 'privacy' && (
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black mb-3">سياسة الخصوصية والأمان</h2>
@@ -1022,11 +1021,11 @@ export function LandingPage() {
             </div>
           </div>
         </section>
-      )}
+        )}
 
-      {/* TERMS */}
-      {activeTab === 'terms' && (
-        <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
+        {/* TERMS */}
+        {activeTab === 'terms' && (
+          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black text-slate-900 mb-3">الشروط والأحكام</h2>
@@ -1054,8 +1053,9 @@ export function LandingPage() {
               </div>
             </div>
           </div>
-        </section>
-      )}
+          </section>
+        )}
+      </div>
 
       {/* Direct Auth Modal */}
       {showAuthDirect && (

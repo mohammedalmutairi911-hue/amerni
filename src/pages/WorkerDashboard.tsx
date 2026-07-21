@@ -24,7 +24,7 @@ export function WorkerDashboard() {
   const { user, profile, signOut } = useAuth()
   const { navigate } = useApp()
   const { toast } = useToast()
-  const [tab, setTab] = useState<'overview' | 'feed' | 'my-tasks' | 'chat' | 'profile'>('overview')
+  const [tab, setTab] = useState<'overview' | 'shifts' | 'my-tasks' | 'chat' | 'analytics' | 'achievements'>('overview')
   const [workerProfile, setWorkerProfile] = useState<WorkerProfile | null>(null)
   const [feedTasks, setFeedTasks] = useState<Task[]>([])
   const [myTasks, setMyTasks] = useState<Task[]>([])

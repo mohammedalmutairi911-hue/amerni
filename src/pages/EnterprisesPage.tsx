@@ -1531,10 +1531,9 @@ export function EnterprisesPage() {
             </div>
           </section>
         )}
-      </div>
 
-      {/* ══ PRIVACY ══ */}
-      {activeTab === 'privacy' && (
+        {/* ══ PRIVACY ══ */}
+        {activeTab === 'privacy' && (
         <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12"><h2 className="text-4xl font-black mb-3">سياسة الخصوصية</h2><p className="text-slate-400">آخر تحديث: يوليو ٢٠٢٦</p></div>
@@ -1557,10 +1556,10 @@ export function EnterprisesPage() {
             </div>
           </div>
         </section>
-      )}
+        )}
 
-      {/* ══ TERMS ══ */}
-      {activeTab === 'terms' && (
+        {/* ══ TERMS ══ */}
+        {activeTab === 'terms' && (
         <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12"><h2 className="text-4xl font-black text-slate-900 mb-3">الشروط والأحكام</h2></div>
@@ -1586,7 +1585,7 @@ export function EnterprisesPage() {
             </div>
           </div>
         </section>
-      )}
+        )}
 
       {/* Footer */}
       <footer className="bg-[#07101f] text-white py-12 px-4 mt-auto">
@@ -1621,6 +1620,7 @@ export function EnterprisesPage() {
           </div>
         </div>
       </footer>
+      </div>
 
       {/* ══ REQUEST FORM MODAL ══ */}
       {showForm && (
