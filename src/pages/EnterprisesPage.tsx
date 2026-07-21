@@ -16,7 +16,7 @@ import {
   Cpu, Megaphone, ShoppingCart, BarChart2, Landmark,
   Languages, Flame, Home, GraduationCap, FolderKanban,
   Leaf, Umbrella, ClipboardCheck, Send, X, Bot, Loader2,
-  Mail, Shield, Star, Zap, Users, MessageCircle, Search,
+  Mail, Shield, Star, Zap, Users, MessageCircle, Search, Sparkles,
   Clock, CheckCircle, AlertCircle, Package, ChevronRight,
   LogOut, List, LayoutDashboard, Plus, Bell, MessageSquare
 } from 'lucide-react'
@@ -94,6 +94,28 @@ const EMPTY_FORM: LeadForm = { company_name: '', contact_name: '', contact_email
 
 const DRAFT_KEY = 'amerni_enterprise_draft'
 
+// أمثلة متغيرة لصندوق البحث في الشركات
+const ENTERPRISE_EXAMPLES = [
+  'أبي مستشار حوكمة لمنشأتي',
+  'أبحث عن خبير سعودة ونطاقات',
+  'أحتاج استشارة قانونية للعقود',
+  'أبي شركة تدقيق مالي محاسبي',
+  'أحتاج مستشار ISO 9001',
+  'أبي خبير أمن سيبراني',
+  'أبحث عن مكتب دراسات جدوى',
+  'أحتاج مستشار موارد بشرية',
+]
+
+// فئات شائعة سريعة للشركات
+const POPULAR_CATS = [
+  { emoji: '🏛️', label: 'حوكمة', catId: 'governance' },
+  { emoji: '👥', label: 'سعودة', catId: 'saudization' },
+  { emoji: '⚖️', label: 'قانوني', catId: 'legal' },
+  { emoji: '💰', label: 'مالي', catId: 'finance' },
+  { emoji: '🛡️', label: 'أمن سيبراني', catId: 'cybersecurity' },
+  { emoji: '✨', label: 'المزيد', catId: null as string | null },
+]
+
 const TABS: { id: Tab; label: string }[] = [
   { id: 'home', label: 'الرئيسية' },
   { id: 'how', label: 'كيف يعمل؟' },
@@ -138,6 +160,18 @@ export function EnterprisesPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   const [savedProfile, setSavedProfile] = useState<any>(null)
+
+  // Hero quick search (like individuals landing)
+  const [heroQuery, setHeroQuery] = useState('')
+  const [heroIdx, setHeroIdx] = useState(0)
+  const [heroVisible, setHeroVisible] = useState(true)
+  useEffect(() => {
+    const t = setInterval(() => {
+      setHeroVisible(false)
+      setTimeout(() => { setHeroIdx(i => (i + 1) % ENTERPRISE_EXAMPLES.length); setHeroVisible(true) }, 300)
+    }, 3000)
+    return () => clearInterval(t)
+  }, [])
 
   // تحميل بروفايل الشركة المحفوظ + الإيميل تلقائياً (تعبئة تلقائية)
   // فتح تبويب "طلباتي" تلقائياً بعد تسجيل الشركة
@@ -554,9 +588,61 @@ export function EnterprisesPage() {
                     حوّل رؤيتك إلى واقع مع<br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-cyan-300">خبرات عند الطلب</span>
                   </h1>
-                  <p className="text-slate-400 text-base sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
+                  <p className="text-slate-400 text-base sm:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
                     المنصة السعودية الأول لتمكين النمو من خلال ربط المنشآت بنخبة من المستشارين والخبراء المعتمدين في أكثر من 18 تخصصاً استراتيجياً.
                   </p>
+
+                  {/* ── صندوق البحث السريع (مثل صفحة الأفراد) ── */}
+                  <div className="relative max-w-2xl mx-auto mb-5">
+                    <div className="flex items-center gap-2 sm:gap-3 bg-white/95 border-2 border-white/20 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-blue-400 transition-all shadow-2xl shadow-blue-500/10">
+                      <Sparkles size={18} className="text-blue-600 flex-shrink-0" />
+                      <input
+                        value={heroQuery}
+                        onChange={e => setHeroQuery(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' && heroQuery.trim()) {
+                            setSelectedCat(null)
+                            setForm({ ...(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)), description: heroQuery.trim() })
+                            setSuccess(false)
+                            setShowForm(true)
+                          }
+                        }}
+                        placeholder={heroVisible ? ENTERPRISE_EXAMPLES[heroIdx] : ''}
+                        className="flex-1 text-right bg-transparent text-slate-900 placeholder-slate-500 text-sm sm:text-base outline-none"
+                      />
+                      <button
+                        onClick={() => {
+                          setSelectedCat(null)
+                          setForm({ ...(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)), description: heroQuery.trim() })
+                          setSuccess(false)
+                          setShowForm(true)
+                        }}
+                        className="bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-colors flex-shrink-0 flex items-center gap-1.5"
+                      >
+                        اطلب <ArrowLeft size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ── فئات شائعة سريعة ── */}
+                  <p className="text-xs text-slate-500 mb-3">تخصصات شائعة:</p>
+                  <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-10 px-2">
+                    {POPULAR_CATS.map(c => (
+                      <button
+                        key={c.label}
+                        onClick={() => {
+                          if (c.catId) setSelectedCat(c.catId)
+                          else setSelectedCat(null)
+                          setForm({ ...(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)), category: c.catId || '' })
+                          setSuccess(false)
+                          setShowForm(true)
+                        }}
+                        className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 rounded-full text-sm text-white transition-all"
+                      >
+                        {c.emoji} {c.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 {/* بطاقتان */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto mb-10">
