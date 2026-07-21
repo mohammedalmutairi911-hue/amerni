@@ -200,16 +200,22 @@ export function LandingPage() {
   const { user, profile } = useAuth()
 
   // ── Gateway: أفراد أو منشآت ──────────────────
-  // المستخدم المسجل يتجاوز الشاشة مباشرة
-  // نحفظ الاختيار في sessionStorage عشان الرجوع من صفحات ثانية يشتغل صح
+  // المستخدم المسجل يتجاوز الشاشة مباشرة.
+  // نقرأ الاختيار من history.state بدل sessionStorage — عشان:
+  //   1) الزيارة الجديدة (تبويب جديد / رجوع بعد إغلاق) ترجّع لشاشة الاختيار دائماً
+  //   2) إعادة تحميل الصفحة (F5) تحتفظ بالوضع الحالي
+  //   3) زر رجوع في المتصفح يشتغل صح (يرجّع للـ gateway بدل ما يطلع من الموقع)
   const [mode, setModeRaw] = useState<'individuals' | 'enterprises' | null>(() => {
     if (user) return 'individuals'
-    const saved = sessionStorage.getItem('amerni_mode') as 'individuals' | 'enterprises' | null
-    return saved || null
+    return (window.history.state?.amerni_mode as 'individuals' | 'enterprises' | null) || null
   })
   const setMode = (m: 'individuals' | 'enterprises' | null) => {
-    if (m) sessionStorage.setItem('amerni_mode', m)
-    else sessionStorage.removeItem('amerni_mode')
+    // زر "أفراد ↕" (setMode(null)) للرجوع للـ gateway:
+    // لو فيه history entry مضاف — استخدم back() عشان يتوافق مع زر رجوع المتصفح
+    if (m === null && window.history.state?.amerni_mode) {
+      window.history.back()
+      return // popstate handler سيسوّي setModeRaw(null)
+    }
     setModeRaw(m)
   }
   const [activeTab, setActiveTab] = useState<Tab>('home')
@@ -235,8 +241,24 @@ export function LandingPage() {
 
   const chooseMode = (m: 'individuals' | 'enterprises') => {
     if (m === 'enterprises') { navigate('enterprises'); return }
-    setMode(m)
+    // نضيف history entry جديد — عشان زر رجوع في المتصفح يرجّع للـ gateway
+    // بدل ما يطلع المستخدم من الموقع كلياً (كان هذا هو البق)
+    if (!window.history.state?.amerni_mode) {
+      window.history.pushState({ amerni_mode: 'individuals' }, '')
+    }
+    setModeRaw('individuals')
   }
+
+  // popstate: لما المستخدم يضغط رجوع/تقدّم في المتصفح، sync الوضع مع history state
+  useEffect(() => {
+    if (user) return
+    const onPop = (e: PopStateEvent) => {
+      const newMode = (e.state?.amerni_mode as 'individuals' | 'enterprises' | null) || null
+      setModeRaw(newMode)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [user])
 
   useEffect(() => {
     const t = setInterval(() => {
