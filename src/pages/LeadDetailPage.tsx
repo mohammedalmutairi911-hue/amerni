@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { ArrowRight, CheckCircle2, Clock, X, Loader2, AlertCircle, MessageSquare, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Clock, X, Loader2, AlertCircle, MessageSquare, ThumbsUp, ThumbsDown, LayoutDashboard, List, Plus, LogOut, Building2, FileText, DollarSign } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import { ProviderProfileCard } from '../components/enterprise/ProviderProfileCard'
@@ -8,12 +8,12 @@ import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { StatusTimeline } from '../components/enterprise/UXComponents'
 import { ReviewBox } from '../components/enterprise/ReviewBox'
 
-const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
-  open:      { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', icon: Clock },
-  matched:   { label: 'مزود قبِل — بانتظار موافقتك', color: 'bg-amber-50 text-amber-600 border-amber-200', icon: Clock },
-  closed:    { label: 'مكتمل', color: 'bg-slate-100 text-slate-500 border-slate-200', icon: CheckCircle2 },
-  cancelled: { label: 'ملغى', color: 'bg-red-50 text-red-500 border-red-200', icon: X },
-  new:       { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', icon: Clock },
+const STATUS_MAP: Record<string, { label: string; color: string; dot: string }> = {
+  open:      { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', dot: 'bg-blue-400' },
+  matched:   { label: 'بانتظار موافقتك', color: 'bg-amber-50 text-amber-600 border-amber-200', dot: 'bg-amber-400' },
+  closed:    { label: 'مكتمل', color: 'bg-green-50 text-green-600 border-green-200', dot: 'bg-green-400' },
+  cancelled: { label: 'ملغى', color: 'bg-red-50 text-red-500 border-red-200', dot: 'bg-red-400' },
+  new:       { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', dot: 'bg-blue-400' },
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -27,12 +27,14 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function LeadDetailPage() {
   const { navigate } = useApp()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [lead, setLead] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [closing, setClosing] = useState(false)
   const [changing, setChanging] = useState(false)
   const [accepting, setAccepting] = useState(false)
+  const [contractVal, setContractVal] = useState('')
+  const [showClose, setShowClose] = useState(false)
 
   const leadId = window.location.hash.split('/')[2]
 
@@ -46,10 +48,11 @@ export function LeadDetailPage() {
       })
   }, [leadId])
 
+  const goBack = () => { sessionStorage.setItem('enterprises_tab', 'my-requests'); navigate('enterprises') }
+
   const acceptProvider = async () => {
     setAccepting(true)
     await supabase.from('enterprise_leads').update({ company_accepted: true }).eq('id', lead.id)
-    // رسالة نظام في الشات
     await supabase.from('enterprise_messages').insert({
       lead_id: lead.id, sender_id: user?.id, sender_role: 'company',
       content: '✅ وافقت الشركة على المزود — يمكنكم الآن بدء التواصل', is_system: true
@@ -65,172 +68,263 @@ export function LeadDetailPage() {
     setChanging(false)
     if (error) { alert('خطأ: ' + error.message); return }
     setLead((l: any) => ({ ...l, status: 'open', provider_id: null, company_accepted: false }))
-    // رجوع لطلباتي بعد ثانيتين
-    setTimeout(() => { sessionStorage.setItem('enterprises_tab', 'my-requests'); navigate('enterprises') }, 1500)
+    setTimeout(goBack, 1500)
   }
 
   const closeLead = async () => {
-    const val = prompt('قيمة العقد المتفق عليها (ريال) — لحساب العمولة ١٪:')
-    if (val === null) return
+    const num = parseFloat(contractVal) || null
     setClosing(true)
-    const { data, error } = await supabase.rpc('close_enterprise_lead', {
-      p_lead_id: lead.id, p_contract_value: parseFloat(val) || null
-    })
+    const { data, error } = await supabase.rpc('close_enterprise_lead', { p_lead_id: lead.id, p_contract_value: num })
     setClosing(false)
     if (error) { alert('خطأ: ' + error.message); return }
-    alert('تم إغلاق الطلب' + (data?.commission ? ` — العمولة: ${data.commission} ريال` : ''))
+    setShowClose(false)
     setLead((l: any) => ({ ...l, status: 'closed' }))
+    alert('✅ تم إغلاق الطلب' + (data?.commission ? ` — العمولة المستحقة: ${data.commission} ريال` : ''))
   }
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Loader2 size={28} className="animate-spin text-primary-400" />
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <Loader2 size={32} className="animate-spin text-primary-400" />
     </div>
   )
   if (!lead) return null
 
-  // حالة الشارة: لو matched وقبلت الشركة → "جاري التنفيذ"
-  const displayStatus = lead.status === 'matched' && lead.company_accepted
-    ? { label: 'جاري التنفيذ', color: 'bg-green-50 text-green-600 border-green-200', icon: CheckCircle2 }
+  const st = lead.status === 'matched' && lead.company_accepted === true
+    ? { label: 'جاري التنفيذ', color: 'bg-green-50 text-green-600 border-green-200', dot: 'bg-green-500' }
     : STATUS_MAP[lead.status] || STATUS_MAP.open
-  const StIcon = displayStatus.icon
+
+  const isMatchedPending = lead.status === 'matched' && lead.provider_id && lead.company_accepted !== true
+  const isMatchedActive  = lead.status === 'matched' && lead.provider_id && lead.company_accepted === true
+  const isClosed         = lead.status === 'closed'
+  const isCancelled      = lead.status === 'cancelled'
+  const isOpen           = lead.status === 'open' || lead.status === 'new'
 
   return (
-    <div className="min-h-screen bg-slate-50" dir="rtl">
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3 shadow-sm">
-        <button onClick={() => {
-          sessionStorage.setItem('enterprises_tab', 'my-requests')
-          navigate('enterprises')
-        }}
-          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors">
-          <ArrowRight size={16} /> طلباتي
-        </button>
-        <span className="text-slate-300">/</span>
-        <p className="font-bold text-slate-800 truncate flex-1">{lead.company_name}</p>
-        <span className={`text-xs font-bold px-3 py-1 rounded-full border flex items-center gap-1 ${displayStatus.color}`}>
-          <StIcon size={11} /> {displayStatus.label}
-        </span>
-      </header>
+    <div className="min-h-screen flex bg-slate-50" dir="rtl">
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
-
-        {/* خط زمني */}
-        {lead.status !== 'cancelled' && <StatusTimeline status={lead.status} />}
-
-        {/* تفاصيل الطلب */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5">
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <h1 className="text-xl font-black text-slate-900">{lead.company_name}</h1>
-              <p className="text-sm text-slate-500 mt-0.5">{CATEGORY_LABELS[lead.category] || lead.category}</p>
+      {/* ── Sidebar ── */}
+      <aside className="hidden lg:flex flex-col h-screen sticky top-0 bg-slate-900 w-56 flex-shrink-0">
+        {/* Company Info */}
+        <div className="px-4 py-5 border-b border-slate-800">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-black text-lg flex-shrink-0">
+              {(profile?.full_name || user?.email || 'ش')[0].toUpperCase()}
             </div>
-          </div>
-          <div className="bg-slate-50 rounded-xl px-4 py-3 mb-3">
-            <p className="text-sm text-slate-700 leading-relaxed">{lead.description}</p>
-          </div>
-          <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-            {lead.budget_range && <span className="bg-slate-100 px-2.5 py-1 rounded-lg">💰 {lead.budget_range}</span>}
-            {lead.company_size && <span className="bg-slate-100 px-2.5 py-1 rounded-lg">👥 {lead.company_size} موظف</span>}
-            <span className="bg-slate-100 px-2.5 py-1 rounded-lg">
-              🗓 {new Date(lead.created_at).toLocaleDateString('ar-SA', { month: 'long', day: 'numeric' })}
-            </span>
+            <div className="min-w-0">
+              <p className="text-white font-bold text-sm truncate">{profile?.full_name || user?.email?.split('@')[0]}</p>
+              <p className="text-slate-400 text-xs">عميل المنشآت</p>
+            </div>
           </div>
         </div>
 
-        {/* بانتظار مزود */}
-        {(lead.status === 'open' || lead.status === 'new') && (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center">
-            <Clock size={36} className="text-blue-400 mx-auto mb-2 animate-pulse" />
-            <p className="font-bold text-blue-700">طلبك منشور لكل المزودين المعتمدين</p>
-            <p className="text-sm text-blue-500 mt-1">ستصلك إشعار فوراً عند قبول أحدهم</p>
-          </div>
-        )}
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          {[
+            { icon: LayoutDashboard, label: 'لوحة التحكم', action: () => { sessionStorage.setItem('enterprises_tab', 'dashboard'); navigate('enterprises') } },
+            { icon: List, label: 'طلباتي', action: goBack, active: true },
+            { icon: Plus, label: 'طلب جديد', action: () => { sessionStorage.setItem('enterprises_tab', 'home'); navigate('enterprises') } },
+          ].map(({ icon: Icon, label, action, active }: any) => (
+            <button key={label} onClick={action}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                active ? 'bg-primary-500 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+              }`}>
+              <Icon size={16} />
+              <span className="flex-1 text-right">{label}</span>
+            </button>
+          ))}
+        </nav>
 
-        {/* مزود قبل — انتظار موافقة الشركة */}
-        {lead.status === 'matched' && lead.provider_id && lead.company_accepted !== true && (
-          <div className="space-y-4">
-            {/* إشعار القبول */}
-            <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 flex items-start gap-3">
-              <span className="text-2xl">🎉</span>
-              <div>
-                <p className="font-bold text-amber-800">مزود خدمة قبِل طلبك!</p>
-                <p className="text-sm text-amber-700 mt-0.5">راجع ملفه أدناه وأكّد موافقتك للبدء في التواصل</p>
+        {/* Company name */}
+        <div className="p-4 border-t border-slate-800">
+          <div className="bg-slate-800 rounded-xl p-3 mb-2">
+            <p className="text-xs text-slate-400 mb-0.5">الطلب الحالي</p>
+            <p className="text-white font-bold text-sm truncate">{lead.company_name}</p>
+            <p className="text-slate-400 text-xs mt-0.5">{CATEGORY_LABELS[lead.category] || lead.category}</p>
+          </div>
+          <button onClick={goBack}
+            className="w-full flex items-center justify-center gap-2 text-slate-500 hover:text-slate-300 text-xs py-2 transition-colors">
+            <LogOut size={13} /> خروج من الداشبورد
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Main ── */}
+      <div className="flex-1 flex flex-col min-h-screen">
+
+        {/* Header */}
+        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3.5 flex items-center gap-3 shadow-sm">
+          <button onClick={goBack}
+            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-primary-500 transition-colors font-medium">
+            <ArrowRight size={16} /> طلباتي
+          </button>
+          <span className="text-slate-200">/</span>
+          <p className="font-bold text-slate-800 truncate flex-1">{lead.company_name}</p>
+          <span className={`text-xs font-bold px-3 py-1.5 rounded-full border flex items-center gap-1.5 ${st.color}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />
+            {st.label}
+          </span>
+        </header>
+
+        {/* Content */}
+        <div className="flex-1 p-5 md:p-6 max-w-5xl w-full mx-auto space-y-5">
+
+          {/* خط زمني */}
+          {!isCancelled && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+              <StatusTimeline status={isMatchedActive ? 'matched' : lead.status} />
+            </div>
+          )}
+
+          {/* تفاصيل الطلب + إجراءات */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+            {/* تفاصيل الطلب — يمين */}
+            <div className="lg:col-span-1 space-y-4">
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <h2 className="font-black text-slate-900 text-lg mb-1">{lead.company_name}</h2>
+                <p className="text-sm text-primary-500 font-medium mb-3">{CATEGORY_LABELS[lead.category] || lead.category}</p>
+                <div className="bg-slate-50 rounded-xl px-4 py-3 mb-4">
+                  <p className="text-sm text-slate-700 leading-relaxed">{lead.description}</p>
+                </div>
+                <div className="space-y-2">
+                  {lead.budget_range && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <DollarSign size={14} className="text-slate-400" />
+                      <span className="text-slate-600">{lead.budget_range}</span>
+                    </div>
+                  )}
+                  {lead.company_size && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Building2 size={14} className="text-slate-400" />
+                      <span className="text-slate-600">{lead.company_size} موظف</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock size={14} className="text-slate-400" />
+                    <span className="text-slate-600">{new Date(lead.created_at).toLocaleDateString('ar-SA', { year:'numeric', month:'long', day:'numeric' })}</span>
+                  </div>
+                </div>
               </div>
+
+              {/* إغلاق الطلب card */}
+              {isMatchedActive && (
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <p className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <FileText size={15} /> إغلاق الطلب
+                  </p>
+                  {showClose ? (
+                    <div className="space-y-2">
+                      <input type="number" value={contractVal} onChange={e => setContractVal(e.target.value)}
+                        placeholder="قيمة العقد (ريال)" inputMode="numeric"
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
+                      <p className="text-xs text-slate-400">العمولة ١٪ من القيمة = {contractVal ? Math.round(parseFloat(contractVal)*0.01) : 0} ريال</p>
+                      <div className="flex gap-2">
+                        <button onClick={closeLead} disabled={closing}
+                          className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-xl text-sm disabled:opacity-50 flex items-center justify-center gap-1.5">
+                          {closing ? <Loader2 size={14} className="animate-spin" /> : <><CheckCircle2 size={14} /> تأكيد</>}
+                        </button>
+                        <button onClick={() => setShowClose(false)} className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-500">إلغاء</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button onClick={() => setShowClose(true)}
+                      className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
+                      <CheckCircle2 size={14} /> تم التعاقد — أغلق الطلب
+                    </button>
+                  )}
+                  <button onClick={changeProvider} disabled={changing}
+                    className="w-full mt-2 border border-red-200 text-red-500 hover:bg-red-50 py-2 rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
+                    {changing ? <Loader2 size={14} className="animate-spin" /> : 'تغيير المزود'}
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* ملف المزود كامل */}
-            <ProviderProfileCard providerId={lead.provider_id} />
+            {/* المحتوى الرئيسي — يسار */}
+            <div className="lg:col-span-2 space-y-4">
 
-            {/* أزرار الموافقة */}
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={acceptProvider} disabled={accepting}
-                className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                {accepting
-                  ? <Loader2 size={16} className="animate-spin" />
-                  : <><ThumbsUp size={18} /> نعم، أوافق على المزود</>}
-              </button>
-              <button onClick={changeProvider} disabled={changing}
-                className="bg-white border-2 border-red-200 text-red-500 hover:bg-red-50 font-bold py-4 rounded-2xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                {changing
-                  ? <Loader2 size={16} className="animate-spin" />
-                  : <><ThumbsDown size={18} /> لا، أريد مزوداً آخر</>}
-              </button>
+              {/* بانتظار مزود */}
+              {isOpen && (
+                <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8 text-center">
+                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                    <Clock size={28} className="text-blue-500 animate-pulse" />
+                  </div>
+                  <p className="font-bold text-blue-700 text-lg">طلبك منشور للمزودين</p>
+                  <p className="text-sm text-blue-500 mt-1">ستصلك إشعار فوراً عند قبول أحد المزودين المعتمدين</p>
+                </div>
+              )}
+
+              {/* انتظار موافقة الشركة */}
+              {isMatchedPending && (
+                <div className="space-y-4">
+                  <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+                    <span className="text-2xl">🎉</span>
+                    <div>
+                      <p className="font-bold text-amber-800">مزود خدمة قبِل طلبك!</p>
+                      <p className="text-sm text-amber-600 mt-0.5">راجع ملفه أدناه وأكّد موافقتك للبدء في التواصل</p>
+                    </div>
+                  </div>
+                  <ProviderProfileCard providerId={lead.provider_id} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <button onClick={acceptProvider} disabled={accepting}
+                      className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-green-500/20">
+                      {accepting ? <Loader2 size={16} className="animate-spin" /> : <><ThumbsUp size={18} /> نعم، أوافق</>}
+                    </button>
+                    <button onClick={changeProvider} disabled={changing}
+                      className="bg-white border-2 border-red-200 text-red-500 hover:bg-red-50 font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                      {changing ? <Loader2 size={16} className="animate-spin" /> : <><ThumbsDown size={18} /> أريد مزوداً آخر</>}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* وافق + شات */}
+              {isMatchedActive && (
+                <div className="space-y-4">
+                  <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                    <CheckCircle2 size={16} className="text-green-500 flex-shrink-0" />
+                    <p className="text-sm font-bold text-green-700">وافقت على المزود — تواصل معه الآن</p>
+                  </div>
+                  <ProviderProfileCard providerId={lead.provider_id} />
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-2">
+                      <MessageSquare size={15} className="text-primary-500" />
+                      <p className="font-bold text-slate-800 text-sm">المحادثة مع المزود</p>
+                    </div>
+                    <div className="p-3">
+                      <EnterpriseChat leadId={lead.id} senderRole="company" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* مغلق */}
+              {isClosed && (
+                <div className="space-y-4">
+                  <div className="bg-green-50 border border-green-200 rounded-2xl p-5 text-center">
+                    <CheckCircle2 size={36} className="text-green-500 mx-auto mb-2" />
+                    <p className="font-bold text-green-800 text-lg">تم إغلاق الطلب بنجاح!</p>
+                    <p className="text-sm text-green-600 mt-1">شكراً لاستخدامك أمرني للمنشآت</p>
+                  </div>
+                  {lead.provider_id && (
+                    <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                      <p className="font-bold text-slate-800 mb-3">قيّم تجربتك مع المزود</p>
+                      <ReviewBox leadId={lead.id} targetLabel="المزود" />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ملغى */}
+              {isCancelled && (
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+                  <AlertCircle size={32} className="text-red-400 mx-auto mb-2" />
+                  <p className="text-red-600 font-bold">تم إلغاء هذا الطلب</p>
+                </div>
+              )}
             </div>
           </div>
-        )}
-
-        {/* وافقت — شات + إجراءات */}
-        {lead.status === 'matched' && lead.provider_id && lead.company_accepted === true && (
-          <div className="space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-green-500" />
-              <p className="text-sm font-bold text-green-700">وافقت على المزود — تواصل معه الآن</p>
-            </div>
-
-            {/* ملف المزود (مطوي) */}
-            <ProviderProfileCard providerId={lead.provider_id} />
-
-            {/* الشات */}
-            <div>
-              <h3 className="text-sm font-bold text-slate-700 mb-2 flex items-center gap-2">
-                <MessageSquare size={15} /> المحادثة مع المزود
-              </h3>
-              <EnterpriseChat leadId={lead.id} senderRole="company" />
-            </div>
-
-            {/* الإجراءات */}
-            <div className="flex gap-3">
-              <button onClick={closeLead} disabled={closing}
-                className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                {closing ? <Loader2 size={15} className="animate-spin" /> : <><CheckCircle2 size={15} /> إغلاق الطلب (تم التعاقد)</>}
-              </button>
-              <button onClick={changeProvider} disabled={changing}
-                className="border border-red-200 text-red-500 hover:bg-red-50 px-4 py-3 rounded-xl text-sm transition-colors disabled:opacity-50">
-                {changing ? <Loader2 size={15} className="animate-spin" /> : 'تغيير المزود'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* مغلق */}
-        {lead.status === 'closed' && (
-          <div className="space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3">
-              <CheckCircle2 size={20} className="text-green-500 flex-shrink-0" />
-              <p className="text-green-700 font-bold">تم إغلاق الطلب — شكراً لاستخدامك أمرني للمنشآت</p>
-            </div>
-            {lead.provider_id && <ReviewBox leadId={lead.id} targetLabel="المزود" />}
-          </div>
-        )}
-
-        {/* ملغى */}
-        {lead.status === 'cancelled' && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
-            <AlertCircle size={20} className="text-red-400 flex-shrink-0" />
-            <p className="text-red-600 font-medium">تم إلغاء هذا الطلب</p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   )
