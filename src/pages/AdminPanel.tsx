@@ -7,7 +7,7 @@ import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { Chat } from '../components/chat/Chat'
 
-type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises' | 'providers'
+type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises' | 'providers' | 'financial'
 
 export function AdminPanel() {
   const { navigate } = useApp()
@@ -188,6 +188,7 @@ export function AdminPanel() {
     { id: 'enterprises',   icon: Building2,     label: 'المنشآت',       badge: leads.filter(l=>l.status==='open').length },
     { id: 'conversations', icon: MessageSquare, label: 'المحادثات',     badge: stats.disputed },
     { id: 'providers',     icon: ShieldAlert,   label: 'مزودو الخدمة', badge: providers.filter(p=>!p.is_approved).length },
+    { id: 'financial',     icon: Briefcase,     label: 'التقارير المالية', badge: 0 },
   ]
 
   return (
@@ -980,6 +981,199 @@ export function AdminPanel() {
           </div>
         )}
         </div>
+
+        {/* ══ FINANCIAL ══ */}
+        {tab === 'financial' && (
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            {/* Header */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">لوحة التحكم المالية</h2>
+                <p className="text-slate-400 text-sm mt-0.5">متابعة الإيرادات والمدفوعات والعمولات في الوقت الفعلي.</p>
+              </div>
+              <div className="flex gap-2">
+                <button className="flex items-center gap-2 bg-white border border-slate-200 text-slate-600 font-medium px-4 py-2 rounded-xl text-sm hover:border-slate-300 transition-colors">
+                  📅 آخر ٣٠ يوم
+                </button>
+                <button onClick={() => exportCSV('tasks')}
+                  className="flex items-center gap-2 bg-primary-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-primary-800 transition-colors shadow-sm">
+                  📥 تصدير التقرير
+                </button>
+              </div>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                {
+                  label: 'إجمالي الإيرادات', value: '١٢٤,٥٠٠', unit: 'رس.',
+                  growth: '+١٢٪', iconBg: 'bg-blue-50', icon: '💰',
+                  badge: null
+                },
+                {
+                  label: 'رسوم المنصة', value: '٦,٢٢٥', unit: 'رس.',
+                  sub: 'عمولة ٥٪', iconBg: 'bg-slate-50', icon: '🏷️',
+                  badge: null
+                },
+                {
+                  label: 'مدفوعات الموردين', value: '٨٥,٣٠٠', unit: 'رس.',
+                  iconBg: 'bg-red-50', icon: '📤',
+                  badge: `${tasks.filter(t=>t.status==='in_progress').length} طلبات معلقة`
+                },
+              ].map(({ label, value, unit, growth, sub, iconBg, icon, badge }) => (
+                <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-11 h-11 ${iconBg} rounded-xl flex items-center justify-center text-xl`}>{icon}</div>
+                    <div className="text-left">
+                      {growth && <span className="text-xs text-green-500 font-bold">↗ {growth}</span>}
+                      {sub && <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">{sub}</span>}
+                      {badge && <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-bold">{badge}</span>}
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-slate-900">{value} <span className="text-base font-medium text-slate-400">{unit}</span></p>
+                  <p className="text-xs text-slate-400 mt-1">{label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Charts Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* توزيع الميزانية */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <h3 className="font-bold text-slate-900 mb-4">توزيع الميزانية</h3>
+                <div className="flex items-center gap-6">
+                  {/* Donut chart */}
+                  <div className="relative w-32 h-32 flex-shrink-0">
+                    <svg viewBox="0 0 36 36" className="w-32 h-32 -rotate-90">
+                      <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" strokeWidth="3"/>
+                      <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1e3a8a" strokeWidth="3"
+                        strokeDasharray="75 25" strokeLinecap="round"/>
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-lg font-black text-slate-900">إجمالي</span>
+                      <span className="text-xl font-black text-primary-700">٪٧٥</span>
+                    </div>
+                  </div>
+                  {/* Legend */}
+                  <div className="space-y-3 flex-1">
+                    {[
+                      { label: 'مدفوعات الموردين', value: '٨٥,٣٠٠ رس', color: 'bg-primary-700' },
+                      { label: 'عمولة المنصة',    value: '٦,٢٢٥ رس',  color: 'bg-slate-400' },
+                      { label: 'مصاريف التشغيل', value: '٣,٤٠٠ رس',  color: 'bg-slate-200' },
+                    ].map(({ label, value, color }) => (
+                      <div key={label} className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2.5 h-2.5 rounded-full ${color} flex-shrink-0`}/>
+                          <span className="text-xs text-slate-500">{label}</span>
+                        </div>
+                        <span className="text-xs font-bold text-slate-700">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* الإيرادات الشهرية */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-primary-600"/>
+                    <span className="text-xs text-slate-400">الإيرادات</span>
+                  </div>
+                  <h3 className="font-bold text-slate-900">الإيرادات الشهرية</h3>
+                </div>
+                {/* Bar chart simulation */}
+                <div className="flex items-end gap-2 h-28 mt-2">
+                  {[
+                    { m: 'يناير', h: 40 }, { m: 'فبراير', h: 55 }, { m: 'مارس', h: 35 },
+                    { m: 'أبريل', h: 70 }, { m: 'مايو', h: 50 }, { m: 'يونيو', h: 85 },
+                  ].map(({ m, h }) => (
+                    <div key={m} className="flex-1 flex flex-col items-center gap-1">
+                      <div className="w-full rounded-t-lg bg-primary-100 relative" style={{ height: `${h}%` }}>
+                        <div className="absolute bottom-0 w-full bg-primary-600 rounded-t-lg" style={{ height: `${h * 0.6}%` }}/>
+                      </div>
+                      <span className="text-xs text-slate-400">{m}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* أحدث المعاملات */}
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <button className="w-8 h-8 border border-slate-200 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50">
+                    <AlertTriangle size={14} />
+                  </button>
+                  <div className="relative">
+                    <input placeholder="ابحث عن معاملة..." dir="rtl"
+                      className="border border-slate-200 rounded-xl px-4 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-primary-300" />
+                  </div>
+                </div>
+                <h3 className="font-bold text-slate-900">أحدث المعاملات</h3>
+              </div>
+              <table className="w-full text-sm" dir="rtl">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50">
+                    {['التاريخ','الجهة المستفيدة','المبلغ','النوع','الحالة','الإجراءات'].map(h => (
+                      <th key={h} className="px-5 py-3 text-right text-xs font-bold text-slate-400">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {tasks.slice(0,6).map((t, i) => {
+                    const types = ['دفع مورد','أتعاب وردية','تحصيل عقد','عمولة منصة','مدفوعات أخرى','رسوم خدمة']
+                    const statuses = [
+                      { label: 'تم التحويل', color: 'bg-green-50 text-green-600 border-green-200' },
+                      { label: 'قيد المعالجة', color: 'bg-amber-50 text-amber-500 border-amber-200' },
+                      { label: 'مستلم', color: 'bg-blue-50 text-blue-600 border-blue-200' },
+                    ]
+                    const st = statuses[i % 3]
+                    const amounts = ['١٢,٥٠٠','١,٢٠٠','٤٥,٠٠٠','٣,٨٠٠','٨,٩٠٠','٢,١٠٠']
+                    return (
+                      <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                        <td className="px-5 py-3.5">
+                          <p className="text-xs text-slate-600 font-medium">{new Date(t.created_at).toLocaleDateString('ar-SA', { day:'numeric', month:'long', year:'numeric' })}</p>
+                          <p className="text-xs text-slate-400">{new Date(t.created_at).toLocaleTimeString('ar-SA', { hour:'2-digit', minute:'2-digit' })}</p>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-xs flex-shrink-0">🏢</div>
+                            <span className="text-sm text-slate-700 font-medium">{t.title?.slice(0,16) || 'جهة غير محددة'}</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5 font-black text-slate-800">{amounts[i]} رس.</td>
+                        <td className="px-5 py-3.5 text-sm text-slate-500">{types[i % types.length]}</td>
+                        <td className="px-5 py-3.5">
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full border ${st.color}`}>
+                            <span className="w-1.5 h-1.5 rounded-full bg-current"/> {st.label}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <button className="text-xs text-primary-500 hover:text-primary-700 font-bold">التفاصيل</button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  {tasks.length === 0 && (
+                    <tr><td colSpan={6} className="px-5 py-10 text-center text-slate-400 text-sm">لا توجد معاملات بعد</td></tr>
+                  )}
+                </tbody>
+              </table>
+              {tasks.length > 0 && (
+                <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                  <div className="flex items-center gap-1">
+                    <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">›</button>
+                    <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">‹</button>
+                  </div>
+                  <span>عرض ٣٠-١ من أصل {tasks.length * 5} معاملة</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   )
