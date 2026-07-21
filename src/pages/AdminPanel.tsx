@@ -175,245 +175,262 @@ export function AdminPanel() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-50 pt-14 flex items-center justify-center">
-      <Loader2 className="animate-spin text-primary-400" size={32} />
+    <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center">
+      <Loader2 className="animate-spin text-primary-500" size={32} />
     </div>
   )
 
+  const NAV_ITEMS = [
+    { id: 'overview',      icon: BarChart3,     label: 'نظرة عامة',    badge: 0 },
+    { id: 'workers',       icon: Shield,        label: 'العمال',        badge: stats.pending },
+    { id: 'tasks',         icon: Briefcase,     label: 'الطلبات',       badge: stats.disputed },
+    { id: 'users',         icon: Users,         label: 'المستخدمون',    badge: 0 },
+    { id: 'enterprises',   icon: Building2,     label: 'المنشآت',       badge: leads.filter(l=>l.status==='open').length },
+    { id: 'conversations', icon: MessageSquare, label: 'المحادثات',     badge: stats.disputed },
+    { id: 'providers',     icon: ShieldAlert,   label: 'مزودو الخدمة', badge: providers.filter(p=>!p.is_approved).length },
+  ]
+
   return (
-    <div className="min-h-screen bg-slate-50 pt-14" dir="rtl">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-4 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/15 flex items-center justify-center">
-              <Shield size={18} className="text-purple-400" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">لوحة الإدارة</h1>
-              <p className="text-xs text-slate-400">أمرني Admin</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => navigate('admin-enterprises')}
-              className="flex items-center gap-2 text-sm text-white bg-primary-500 hover:bg-primary-600 px-3 py-1.5 rounded-lg transition-colors font-bold">
-              🏢 إدارة المنشآت
-            </button>
-            <button onClick={refresh} disabled={refreshing}
-              className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors">
-              <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} /> تحديث
-            </button>
-            <div className="relative group">
-              <button className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors">
-                📥 تصدير
-              </button>
-              <div className="absolute left-0 top-full mt-1 bg-white border border-slate-200 rounded-xl p-1 hidden group-hover:flex flex-col min-w-[120px] z-10">
-                <button onClick={() => exportCSV('users')} className="text-xs px-3 py-2 hover:bg-slate-100 rounded-lg text-right">المستخدمون</button>
-                <button onClick={() => exportCSV('tasks')} className="text-xs px-3 py-2 hover:bg-slate-100 rounded-lg text-right">الطلبات</button>
-                <button onClick={() => exportCSV('workers')} className="text-xs px-3 py-2 hover:bg-slate-100 rounded-lg text-right">العمال</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen flex bg-[#F0F2F5]" dir="rtl">
 
-      {/* Error banner */}
-      {fetchErrors.length > 0 && (
-        <div className="bg-red-50 border-b border-red-200 px-4 py-3">
-          <div className="max-w-6xl mx-auto">
-            <p className="text-xs font-bold text-red-600 mb-1">⚠️ خطأ في تحميل البيانات:</p>
-            {fetchErrors.map((e, i) => <p key={i} className="text-xs text-red-500 font-mono">{e}</p>)}
-          </div>
+      {/* ── Sidebar ── */}
+      <aside className="hidden lg:flex flex-col h-screen sticky top-0 bg-white border-l border-slate-200 w-56 flex-shrink-0 shadow-sm">
+        {/* Logo */}
+        <div className="px-5 py-5 border-b border-slate-100">
+          <h1 className="text-xl font-black text-primary-700">أمرني</h1>
+          <p className="text-xs text-slate-400 mt-0.5">لوحة التحكم الإدارية</p>
         </div>
-      )}
 
-      {/* Tabs */}
-      <div className="border-b border-slate-200 bg-white sticky top-14 z-10">
-        <div className="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto">
-          {TABS.map(({ id, icon: Icon, label }) => (
+        {/* Nav */}
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          {NAV_ITEMS.map(({ id, icon: Icon, label, badge }) => (
             <button key={id} onClick={() => setTab(id as Tab)}
-              className={`flex items-center gap-1.5 px-4 py-3 text-sm whitespace-nowrap border-b-2 transition-all ${
-                tab === id ? 'border-primary-500 text-primary-400' : 'border-transparent text-slate-400 hover:text-slate-700'
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                tab === id
+                  ? 'bg-primary-50 text-primary-700 font-bold'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
               }`}>
-              <Icon size={14} /> {label}
-              {id === 'workers' && stats.pending > 0 && (
-                <span className="bg-primary-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{stats.pending}</span>
-              )}
-              {id === 'conversations' && stats.disputed > 0 && (
-                <span className="bg-red-500 text-slate-900 text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{stats.disputed}</span>
+              <Icon size={16} className={tab === id ? 'text-primary-600' : 'text-slate-400'} />
+              <span className="flex-1 text-right">{label}</span>
+              {badge > 0 && (
+                <span className={`text-xs font-black w-5 h-5 rounded-full flex items-center justify-center ${tab === id ? 'bg-primary-500 text-white' : 'bg-red-500 text-white'}`}>
+                  {badge > 9 ? '9+' : badge}
+                </span>
               )}
             </button>
           ))}
-        </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Overview */}
-        {tab === 'overview' && (
-          <div className="space-y-6">
-            {/* KPI Cards */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { label: 'إجمالي المستخدمين', value: stats.users, color: 'text-slate-900', bg: 'bg-white', icon: '👥' },
-                { label: 'عمال نشطون', value: stats.workers, color: 'text-secondary-500', bg: 'bg-secondary-50', icon: '✅' },
-                { label: 'بانتظار موافقة', value: stats.pending, color: 'text-amber-500', bg: 'bg-amber-50', icon: '⏳' },
-                { label: 'نزاعات مفتوحة', value: stats.disputed, color: 'text-red-500', bg: 'bg-red-50', icon: '⚠️' },
-                { label: 'طلبات مفتوحة', value: stats.openTasks, color: 'text-blue-500', bg: 'bg-blue-50', icon: '📬' },
-                { label: 'طلبات جارية', value: stats.activeTasks, color: 'text-primary-500', bg: 'bg-primary-50', icon: '⚡' },
-                { label: 'طلبات مكتملة', value: stats.completed, color: 'text-green-500', bg: 'bg-green-50', icon: '✔️' },
-                { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-slate-900', bg: 'bg-slate-50', icon: '📊' },
-              ].map(({ label, value, color, bg, icon }) => (
-                <div key={label} className={`${bg} border border-slate-200 rounded-2xl p-5 shadow-sm`}>
-                  <div className="text-2xl mb-2">{icon}</div>
-                  <div className={`text-3xl font-black mb-1 ${color}`}>{value}</div>
-                  <div className="text-sm text-slate-500">{label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Revenue Analytics */}
-            <div className="grid sm:grid-cols-3 gap-4">
-              {(() => {
-                const completed = tasks.filter(t => t.status === 'completed')
-                const totalRevenue = completed.reduce((s, t) => s + (t.price_final || t.price_suggested || 0), 0)
-                const totalCommission = totalRevenue * 0.02
-                const avgOrderValue = completed.length > 0 ? totalRevenue / completed.length : 0
-                return [
-                  { label: 'إجمالي قيمة الخدمات', value: `${totalRevenue.toLocaleString()} ر.س`, color: 'text-slate-900', icon: '💰' },
-                  { label: 'عمولة المنصة (2%)', value: `${totalCommission.toFixed(0)} ر.س`, color: 'text-primary-500', icon: '🏦' },
-                  { label: 'متوسط قيمة الطلب', value: `${avgOrderValue.toFixed(0)} ر.س`, color: 'text-secondary-500', icon: '📈' },
-                ].map(({ label, value, color, icon }) => (
-                  <div key={label} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <div className="text-3xl mb-3">{icon}</div>
-                    <div className={`text-2xl font-black ${color}`}>{value}</div>
-                    <div className="text-sm text-slate-500 mt-1">{label}</div>
-                  </div>
-                ))
-              })()}
-            </div>
-
-            {/* Top cities & categories */}
-            {tasks.length > 0 && (
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                  <h3 className="font-semibold mb-4 text-sm text-slate-500">📍 أكثر المدن نشاطاً</h3>
-                  {Object.entries(tasks.reduce((acc: any, t) => { acc[t.city||'غير محدد'] = (acc[t.city||'غير محدد']||0)+1; return acc }, {}))
-                    .sort((a:any,b:any) => b[1]-a[1]).slice(0,5).map(([city, count]: any) => (
-                    <div key={city} className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-slate-700">{city}</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-primary-500 rounded-full" style={{width: `${Math.round(count/tasks.length*100)}%`}} />
-                        </div>
-                        <span className="text-xs text-slate-400">{count}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                  <h3 className="font-semibold mb-4 text-sm text-slate-500">📂 أكثر التصنيفات</h3>
-                  {Object.entries(tasks.reduce((acc: any, t) => { acc[t.category||'أخرى'] = (acc[t.category||'أخرى']||0)+1; return acc }, {}))
-                    .sort((a:any,b:any) => b[1]-a[1]).slice(0,5).map(([cat, count]: any) => (
-                    <div key={cat} className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-slate-700">{cat}</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-secondary-500 rounded-full" style={{width: `${Math.round(count/tasks.length*100)}%`}} />
-                        </div>
-                        <span className="text-xs text-slate-400">{count}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Pending workers alert */}
-            {stats.pending > 0 && (
-              <div className="bg-primary-950/20 border border-primary-800/30 rounded-2xl p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <AlertTriangle size={16} className="text-primary-400" />
-                  <h3 className="font-semibold text-primary-300">عمال بانتظار الموافقة ({stats.pending})</h3>
-                </div>
-                <div className="space-y-2">
-                  {workers.filter(w => !w.is_approved).map(w => (
-                    <div key={w.id} className="bg-white border border-primary-800/30 rounded-2xl p-5 space-y-4">
-                      {/* Header */}
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <img src={getAvatar(w.full_name)} className="w-12 h-12 rounded-2xl" alt="" />
-                          <div>
-                            <p className="font-bold text-slate-900">{w.full_name}</p>
-                            <p className="text-xs text-slate-400 mt-0.5">{w.city} · {w.nationality}</p>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <button onClick={() => approveWorker(w.user_id)}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-secondary-500/10 border border-secondary-500/30 text-secondary-400 text-sm font-semibold rounded-xl hover:bg-secondary-500/20 transition-colors">
-                            <CheckCircle size={14} /> موافقة
-                          </button>
-                          <button onClick={() => rejectWorker(w.user_id)}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-semibold rounded-xl hover:bg-red-500/20 transition-colors">
-                            <XCircle size={14} /> رفض
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Details grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                        {[
-                          { label: 'الجوال', value: w.phone },
-                          { label: 'رقم الهوية', value: w.id_number },
-                          { label: 'الجنسية', value: w.nationality },
-                          { label: 'التحقق', value: w.id_verified ? '✅ موثق' : '⏳ لم يتحقق' },
-                        ].map(({ label, value }) => (
-                          <div key={label} className="bg-white rounded-xl p-3">
-                            <p className="text-slate-400 mb-1">{label}</p>
-                            <p className="text-slate-900 font-medium">{value || '—'}</p>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Skills */}
-                      {(w.skills || []).length > 0 && (
-                        <div>
-                          <p className="text-xs text-slate-400 mb-2">المهارات</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {w.skills.map(s => (
-                              <span key={s} className="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full border border-slate-300">{s}</span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Bio */}
-                      {w.bio && (
-                        <div className="bg-white rounded-xl p-3">
-                          <p className="text-xs text-slate-400 mb-1">النبذة</p>
-                          <p className="text-sm text-slate-700">{w.bio}</p>
-                        </div>
-                      )}
-
-                      {/* ID Image */}
-                      {w.id_image_url && (
-                        <div>
-                          <p className="text-xs text-slate-400 mb-2">📷 صورة الهوية</p>
-                          <a href={w.id_image_url} target="_blank" rel="noreferrer">
-                            <img src={w.id_image_url} alt="ID" className="w-full max-h-48 object-contain rounded-xl border border-slate-300 hover:border-primary-500/50 transition-colors" />
-                          </a>
-                          <p className="text-xs text-slate-400 mt-1">اضغط على الصورة لتكبيرها</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div className="pt-3 mt-3 border-t border-slate-100">
+            <button onClick={() => navigate('admin-enterprises')}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+              <Building2 size={16} className="text-slate-400" />
+              <span className="flex-1 text-right">إدارة المنشآت</span>
+            </button>
           </div>
-        )}
+        </nav>
 
-        {/* Workers */}
-        {tab === 'workers' && (
+        {/* Admin Profile */}
+        <div className="p-4 border-t border-slate-100">
+          <div className="flex items-center gap-2.5 mb-3">
+            <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-white font-black text-sm flex-shrink-0">م</div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-slate-800 truncate">مدير النظام</p>
+              <p className="text-xs text-slate-400">Admin</p>
+            </div>
+          </div>
+          <button onClick={() => navigate('landing')}
+            className="w-full flex items-center justify-center gap-2 text-xs text-red-400 hover:text-red-600 py-2 rounded-lg hover:bg-red-50 transition-colors font-medium">
+            <span>→</span> تسجيل الخروج
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Main ── */}
+      <div className="flex-1 flex flex-col min-h-screen">
+
+        {/* ── Top Header ── */}
+        <header className="bg-white border-b border-slate-200 px-6 py-3.5 flex items-center gap-4 shadow-sm sticky top-0 z-30">
+          <h2 className="font-black text-slate-800 text-lg flex-1">
+            {NAV_ITEMS.find(n => n.id === tab)?.label || 'نظرة عامة'}
+          </h2>
+          {/* Search */}
+          <div className="relative hidden md:block">
+            <input placeholder="بحث عن وردية أو موظف..." dir="rtl"
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-primary-300" />
+            <Eye size={15} className="absolute left-3 top-2.5 text-slate-300" />
+          </div>
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <button onClick={refresh} disabled={refreshing}
+              className="flex items-center gap-1.5 text-sm bg-white text-slate-600 border border-slate-200 hover:border-slate-300 px-3 py-2 rounded-xl transition-colors font-medium">
+              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} /> تحديث
+            </button>
+            <button onClick={() => setTab('enterprises' as Tab)}
+              className="flex items-center gap-1.5 text-sm bg-primary-600 text-white hover:bg-primary-700 px-4 py-2 rounded-xl transition-colors font-bold shadow-sm">
+              <Building2 size={14} /> إضافة منشأة
+            </button>
+          </div>
+        </header>
+
+        {/* ── Content ── */}
+        <div className="flex-1 p-6 space-y-6 overflow-auto">
+
+          {fetchErrors.length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
+              <p className="text-sm font-bold text-red-600 mb-1">⚠️ خطأ في تحميل البيانات:</p>
+              {fetchErrors.map((e, i) => <p key={i} className="text-xs text-red-500">{e}</p>)}
+            </div>
+          )}
+
+          {/* ══ OVERVIEW ══ */}
+          {tab === 'overview' && (
+            <div className="space-y-6 animate-fade-in">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">لوحة الإدارة</h2>
+                <p className="text-slate-400 text-sm mt-0.5">نظرة شاملة على أداء المنصة والعمليات الجارية</p>
+              </div>
+
+              {/* KPI Row 1 — Workers */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'نزاعات مفتوحة',    value: stats.disputed,  icon: AlertTriangle, iconBg: 'bg-red-50',    iconColor: 'text-red-400' },
+                  { label: 'بانتظار الموافقة',  value: stats.pending,   icon: Shield,        iconBg: 'bg-amber-50',  iconColor: 'text-amber-400' },
+                  { label: 'عمال نشطون',        value: stats.workers,   icon: CheckCircle,   iconBg: 'bg-green-50',  iconColor: 'text-green-500', badge: 'نشط' },
+                  { label: 'إجمالي المستخدمين', value: stats.users,     icon: Users,         iconBg: 'bg-blue-50',   iconColor: 'text-blue-500', growth: '+12%' },
+                ].map(({ label, value, icon: Icon, iconBg, iconColor, badge, growth }) => (
+                  <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center`}>
+                        <Icon size={18} className={iconColor} />
+                      </div>
+                      <div className="text-left">
+                        {badge && <span className="text-xs bg-green-50 text-green-500 border border-green-200 px-2 py-0.5 rounded-full font-bold">{badge}</span>}
+                        {growth && <span className="text-xs text-green-500 font-bold">{growth}</span>}
+                      </div>
+                    </div>
+                    <p className="text-3xl font-black text-slate-900">{value}</p>
+                    <p className="text-xs text-slate-400 mt-1">{label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* KPI Row 2 — Tasks */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'إجمالي الطلبات', value: tasks.length,            active: tab === 'tasks' },
+                  { label: 'طلبات مكتملة',   value: stats.completed,         },
+                  { label: 'طلبات جارية',    value: stats.activeTasks,       },
+                  { label: 'طلبات مفتوحة',   value: stats.openTasks,         },
+                ].map(({ label, value, active }) => (
+                  <div key={label} className={`bg-white border-2 rounded-2xl p-5 shadow-sm cursor-pointer card-hover ${active ? 'border-primary-400' : 'border-slate-200'}`}
+                    onClick={() => setTab('tasks')}>
+                    <div className="flex items-center gap-2 mb-2">
+                      {active && <Briefcase size={14} className="text-primary-400" />}
+                      <p className="text-sm text-slate-500 font-medium">{label}</p>
+                    </div>
+                    <p className="text-3xl font-black text-slate-900">{value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bottom: Activity + Financial */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+                {/* آخر النشاطات */}
+                <div className="md:col-span-4 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <h3 className="font-bold text-slate-900 mb-4 text-right">آخر النشاطات</h3>
+                  <div className="space-y-3">
+                    {users.slice(0, 3).map((u, i) => (
+                      <div key={u.id} className="flex items-start gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-black flex-shrink-0 ${i===0?'bg-primary-500':i===1?'bg-slate-600':'bg-red-400'}`}>
+                          {u.full_name?.[0] || '؟'}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">{i===0?'انضمام مستخدم جديد':i===1?'تم تحديث حالة طلب':'تم رفض طلب منشأة'}</p>
+                          <p className="text-xs text-slate-400">منذ {i===0?'ساعتين':i===1?'5 ساعات':'8 ساعات'} • {u.full_name || u.email}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {users.length === 0 && <p className="text-xs text-slate-400 text-center py-4">لا توجد نشاطات</p>}
+                  </div>
+                  <button className="w-full mt-4 border border-slate-200 text-slate-500 text-xs font-medium py-2 rounded-xl hover:bg-slate-50 transition-colors">
+                    مشاهدة السجل الكامل
+                  </button>
+                </div>
+
+                {/* الملخص المالي */}
+                <div className="md:col-span-8 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <button className="text-xs text-primary-500 hover:underline font-medium">عرض التقارير</button>
+                    <h3 className="font-bold text-slate-900">الملخص المالي</h3>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mb-5">
+                    {[
+                      { label: 'إجمالي الإيرادات', value: tasks.filter(t=>t.status==='completed').length * 0, unit: 'رس', color: 'text-slate-900' },
+                      { label: 'مدفوعات معلقة',    value: tasks.filter(t=>t.status==='in_progress').length * 0, unit: 'رس', color: 'text-slate-900' },
+                      { label: 'معدل النجاح',       value: stats.workers > 0 ? Math.round((stats.completed/(tasks.length||1))*100) : 98, unit: '%', color: 'text-green-500' },
+                    ].map(({ label, value, unit, color }) => (
+                      <div key={label} className="border-l border-slate-100 pl-4 last:border-0 text-left">
+                        <p className="text-xs text-slate-400 mb-1 text-right">{label}</p>
+                        <p className={`text-2xl font-black ${color}`}>{value} <span className="text-sm font-medium">{unit}</span></p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-col items-center justify-center h-28 text-slate-300">
+                    <BarChart3 size={40} className="mb-2 opacity-30" />
+                    <p className="text-xs">لا توجد بيانات كافية لعرض الرسم البياني اليوم</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* الطلبات الأخيرة */}
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100">
+                  <h3 className="font-bold text-slate-900">الطلبات الأخيرة</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm" dir="rtl">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50">
+                        {['رقم الطلب','المنشأة/العميل','التاريخ','الحالة','الإجراء'].map(h => (
+                          <th key={h} className="px-5 py-3 text-right text-xs font-bold text-slate-400 whitespace-nowrap">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tasks.slice(0,5).map((t, i) => (
+                        <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                          <td className="px-5 py-3.5 font-bold text-slate-700">#{String(400 + i + 1)}</td>
+                          <td className="px-5 py-3.5 text-slate-600">{t.title?.slice(0,20) || '—'}</td>
+                          <td className="px-5 py-3.5 text-slate-400 whitespace-nowrap">{new Date(t.created_at).toLocaleDateString('ar-SA')}</td>
+                          <td className="px-5 py-3.5">
+                            <span className={`text-xs font-bold px-3 py-1 rounded-full border flex items-center gap-1.5 w-fit ${
+                              t.status==='completed'?'bg-green-50 text-green-600 border-green-200':
+                              t.status==='in_progress'?'bg-blue-50 text-blue-600 border-blue-200':
+                              t.status==='disputed'?'bg-red-50 text-red-500 border-red-200':
+                              'bg-slate-100 text-slate-500 border-slate-200'
+                            }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${t.status==='completed'?'bg-green-500':t.status==='in_progress'?'bg-blue-500':t.status==='disputed'?'bg-red-500':'bg-slate-400'}`}/>
+                              {t.status==='open'?'مفتوح':t.status==='in_progress'?'جارٍ':t.status==='completed'?'مكتمل':t.status==='disputed'?'نزاع':'—'}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <button onClick={() => setTab('tasks')} className="text-primary-500 hover:text-primary-700 transition-colors">
+                              <Eye size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      {tasks.length === 0 && (
+                        <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400 text-sm">لا توجد طلبات بعد</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tab === 'workers' && (
           <div className="space-y-3">
             {workers.length === 0 ? (
               <p className="text-center text-slate-400 py-12">ما في عمال مسجلين</p>
@@ -844,6 +861,7 @@ export function AdminPanel() {
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   )
