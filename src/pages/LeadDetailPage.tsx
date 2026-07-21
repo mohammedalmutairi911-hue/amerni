@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { ArrowRight, CheckCircle2, Clock, X, Loader2, AlertCircle, MessageSquare, ThumbsUp, ThumbsDown, LayoutDashboard, List, Plus, LogOut, Building2, FileText, DollarSign } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Clock, X, Loader2, AlertCircle, MessageSquare, LayoutDashboard, List, Plus, LogOut, Building2, FileText, DollarSign } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import { ProviderProfileCard } from '../components/enterprise/ProviderProfileCard'
@@ -257,24 +257,21 @@ export function LeadDetailPage() {
               {/* انتظار موافقة الشركة */}
               {isMatchedPending && (
                 <div className="space-y-4">
-                  <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
                     <span className="text-2xl">🎉</span>
                     <div>
-                      <p className="font-bold text-amber-800">مزود خدمة قبِل طلبك!</p>
-                      <p className="text-sm text-amber-600 mt-0.5">راجع ملفه أدناه وأكّد موافقتك للبدء في التواصل</p>
+                      <p className="font-bold text-blue-800">مزود خدمة قبِل طلبك!</p>
+                      <p className="text-sm text-blue-600 mt-0.5">راجع ملفه أدناه وأكّد موافقتك للبدء في التواصل</p>
                     </div>
                   </div>
-                  <ProviderProfileCard providerId={lead.provider_id} />
-                  <div className="grid grid-cols-2 gap-3">
-                    <button onClick={acceptProvider} disabled={accepting}
-                      className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-green-500/20">
-                      {accepting ? <Loader2 size={16} className="animate-spin" /> : <><ThumbsUp size={18} /> نعم، أوافق</>}
-                    </button>
-                    <button onClick={changeProvider} disabled={changing}
-                      className="bg-white border-2 border-red-200 text-red-500 hover:bg-red-50 font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                      {changing ? <Loader2 size={16} className="animate-spin" /> : <><ThumbsDown size={18} /> أريد مزوداً آخر</>}
-                    </button>
-                  </div>
+                  <ProviderProfileCard
+                    providerId={lead.provider_id}
+                    showActions={true}
+                    onAccept={acceptProvider}
+                    onReject={changeProvider}
+                    accepting={accepting}
+                    rejecting={changing}
+                  />
                 </div>
               )}
 
@@ -285,7 +282,7 @@ export function LeadDetailPage() {
                     <CheckCircle2 size={16} className="text-green-500 flex-shrink-0" />
                     <p className="text-sm font-bold text-green-700">وافقت على المزود — تواصل معه الآن</p>
                   </div>
-                  <ProviderProfileCard providerId={lead.provider_id} />
+                  <ProviderProfileCard providerId={lead.provider_id} showActions={false} />
                   <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                     <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-2">
                       <MessageSquare size={15} className="text-primary-500" />
