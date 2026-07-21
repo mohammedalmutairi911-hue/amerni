@@ -277,424 +277,502 @@ export function WorkerDashboard() {
     </div>
   )
 
+  const BADGES = [
+    { icon: '🏆', label: 'بطل الشهر', sub: 'أكتوبر 2024', locked: false },
+    { icon: '⏰', label: 'ملتزم بالوقت', sub: '15 وردية متتالية', locked: false },
+    { icon: '🤝', label: 'المساعد المثالي', sub: 'تبادل ورديات مرن', locked: false },
+    { icon: '🔒', label: 'منقذ الموقف', sub: 'قريباً...', locked: true },
+  ]
+  const LEADERBOARD = [
+    { rank: 1, name: 'سارة حسن', dept: 'إدارة العمليات', score: '98%', me: false },
+    { rank: 2, name: 'ليلى مراد', dept: 'فريق التوزيع', score: '95%', me: false },
+    { rank: 3, name: profile?.full_name || 'أنت', dept: 'فريق الدعم', score: '90%', me: true },
+    { rank: 4, name: 'ياسين عمر', dept: 'قسم اللوجستيات', score: '88%', me: false },
+  ]
+  const SHIFTS = [
+    { name: 'سارة أحمد', role: 'ممرض أول', type: 'صباحي', typeIcon: '🌤️', date: 'الاثنين، 15 مايو 2024', time: '08:00 ص - 04:00 م' },
+    { name: 'محمد خالد', role: 'مشرف وردية', type: 'ليلي', typeIcon: '🌙', date: 'الثلاثاء، 16 مايو 2024', time: '12:00 ص - 08:00 ص' },
+    { name: 'ليلى عمر', role: 'فني مختبر', type: 'مسائي', typeIcon: '🌅', date: 'الأربعاء، 17 مايو 2024', time: '04:00 م - 12:00 ص' },
+    { name: 'أحمد محمود', role: 'أخصائي تقني', type: 'صباحي', typeIcon: '🌤️', date: 'الخميس، 18 مايو 2024', time: '08:00 ص - 04:00 م' },
+  ]
+  const HEATMAP_DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس']
+  const HEATMAP_DATA = [
+    [1,2,3,4,3,2,1,1,1,1,1,1],
+    [2,3,4,4,4,3,2,2,1,1,1,1],
+    [1,1,2,3,3,2,1,1,1,1,1,1],
+    [1,1,1,2,2,1,1,1,1,1,1,1],
+    [2,3,4,4,3,2,1,1,1,1,1,1],
+  ]
+  const heatColor = (v: number) => ['bg-slate-100','bg-primary-100','bg-primary-300','bg-primary-600','bg-primary-800'][v] || 'bg-slate-100'
+
+  const NAV = [
+    { id: 'overview', icon: Home, label: 'الرئيسية' },
+    { id: 'shifts', icon: Calendar, label: 'الورديات' },
+    { id: 'my-tasks', icon: Briefcase, label: 'الطلبات', badge: activeTasks.length },
+    { id: 'analytics', icon: BarChart2, label: 'التحليلات' },
+    { id: 'achievements', icon: Star, label: 'الإنجازات' },
+  ]
+
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans" dir="rtl">
+    <div className="min-h-screen bg-[#f8f9fa]" dir="rtl">
 
-      {/* Sidebar - Desktop - LEFT side like design */}
-      <aside className="hidden md:flex flex-col h-screen fixed left-0 top-0 bg-white border-r border-slate-200 w-64 z-50 shadow-sm">
-        <div className="p-6 border-b border-slate-100">
-          <button onClick={() => navigate('landing')} className="text-xl font-black text-primary-500 hover:opacity-80 transition-opacity">آمرني</button>
-        </div>
-
-        {/* Profile */}
-        <div className="px-4 py-4 flex items-center gap-3 border-b border-slate-100">
-          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-500 font-black text-lg flex-shrink-0">
+      {/* ── Top App Bar ── */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm h-16 flex flex-row-reverse justify-between items-center px-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary-600 flex items-center justify-center text-white font-black text-lg overflow-hidden">
             {profile?.full_name?.[0] || '؟'}
           </div>
-          <div>
-            <p className="text-sm font-bold text-slate-900">{profile?.full_name}</p>
-            <div className="flex items-center gap-1">
-              <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">محترف موثق</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 p-3 space-y-1">
-          {[
-            { id: 'overview', icon: BarChart2, label: 'نظرة عامة' },
-            { id: 'feed', icon: Zap, label: 'الطلبات المتاحة', badge: filteredFeed.length },
-            { id: 'my-tasks', icon: Briefcase, label: 'طلباتي', badge: activeTasks.length },
-            { id: 'chat', icon: MessageSquare, label: 'المحادثات' },
-            { id: 'profile', icon: User, label: 'ملفي الشخصي' },
-          ].map(({ id, icon: Icon, label, badge }) => (
-            <button key={id} onClick={() => setTab(id as any)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
-                tab === id ? 'bg-primary-500 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-              }`}>
-              <Icon size={16} />
-              <span className="flex-1 text-right">{label}</span>
-              {badge !== undefined && badge > 0 && (
-                <span className={`text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold ${tab === id ? 'bg-white text-primary-500' : 'bg-primary-500 text-white'}`}>
-                  {badge > 9 ? '9+' : badge}
-                </span>
-              )}
-            </button>
-          ))}
-        </nav>
-
-        <div className="p-4 border-t border-slate-100 space-y-3">
-          <button onClick={toggleOnline} disabled={toggling}
-            className={`w-full py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-              workerProfile?.is_online ? 'bg-secondary-500 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200'
-            }`}>
-            {toggling ? <Loader2 size={14} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={14} /> متاح الآن</> : <><WifiOff size={14} /> غير متاح</>}
+          <button className="relative w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 rounded-full">
+            🔔
           </button>
-          <div className="flex gap-2 text-xs justify-center">
-            <button onClick={() => navigate('support')} className="text-slate-400 hover:text-slate-600">مركز المساعدة</button>
-            <span className="text-slate-300">•</span>
-            <button onClick={async () => { await signOut(); navigate('landing') }} className="text-red-400 hover:text-red-500 font-medium flex items-center gap-1">
-              <LogOut size={11} /> تسجيل الخروج
-            </button>
-          </div>
         </div>
-      </aside>
+        <h1 className="text-xl font-black text-primary-700">أمرني</h1>
+      </header>
 
-      {/* Main */}
-      <main className="flex-1 md:mr-0 md:ml-64 min-h-screen pb-20 md:pb-0">
+      {/* ── Main ── */}
+      <main className="pt-20 pb-24 px-4 max-w-2xl mx-auto">
 
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shadow-sm">
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate('landing')} className="md:hidden text-lg font-black text-primary-500 hover:opacity-80 transition-opacity">آمرني</button>
-            <div className="hidden md:block">
-              <h2 className="text-2xl font-black text-slate-900">لوحة تحكم مقدم الخدمة</h2>
-              <p className="text-slate-600 text-sm font-medium mt-0.5">
-                مرحباً <span className="text-primary-500 font-bold">{profile?.full_name?.split(' ')[0]}</span> 👋 — إليك أداءك اليوم
-              </p>
+        {/* Commission Modal */}
+        {showCommission && pendingTask && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/80 p-0">
+            <div className="w-full max-w-sm bg-white rounded-t-2xl p-5 shadow-xl">
+              <h2 className="text-base font-bold text-slate-900 text-center mb-3">شروط قبول الطلب</h2>
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-3 mb-3">
+                <p className="text-sm font-bold">{pendingTask.title}</p>
+              </div>
+              <p className="text-sm text-slate-600 mb-4">أتعهد بتحويل عمولة <b className="text-primary-600">2%</b> من قيمة الطلب خلال 72 ساعة.</p>
+              <div className="flex gap-3">
+                <button onClick={() => { setShowCommission(false); setPendingTask(null) }} className="flex-1 border border-slate-200 py-3 rounded-xl text-sm">إلغاء</button>
+                <button onClick={confirmAcceptTask} className="flex-1 bg-primary-700 text-white font-bold py-3 rounded-xl text-sm">أوافق وأقبل</button>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-3 bg-slate-100 px-4 py-2.5 rounded-full border border-slate-200">
-            <span className="text-sm text-slate-600 font-medium">
-              الحالة: <span className={`font-bold ${workerProfile?.is_online ? 'text-secondary-500' : 'text-red-400'}`}>
-                {workerProfile?.is_online ? 'متاح' : 'غير متاح'}
-              </span>
-            </span>
-            <button onClick={toggleOnline} disabled={toggling}
-              className={`relative w-11 h-6 rounded-full transition-all ${workerProfile?.is_online ? 'bg-secondary-500' : 'bg-slate-300'}`}>
-              <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${workerProfile?.is_online ? 'right-0.5' : 'left-0.5'}`} />
-            </button>
-          </div>
-        </header>
+        )}
 
-        <div className="p-4 md:p-8 space-y-6">
+        {/* ══ OVERVIEW ══ */}
+        {(tab === 'overview' || !['shifts','my-tasks','analytics','achievements'].includes(tab)) && (
+          <div className="space-y-5 animate-fade-in">
+            <div>
+              <h2 className="text-2xl font-black text-primary-700 mb-1">لوحة العامل</h2>
+              <p className="text-slate-500 text-sm">مرحباً، {profile?.full_name?.split(' ')[0]} 👋 — إليك أداءك اليوم</p>
+            </div>
 
-          {/* Mobile Welcome */}
-          <div className="md:hidden bg-primary-50 border border-primary-100 rounded-2xl px-5 py-4">
-            <p className="text-slate-500 text-xs mb-0.5">مرحباً 👋</p>
-            <h2 className="text-xl font-black text-slate-900">{profile?.full_name?.split(' ')[0]}</h2>
-            <p className="text-slate-500 text-xs mt-0.5">إليك أداءك اليوم</p>
-          </div>
+            {/* KPI */}
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: 'طلبات مكتملة', value: completedTasks.length, icon: '✅', sub: `+${thisMonth} هذا الشهر` },
+                { label: 'إجمالي الأرباح', value: `${totalEarnings.toLocaleString()} ر`, icon: '💰', sub: 'بعد العمولة' },
+                { label: 'تقييمي', value: `${workerProfile?.rating?.toFixed(1) || '0.0'} ⭐`, icon: '⭐', sub: `${workerProfile?.total_reviews || 0} تقييم` },
+                { label: 'طلبات نشطة', value: activeTasks.length, icon: '🔄', sub: 'جارٍ تنفيذها' },
+              ].map(({ label, value, icon, sub }) => (
+                <div key={label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <p className="text-2xl mb-1">{icon}</p>
+                  <p className="text-2xl font-black text-slate-900">{value}</p>
+                  <p className="text-xs font-bold text-slate-600 mt-0.5">{label}</p>
+                  <p className="text-xs text-slate-400">{sub}</p>
+                </div>
+              ))}
+            </div>
 
-          {/* Overview Tab */}
-          {tab === 'overview' && (
-            <>
-              {/* KPI Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {[
-                  {
-                    icon: DollarSign, label: 'إجمالي الأرباح', value: `${totalEarnings.toLocaleString()} ر.س`,
-                    badge: '+12% مقارنة بالأسبوع الماضي', badgeColor: 'bg-green-100 text-green-600',
-                    iconBg: 'bg-primary-50', iconColor: 'text-primary-500',
-                  },
-                  {
-                    icon: Star, label: 'متوسط التقييم', value: workerProfile?.rating ? workerProfile.rating.toFixed(1) : '—',
-                    badge: 'الأفضل في المنطقة', badgeColor: 'bg-slate-100 text-slate-500',
-                    iconBg: 'bg-amber-50', iconColor: 'text-amber-500',
-                    extra: workerProfile?.rating ? (
-                      <div className="flex gap-0.5 mt-1">
-                        {[1,2,3,4,5].map(s => <Star key={s} size={12} className={s <= Math.round(workerProfile.rating) ? 'text-amber-400 fill-amber-400' : 'text-slate-200'} />)}
-                      </div>
-                    ) : null
-                  },
-                  {
-                    icon: CheckCircle, label: 'طلبات مكتملة', value: completedTasks.length.toString(),
-                    badge: `${thisMonth} هذا الشهر`, badgeColor: 'bg-blue-50 text-blue-600',
-                    iconBg: 'bg-green-50', iconColor: 'text-green-500',
-                  },
-                ].map(({ icon: Icon, label, value, badge, badgeColor, iconBg, iconColor, extra }: any) => (
-                  <div key={label} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`p-3 rounded-xl ${iconBg}`}>
-                        <Icon size={20} className={iconColor} />
-                      </div>
-                      <span className={`text-xs font-bold px-2 py-1 rounded-full ${badgeColor}`}>{badge}</span>
-                    </div>
-                    <p className="text-slate-500 text-sm">{label}</p>
-                    <p className="text-3xl font-black text-primary-500 mt-1">{value}</p>
-                    {extra}
+            {/* Status Toggle */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+              <div>
+                <p className="font-bold text-slate-800">حالتك الآن</p>
+                <p className="text-xs text-slate-400 mt-0.5">{workerProfile?.is_online ? 'تظهر للعملاء في الفيد' : 'مخفي عن العملاء'}</p>
+              </div>
+              <button onClick={toggleOnline} disabled={toggling}
+                className={`flex items-center gap-2 font-bold px-5 py-2.5 rounded-xl text-sm transition-all ${workerProfile?.is_online ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
+                {toggling ? <Loader2 size={14} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={14} /> متاح</> : <><WifiOff size={14} /> غير متاح</>}
+              </button>
+            </div>
+
+            {/* Latest tasks */}
+            {myTasks.slice(0,3).length > 0 && (
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                  <button onClick={() => setTab('my-tasks')} className="text-xs text-primary-600 font-bold">عرض الكل</button>
+                  <p className="font-bold text-slate-900 text-sm">آخر الطلبات</p>
+                </div>
+                {myTasks.slice(0,3).map(t => (
+                  <div key={t.id} className="px-4 py-3 border-b border-slate-50 last:border-0 flex items-center justify-between">
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${STATUS_COLOR[t.status]}`}>{STATUS_LABEL[t.status]}</span>
+                    <p className="text-sm font-medium text-slate-800 truncate max-w-[60%]">{t.title}</p>
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+        )}
 
-              {/* Upcoming + Insights */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
-                {/* Upcoming Bookings */}
-                <div className="lg:col-span-2 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-slate-900 text-lg">الطلبات القادمة</h3>
-                    <button onClick={() => setTab('my-tasks')} className="text-primary-500 text-sm font-semibold hover:underline">عرض الكل</button>
-                  </div>
-
-                  {activeTasks.length === 0 ? (
-                    <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
-                      <Zap size={32} className="text-slate-200 mx-auto mb-3" />
-                      <p className="text-slate-400 text-sm mb-4">ما في طلبات نشطة</p>
-                      <button onClick={() => setTab('feed')} className="bg-primary-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-primary-700 transition-colors">
-                        شوف الطلبات المتاحة
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {activeTasks.slice(0, 3).map(task => (
-                        <div key={task.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
-                          <div className="flex gap-4">
-                            <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center text-2xl flex-shrink-0">
-                              📋
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className="font-bold text-slate-900 text-sm">{task.title}</h4>
-                                <span className={`text-xs px-2 py-0.5 rounded-full border font-bold ${STATUS_COLOR[task.status]}`}>
-                                  {STATUS_LABEL[task.status]}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-3 text-xs text-slate-400">
-                                {task.city && <span className="flex items-center gap-1"><MapPin size={10} /> {task.city}</span>}
-                                {task.price_suggested && <span className="text-primary-500 font-bold">{task.price_suggested} ر.س</span>}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex gap-2 flex-shrink-0">
-                            <button onClick={() => { setSelectedTask(task); setTab('chat') }}
-                              className="flex items-center gap-1 px-4 py-2 text-primary-500 border border-primary-200 rounded-xl text-sm font-medium hover:bg-primary-50 transition-colors">
-                              <MessageSquare size={13} /> محادثة
-                            </button>
-                            {task.status === 'in_progress' && (
-                              <button onClick={() => setCompletingTask(task)}
-                                className="flex items-center gap-1 px-4 py-2 bg-secondary-500 text-white rounded-xl text-sm font-bold hover:bg-secondary-600 transition-colors">
-                                <CheckCircle size={13} /> أنهيت الطلب
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Service Insights */}
-                <div className="space-y-4">
-                  <h3 className="font-bold text-slate-900 text-lg">Service Insights</h3>
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
-                    <p className="font-bold text-primary-500 text-sm mb-4">آخر تقييم</p>
-                    <div className="flex gap-0.5 mb-3">
-                      {[1,2,3,4,5].map(s => <Star key={s} size={16} className="text-amber-400 fill-amber-400" />)}
-                    </div>
-                    <p className="text-slate-700 text-sm italic leading-relaxed mb-3">
-                      "وصل في الوقت المحدد وأدى عملاً رائعاً. محترف جداً وأنظف. أوصي به بشدة!"
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <span className="font-bold text-slate-600">— أحمد ر.</span>
-                      <span>• منذ يومين</span>
-                    </div>
-
-                    <div className="mt-5 p-4 bg-green-50 rounded-xl border border-green-200">
-                      <p className="font-bold text-green-700 text-sm mb-1">فرصة أرباح 🚀</p>
-                      <p className="text-green-600 text-xs leading-relaxed">
-                        الطلبات في منطقتك مرتفعة الآن. حدّث حالتك إلى "متاح" لاستقبال المزيد من الطلبات.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Feed Tab */}
-          {tab === 'feed' && (
+        {/* ══ SHIFTS (سوق الشفتات) ══ */}
+        {tab === 'shifts' && (
+          <div className="space-y-4 animate-fade-in">
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-slate-900 text-lg">الطلبات المتاحة</h3>
-                <div className="flex gap-2">
-                  {[['all','الكل'],['smart','مناسبة لي'],['city','منطقتي']].map(([v,l]) => (
-                    <button key={v} onClick={() => setCityFilter(v)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${cityFilter === v ? 'bg-primary-500 text-white' : 'bg-white border border-slate-200 text-slate-600'}`}>
-                      {l}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {filteredFeed.length === 0 ? (
-                <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl">
-                  <Zap size={32} className="text-slate-200 mx-auto mb-3" />
-                  <p className="text-slate-400">ما في طلبات متاحة الحين</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {filteredFeed.map(task => (
-                    <div key={task.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-primary-500/30 transition-all">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <h4 className="font-bold text-slate-900 mb-1">{task.title}</h4>
-                          <div className="flex items-center gap-3 text-xs text-slate-400">
-                            {task.category && <span className="bg-slate-100 px-2 py-1 rounded-full">{task.category}</span>}
-                            {task.city && <span className="flex items-center gap-1"><MapPin size={10} /> {task.city}</span>}
-                            {task.price_suggested && <span className="text-primary-500 font-bold">{task.price_suggested} ر.س</span>}
-                          </div>
-                        </div>
-                        <button onClick={() => acceptTask(task)} disabled={!!accepting}
-                          className="bg-primary-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-primary-700 transition-colors flex-shrink-0 flex items-center gap-1.5 disabled:opacity-50">
-                          {accepting === task.id ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle size={13} />}
-                          قبول الطلب
-                        </button>
+              <h2 className="text-2xl font-black text-primary-700 mb-1">سوق الشفتات</h2>
+              <p className="text-slate-500 text-sm">استكشف فرص التبديل المتاحة مع زملائك في العمل</p>
+            </div>
+
+            {/* Search */}
+            <div className="relative">
+              <input placeholder="البحث عن زميل أو تاريخ معين..." dir="rtl"
+                className="w-full pr-10 pl-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
+              <span className="absolute right-3 top-3.5 text-slate-300 text-lg">🔍</span>
+            </div>
+
+            {/* Filters */}
+            <div className="grid grid-cols-2 gap-2">
+              <button className="flex items-center justify-center gap-2 bg-white border border-slate-200 rounded-xl py-2.5 text-sm text-slate-600 font-medium">📅 التاريخ</button>
+              <button className="flex items-center justify-center gap-2 bg-white border border-slate-200 rounded-xl py-2.5 text-sm text-slate-600 font-medium">⚙️ الفلاتر</button>
+            </div>
+
+            {/* Chips */}
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {['الكل','صباحي','مسائي','ليلي','نهاية الأسبوع'].map((f, i) => (
+                <button key={f} className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap border transition-colors ${i===0 ? 'bg-primary-700 text-white border-primary-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            {/* Shift Cards */}
+            <div className="space-y-3">
+              {SHIFTS.map((s, i) => (
+                <div key={i} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="text-xs bg-slate-100 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1">
+                      {s.typeIcon} {s.type}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-black text-sm">{s.name[0]}</div>
+                      <div className="text-right">
+                        <p className="font-bold text-slate-900 text-sm">{s.name}</p>
+                        <p className="text-xs text-slate-400">{s.role}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* My Tasks Tab */}
-          {tab === 'my-tasks' && (
-            <div>
-              <h3 className="font-bold text-slate-900 text-lg mb-4">طلباتي</h3>
-              {myTasks.length === 0 ? (
-                <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl">
-                  <Briefcase size={32} className="text-slate-200 mx-auto mb-3" />
-                  <p className="text-slate-400">ما قبلت أي طلب بعد</p>
-                  <button onClick={() => setTab('feed')} className="mt-4 bg-primary-500 text-white font-bold px-5 py-2 rounded-xl text-sm hover:bg-primary-700">
-                    تصفح الطلبات المتاحة ←
+                  </div>
+                  <div className="space-y-1.5 border-t border-slate-100 pt-3 mb-3">
+                    <p className="text-sm text-slate-600 flex items-center gap-2">📅 {s.date}</p>
+                    <p className="text-sm text-slate-600 flex items-center gap-2">🕐 {s.time}</p>
+                  </div>
+                  <button className="w-full bg-primary-700 hover:bg-primary-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">
+                    طلب تبديل
                   </button>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  {myTasks.map(task => (
-                    <div key={task.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h4 className="font-bold text-slate-900">{task.title}</h4>
-                          <div className="flex items-center gap-2 mt-1 text-xs text-slate-400">
-                            {task.city && <span className="flex items-center gap-1"><MapPin size={10} /> {task.city}</span>}
-                            {task.price_final && <span className="text-primary-500 font-bold">{task.price_final} ر.س</span>}
-                          </div>
-                        </div>
-                        <span className={`text-xs px-2.5 py-1 rounded-full border font-bold flex-shrink-0 ${STATUS_COLOR[task.status]}`}>
-                          {STATUS_LABEL[task.status]}
-                        </span>
-                      </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ══ MY TASKS ══ */}
+        {tab === 'my-tasks' && (
+          <div className="space-y-4 animate-fade-in">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-primary-700 mb-1">طلباتي</h2>
+                <p className="text-slate-500 text-sm">الطلبات النشطة والمكتملة</p>
+              </div>
+              <button onClick={() => setTab('overview')}
+                className="bg-primary-700 text-white font-bold px-4 py-2 rounded-xl text-sm">الكل</button>
+            </div>
+
+            {/* Available Tasks */}
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                <span className="text-xs text-primary-600 font-bold bg-primary-50 px-2 py-0.5 rounded-full">{filteredFeed.length} متاح</span>
+                <p className="font-bold text-slate-900 text-sm">الطلبات المتاحة</p>
+              </div>
+              {filteredFeed.slice(0,5).map(task => (
+                <div key={task.id} className="px-4 py-3 border-b border-slate-50 last:border-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <button onClick={() => acceptTask(task)} disabled={accepting === task.id}
+                      className="flex-shrink-0 bg-primary-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-50">
+                      {accepting === task.id ? <Loader2 size={12} className="animate-spin" /> : 'اقبل'}
+                    </button>
+                    <div className="flex-1 text-right">
+                      <p className="font-bold text-slate-900 text-sm">{task.title}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{task.city} • {task.category}</p>
+                      {task.price_suggested && <p className="text-xs text-primary-600 font-bold mt-0.5">{task.price_suggested} ريال</p>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {filteredFeed.length === 0 && <p className="text-center text-slate-400 text-sm py-8">لا توجد طلبات متاحة الآن</p>}
+            </div>
+
+            {/* My Active Tasks */}
+            {myTasks.length > 0 && (
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className="px-4 py-3 border-b border-slate-100">
+                  <p className="font-bold text-slate-900 text-sm">طلباتي الحالية</p>
+                </div>
+                {myTasks.map(t => (
+                  <div key={t.id} className="px-4 py-3 border-b border-slate-50 last:border-0">
+                    <div className="flex items-start justify-between gap-3">
                       <div className="flex gap-2">
-                        {['in_progress'].includes(task.status) && (
-                          <>
-                            <button onClick={() => { setSelectedTask(task); setTab('chat') }}
-                              className="flex-1 flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm py-2.5 rounded-xl transition-colors font-medium">
-                              <MessageSquare size={14} /> محادثة
-                            </button>
-                            <button onClick={() => setCompletingTask(task)}
-                              className="flex-1 flex items-center justify-center gap-1.5 bg-secondary-500 hover:bg-secondary-600 text-white text-sm py-2.5 rounded-xl transition-colors font-bold">
-                              <Upload size={14} /> أنهيت الطلب
-                            </button>
-                          </>
+                        {t.status === 'in_progress' && (
+                          <button onClick={() => setCompletingTask(t)}
+                            className="text-xs bg-green-500 text-white font-bold px-3 py-1.5 rounded-lg">أنهِ</button>
                         )}
-                        {task.status === 'pending_confirmation' && (
-                          <div className="flex-1 text-center py-2 text-purple-500 text-sm font-bold bg-purple-50 rounded-xl border border-purple-200">
-                            ⏳ بانتظار تأكيد العميل
-                          </div>
-                        )}
-                        {task.status === 'completed' && (
-                          <button onClick={() => { setSelectedTask(task); setTab('chat') }}
-                            className="flex-1 flex items-center justify-center gap-1.5 bg-slate-100 text-slate-600 text-sm py-2.5 rounded-xl">
-                            <MessageSquare size={14} /> عرض المحادثة
-                          </button>
+                        {t.status !== 'completed' && t.status !== 'cancelled' && (
+                          <button onClick={() => { setSelectedTask(t); setTab('chat') }}
+                            className="text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg">💬</button>
                         )}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Chat Tab */}
-          {tab === 'chat' && (
-            <div>
-              <h3 className="font-bold text-slate-900 text-lg mb-4">المحادثات</h3>
-              {selectedTask ? (
-                <div>
-                  <button onClick={() => setSelectedTask(null)} className="text-sm text-slate-500 hover:text-slate-900 mb-4 transition-colors">← رجوع للمحادثات</button>
-                  <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {myTasks.filter(t => ['in_progress', 'pending_confirmation'].includes(t.status)).length === 0 ? (
-                    <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl">
-                      <MessageSquare size={32} className="text-slate-200 mx-auto mb-3" />
-                      <p className="text-slate-400">ما في محادثات نشطة</p>
-                    </div>
-                  ) : (
-                    myTasks.filter(t => ['in_progress', 'pending_confirmation'].includes(t.status)).map(task => (
-                      <button key={task.id} onClick={() => setSelectedTask(task)}
-                        className="w-full bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:border-primary-500/30 hover:shadow-md transition-all text-right flex items-center justify-between">
-                        <div>
-                          <p className="font-bold text-slate-900 text-sm">{task.title}</p>
-                          <p className="text-xs text-slate-400 mt-1">{STATUS_LABEL[task.status]}</p>
+                      <div className="flex-1 text-right">
+                        <div className="flex items-center justify-end gap-2 mb-0.5">
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${STATUS_COLOR[t.status]}`}>{STATUS_LABEL[t.status]}</span>
+                          <p className="font-bold text-slate-900 text-sm">{t.title}</p>
                         </div>
-                        <MessageSquare size={18} className="text-primary-500" />
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Profile Tab */}
-          {tab === 'profile' && (
-            <div className="max-w-lg">
-              <h3 className="font-bold text-slate-900 text-lg mb-5">ملفي الشخصي</h3>
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-                <div className="flex items-center gap-4 pb-4 border-b border-slate-100">
-                  <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center text-primary-500 font-black text-2xl">
-                    {profile?.full_name?.[0] || '؟'}
-                  </div>
-                  <div>
-                    <p className="font-black text-slate-900 text-lg">{profile?.full_name}</p>
-                    <div className="flex items-center gap-1 mt-1">
-                      <Star size={12} className="text-amber-400 fill-amber-400" />
-                      <span className="text-sm font-bold text-slate-700">{workerProfile?.rating?.toFixed(1) || '—'}</span>
-                      <span className="text-xs text-slate-400 mr-2">{workerProfile?.city}</span>
+                        <p className="text-xs text-slate-400">{t.city} • {new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
+                      </div>
                     </div>
                   </div>
+                ))}
+              </div>
+            )}
+
+            {/* Completion Modal */}
+            {completingTask && (
+              <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-end justify-center">
+                <div className="bg-white rounded-t-2xl w-full max-w-sm p-5">
+                  <h3 className="font-bold text-slate-900 mb-3">إنهاء الطلب</h3>
+                  <input type="number" value={priceOffer} onChange={e => setPriceOffer(e.target.value)}
+                    placeholder="السعر المقترح (ريال)" className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-primary-300" />
+                  <textarea value={proofNote} onChange={e => setProofNote(e.target.value)}
+                    placeholder="ملاحظة للعميل..." rows={2}
+                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mb-3 resize-none focus:outline-none focus:ring-2 focus:ring-primary-300" />
+                  <div className="flex gap-2">
+                    <button onClick={() => { setCompletingTask(null); setProofUrl(''); setProofNote(''); setPriceOffer('') }}
+                      className="flex-1 border border-slate-200 py-2.5 rounded-xl text-sm">إلغاء</button>
+                    <button onClick={submitCompletion} disabled={uploadingProof || !priceOffer}
+                      className="flex-1 bg-green-500 text-white font-bold py-2.5 rounded-xl text-sm disabled:opacity-50">
+                      {uploadingProof ? <Loader2 size={14} className="animate-spin inline" /> : 'أرسل للعميل'}
+                    </button>
+                  </div>
                 </div>
-                {[
-                  ['إجمالي الأرباح', `${totalEarnings.toLocaleString()} ر.س`],
-                  ['الطلبات المكتملة', completedTasks.length.toString()],
-                  ['طلبات هذا الشهر', thisMonth.toString()],
-                  ['الحالة', workerProfile?.is_online ? 'متاح' : 'غير متاح'],
-                ].map(([k,v]) => (
-                  <div key={k} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0">
-                    <span className="text-slate-900 font-medium text-sm">{v}</span>
-                    <span className="text-slate-400 text-sm">{k}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══ ANALYTICS (التحليلات الاستباقية) ══ */}
+        {tab === 'analytics' && (
+          <div className="space-y-5 animate-fade-in">
+            <div>
+              <h2 className="text-2xl font-black text-primary-700 mb-1">التحليلات الاستباقية</h2>
+              <p className="text-slate-500 text-sm">توقعات ضغط العمل للأسبوع القادم بناءً على الذكاء الاصطناعي</p>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 gap-3">
+              <div className="bg-white border-2 border-red-200 rounded-2xl p-4 shadow-sm">
+                <div className="flex items-start justify-between mb-2">
+                  <span className="text-xs text-red-500 font-bold">+12% عن الأسبوع الماضي</span>
+                  <span className="text-2xl">⚠️</span>
+                </div>
+                <p className="text-3xl font-black text-slate-900">14 ساعة</p>
+                <p className="text-xs font-bold text-slate-600 mt-0.5">العجز المتوقع</p>
+                <p className="text-xs text-slate-400 mt-1">يتركز في ورديات المساء (قسم اللوجستيات)</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <span className="text-xl">📈</span>
+                  <p className="text-xs text-slate-400 mt-1">أيام الذروة</p>
+                  <div className="flex gap-1 mt-2">
+                    {['أح','ث','ثل'].map((d, i) => (
+                      <div key={d} className={`flex-1 text-center p-1.5 rounded-lg text-xs font-bold ${i===1?'bg-primary-700 text-white':i===0?'bg-primary-200 text-primary-800':'bg-slate-100 text-slate-500'}`}>{d}</div>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                  <span className="text-xl">👥</span>
+                  <p className="text-xs text-slate-400 mt-1">كفاءة التوزيع</p>
+                  <p className="text-2xl font-black text-primary-700 mt-1">82%</p>
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full mt-1">
+                    <div className="bg-primary-600 h-1.5 rounded-full" style={{width:'82%'}}/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Heatmap */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-x-auto">
+              <h3 className="font-bold text-primary-700 mb-1 text-sm">خريطة كثافة العمل</h3>
+              <p className="text-xs text-slate-400 mb-3">توزيع ضغط العمل للأسبوع القادم</p>
+              <div className="min-w-[340px]">
+                <div className="grid grid-cols-[50px_repeat(8,1fr)] gap-1 mb-2 text-center">
+                  <div/>{['08','10','12','14','16','18','20','22'].map(h=><div key={h} className="text-xs text-slate-400">{h}</div>)}
+                </div>
+                {HEATMAP_DAYS.map((day, i) => (
+                  <div key={day} className="grid grid-cols-[50px_repeat(8,1fr)] gap-1 mb-1">
+                    <div className="text-xs text-slate-500 flex items-center">{day}</div>
+                    {HEATMAP_DATA[i].slice(0,8).map((v, j) => (
+                      <div key={j} className={`h-7 rounded ${heatColor(v)} transition-all hover:opacity-80`}/>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-3 mt-3 flex-wrap">
+                {['منخفض','متوسط','مرتفع','ذروة'].map((l,i) => (
+                  <div key={l} className="flex items-center gap-1">
+                    <div className={`w-3 h-3 rounded ${['bg-slate-100','bg-primary-200','bg-primary-500','bg-primary-800'][i]}`}/>
+                    <span className="text-xs text-slate-400">{l}</span>
                   </div>
                 ))}
               </div>
             </div>
-          )}
 
-        </div>
+            {/* Department Coverage */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+              <h3 className="font-bold text-primary-700 mb-3 text-sm">معدل التغطية حسب القسم</h3>
+              <div className="space-y-3">
+                {[['قسم المبيعات','98','text-primary-600'],['قسم اللوجستيات','65','text-red-500'],['خدمة العملاء','88','text-primary-600']].map(([dept,pct,color])=>(
+                  <div key={dept}>
+                    <div className="flex justify-between mb-1">
+                      <span className={`text-xs font-bold ${color}`}>{pct}%</span>
+                      <span className="text-xs text-slate-600">{dept}</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-2 rounded-full">
+                      <div className={`h-2 rounded-full ${color.includes('red')?'bg-red-500':'bg-primary-600'}`} style={{width:`${pct}%`}}/>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ ACHIEVEMENTS (الإنجازات) ══ */}
+        {tab === 'achievements' && (
+          <div className="space-y-5 animate-fade-in">
+            {/* Profile Hero */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center gap-5 shadow-sm">
+              <div className="relative flex-shrink-0">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#e2e8f0" strokeWidth="6"/>
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#1e3a8a" strokeWidth="6"
+                    strokeDasharray="213.6" strokeDashoffset="21.36" strokeLinecap="round"
+                    transform="rotate(-90 40 40)"/>
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-sm font-black text-primary-700">90%</span>
+                  <span className="text-xs text-slate-400">الالتزام</span>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h2 className="font-black text-slate-900">أهلاً، {profile?.full_name?.split(' ')[0]}</h2>
+                <p className="text-xs text-slate-500 mt-0.5">أنت ضمن أفضل 5% من الموظفين الملتزمين هذا الشهر.</p>
+                <div className="flex gap-2 mt-2 flex-wrap">
+                  <span className="text-xs bg-primary-700 text-white px-2.5 py-1 rounded-full font-bold">⭐ مستوى: محترف</span>
+                  <span className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium">ترتيب: 3#</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Badges */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <button className="text-xs text-primary-600 font-bold">عرض الكل</button>
+                <h3 className="font-bold text-slate-900">الأوسمة والإنجازات</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {BADGES.map((b) => (
+                  <div key={b.label} className={`flex flex-col items-center p-4 rounded-xl border transition-colors ${b.locked ? 'bg-slate-50 opacity-50 border-slate-200' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-2 ${b.locked ? 'bg-slate-100' : 'bg-primary-50'}`}>
+                      {b.locked ? '🔒' : b.icon}
+                    </div>
+                    <p className="font-bold text-sm text-slate-800 text-center">{b.label}</p>
+                    <p className="text-xs text-slate-400 text-center mt-0.5">{b.sub}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Leaderboard */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+              <h3 className="font-bold text-slate-900 mb-4">لوحة الشرف</h3>
+              <div className="space-y-2">
+                {LEADERBOARD.map((e) => (
+                  <div key={e.rank} className={`flex items-center gap-3 p-3 rounded-xl ${e.me ? 'bg-primary-700 text-white ring-2 ring-primary-500' : 'bg-slate-50'}`}>
+                    <span className={`font-black text-lg w-6 text-center ${e.me ? 'text-white' : 'text-slate-400'}`}>{e.rank}</span>
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${e.me ? 'bg-white/20 text-white' : 'bg-primary-100 text-primary-700'}`}>
+                      {e.name[0]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-bold text-sm ${e.me ? 'text-white' : 'text-slate-900'}`}>{e.name}{e.me ? ' (أنت)' : ''}</p>
+                      <p className={`text-xs ${e.me ? 'text-white/70' : 'text-slate-400'}`}>{e.dept}</p>
+                    </div>
+                    <span className={`font-black text-sm ${e.me ? 'text-white' : 'text-primary-700'}`}>{e.score}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Commitment Timeline */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+              <h3 className="font-bold text-slate-900 mb-4">سجل الالتزام الأخير</h3>
+              <div className="space-y-3 relative before:absolute before:right-[14px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+                {[
+                  { icon: '✅', color: 'bg-green-100', label: 'وردية الصباح — مكتملة', time: 'اليوم، 08:00 - 16:00', points: '+10 نقاط', star: false },
+                  { icon: '✅', color: 'bg-green-100', label: 'وردية المساء — مكتملة', time: 'أمس، 16:00 - 00:00', points: '+12 نقطة', star: false },
+                  { icon: '⭐', color: 'bg-primary-100', label: 'تم الحصول على وسام "ملتزم بالوقت"', time: 'قبل 3 أيام', points: '', star: true },
+                ].map((item, i) => (
+                  <div key={i} className="relative pr-8">
+                    <div className={`absolute right-0 top-0 w-7 h-7 rounded-full ${item.color} flex items-center justify-center text-sm z-10`}>
+                      {item.icon}
+                    </div>
+                    <div className={`p-3 rounded-xl ${item.star ? 'bg-primary-50 border border-primary-200' : 'bg-slate-50'}`}>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-bold ${item.star ? 'text-primary-600' : 'text-green-600'}`}>{item.points}</span>
+                        <p className={`font-bold text-sm ${item.star ? 'text-primary-700' : 'text-slate-800'}`}>{item.label}</p>
+                      </div>
+                      <p className="text-xs text-slate-400 mt-0.5 text-right">{item.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ CHAT ══ */}
+        {tab === 'chat' && selectedTask && (
+          <div className="animate-fade-in">
+            <div className="flex items-center gap-3 mb-4">
+              <button onClick={() => setTab('my-tasks')} className="text-slate-500 hover:text-slate-800">←</button>
+              <h2 className="font-black text-primary-700">{selectedTask.title}</h2>
+            </div>
+            <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
+          </div>
+        )}
+        {tab === 'chat' && !selectedTask && (
+          <div className="animate-fade-in text-center py-16">
+            <MessageSquare size={40} className="text-slate-200 mx-auto mb-3"/>
+            <p className="text-slate-400">اختر طلباً لبدء المحادثة</p>
+            <button onClick={() => setTab('my-tasks')} className="mt-3 text-primary-600 text-sm font-bold">اذهب لطلباتي</button>
+          </div>
+        )}
+
       </main>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 bg-white border-t border-slate-200 z-50 shadow-lg">
+      {/* ── Bottom Navigation ── */}
+      <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-lg z-50 flex flex-row-reverse justify-around items-center py-2 px-2">
         {[
-          { id: 'overview', icon: Home, label: 'الرئيسية' },
-          { id: 'feed', icon: Zap, label: 'متاحة' },
-          { id: 'my-tasks', icon: Briefcase, label: 'طلباتي' },
-          { id: 'chat', icon: MessageSquare, label: 'المحادثات' },
-        ].map(({ id, icon: Icon, label }) => (
+          { id: 'overview', icon: '🏠', label: 'الرئيسية' },
+          { id: 'shifts', icon: '🕐', label: 'الورديات' },
+          { id: 'my-tasks', icon: '📋', label: 'الطلبات', badge: activeTasks.length },
+          { id: 'analytics', icon: '📊', label: 'التحليلات' },
+          { id: 'achievements', icon: '⭐', label: 'الإنجازات' },
+        ].map(({ id, icon, label, badge }) => (
           <button key={id} onClick={() => setTab(id as any)}
-            className={`flex flex-col items-center gap-1 px-2 transition-all ${tab === id ? 'text-primary-500' : 'text-slate-400'}`}>
-            <Icon size={20} />
-            <span className="text-[10px] font-medium">{label}</span>
+            className={`flex flex-col items-center justify-center px-2 py-1 rounded-xl transition-all relative ${tab === id ? 'text-primary-700' : 'text-slate-400'}`}>
+            <span className="text-xl">{icon}</span>
+            <span className={`text-xs mt-0.5 font-medium ${tab === id ? 'font-bold text-primary-700' : ''}`}>{label}</span>
+            {badge !== undefined && badge > 0 && (
+              <span className="absolute top-0 left-1 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">{badge}</span>
+            )}
           </button>
         ))}
-        <button onClick={async () => { await signOut(); navigate('landing') }}
-          className="flex flex-col items-center gap-1 px-2 text-red-400">
-          <LogOut size={20} />
-          <span className="text-[10px] font-medium">خروج</span>
-        </button>
       </nav>
     </div>
   )
