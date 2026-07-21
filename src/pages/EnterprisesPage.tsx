@@ -483,7 +483,7 @@ export function EnterprisesPage() {
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button onClick={() => { sessionStorage.removeItem('amerni_mode'); navigate('landing') }} className="flex items-center hover:opacity-80 transition-opacity"><Logo size={30} /></button>
-            <button onClick={() => navigate('landing')} className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition-colors">منشآت ↕</button>
+            <button onClick={() => { sessionStorage.removeItem('amerni_mode'); navigate('landing') }} className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition-colors">منشآت ↕</button>
           </div>
           <div className="hidden md:flex items-center gap-0.5 overflow-x-auto">
             {TABS.filter(t => !['my-requests','provider-register'].includes(t.id)).slice(1).map(tab => (
@@ -1596,15 +1596,36 @@ export function EnterprisesPage() {
               <p className="text-slate-400 text-sm leading-relaxed">المنصة السعودية الأولى لخدمات B2B — نربط المنشآت بأفضل المستشارين في 18 تخصصاً.</p>
             </div>
             {[
-              { title: 'المنشآت', links: ['الحوكمة','السعودة','القانون','المالية'] },
-              { title: 'الدعم', links: ['الدعم الفني','سياسة الخصوصية','الشروط','اتصل بنا'] },
-              { title: 'التنقل', links: TABS.filter(t => !['my-requests','provider-register'].includes(t.id)).slice(0,4).map(t => t.label) },
+              { title: 'المنشآت', links: [
+                { label: 'الرئيسية', tab: 'home' as Tab },
+                { label: 'كيف يعمل؟', tab: 'how' as Tab },
+                { label: 'المميزات', tab: 'features' as Tab },
+                { label: 'من نحن', tab: 'about' as Tab },
+              ]},
+              { title: 'الدعم', links: [
+                { label: 'الدعم الفني', tab: 'support' as Tab },
+                { label: 'سياسة الخصوصية', tab: 'privacy' as Tab },
+                { label: 'الشروط والأحكام', tab: 'terms' as Tab },
+                { label: 'اتصل بنا', tab: 'contact' as Tab },
+              ]},
+              { title: 'الحساب', links: [
+                { label: 'الثقة والأمان', tab: 'trust' as Tab },
+                { label: 'طلباتي', tab: 'my-requests' as Tab },
+                { label: 'سجّل كمزود', tab: 'provider-register' as Tab },
+              ]},
             ].map(({ title, links }) => (
               <div key={title}>
                 <h4 className="text-sm font-bold text-white mb-3">{title}</h4>
                 <ul className="space-y-2">
                   {links.map(l => (
-                    <li key={l}><span className="text-slate-400 text-sm hover:text-white cursor-pointer transition-colors">{l}</span></li>
+                    <li key={l.label}>
+                      <button
+                        onClick={() => { setActiveTab(l.tab); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                        className="text-slate-400 text-sm hover:text-white transition-colors text-right"
+                      >
+                        {l.label}
+                      </button>
+                    </li>
                   ))}
                 </ul>
               </div>
