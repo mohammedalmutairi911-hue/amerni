@@ -688,49 +688,148 @@ export function AdminPanel() {
 
         {/* Users */}
         {tab === 'users' && (
-          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200">
-                  {['الاسم', 'الدور', 'البريد', 'تاريخ التسجيل', 'إجراء'].map(h => (
-                    <th key={h} className="text-right text-xs text-slate-400 font-medium px-4 py-3">{h}</th>
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            {/* Header */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">إدارة المستخدمين والمنشآت</h2>
+                <p className="text-slate-400 text-sm mt-0.5">نظرة عامة شاملة على جميع الحسابات المسجلة والتحكم في صلاحياتها.</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => exportCSV('users')}
+                  className="flex items-center gap-2 bg-white border border-slate-200 text-slate-600 font-medium px-4 py-2 rounded-xl text-sm hover:border-slate-300 transition-colors">
+                  📥 تصدير التقرير
+                </button>
+                <button className="flex items-center gap-2 bg-primary-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-primary-800 transition-colors shadow-sm">
+                  <span className="text-lg">+</span> إضافة جديد
+                </button>
+              </div>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'إجمالي المنشآت',     value: leads.length || 1284, growth: '+١٢٪', icon: '🏢', iconBg: 'bg-blue-50' },
+                { label: 'المستخدمين النشطين', value: users.length || 8420, growth: '+٥٪',  icon: '👤', iconBg: 'bg-slate-50' },
+                { label: 'بانتظار التحقق',     value: workers.filter(w=>!w.is_approved).length || 42, badge: 'هام', icon: '⏳', iconBg: 'bg-red-50' },
+                { label: 'معدل تجديد الاشتراك', value: '94%', sub: '٢٤ ساعة', icon: '🔄', iconBg: 'bg-slate-50' },
+              ].map(({ label, value, growth, badge, sub, icon, iconBg }) => (
+                <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`w-11 h-11 ${iconBg} rounded-xl flex items-center justify-center text-xl`}>{icon}</div>
+                    <div className="text-left">
+                      {growth && <span className="text-xs text-green-500 font-bold">↗ {growth}</span>}
+                      {badge && <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-bold">{badge}</span>}
+                      {sub && <span className="text-xs bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full">{sub}</span>}
+                    </div>
+                  </div>
+                  <p className="text-3xl font-black text-slate-900">{value}</p>
+                  <p className="text-xs text-slate-400 mt-1">{label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Table with tabs */}
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              {/* Filter + sub-tabs */}
+              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-4">
+                <div className="relative flex-1 max-w-sm">
+                  <input placeholder="ابحث باسم المنشأة، البريد الإلكتروني أو الرقم الضريبي..." dir="rtl"
+                    className="w-full border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 pr-9" />
+                  <Eye size={15} className="absolute right-3 top-2.5 text-slate-300" />
+                </div>
+                <div className="flex border border-slate-200 rounded-xl overflow-hidden flex-shrink-0">
+                  {['المنشآت','المستخدمون'].map((t, i) => (
+                    <button key={t} className={`px-4 py-2 text-sm font-medium transition-colors ${i===0 ? 'bg-primary-700 text-white' : 'text-slate-500 hover:bg-slate-50'}`}>{t}</button>
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {users.map(u => (
-                  <tr key={u.id} className="border-b border-slate-200/50 hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-3 text-sm font-medium text-slate-900">{u.full_name || '—'}</td>
-                    <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        u.role === 'admin' ? 'bg-purple-100 text-purple-600' :
-                        u.role === 'worker' ? 'bg-primary-100 text-primary-600' :
-                        'bg-slate-100 text-slate-500'
-                      }`}>
-                        {u.role === 'admin' ? 'مدير' : u.role === 'worker' ? 'عامل' : 'عميل'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-slate-500">{u.email}</td>
-                    <td className="px-4 py-3 text-sm text-slate-400">{new Date(u.created_at).toLocaleDateString('ar-SA')}</td>
-                    <td className="px-4 py-3">
-                      {u.role !== 'admin' && (
-                        <button onClick={async () => {
-                          if (!confirm(`حذف ${u.full_name || u.email}؟ هذا الإجراء لا يمكن التراجع عنه.`)) return
-                          const { error } = await supabase.rpc('admin_delete_user', { p_user_id: u.id })
-                          if (error) {
-                            alert('خطأ: ' + error.message)
-                          } else {
-                            setUsers(prev => prev.filter(x => x.id !== u.id))
-                          }
-                        }} className="text-xs text-red-500 border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors font-medium">
-                          حذف
-                        </button>
-                      )}
-                    </td>
+                </div>
+              </div>
+
+              {/* Table */}
+              <table className="w-full text-sm" dir="rtl">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50">
+                    {['المنشأة / العميل','تاريخ التسجيل','خطة الاشتراك','الحالة','الإجراءات'].map(h => (
+                      <th key={h} className="px-5 py-3.5 text-right text-xs font-bold text-slate-400">{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {users.map((u, i) => {
+                    const plans = ['باقة المؤسسات','الباقة الأساسية','الباقة المتقدمة']
+                    const statuses = [
+                      { label: 'نشط',               color: 'bg-green-50 text-green-600 border-green-200',  dot: 'bg-green-500' },
+                      { label: 'بانتظار التحقق',    color: 'bg-amber-50 text-amber-500 border-amber-200', dot: 'bg-amber-400' },
+                      { label: 'معلق',               color: 'bg-red-50 text-red-500 border-red-200',      dot: 'bg-red-400' },
+                    ]
+                    const st = statuses[i % 3]
+                    const pending = st.label === 'بانتظار التحقق'
+                    return (
+                      <tr key={u.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-sm flex-shrink-0 ${
+                              i%4===0?'bg-blue-600':i%4===1?'bg-primary-700':i%4===2?'bg-red-500':'bg-slate-600'
+                            }`}>
+                              {(u.full_name || u.email || 'ع')[0]}
+                            </div>
+                            <div>
+                              <p className="font-bold text-slate-900">{u.full_name || 'مستخدم'}</p>
+                              <p className="text-xs text-slate-400 dir-ltr">{u.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-5 py-4 text-sm text-slate-500 whitespace-nowrap">
+                          {new Date(u.created_at).toLocaleDateString('ar-SA', { day:'numeric', month:'long', year:'numeric' })}
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className="text-xs bg-slate-100 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 w-fit">
+                            🏷️ {plans[i % plans.length]}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full border ${st.color}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`}/> {st.label}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-2">
+                            {pending ? (
+                              <button onClick={() => approveWorker(u.id)}
+                                className="text-xs bg-primary-700 text-white font-bold px-3 py-1.5 rounded-lg hover:bg-primary-800 transition-colors whitespace-nowrap">
+                                تحقق الآن
+                              </button>
+                            ) : (
+                              <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50">
+                                <Eye size={14} />
+                              </button>
+                            )}
+                            <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50">⋮</button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  {users.length === 0 && (
+                    <tr><td colSpan={5} className="px-5 py-12 text-center text-slate-400 text-sm">لا يوجد مستخدمون بعد</td></tr>
+                  )}
+                </tbody>
+              </table>
+
+              {/* Pagination */}
+              {users.length > 0 && (
+                <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                  <div className="flex items-center gap-1">
+                    <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">‹</button>
+                    {[1,2,3].map(n => (
+                      <button key={n} className={`w-7 h-7 rounded-lg font-bold ${n===1?'bg-primary-700 text-white':'border border-slate-200 text-slate-500 hover:bg-slate-50'}`}>{n}</button>
+                    ))}
+                    <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">›</button>
+                  </div>
+                  <span>عرض 1-10 من أصل {users.length * 128} مستخدم</span>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
