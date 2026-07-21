@@ -129,8 +129,8 @@ export default function App() {
   const renderContent = () => {
     if (page === 'enterprises') return <><Navbar /><EnterprisesPage />{authOpen && <AuthModal />}</>
 
-    if (!user || !profile) return <><Navbar /><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
-    if (page === 'landing') return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
+    if (!user || !profile) return <><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
+    if (page === 'landing') return <><LandingPage />{authOpen && <AuthModal />}</>
     if (page === 'provider-dashboard') return <><ProviderDashboard />{authOpen && <AuthModal />}</>
     if (page === 'support') return <><Navbar /><SupportPage /></>
     if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
@@ -141,7 +141,7 @@ export default function App() {
     if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
 
     if (profile.role === 'admin') {
-      if (page === 'landing') return <><Navbar /><LandingPage /></>
+      if (page === 'landing') return <><LandingPage /></>
       return <><Navbar /><AdminPanel /></>
     }
     if (page === 'admin-enterprises') {
@@ -181,7 +181,7 @@ export default function App() {
       return <><Navbar /><WorkerDashboard /></>
     }
 
-    if (page === 'landing') return <><Navbar /><LandingPage />{authOpen && <AuthModal />}</>
+    if (page === 'landing') return <><LandingPage />{authOpen && <AuthModal />}</>
     if (page === 'dashboard') return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
     return <><Navbar /><NotFoundPage /></>
   }
