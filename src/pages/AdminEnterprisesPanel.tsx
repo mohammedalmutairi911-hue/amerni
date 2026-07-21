@@ -41,8 +41,10 @@ export function AdminEnterprisesPanel() {
   }
 
   const approveProvider = async (id: string, approved: boolean) => {
+    // اعتماد مزوّد المنشآت = تحديث سجل enterprise_providers مباشرة.
+    // أُزيلت مناداة admin_approve_worker — كانت خاطئة (اسم بارامتر p_worker_id
+    // بدل p_user_id، وتمرّر id سجل المزوّد بدل user_id) وتفشل بصمت بلا أثر.
     await supabase.from('enterprise_providers').update({ is_approved: approved, verification_level: approved ? 'verified' : 'basic' }).eq('id', id)
-    if (approved) await supabase.rpc('admin_approve_worker', { p_worker_id: id, p_approved: approved }).catch(() => {})
     setProviders(p => p.map(prov => prov.id === id ? { ...prov, is_approved: approved } : prov))
   }
 

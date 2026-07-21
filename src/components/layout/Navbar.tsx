@@ -1,5 +1,5 @@
 import { Logo } from '../Logo'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown, Users, Gift, Building2 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
@@ -10,6 +10,17 @@ export function Navbar() {
   const { navigate, openAuth } = useApp()
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropOpen, setDropOpen] = useState(false)
+  const dropRef = useRef<HTMLDivElement>(null)
+
+  // إغلاق قائمة الحساب عند الضغط خارجها (كانت تبقى مفتوحة)
+  useEffect(() => {
+    if (!dropOpen) return
+    const onDown = (e: MouseEvent) => {
+      if (dropRef.current && !dropRef.current.contains(e.target as Node)) setDropOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [dropOpen])
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id)
@@ -39,7 +50,7 @@ export function Navbar() {
         {/* Right side */}
         <div className="flex items-center gap-3">
           {user && profile ? (
-            <div className="relative">
+            <div className="relative" ref={dropRef}>
               <button
                 onClick={() => setDropOpen(!dropOpen)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition-colors"

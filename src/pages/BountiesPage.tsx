@@ -3,6 +3,7 @@ import { Zap, MapPin, Clock, ChevronLeft, Plus, Loader2, CheckCircle } from 'luc
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
+import { useToast } from '../components/Toast'
 import { Task } from '../types'
 
 const STATUS_COLOR: Record<string, string> = {
@@ -14,6 +15,7 @@ const STATUS_COLOR: Record<string, string> = {
 export function BountiesPage() {
   const { user } = useAuth()
   const { navigate } = useApp()
+  const { toast } = useToast()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [applying, setApplying] = useState<string | null>(null)
@@ -32,18 +34,26 @@ export function BountiesPage() {
     if (!user) { navigate('landing'); return }
     setApplying(task.id)
     // استخدام الدالة الآمنة بدل التحديث المباشر — تمنع تعارض قبول نفس الطلب
-    // من أكثر من عامل بنفس اللحظة (race condition) وتتحقق من حالة الطلب فعلياً
+    // من أكثر من عامل بنفس اللحظة (race condition) وتتحقق من حالة الطلب فعلياً.
+    // ملاحظة: الدالة تستنتج هوية العامل من auth.uid() داخلياً — لا نمرر p_worker_id
     const { data, error } = await supabase.rpc('accept_task', {
       p_task_id: task.id,
-      p_worker_id: user.id,
-      p_worker_price: (task as any).price_suggested || (task as any).client_price || 0,
+      p_worker_price: (task as any).price_suggested || (task as any).client_price || null,
     })
-    if (!error && data === 'ok') {
+    if (!error && (data as any)?.success) {
+      // قُبِل فعلاً — انقله من القائمة وأظهر تأكيد
       setApplied(p => new Set([...p, task.id]))
       setTasks(p => p.filter(t => t.id !== task.id))
+      toast('تم قبول الطلب ✅ افتح "مهامي" للمتابعة', 'success')
     } else {
-      // الطلب اتقبل من عامل ثاني قبلك بثوانٍ — حدّث القائمة
-      setTasks(p => p.filter(t => t.id !== task.id))
+      // خطأ حقيقي أو الطلب لم يعد متاحاً — أظهر السبب بدل الإخفاء الصامت
+      const msg = error?.message || 'الطلب لم يعد متاحاً'
+      if (msg.includes('غير متاح') || msg.includes('غير موجود')) {
+        setTasks(p => p.filter(t => t.id !== task.id))
+        toast('هذا الطلب لم يعد متاحاً', 'info')
+      } else {
+        toast('تعذّر قبول الطلب: ' + msg, 'error')
+      }
     }
     setApplying(null)
   }
