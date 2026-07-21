@@ -592,59 +592,81 @@ export function EnterprisesPage() {
             <section className="py-16 px-4 bg-white">
               <div className="max-w-6xl mx-auto">
                 <div className="mb-8"><SocialProofBar /></div>
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-black text-slate-900 mb-2">اختر التخصص</h2>
-                  <p className="text-slate-500 mb-6">١٨ تخصصاً في ٥ مجموعات</p>
-                  <div className="relative max-w-md mx-auto">
-                    <Search size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input value={catSearch} onChange={e => setCatSearch(e.target.value)}
-                      placeholder="ابحث عن تخصص..."
-                      className="w-full border border-slate-200 rounded-xl pr-10 pl-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" />
-                  </div>
+
+                {/* Header */}
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl font-black text-slate-900 mb-2">اختر التخصص</h2>
+                  <p className="text-slate-500 text-sm">١٨ تخصصاً في ٥ مجموعات</p>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-                {(catSearch.trim() ? ALL_CATEGORIES.filter(c => c.label.includes(catSearch) || c.desc.includes(catSearch)) : ALL_CATEGORIES).map(cat => {
-                  const group = CATEGORY_GROUPS.find(g => g.items.some(i => i.id === cat.id))
-                  const Icon = group?.icon || Building2
-                  return (
-                    <button key={cat.id} onClick={() => openForm(cat.id)}
-                      className="group bg-white border border-slate-200 rounded-2xl p-4 text-right hover:border-primary-400 hover:shadow-md transition-all duration-200 flex flex-col gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary-50 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
-                        <Icon size={18} className="text-primary-500" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-900 leading-tight mb-0.5">{cat.label}</p>
-                        <p className="text-xs text-slate-400 leading-relaxed">{cat.desc}</p>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-primary-500 font-medium mt-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span>أرسل طلبك</span>
-                        <ArrowLeft size={11} />
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
+                {/* Search */}
+                <div className="relative max-w-xl mx-auto mb-10">
+                  <Search size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input value={catSearch} onChange={e => setCatSearch(e.target.value)}
+                    placeholder="ابحث عن تخصص..."
+                    className="w-full border-2 border-slate-200 focus:border-primary-400 rounded-2xl pr-11 pl-4 py-3.5 text-sm focus:outline-none bg-white transition-colors shadow-sm" />
+                </div>
+
+                {/* Categories Grid — بطاقات كبيرة مثل التصميم */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {(catSearch.trim()
+                    ? ALL_CATEGORIES.filter(c => c.label.includes(catSearch) || c.desc.includes(catSearch))
+                    : ALL_CATEGORIES
+                  ).map(cat => {
+                    const group = CATEGORY_GROUPS.find(g => g.items.some(i => i.id === cat.id))
+                    const Icon = group?.icon || Building2
+                    const iconBg = group?.bg || 'bg-primary-50'
+                    const iconColor = group?.color || 'text-primary-500'
+                    return (
+                      <button key={cat.id} onClick={() => openForm(cat.id)}
+                        className="group bg-white border-2 border-slate-100 hover:border-primary-300 rounded-2xl p-6 text-right hover:shadow-lg transition-all duration-200 flex flex-col items-end gap-4">
+                        {/* أيقونة */}
+                        <div className={`w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                          <Icon size={22} className={iconColor} />
+                        </div>
+                        {/* المحتوى */}
+                        <div className="w-full">
+                          <p className="font-black text-slate-900 text-base mb-1">{cat.label}</p>
+                          <p className="text-xs text-slate-400 leading-relaxed">{cat.desc}</p>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             </section>
 
             {/* Stats */}
-            <section className="py-12 px-4 bg-slate-50">
-              <div className="max-w-4xl mx-auto grid grid-cols-3 gap-6 text-center">
-                {[['١٨','تخصصاً'],['٢٤س','وقت الرد'],['١٪','عمولة مؤقتة']].map(([v,l]) => (
-                  <div key={l}><div className="text-3xl font-black text-primary-500 mb-1">{v}</div><div className="text-sm text-slate-500">{l}</div></div>
-                ))}
+            {/* الإحصائيات */}
+            <section className="py-16 px-4 bg-slate-50 border-y border-slate-100">
+              <div className="max-w-5xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                  {[
+                    { value: '18+', label: 'تخصصاً توفره' },
+                    { value: '24س', label: 'سرعة الاستجابة' },
+                    { value: '100%', label: 'خبراء معتمدون' },
+                    { value: '1%', label: 'عمولة تنافسية' },
+                  ].map(({ value, label }) => (
+                    <div key={label}>
+                      <p className="text-4xl sm:text-5xl font-black text-primary-700 mb-2">{value}</p>
+                      <p className="text-sm text-slate-500 font-medium">{label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
 
-            <section className="py-16 px-4 bg-primary-900 text-white text-center">
-              <h2 className="text-2xl font-black mb-3">جاهز تبدأ؟</h2>
-              <p className="text-primary-200 mb-2">أرسل طلبك الآن — الرد خلال ٢٤ ساعة</p>
-              <p className="text-primary-300 text-xs mb-6">عمولة ١٪ مؤقتاً • قادم نظام اشتراك شهري</p>
-              <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
-                className="bg-white text-primary-900 font-bold px-8 py-3 rounded-2xl hover:bg-primary-50 transition-colors">
-                أرسل طلبك الآن
-              </button>
+            {/* CTA */}
+            <section className="py-20 px-4 bg-[#07101f] text-white text-center">
+              <div className="max-w-2xl mx-auto">
+                <h2 className="text-3xl font-black mb-3">جاهز لبدء التحوّل؟</h2>
+                <p className="text-slate-400 mb-2">أرسل طلبك الآن — الرد خلال ٢٤ ساعة</p>
+                <p className="text-slate-500 text-xs mb-8">عمولة ١٪ مؤقتاً • +18 تخصص متاح • مزودون معتمدون</p>
+                <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-lg shadow-blue-500/20">
+                  ابدأ رحلة التحول الآن
+                </button>
+              </div>
             </section>
           </div>
         )}
