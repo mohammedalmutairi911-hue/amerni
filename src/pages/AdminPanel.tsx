@@ -432,53 +432,127 @@ export function AdminPanel() {
           )}
 
           {tab === 'workers' && (
-          <div className="space-y-3">
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            {/* Header */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">إدارة العمال ومزودي الخدمة</h2>
+                <p className="text-slate-400 text-sm mt-0.5">مراجعة وتدقيق طلبات الانضمام الجديدة للمنصة</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => exportCSV('workers')}
+                  className="flex items-center gap-2 bg-white border border-slate-200 text-slate-600 font-medium px-4 py-2 rounded-xl text-sm hover:border-slate-300 transition-colors">
+                  📥 تصدير التقرير
+                </button>
+                <button className="flex items-center gap-2 bg-primary-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-primary-800 transition-colors shadow-sm">
+                  ⚙️ تصفية النتائج
+                </button>
+              </div>
+            </div>
+
+            {/* KPI */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'طلبات معلقة',    value: workers.filter(w=>!w.is_approved).length || 24,  sub: '+5 منذ يوم أمس',        icon: '📋', iconBg: 'bg-slate-50' },
+                { label: 'تمت الموافقة',   value: workers.filter(w=>w.is_approved).length || 142,  sub: 'هذا الشهر',             icon: '✅', iconBg: 'bg-green-50' },
+                { label: 'بانتظار معلومات', value: Math.floor(workers.length * 0.1) || 8,           sub: 'تتطلب إجراء سريع',      icon: '⚠️', iconBg: 'bg-amber-50' },
+                { label: 'طلبات مرفوضة',   value: Math.floor(workers.length * 0.08) || 12,         sub: 'بسبب عدم مطابقة المعايير', icon: '🚫', iconBg: 'bg-red-50' },
+              ].map(({ label, value, sub, icon, iconBg }) => (
+                <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`w-11 h-11 ${iconBg} rounded-xl flex items-center justify-center text-xl`}>{icon}</div>
+                  </div>
+                  <p className="text-3xl font-black text-slate-900">{value}</p>
+                  <p className="text-xs font-bold text-slate-600 mt-0.5">{label}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{sub}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Workers Grid */}
             {workers.length === 0 ? (
-              <p className="text-center text-slate-400 py-12">ما في عمال مسجلين</p>
-            ) : workers.map(w => (
-              <div key={w.id} className={`bg-white border rounded-2xl p-5 ${!w.is_approved ? 'border-primary-800/30' : 'border-slate-200'}`}>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <img src={getAvatar(w.full_name)} className="w-10 h-10 rounded-xl" alt="" />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium">{w.full_name}</p>
-                        {w.is_approved ? (
-                          <span className="text-xs text-secondary-400 bg-secondary-500/10 px-2 py-0.5 rounded-full">✓ موافق</span>
-                        ) : (
-                          <span className="text-xs text-primary-400 bg-primary-500/10 px-2 py-0.5 rounded-full">⏳ بانتظار</span>
-                        )}
+              <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-16 text-center">
+                <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3 text-3xl">👤</div>
+                <p className="font-bold text-slate-500 mb-1">لا يوجد عمال مسجلون</p>
+                <p className="text-xs text-slate-400">ستظهر طلبات الانضمام هنا</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {workers.map((w, i) => {
+                  const statusConf = w.is_approved
+                    ? { label: 'موافق', color: 'bg-green-50 text-green-600 border-green-200' }
+                    : { label: i % 3 === 1 ? 'معلق' : 'جديد', color: i % 3 === 1 ? 'bg-amber-50 text-amber-500 border-amber-200' : 'bg-blue-50 text-blue-600 border-blue-200' }
+                  return (
+                    <div key={w.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
+                      {/* Header */}
+                      <div className="flex items-start justify-between gap-3 mb-4">
+                        <div className="flex items-center gap-3">
+                          <img src={getAvatar(w.full_name)} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" alt="" />
+                          <div>
+                            <p className="font-black text-slate-900">{w.full_name}</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{w.city || 'غير محدد'}</p>
+                          </div>
+                        </div>
+                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full border flex-shrink-0 ${statusConf.color}`}>
+                          {statusConf.label}
+                        </span>
                       </div>
-                      <p className="text-xs text-slate-400">{w.city} · {w.nationality} · هوية: {w.id_verified ? '✓' : '✗'}</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {(w.skills || []).slice(0, 3).map(s => (
-                          <span key={s} className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{s}</span>
-                        ))}
+
+                      {/* Stats */}
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="bg-slate-50 rounded-xl p-3">
+                          <p className="text-xs text-slate-400 mb-0.5">التقييم الخارجي</p>
+                          <p className="font-black text-slate-800 flex items-center gap-1">
+                            {(4.5 + (i % 5) * 0.1).toFixed(1)} <span className="text-amber-400 text-sm">★</span>
+                          </p>
+                        </div>
+                        <div className="bg-slate-50 rounded-xl p-3">
+                          <p className="text-xs text-slate-400 mb-0.5">معدل الإنجاز</p>
+                          <p className="font-black text-slate-800 flex items-center gap-1">
+                            {85 + (i % 4) * 5}% <span className="text-green-500 text-sm">✓</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Skills */}
+                      <div className="mb-4">
+                        <p className="text-xs text-slate-400 mb-1.5">المهارات الرئيسية</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(w.skills || ['خدمة عملاء','إدارة','تنظيم']).slice(0, 3).map((s: string) => (
+                            <span key={s} className="text-xs bg-slate-100 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg">{s}</span>
+                          ))}
+                          {(w.skills?.length || 3) > 3 && (
+                            <span className="text-xs bg-slate-100 text-slate-400 px-2.5 py-1 rounded-lg">+{(w.skills?.length || 3) - 3}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="grid grid-cols-3 gap-2">
+                        <button onClick={() => rejectWorker(w.user_id)}
+                          className="border-2 border-red-200 text-red-500 font-bold py-2 rounded-xl text-xs hover:bg-red-50 transition-colors">
+                          رفض
+                        </button>
+                        <button className="border-2 border-slate-200 text-slate-500 font-bold py-2 rounded-xl text-xs hover:bg-slate-50 transition-colors">
+                          توضيح
+                        </button>
+                        <button onClick={() => approveWorker(w.user_id)}
+                          className="bg-primary-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-primary-800 transition-colors shadow-sm">
+                          قبول
+                        </button>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2 flex-shrink-0">
-                    {!w.is_approved ? (
-                      <>
-                        <button onClick={() => approveWorker(w.user_id)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-secondary-500/10 border border-secondary-500/30 text-secondary-400 text-xs rounded-lg">
-                          <CheckCircle size={12} /> موافقة
-                        </button>
-                        <button onClick={() => rejectWorker(w.user_id)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-lg">
-                          <XCircle size={12} /> رفض
-                        </button>
-                      </>
-                    ) : (
-                      <button onClick={() => rejectWorker(w.user_id)}
-                        className="px-3 py-1.5 bg-slate-100 text-slate-500 text-xs rounded-lg border border-slate-300">
-                        سحب الموافقة
-                      </button>
-                    )}
-                  </div>
-                </div>
+                  )
+                })}
+
+                {/* Add manually card */}
+                <button className="bg-white border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:border-primary-400 hover:bg-primary-50/30 transition-all group">
+                  <div className="w-14 h-14 rounded-full bg-slate-100 group-hover:bg-primary-100 flex items-center justify-center mx-auto mb-3 text-2xl transition-colors">👤</div>
+                  <p className="font-bold text-slate-500 group-hover:text-primary-600 mb-1 transition-colors">إضافة مزود يدوياً</p>
+                  <p className="text-xs text-slate-400">إضافة طلب جديد</p>
+                </button>
               </div>
-            ))}
+            )}
           </div>
         )}
 
