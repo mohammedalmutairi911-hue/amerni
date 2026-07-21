@@ -306,7 +306,107 @@ export function LandingPage() {
     setSupportLoading(false)
   }
 
+
   if (showNewTask) return <NewTaskPage initialTask={taskInput} onClose={() => setShowNewTask(false)} />
+
+  // ── Gateway شاشة الاختيار ──
+  if (!user && mode === null) return (
+    <div className="min-h-screen flex flex-col" dir="rtl">
+      <nav className="fixed top-0 inset-x-0 z-50 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-5 h-14 flex items-center justify-between">
+          <div className="flex items-center">
+            <Logo size={30} dark={true} />
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => { setAuthDirectMode('login'); setShowAuthDirect(true) }}
+              className="text-slate-300 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors">
+              دخول
+            </button>
+            <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded-lg text-sm transition-colors">
+              ابدأ الآن
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <section className="relative min-h-screen flex flex-col justify-center px-4 overflow-hidden bg-[#07101f] pt-14">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-3xl pointer-events-none" />
+        <div className="relative max-w-6xl mx-auto w-full py-20">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight mb-6">
+              حوّل رؤيتك إلى واقع مع
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-blue-200">
+                خبرات عند الطلب
+              </span>
+            </h1>
+            <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+              المنصة السعودية الأول لتمكين النمو من خلال ربط المنشآت والأفراد بنخبة من المستشارين والخبراء المعتمدين في +18 تخصصاً استراتيجياً.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto mb-10">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors group cursor-pointer"
+              onClick={() => navigate('enterprises')}>
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                  <Shield size={20} className="text-blue-400" />
+                </div>
+                <span className="text-blue-400 text-xs font-bold group-hover:text-blue-300">حول المنشآت ←</span>
+              </div>
+              <h3 className="text-white font-black text-lg mb-1">نمو المنشآت</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">حلول مؤسسية متكاملة (B2B) لتطوير نمو أعمالك وضمن استمرارية المنشأة من خلال شبكة الخبراء الاستراتيجيين.</p>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors group cursor-pointer"
+              onClick={() => setMode('individuals')}>
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                  <Users size={20} className="text-purple-400" />
+                </div>
+                <span className="text-purple-400 text-xs font-bold group-hover:text-purple-300">اكتشف المزيد ←</span>
+              </div>
+              <h3 className="text-white font-black text-lg mb-1">تميز الأفراد</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">ارتقِ بمسيرتك المهنية عبر استشارات فردية مخصصة وخدمات تطوير شخصي لتحقيق أهدافك.</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button onClick={() => navigate('enterprises')}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg shadow-blue-500/20">
+              ابدأ رحلة التحول الآن
+            </button>
+            <button onClick={() => setMode('individuals')}
+              className="bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold px-8 py-3.5 rounded-xl text-base transition-colors">
+              استكشف الحلول
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {showAuthDirect && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold">{authDirectMode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب'}</h2>
+              <button onClick={() => setShowAuthDirect(false)} className="text-slate-400 hover:text-slate-900">✕</button>
+            </div>
+            <div className="flex gap-1 bg-white rounded-xl p-1 mb-5">
+              {[{ v: 'login', l: 'دخول' }, { v: 'register', l: 'حساب جديد' }].map(({ v, l }) => (
+                <button key={v} onClick={() => setAuthDirectMode(v as any)}
+                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${authDirectMode === v ? 'bg-primary-500 text-white' : 'text-slate-500 hover:text-slate-900'}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+            <DirectAuthForm mode={authDirectMode} onSuccess={() => { setShowAuthDirect(false); navigate('dashboard') }} />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
 
   const TABS = [
     { id: 'home', label: 'الرئيسية' },
@@ -384,90 +484,32 @@ export function LandingPage() {
                 </p>
               </div>
             )}
-            {/* ══ HERO DARK ══ */}
-            <section className="relative min-h-screen flex flex-col justify-center px-4 overflow-hidden bg-[#07101f]">
-              {/* Grid background */}
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:60px_60px]" />
-              {/* Glow */}
-              <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-3xl pointer-events-none" />
-              <div className="absolute top-1/2 right-0 w-[300px] h-[300px] rounded-full bg-blue-500/5 blur-2xl pointer-events-none" />
-
-              <div className="relative max-w-6xl mx-auto w-full py-20">
-                {/* Badge */}
-                {user && profile && (
-                  <div className="flex justify-center mb-6">
-                    <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 rounded-full px-4 py-1.5 text-sm text-blue-300">
-                      <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                      مرحباً {(profile as any).full_name?.split(' ')[0]} — منصلك فرصة تنمي منشأتك
-                    </div>
-                  </div>
-                )}
-
-                {/* Main headline */}
-                <div className="text-center mb-10">
-                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight mb-6">
-                    حوّل رؤيتك إلى واقع مع
-                    <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-blue-200">
-                      خبرات عند الطلب
-                    </span>
-                  </h1>
-                  <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                    المنصة السعودية الأول لتمكين النمو من خلال ربط المنشآت والأفراد بنخبة من المستشارين والخبراء المعتمدين في +18 تخصصاً استراتيجياً.
-                  </p>
+            {/* ══ HERO INDIVIDUALS ══ */}
+            <section className="py-16 px-4 bg-gradient-to-b from-slate-50 to-white border-b border-slate-100">
+              <div className="max-w-4xl mx-auto text-center">
+                <div className="inline-flex items-center gap-2 bg-primary-500/10 border border-primary-500/20 rounded-full px-4 py-1.5 text-sm text-primary-600 mb-6 font-medium">
+                  <Sparkles size={14} />
+                  منصة أمرني للأفراد
                 </div>
-
-                {/* Two cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto mb-10">
-                  {/* Card 1 - المنشآت */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors group cursor-pointer"
-                    onClick={() => navigate('enterprises')}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                        <Shield size={20} className="text-blue-400" />
-                      </div>
-                      <button className="text-blue-400 text-xs font-bold group-hover:text-blue-300 flex items-center gap-1">
-                        حول المنشأت ←
-                      </button>
-                    </div>
-                    <h3 className="text-white font-black text-lg mb-1">نمو المنشآت</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">
-                      حلول مؤسسية متكاملة (B2B) لتطوير نمو أعمالك وضمن استمرارية المنشأة من خلال شبكة الخبراء الاستراتيجيين.
-                    </p>
-                  </div>
-
-                  {/* Card 2 - الأفراد */}
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors group cursor-pointer"
-                    onClick={() => { setShowBrowse(true) }}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                        <Users size={20} className="text-purple-400" />
-                      </div>
-                      <button className="text-purple-400 text-xs font-bold group-hover:text-purple-300 flex items-center gap-1">
-                        اكتشف المزيد ←
-                      </button>
-                    </div>
-                    <h3 className="text-white font-black text-lg mb-1">تميز الأفراد</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">
-                      ارتقِ بمسيرتك المهنية عبر استشارات فردية مخصصة وخدمات تطوير شخصي لتحقيق أهدافك.
-                    </p>
-                  </div>
-                </div>
-
-                {/* CTAs */}
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 leading-tight mb-4">
+                  اطلب أي خدمة — نجيبلك
+                  <span className="text-primary-500"> الشخص المناسب</span>
+                </h1>
+                <p className="text-slate-500 text-base sm:text-lg max-w-xl mx-auto leading-relaxed mb-8">
+                  من التوصيل، التصوير، المشاوير، والمهام اليومية — مقدمو خدمة موثوقون في منطقتك.
+                </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <button onClick={() => navigate('enterprises')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg shadow-blue-500/20">
-                    ابدأ رحلة التحول الآن
+                  <button onClick={() => setShowNewTask(true)}
+                    className="bg-primary-500 hover:bg-primary-600 text-white font-black px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg shadow-primary-500/20">
+                    اطلب الآن
                   </button>
-                  <button onClick={() => setActiveTab('features')}
-                    className="bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold px-8 py-3.5 rounded-xl text-base transition-colors">
-                    استكشف الحلول
+                  <button onClick={handleBrowse}
+                    className="bg-white border-2 border-slate-200 hover:border-primary-300 text-slate-700 font-bold px-8 py-3.5 rounded-xl text-base transition-colors">
+                    تصفح مقدمي الخدمة
                   </button>
                 </div>
               </div>
             </section>
-
             {/* ══ SERVICES SECTION ══ */}
             <section className="py-20 px-4 bg-white">
               <div className="max-w-6xl mx-auto">
