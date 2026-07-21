@@ -202,9 +202,18 @@ export function LandingPage() {
 
   // ── Gateway: أفراد أو منشآت ──────────────────
   // المستخدم المسجل يتجاوز الشاشة مباشرة
-  const [mode, setMode] = useState<'individuals' | 'enterprises' | null>(
-    user ? 'individuals' : null
-  )
+  const [mode, setMode] = useState<'individuals' | 'enterprises' | null>(() => {
+    if (user) return 'individuals'
+    const saved = sessionStorage.getItem('amerni_mode') as 'individuals' | 'enterprises' | null
+    return saved || null
+  })
+
+  // حفظ الـ mode في sessionStorage
+  const setModeAndSave = (m: 'individuals' | 'enterprises' | null) => {
+    if (m) sessionStorage.setItem('amerni_mode', m)
+    else sessionStorage.removeItem('amerni_mode')
+    setModeAndSave(m)
+  }
   const [activeTab, setActiveTab] = useState<Tab>('home')
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -248,7 +257,7 @@ export function LandingPage() {
 
   const chooseMode = (m: 'individuals' | 'enterprises') => {
     if (m === 'enterprises') { navigate('enterprises'); return }
-    setMode(m)
+    setModeAndSave(m)
   }
 
   useEffect(() => {
@@ -360,7 +369,7 @@ export function LandingPage() {
               <p className="text-slate-400 text-sm leading-relaxed">حلول مؤسسية متكاملة (B2B) لتطوير نمو أعمالك وضمن استمرارية المنشأة من خلال شبكة الخبراء الاستراتيجيين.</p>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors group cursor-pointer"
-              onClick={() => setMode('individuals')}>
+              onClick={() => setModeAndSave('individuals')}>
               <div className="flex items-start justify-between mb-4">
                 <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
                   <Users size={20} className="text-purple-400" />
@@ -377,7 +386,7 @@ export function LandingPage() {
               className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg shadow-blue-500/20">
               ابدأ رحلة التحول الآن
             </button>
-            <button onClick={() => setMode('individuals')}
+            <button onClick={() => setModeAndSave('individuals')}
               className="bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold px-8 py-3.5 rounded-xl text-base transition-colors">
               استكشف الحلول
             </button>
@@ -434,7 +443,7 @@ export function LandingPage() {
       <nav className="fixed top-0 inset-x-0 z-50 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-5 h-14 flex items-center justify-between gap-4">
           {/* Logo */}
-          <button onClick={() => setMode(null)} className="flex items-center hover:opacity-80 transition-opacity">
+          <button onClick={() => setModeAndSave(null)} className="flex items-center hover:opacity-80 transition-opacity">
             <Logo size={30} dark={true} />
           </button>
           {/* Nav Links */}
