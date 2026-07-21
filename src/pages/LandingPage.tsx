@@ -260,53 +260,7 @@ export function LandingPage() {
   }, [])
 
   // إذا لم يختر وجهة — اعرض شاشة الاختيار
-  if (!mode && !user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 flex items-center justify-center px-4" dir="rtl">
-        <div className="w-full max-w-lg text-center">
-          <div className="mb-10">
-            <h1 className="text-4xl font-black text-white mb-2">أمرني</h1>
-            <p className="text-slate-400 text-sm">منصة الخدمات السعودية</p>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <button
-              onClick={() => chooseMode('individuals')}
-              className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-400/50 rounded-3xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-primary-500/20 group-hover:bg-primary-500/30 flex items-center justify-center mx-auto mb-4 transition-colors">
-                <span className="text-3xl">🙋</span>
-              </div>
-              <h2 className="text-white font-black text-lg mb-1">أفراد</h2>
-              <p className="text-slate-400 text-xs leading-relaxed">اطلب أي خدمة يومية بسرعة وأمان</p>
-              <div className="mt-4 text-xs text-primary-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">ابدأ الآن ←</div>
-            </button>
-
-            <button
-              onClick={() => chooseMode('enterprises')}
-              className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-accent-400/50 rounded-3xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent-500/20"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-accent-500/20 group-hover:bg-accent-500/30 flex items-center justify-center mx-auto mb-4 transition-colors">
-                <span className="text-3xl">🏢</span>
-              </div>
-              <h2 className="text-white font-black text-lg mb-1">منشآت</h2>
-              <p className="text-slate-400 text-xs leading-relaxed">حلول B2B لشركتك في ١٨ تخصصاً</p>
-              <div className="mt-4 text-xs text-accent-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">اكتشف الخدمات ←</div>
-            </button>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-500">
-            {['موثوق ومرخص', 'بيانات محمية', 'دعم ٢٤/٧'].map(t => (
-              <div key={t} className="flex items-center gap-1.5">
-                <CheckCircle size={11} className="text-primary-400" />
-                <span>{t}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   const handleStart = () => {
     if (!taskInput.trim() && user) { navigate('dashboard'); return }
