@@ -353,43 +353,44 @@ export function LandingPage() {
   if (showNewTask) return <NewTaskPage onClose={() => setShowNewTask(false)} />
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
-      {/* Navbar */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/95 backdrop-blur border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button onClick={() => setMode(null)} className="text-xl font-black text-primary-500">أمرني</button>
-            <button onClick={() => setMode(null)} className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary-100 text-primary-600 border border-primary-200 hover:bg-primary-200 transition-colors">
-              أفراد ↕
-            </button>
-          </div>
-          <div className="hidden md:flex items-center gap-1 overflow-x-auto">
-            {TABS.slice(1).map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
-                className={`px-3 py-1.5 rounded-lg text-sm transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500/10 text-primary-500' : 'text-slate-500 hover:text-slate-900'}`}>
-                {tab.label}
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans" dir="rtl">
+
+      {/* ══ NAVBAR ══ */}
+      <nav className="fixed top-0 inset-x-0 z-50 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-5 h-14 flex items-center justify-between gap-4">
+          {/* Logo */}
+          <button onClick={() => setMode(null)} className="text-xl font-black text-white hover:text-blue-300 transition-colors flex-shrink-0">
+            أمرني
+          </button>
+          {/* Nav Links */}
+          <div className="hidden md:flex items-center gap-1">
+            {[['الحلول','features'],['الأسعار','trust'],['المدونة','about'],['الدعم','support']].map(([l,id]) => (
+              <button key={id} onClick={() => setActiveTab(id as Tab)}
+                className="px-3 py-1.5 text-sm text-slate-300 hover:text-white transition-colors rounded-lg hover:bg-white/5">
+                {l}
               </button>
             ))}
           </div>
-          {user ? (
-            <button onClick={() => navigate('dashboard')} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
-              حسابي
-            </button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button onClick={() => { setAuthDirectMode('login'); setShowAuthDirect(true) }} className="text-slate-500 hover:text-slate-900 text-sm transition-colors">دخول</button>
-              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">سجّل</button>
-            </div>
-          )}
-        </div>
-        {/* Mobile tabs */}
-        <div className="md:hidden flex gap-1 px-4 pb-2 overflow-x-auto">
-          {TABS.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
-              className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500 text-white font-bold' : 'text-slate-400 hover:text-slate-900'}`}>
-              {tab.label}
-            </button>
-          ))}
+          {/* CTA */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {user ? (
+              <button onClick={() => navigate('dashboard')}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded-lg text-sm transition-colors">
+                حسابي
+              </button>
+            ) : (
+              <>
+                <button onClick={() => { setAuthDirectMode('login'); setShowAuthDirect(true) }}
+                  className="text-slate-300 hover:text-white text-sm transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
+                  دخول
+                </button>
+                <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded-lg text-sm transition-colors shadow-lg shadow-blue-500/20">
+                  ابدأ الآن
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -408,60 +409,213 @@ export function LandingPage() {
                 </p>
               </div>
             )}
-            {/* Hero - full viewport */}
-            <section className="relative min-h-[calc(100vh-56px)] flex flex-col items-center justify-center px-4 overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white">
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary-500/5 blur-3xl" />
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e3a8a08_1px,transparent_1px),linear-gradient(to_bottom,#1e3a8a08_1px,transparent_1px)] bg-[size:60px_60px]" />
-              </div>
-              <div className="relative max-w-3xl mx-auto text-center w-full">
-                <div className="inline-flex items-center gap-2 bg-primary-500/10 border border-primary-500/20 rounded-full px-4 py-1.5 text-sm text-primary-500 mb-8">
-                  <Sparkles size={13} /> آمرني — اطلب أي شيء في السعودية
-                </div>
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-4 sm:mb-6 leading-[1.1]">
-                  <span className="text-slate-900">دليل الخدمات</span>{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-500 to-accent-500">المتكامل</span>
-                </h1>
-                <p className="text-slate-500 text-base sm:text-xl mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed px-2">
-                  منصة سعودية تربطك بشخص ثقة وكفو يسوي لك أي خدمة — بسرعة وبثقة.
-                </p>
+            {/* ══ HERO DARK ══ */}
+            <section className="relative min-h-screen flex flex-col justify-center px-4 overflow-hidden bg-[#07101f]">
+              {/* Grid background */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:60px_60px]" />
+              {/* Glow */}
+              <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-3xl pointer-events-none" />
+              <div className="absolute top-1/2 right-0 w-[300px] h-[300px] rounded-full bg-blue-500/5 blur-2xl pointer-events-none" />
 
-                {/* Search bar */}
-                <div className="relative max-w-xl mx-auto mb-4">
-                  <div className="flex items-center gap-2 sm:gap-3 bg-white border-2 border-slate-200 rounded-2xl px-3 sm:px-5 py-3 sm:py-4 focus-within:border-primary-500 transition-all shadow-lg">
-                    <Sparkles size={18} className="text-primary-500 flex-shrink-0" />
-                    <input
-                      value={taskInput} onChange={e => setTaskInput(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && taskInput.trim() && handleStart()}
-                      placeholder={visible ? EXAMPLES[idx] : ''}
-                      className="flex-1 text-right bg-transparent text-slate-900 placeholder-slate-400 text-sm outline-none"
-                    />
-                    <button onClick={handleStart}
-                      className="bg-primary-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-colors flex-shrink-0 flex items-center gap-1.5">
-                      بحث <ArrowLeft size={14} />
-                    </button>
+              <div className="relative max-w-6xl mx-auto w-full py-20">
+                {/* Badge */}
+                {user && profile && (
+                  <div className="flex justify-center mb-6">
+                    <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 rounded-full px-4 py-1.5 text-sm text-blue-300">
+                      <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                      مرحباً {(profile as any).full_name?.split(' ')[0]} — منصلك فرصة تنمي منشأتك
+                    </div>
+                  </div>
+                )}
+
+                {/* Main headline */}
+                <div className="text-center mb-10">
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight mb-6">
+                    حوّل رؤيتك إلى واقع مع
+                    <br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-blue-200">
+                      خبرات عند الطلب
+                    </span>
+                  </h1>
+                  <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                    المنصة السعودية الأول لتمكين النمو من خلال ربط المنشآت والأفراد بنخبة من المستشارين والخبراء المعتمدين في +18 تخصصاً استراتيجياً.
+                  </p>
+                </div>
+
+                {/* Two cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto mb-10">
+                  {/* Card 1 - المنشآت */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors group cursor-pointer"
+                    onClick={() => navigate('enterprises')}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                        <Shield size={20} className="text-blue-400" />
+                      </div>
+                      <button className="text-blue-400 text-xs font-bold group-hover:text-blue-300 flex items-center gap-1">
+                        حول المنشأت ←
+                      </button>
+                    </div>
+                    <h3 className="text-white font-black text-lg mb-1">نمو المنشآت</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">
+                      حلول مؤسسية متكاملة (B2B) لتطوير نمو أعمالك وضمن استمرارية المنشأة من خلال شبكة الخبراء الاستراتيجيين.
+                    </p>
+                  </div>
+
+                  {/* Card 2 - الأفراد */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/8 transition-colors group cursor-pointer"
+                    onClick={() => { setShowBrowse(true) }}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                        <Users size={20} className="text-purple-400" />
+                      </div>
+                      <button className="text-purple-400 text-xs font-bold group-hover:text-purple-300 flex items-center gap-1">
+                        اكتشف المزيد ←
+                      </button>
+                    </div>
+                    <h3 className="text-white font-black text-lg mb-1">تميز الأفراد</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">
+                      ارتقِ بمسيرتك المهنية عبر استشارات فردية مخصصة وخدمات تطوير شخصي لتحقيق أهدافك.
+                    </p>
                   </div>
                 </div>
 
-                {/* Popular services */}
-                <p className="text-xs text-slate-400 mb-3">خدمات شائعة:</p>
-                <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-10 px-2">
-                  {['🚗 توصيل','📸 تصوير','🔍 تحقق','🛍️ تسوق','📚 تعليم','✨ أخرى'].map(cat => (
-                    <button key={cat} onClick={() => { setTaskInput(cat.split(' ')[1]); setShowNewTask(true) }}
-                      className="px-4 py-2 bg-white border border-slate-200 hover:border-primary-500 hover:text-primary-500 rounded-full text-sm text-slate-600 transition-all shadow-sm">
-                      {cat}
-                    </button>
-                  ))}
+                {/* CTAs */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button onClick={() => navigate('enterprises')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg shadow-blue-500/20">
+                    ابدأ رحلة التحول الآن
+                  </button>
+                  <button onClick={() => setActiveTab('features')}
+                    className="bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold px-8 py-3.5 rounded-xl text-base transition-colors">
+                    استكشف الحلول
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* ══ SERVICES SECTION ══ */}
+            <section className="py-20 px-4 bg-white">
+              <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-3">
+                    أبشر بالفزعة.. خبراتنا في خدمتك
+                  </h2>
+                  <p className="text-slate-400">أكثر من 18 مجال تطبق فيها إلى التي يحتاجها العمل بكل احترافية</p>
                 </div>
 
-                {/* Stats */}
-                <div className="flex justify-center gap-6 sm:gap-12 text-center mb-8">
-                  {[['جديد', 'قيد الإطلاق'], ['موثوق', 'عمال معتمدون'], ['آمن', 'دفع مضمون'], ['٢٤/٧', 'دعم متواصل']].map(([v, l]) => (
-                    <div key={l}>
-                      <div className="text-2xl sm:text-3xl font-black text-primary-500">{v}</div>
-                      <div className="text-xs text-slate-400 mt-1">{l}</div>
+                {/* Search */}
+                <div className="relative max-w-lg mx-auto mb-10">
+                  <input value={taskInput} onChange={e => setTaskInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && taskInput.trim() && handleStart()}
+                    placeholder="ابحث عن التخصص أو الخدمة المطلوبة..."
+                    className="w-full pr-12 pl-4 py-3.5 border-2 border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-colors" />
+                  <Sparkles size={18} className="absolute right-4 top-4 text-slate-300" />
+                </div>
+
+                {/* Service Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { icon: '⚖️', title: 'الحوكمة والامتثال', desc: 'هيئة مؤسسية متقدمة في توفير الرقابة الفعالة', color: 'bg-blue-50', iconColor: 'text-blue-500', link: 'governance' },
+                    { icon: '🎯', title: 'نطاقات والسعودة', desc: 'فريق متكامل يوسط تحقيق الامتثال للوائح نطاقات', color: 'bg-green-50', iconColor: 'text-green-500', link: 'saudization' },
+                    { icon: '🛡️', title: 'الاستشارات القانونية', desc: 'مراجعة العقود القانونية والفقه القانوني المتقدم', color: 'bg-purple-50', iconColor: 'text-purple-500', link: 'legal' },
+                    { icon: '📊', title: 'المالية والزكاة', desc: 'إدارة البيانات والمالية والزكاة القانونية المتكاملة', color: 'bg-amber-50', iconColor: 'text-amber-500', link: 'finance' },
+                    { icon: '🔍', title: 'التدقيق والمراجعة', desc: 'مراجعة دقيقة لرفع كفاءة العمليات الداخلية', color: 'bg-rose-50', iconColor: 'text-rose-500', link: 'audit' },
+                    { icon: '🏗️', title: '١٨+ تخصص إضافي', desc: 'ISO، الأمن السيبراني، التدريب، العلاقات الحكومية', color: 'bg-slate-50', iconColor: 'text-slate-500', link: null },
+                  ].map(({ icon, title, desc, color, iconColor, link }) => (
+                    <div key={title} className={`${color} border border-slate-100 rounded-2xl p-5 hover:shadow-md transition-all cursor-pointer group`}
+                      onClick={() => link ? navigate('enterprises') : null}>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className={`text-xs font-bold ${iconColor} group-hover:underline`}>حول الخدمة ←</span>
+                        <span className="text-2xl">{icon}</span>
+                      </div>
+                      <h3 className="font-black text-slate-900 mb-1">{title}</h3>
+                      <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
                     </div>
                   ))}
+                </div>
+              </div>
+            </section>
+
+            {/* ══ STATS ══ */}
+            <section className="py-16 px-4 bg-slate-50 border-y border-slate-200">
+              <div className="max-w-5xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                  {[
+                    { value: '18+', label: 'تخصصاً توفره' },
+                    { value: '24س', label: 'سرعة الاستجابة' },
+                    { value: '100%', label: 'خبراء معتمدون' },
+                    { value: '1%', label: 'عمولة تنافسية' },
+                  ].map(({ value, label }) => (
+                    <div key={label}>
+                      <p className="text-4xl sm:text-5xl font-black text-primary-700 mb-2">{value}</p>
+                      <p className="text-sm text-slate-500 font-medium">{label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* ══ TRUST SECTION ══ */}
+            <section className="py-20 px-4 bg-white">
+              <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                  {/* Left: card */}
+                  <div className="bg-[#07101f] rounded-2xl p-6 text-white">
+                    <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 rounded-full px-3 py-1 text-xs text-blue-300 mb-4">
+                      مؤشر الأداء 2024
+                    </div>
+                    <p className="text-5xl font-black text-white mb-1">%99.8</p>
+                    <p className="text-slate-400 text-sm mb-6">نسبة رضاء العملاء عن الحلول المقدمة</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[['350+','مورد'],['140+','عميل']].map(([v,l]) => (
+                        <div key={l} className="bg-white/10 rounded-xl p-3">
+                          <p className="text-xl font-black">{v}</p>
+                          <p className="text-xs text-slate-400">{l}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right: content */}
+                  <div>
+                    <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2">
+                      منظومة ذكية قائمة على
+                      <span className="text-primary-600"> الثقة والابتكار</span>
+                    </h2>
+                    <p className="text-slate-500 text-sm mb-6 leading-relaxed">
+                      نربطك بأفضل الخبراء المعتمدين بأسرع وقت وأعلى جودة وأقل تكلفة.
+                    </p>
+                    <div className="space-y-4">
+                      {[
+                        { icon: '🔍', title: 'مطابقة معززة بالذكاء الاصطناعي', desc: 'نحلل كل طلب لنقدم لك أنسب المتخصصين خلال دقائق توائم الحاجة والإنجاز.' },
+                        { icon: '🤝', title: 'تحقق وتوثيق تدريجي', desc: 'يخضع جميع المتخصصين لعملية تدقيق لضمان الجودة والاحترافية والإنجاز.' },
+                        { icon: '🔒', title: 'حماية البيانات والخصوصية', desc: 'بروتوكولات أمن متقدمة تصون معلومات منشأتك وعقودها وعلاقاتك الاستشارية.' },
+                      ].map(({ icon, title, desc }) => (
+                        <div key={title} className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                          <span className="text-2xl flex-shrink-0">{icon}</span>
+                          <div>
+                            <p className="font-bold text-slate-900 text-sm">{title}</p>
+                            <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">{desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ══ FINAL CTA ══ */}
+            <section className="py-20 px-4 bg-[#07101f] text-white text-center">
+              <div className="max-w-2xl mx-auto">
+                <h2 className="text-3xl sm:text-4xl font-black mb-3">جاهز لبدء التحوّل؟</h2>
+                <p className="text-slate-400 mb-2">انضم لمئات المنشآت التي تنمو على "أمرني" في إدارة نموها الاستراتيجي.</p>
+                <p className="text-slate-500 text-xs mb-8">أكثر من 18 تخصص متاحة • +350 مورد معتمد • مبدأ العمولة المنصفة</p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button onClick={() => navigate('enterprises')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg">
+                    ابدأ رحلة التحول الآن
+                  </button>
                 </div>
               </div>
             </section>

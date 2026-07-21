@@ -540,25 +540,50 @@ export function EnterprisesPage() {
         {/* ══ HOME ══ */}
         {activeTab === 'home' && (
           <div className="animate-fade-in">
-            <section className="bg-gradient-to-br from-slate-900 via-primary-900 to-slate-900 text-white py-20 px-4">
-              <div className="max-w-4xl mx-auto text-center">
-                <div className="inline-flex items-center gap-2 bg-primary-500/20 border border-primary-500/30 rounded-full px-4 py-1.5 text-primary-300 text-sm mb-6">
-                  <Building2 size={14} /><span>خدمات المنشآت والشركات</span>
+            <section className="relative bg-[#07101f] text-white py-24 px-4 overflow-hidden">
+              {/* Grid */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:60px_60px]" />
+              {/* Glow */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/8 blur-3xl pointer-events-none" />
+
+              <div className="relative max-w-5xl mx-auto text-center">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 bg-blue-500/15 border border-blue-500/30 rounded-full px-4 py-1.5 text-blue-300 text-sm mb-8">
+                  <Building2 size={14} /><span>المنصة السعودية الأولى لخدمات المنشآت</span>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
-                  وصّل منشأتك<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-400 to-blue-400">بأفضل المستشارين المعتمدين</span>
+
+                {/* Headline */}
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-tight">
+                  حوّل رؤيتك إلى واقع مع
+                  <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-cyan-300">
+                    خبرات عند الطلب
+                  </span>
                 </h1>
-                <p className="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">١٨ تخصصاً — مطابقة خلال ٢٤ ساعة — عمولة ١٪ مؤقتاً</p>
-                <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-400 mb-10">
+                <p className="text-slate-400 text-base sm:text-lg mb-10 max-w-2xl mx-auto leading-relaxed">
+                  المنصة السعودية الأول لتمكين النمو من خلال ربط المنشآت والأفراد بنخبة من المستشارين والخبراء المعتمدين في أكثر من 18 تخصصاً استراتيجياً.
+                </p>
+
+                {/* Trust chips */}
+                <div className="flex flex-wrap justify-center gap-3 text-sm text-slate-400 mb-10">
                   {['مطابقة خلال ٢٤ ساعة','مزودون موثّقون','عمولة ١٪ مؤقتاً','تعاقد مباشر'].map(t => (
-                    <div key={t} className="flex items-center gap-1.5"><CheckCircle2 size={13} className="text-primary-400" /><span>{t}</span></div>
+                    <div key={t} className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
+                      <CheckCircle2 size={12} className="text-blue-400" /><span>{t}</span>
+                    </div>
                   ))}
                 </div>
-                <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
-                  className="bg-primary-500 hover:bg-primary-600 text-white font-bold px-8 py-3 rounded-2xl transition-colors btn-press animate-pulse-glow">
-                  أرسل طلبك الآن — مجاناً
-                </button>
+
+                {/* CTAs */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl transition-colors shadow-lg shadow-blue-500/20 btn-press">
+                    ابدأ رحلة التحول الآن
+                  </button>
+                  <button onClick={() => setActiveTab('features')}
+                    className="bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold px-8 py-3.5 rounded-xl transition-colors">
+                    استكشف الحلول
+                  </button>
+                </div>
               </div>
             </section>
 
