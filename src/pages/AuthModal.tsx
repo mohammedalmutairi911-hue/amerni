@@ -3,7 +3,7 @@ import { X, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
 import { supabase } from '../lib/supabase'
-import { goHome, getHomePage } from '../lib/homePage'
+import { goHome, goToUserHome, getHomePage } from '../lib/homePage'
 
 export function AuthModal() {
   const { signIn, signUp } = useAuth()
@@ -59,23 +59,23 @@ export function AuthModal() {
     // للـ login: ما نعتمد على profile من useAuth() لأنه closure قديم — نجيبه فريش.
     // للـ signup: نعرف الدور والمنصة من الفورم مباشرة.
     if (tab === 'login') {
-      // جلب الجلسة الحالية بعد signIn، ثم البروفايل، ثم goHome
+      // جلب الجلسة الحالية بعد signIn، ثم البروفايل، ثم goToUserHome (post-auth = explicit action)
       const { data: { user: currentUser } } = await supabase.auth.getUser()
       if (currentUser) {
         const { data: prof } = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle()
-        goHome(navigate, prof)
+        goToUserHome(navigate, prof)
         // حالة خاصة للمنشآت: افتح تبويب "طلباتي" مباشرة
         if (getHomePage(prof) === 'enterprises') {
           setTimeout(() => window.dispatchEvent(new CustomEvent('enterprises:open-my-requests')), 600)
         }
       } else {
-        navigate('landing')
+        goHome(navigate)
       }
     } else {
-      // signup — نبني بروفايل مؤقت من قيم النموذج ونمرره لـ goHome
+      // signup — نبني بروفايل مؤقت من قيم النموذج ونمرره لـ goToUserHome
       const signupRole = isEnterprise ? 'client' : role
       const fakeProfile = { role: signupRole, platform: authPlatform } as any
-      goHome(navigate, fakeProfile)
+      goToUserHome(navigate, fakeProfile)
       if (isEnterprise) {
         setTimeout(() => window.dispatchEvent(new CustomEvent('enterprises:open-my-requests')), 600)
       }

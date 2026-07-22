@@ -4,7 +4,7 @@ import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown,
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
 import { getAvatar } from '../../lib/supabase'
-import { goHome } from '../../lib/homePage'
+import { goHome, goToUserHome } from '../../lib/homePage'
 
 export function Navbar() {
   const { user, profile, signOut } = useAuth()
@@ -75,9 +75,9 @@ export function Navbar() {
                     </span>
                   </div>
                   <div className="p-1">
-                    {/* "حسابي" — يستخدم goHome ليأخذ كل مستخدم للصفحة الرئيسية الصحيحة حسب الدور والمنصة */}
+                    {/* "حسابي" — الزر المخصّص للعودة للوحة التحكم (استثناء صريح من قاعدة "الشعار للـ landing") */}
                     {profile.role !== 'admin' && (
-                      <button onClick={() => { goHome(navigate, profile); setDropOpen(false) }}
+                      <button onClick={() => { goToUserHome(navigate, profile); setDropOpen(false) }}
                         className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <LayoutDashboard size={15} /> حسابي
                       </button>

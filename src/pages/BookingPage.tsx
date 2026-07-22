@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ArrowRight, ArrowLeft, MapPin, Clock, CreditCard, CheckCircle, Star, Shield } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
-import { goHome } from '../lib/homePage'
+import { goToUserHome } from '../lib/homePage'
 
 type Step = 1 | 2 | 3
 
@@ -57,7 +57,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
             <span className="text-slate-500">الإجمالي</span>
           </div>
         </div>
-        <button onClick={() => { goHome(navigate, profile); onClose() }}
+        <button onClick={() => { goToUserHome(navigate, profile); onClose() }}
           className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors">
           متابعة الطلب
         </button>

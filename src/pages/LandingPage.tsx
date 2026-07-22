@@ -3,7 +3,7 @@ import { COMPANY } from '../lib/constants'
 import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
-import { goHome, getHomePage } from '../lib/homePage'
+import { goHome, getHomePage, goToUserHome } from '../lib/homePage'
 import { supabase } from '../lib/supabase'
 import { NewTaskPage } from './NewTaskPage'
 import { ServiceBrowsePage } from './ServiceBrowsePage'
@@ -274,8 +274,9 @@ export function LandingPage() {
     if (!user && mode === 'enterprises') navigate('enterprises', { replace: true })
   }, [mode, user, navigate])
 
-  // إذا لم يختر وجهة — اعرض شاشة الاختيار
-  if (!mode && !user) {
+  // البوابة (نقطة الدخول الرسمية) — تُعرَض لكل زائر أو مستخدم مسجَّل ما لم يختر وجهة.
+  // المستخدم المسجَّل يحتفظ بجلسته، ونعرض له اختصار "لوحتي" للانتقال لدشبورده صراحةً.
+  if (!mode) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 flex items-center justify-center px-4" dir="rtl">
         <div className="w-full max-w-lg text-center">
@@ -310,7 +311,7 @@ export function LandingPage() {
             </button>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-500">
+          <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-500 mb-6">
             {['موثوق ومرخص', 'بيانات محمية', 'دعم ٢٤/٧'].map(t => (
               <div key={t} className="flex items-center gap-1.5">
                 <CheckCircle size={11} className="text-primary-400" />
@@ -318,13 +319,24 @@ export function LandingPage() {
               </div>
             ))}
           </div>
+
+          {/* اختصار "لوحتي" للمستخدم المسجَّل — الزر المخصّص للعودة للوحة التحكم */}
+          {user && profile && (
+            <button
+              onClick={() => goToUserHome(navigate, profile)}
+              className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 px-4 py-2 rounded-full transition-all"
+            >
+              <span>الذهاب للوحتي</span>
+              <span aria-hidden>←</span>
+            </button>
+          )}
         </div>
       </div>
     )
   }
 
   const handleStart = () => {
-    if (!taskInput.trim() && user) { goHome(navigate, profile); return }
+    if (!taskInput.trim() && user) { goToUserHome(navigate, profile); return }
     setShowNewTask(true)
   }
 
@@ -407,7 +419,7 @@ export function LandingPage() {
             ))}
           </div>
           {user ? (
-            <button onClick={() => goHome(navigate, profile)} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
+            <button onClick={() => goToUserHome(navigate, profile)} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
               حسابي
             </button>
           ) : (
@@ -1087,9 +1099,9 @@ export function LandingPage() {
               const { data: { user: cu } } = await supabase.auth.getUser()
               if (cu) {
                 const { data: prof } = await supabase.from('profiles').select('*').eq('id', cu.id).maybeSingle()
-                goHome(navigate, prof)
+                goToUserHome(navigate, prof)
               } else {
-                navigate('landing')
+                goHome(navigate)
               }
             }} />
           </div>

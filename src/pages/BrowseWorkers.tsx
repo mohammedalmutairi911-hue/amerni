@@ -3,7 +3,7 @@ import { Search, Star, MapPin, CheckCircle, ArrowLeft, MessageSquare, Filter } f
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
-import { goHome } from '../lib/homePage'
+import { goToUserHome } from '../lib/homePage'
 import { WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 
@@ -97,7 +97,7 @@ export function BrowseWorkers() {
         )}
 
         {/* CTA */}
-        <button onClick={() => goHome(navigate, profile)}
+        <button onClick={() => goToUserHome(navigate, profile)}
           className="w-full bg-primary-500 text-white font-bold py-4 rounded-2xl text-base hover:bg-primary-400 transition-colors flex items-center justify-center gap-2">
           <MessageSquare size={18} /> اطلب من {selectedWorker.full_name.split(' ')[0]}
         </button>

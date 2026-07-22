@@ -12,7 +12,6 @@ import { WorkerRegister } from './pages/WorkerRegister'
 import { InstallPrompt } from './components/InstallPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
-import { getHomePage } from './lib/homePage'
 
 // Lazy-loaded pages — code splitting لتسريع التحميل الأول
 const AdminPanel = React.lazy(() => import('./pages/AdminPanel').then(m => ({ default: m.AdminPanel })))
@@ -103,9 +102,10 @@ export default function App() {
       }
     }
 
-    if (profile.role === 'admin' && page !== 'admin' && page !== 'admin-enterprises') { navigate('admin', { replace: true }); return }
+    if (profile.role === 'admin' && page !== 'admin' && page !== 'admin-enterprises' && page !== 'landing') { navigate('admin', { replace: true }); return }
 
-    // فصل المنصات: كل مستخدم يبقى في منصته + في لوحته الصحيحة حسب الدور
+    // فصل المنصات: تصفح صفحة من منصة أخرى → إرجاع للـ landing (بوابة الاختيار)
+    // بدل الذهاب المباشر للوحة (رغبة صريحة: لا فتح dashboard مباشرة)
     if (profile.role !== 'admin') {
       const individualPages = ['dashboard', 'worker', 'browse', 'bounties', 'referral', 'earn', 'join', 'worker-profile']
       const enterprisePages = ['enterprises', 'provider-dashboard']
@@ -113,9 +113,7 @@ export default function App() {
         (profile.platform === 'enterprises' && individualPages.includes(page)) ||
         (profile.platform === 'individuals' && enterprisePages.includes(page))
       if (wrongPlatformPage) {
-        // getHomePage تُرجع الصفحة الصحيحة حسب role + platform
-        // (مثال: worker على enterprises → provider-dashboard وليس enterprises)
-        navigate(getHomePage(profile), { replace: true })
+        navigate('landing', { replace: true })
         return
       }
     }
@@ -126,7 +124,7 @@ export default function App() {
         .then(({ data }) => {
           setWorkerExists(!!data)
           setWorkerApproved(data?.is_approved || false)
-          if (data?.is_approved && page === 'landing') navigate('worker', { replace: true })
+          // لم يعد يوجد auto-redirect من الـ landing: نقطة الدخول تعرض البوابة دائماً
           setChecking(false)
         })
     }

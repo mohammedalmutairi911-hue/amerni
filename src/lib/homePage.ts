@@ -1,17 +1,6 @@
-// Helper واحد مسؤول عن تحديد الصفحة الرئيسية الصحيحة حسب دور المستخدم ومنصته.
-// يُستخدم من جميع شعارات "أمرني" في التطبيق حتى يذهب المستخدم دائماً للمكان الصحيح
-// عند الضغط على الشعار، بدلاً من التوجيه الثابت إلى 'landing'.
-//
-// قواعد التنقل (طبقاً لطلب المستخدم):
-//   - زائر (غير مسجل)                                → landing (الصفحة الرئيسية العامة)
-//   - admin                                          → admin
-//   - platform = 'enterprises' + role = 'client'     → enterprises   (لوحة المنشآت)
-//   - platform = 'enterprises' + role = 'worker'     → provider-dashboard (لوحة مزود المنشآت)
-//   - platform = 'individuals' + role = 'client'     → dashboard     (لوحة الأفراد)
-//   - platform = 'individuals' + role = 'worker'     → worker        (لوحة العامل)
-//
-// ملاحظة: نستخدم loose typing لأن Profile لا يحوي platform في التايبس الحالية،
-// لكن الحقل موجود فعلياً في قاعدة البيانات (يُشار له في App.tsx بنفس الأسلوب).
+// نقطة الدخول الرسمية للمنصة هي صفحة الاختيار (Landing gateway).
+// شعار الموقع من أي مكان يعود دائماً لهذه الصفحة، بغضّ النظر عن دور المستخدم.
+// للأزرار المخصّصة للعودة للوحة (مثل "حسابي" / "لوحتي") نستخدم goToUserHome.
 
 import type { Profile } from '../types'
 
@@ -25,34 +14,50 @@ export type HomePage =
 
 type MaybeProfile = (Profile & { platform?: string }) | null | undefined
 
+// يُرجع الصفحة الرئيسية الخاصة بالمستخدم (لوحته) حسب الدور والمنصة.
+// يُستخدم في:
+//   - AuthModal بعد login/signup الناجح (توجيه صريح مبرَّر بحدث المصادقة).
+//   - أزرار "حسابي" / "لوحتي" المخصّصة داخل الواجهة.
+// لا يُستخدم لتنقّل الشعار.
 export function getHomePage(profile: MaybeProfile): HomePage {
-  // زائر → الصفحة الرئيسية العامة
   if (!profile) return 'landing'
-
-  // أدمن → لوحة الأدمن دائماً (بغض النظر عن platform)
   if (profile.role === 'admin') return 'admin'
-
   const platform = (profile as any).platform
-
-  // مستخدم منصة المنشآت
   if (platform === 'enterprises') {
     return profile.role === 'worker' ? 'provider-dashboard' : 'enterprises'
   }
-
-  // مستخدم منصة الأفراد (الافتراضية)
   return profile.role === 'worker' ? 'worker' : 'dashboard'
 }
 
-// دالة مساعدة تجمع الحساب + التنقل + تنظيف حالة الـ gateway (amerni_mode)
-// عند العودة للـ landing فقط (زائر). لا تُعدّل هذه الحالة لبقية الحالات.
+// ── شعار الموقع ── يعود دائماً لصفحة الـ Landing (البوابة الرسمية).
+// السلوك: يمسح mode الاختيار المخزّن (أفراد/منشآت) حتى تظهر البوابة من جديد.
+// المعامل الثاني (_profile) موجود للتوافق الخلفي فقط ولا يؤثّر على الوجهة.
 export function goHome(
+  navigate: (p: string, opts?: { replace?: boolean }) => void,
+  _profile?: MaybeProfile,
+) {
+  // امسح mode المحفوظ في history state إن وُجد
+  try {
+    if ((window.history.state as any)?.amerni_mode) {
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  } catch { /* تجاهل بصمت */ }
+  sessionStorage.removeItem('amerni_mode')
+  navigate('landing')
+}
+
+// ── زر "لوحتي" / "حسابي" ── يوجّه المستخدم للوحته حسب الدور.
+// هذا هو "الزر المخصّص للعودة إلى لوحة التحكم" المذكور في متطلبات المنصة.
+// لا يُستخدم للشعار.
+export function goToUserHome(
   navigate: (p: string, opts?: { replace?: boolean }) => void,
   profile: MaybeProfile,
 ) {
   const target = getHomePage(profile)
   if (target === 'landing') {
-    // نظّف mode المخزّن حتى يعود الزائر لشاشة اختيار الوجهة (أفراد/منشآت)
-    sessionStorage.removeItem('amerni_mode')
+    // زائر بلا حساب — أرسله للـ landing نفسها
+    goHome(navigate)
+    return
   }
   navigate(target)
 }
