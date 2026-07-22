@@ -4,6 +4,7 @@ import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown,
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
 import { getAvatar } from '../../lib/supabase'
+import { goHome } from '../../lib/homePage'
 
 export function Navbar() {
   const { user, profile, signOut } = useAuth()
@@ -31,8 +32,8 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/90 backdrop-blur border-b border-slate-200">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        {/* Logo */}
-        <button onClick={() => { sessionStorage.removeItem('amerni_mode'); navigate('landing') }} className="text-xl font-black text-primary-400">
+        {/* Logo — يذهب دائماً للصفحة الرئيسية المناسبة حسب دور المستخدم */}
+        <button onClick={() => goHome(navigate, profile)} className="text-xl font-black text-primary-400">
           <Logo size={28} />
         </button>
 

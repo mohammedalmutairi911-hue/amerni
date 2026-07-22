@@ -10,6 +10,7 @@ import { COMPANY } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
+import { goHome } from '../lib/homePage'
 import {
   Building2, ChevronDown, ChevronUp, CheckCircle2, ArrowLeft,
   ShieldCheck, Scale, FileText, BadgeDollarSign, Award,
@@ -516,7 +517,9 @@ export function EnterprisesPage() {
       <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/95 backdrop-blur border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={() => { sessionStorage.removeItem('amerni_mode'); navigate('landing') }} className="flex items-center hover:opacity-80 transition-opacity"><Logo size={30} /></button>
+            {/* Logo — يذهب دائماً للصفحة الرئيسية المناسبة حسب دور المستخدم */}
+            <button onClick={() => goHome(navigate, profile)} className="flex items-center hover:opacity-80 transition-opacity"><Logo size={30} /></button>
+            {/* زر تبديل المنصة (منشآت ↕) — سلوك منفصل: يرجع لبوابة اختيار المنصة */}
             <button onClick={() => { sessionStorage.removeItem('amerni_mode'); navigate('landing') }} className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition-colors">منشآت ↕</button>
           </div>
           <div className="hidden md:flex items-center gap-0.5 overflow-x-auto">

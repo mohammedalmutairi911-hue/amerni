@@ -12,6 +12,7 @@ import { ProviderReviews, ResponseSpeed } from '../components/enterprise/UXCompo
 import { NotificationBell } from '../components/ui/NotificationBell'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
+import { goHome } from '../lib/homePage'
 import { useToast } from '../components/Toast'
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
@@ -123,7 +124,7 @@ export function ProviderDashboard() {
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col h-screen fixed right-0 top-0 bg-white border-l border-slate-200 w-64 z-50 shadow-sm">
         <div className="p-6 border-b border-slate-100">
-          <button onClick={() => navigate('landing')} className="text-xl font-black text-primary-500">أمرني</button>
+          <button onClick={() => goHome(navigate, profile)} className="text-xl font-black text-primary-500">أمرني</button>
           <p className="text-xs text-slate-400 mt-1">للمنشآت — مزود خدمة</p>
         </div>
 
