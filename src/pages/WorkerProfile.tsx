@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react'
 import { Star, MapPin, CheckCircle, MessageSquare, ArrowLeft } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
+import { useAuth } from '../contexts/AuthContext'
+import { goHome } from '../lib/homePage'
 import { getAvatar } from '../lib/supabase'
 
 interface Props { workerId: string }
 
 export function WorkerProfile({ workerId }: Props) {
   const { navigate } = useApp()
+  const { profile } = useAuth()
   const [worker, setWorker] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -91,7 +94,7 @@ export function WorkerProfile({ workerId }: Props) {
         )}
 
         {/* CTA */}
-        <button onClick={() => navigate('dashboard')}
+        <button onClick={() => goHome(navigate, profile)}
           className="w-full bg-primary-500 text-white font-bold py-4 rounded-2xl text-base hover:bg-primary-400 transition-colors flex items-center justify-center gap-2 mb-3">
           <MessageSquare size={18} /> اطلب من {worker.full_name.split(' ')[0]}
         </button>

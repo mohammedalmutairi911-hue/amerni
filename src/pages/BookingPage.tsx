@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { ArrowRight, ArrowLeft, MapPin, Clock, CreditCard, CheckCircle, Star, Shield } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
+import { useAuth } from '../contexts/AuthContext'
+import { goHome } from '../lib/homePage'
 
 type Step = 1 | 2 | 3
 
@@ -10,6 +12,7 @@ const DATES = ['١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩', '١٠', '١
 
 export function BookingPage({ onClose }: { onClose: () => void }) {
   const { navigate } = useApp()
+  const { profile } = useAuth()
   const [step, setStep] = useState<Step>(1)
   const [selectedDay, setSelectedDay] = useState(0)
   const [selectedDate, setSelectedDate] = useState(0)
@@ -54,7 +57,7 @@ export function BookingPage({ onClose }: { onClose: () => void }) {
             <span className="text-slate-500">الإجمالي</span>
           </div>
         </div>
-        <button onClick={() => { navigate('dashboard'); onClose() }}
+        <button onClick={() => { goHome(navigate, profile); onClose() }}
           className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors">
           متابعة الطلب
         </button>

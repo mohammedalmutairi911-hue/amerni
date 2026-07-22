@@ -3,6 +3,7 @@ import { COMPANY } from '../lib/constants'
 import { Send, Loader2, Headphones, ArrowLeft, MessageCircle } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
+import { goHome } from '../lib/homePage'
 
 interface Msg {
   role: 'user' | 'assistant'
@@ -132,7 +133,7 @@ export function SupportPage() {
   return (
     <div className="min-h-screen bg-slate-50 pt-14 px-4 py-6 font-sans">
       <div className="max-w-xl mx-auto">
-        <button onClick={() => navigate('dashboard')} className="flex items-center gap-1.5 text-slate-400 hover:text-slate-900 text-sm mb-4 transition-colors">
+        <button onClick={() => goHome(navigate, profile)} className="flex items-center gap-1.5 text-slate-400 hover:text-slate-900 text-sm mb-4 transition-colors">
           ← رجوع
         </button>
 

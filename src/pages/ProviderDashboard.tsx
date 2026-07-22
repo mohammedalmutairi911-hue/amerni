@@ -189,7 +189,7 @@ export function ProviderDashboard() {
         {/* Header */}
         <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex justify-between items-center gap-3 shadow-sm">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate('landing')} className="md:hidden text-lg font-black text-primary-500">أمرني</button>
+            <button onClick={() => goHome(navigate, profile)} className="md:hidden text-lg font-black text-primary-500">أمرني</button>
             <div className="hidden md:block">
               <h2 className="text-xl font-black text-slate-900">لوحة تحكم مزود الخدمة</h2>
               <p className="text-slate-500 text-sm">مرحباً <span className="text-primary-500 font-bold">{providerData.contact_name}</span> 👋</p>

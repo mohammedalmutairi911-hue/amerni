@@ -12,6 +12,7 @@ import { WorkerRegister } from './pages/WorkerRegister'
 import { InstallPrompt } from './components/InstallPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { getHomePage } from './lib/homePage'
 
 // Lazy-loaded pages — code splitting لتسريع التحميل الأول
 const AdminPanel = React.lazy(() => import('./pages/AdminPanel').then(m => ({ default: m.AdminPanel })))
@@ -104,12 +105,19 @@ export default function App() {
 
     if (profile.role === 'admin' && page !== 'admin' && page !== 'admin-enterprises') { navigate('admin', { replace: true }); return }
 
-    // فصل المنصات: حساب المنشآت يبقى في المنشآت، حساب الأفراد في الأفراد
+    // فصل المنصات: كل مستخدم يبقى في منصته + في لوحته الصحيحة حسب الدور
     if (profile.role !== 'admin') {
       const individualPages = ['dashboard', 'worker', 'browse', 'bounties', 'referral', 'earn', 'join', 'worker-profile']
       const enterprisePages = ['enterprises', 'provider-dashboard']
-      if (profile.platform === 'enterprises' && individualPages.includes(page)) { navigate('enterprises', { replace: true }); return }
-      if (profile.platform === 'individuals' && enterprisePages.includes(page)) { navigate('dashboard', { replace: true }); return }
+      const wrongPlatformPage =
+        (profile.platform === 'enterprises' && individualPages.includes(page)) ||
+        (profile.platform === 'individuals' && enterprisePages.includes(page))
+      if (wrongPlatformPage) {
+        // getHomePage تُرجع الصفحة الصحيحة حسب role + platform
+        // (مثال: worker على enterprises → provider-dashboard وليس enterprises)
+        navigate(getHomePage(profile), { replace: true })
+        return
+      }
     }
 
     if (profile.role === 'worker') {

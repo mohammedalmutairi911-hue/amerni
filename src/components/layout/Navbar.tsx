@@ -75,22 +75,18 @@ export function Navbar() {
                     </span>
                   </div>
                   <div className="p-1">
-                    {(profile.role === 'client' || profile.role === 'admin') && (
-                      <>
-                        <button onClick={() => { navigate('dashboard'); setDropOpen(false) }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-                          <LayoutDashboard size={15} /> حسابي
-                        </button>
-                        <button onClick={() => { navigate('browse'); setDropOpen(false) }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-                          <Users size={15} /> تصفح العمال
-                        </button>
-                      </>
-                    )}
-                    {profile.role === 'worker' && (
-                      <button onClick={() => { navigate('worker'); setDropOpen(false) }}
+                    {/* "حسابي" — يستخدم goHome ليأخذ كل مستخدم للصفحة الرئيسية الصحيحة حسب الدور والمنصة */}
+                    {profile.role !== 'admin' && (
+                      <button onClick={() => { goHome(navigate, profile); setDropOpen(false) }}
                         className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-                        <Briefcase size={15} /> مهامي
+                        <LayoutDashboard size={15} /> حسابي
+                      </button>
+                    )}
+                    {/* "تصفح العمال" — خاص بمنصة الأفراد فقط (browse تصفّح العمال الأفراد) */}
+                    {(profile.role === 'client' || profile.role === 'admin') && (profile as any).platform !== 'enterprises' && (
+                      <button onClick={() => { navigate('browse'); setDropOpen(false) }}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                        <Users size={15} /> تصفح العمال
                       </button>
                     )}
                     {profile.role === 'admin' && (
@@ -99,10 +95,13 @@ export function Navbar() {
                         <Shield size={15} /> الإدارة
                       </button>
                     )}
-                    <button onClick={() => { navigate('enterprises'); setDropOpen(false) }}
-                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-primary-500 hover:bg-primary-50 rounded-lg transition-colors font-medium">
-                      <Building2 size={15} /> المنشآت
-                    </button>
+                    {/* رابط المنشآت — يُظهَر فقط لمستخدمي الأفراد (لتصفح القسم) والأدمن، مخفي لمن هو أصلاً في المنشآت */}
+                    {(profile as any).platform !== 'enterprises' && (
+                      <button onClick={() => { navigate('enterprises'); setDropOpen(false) }}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-primary-500 hover:bg-primary-50 rounded-lg transition-colors font-medium">
+                        <Building2 size={15} /> المنشآت
+                      </button>
+                    )}
                     <button onClick={() => { signOut(); setDropOpen(false) }}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-950/30 rounded-lg transition-colors">
                       <LogOut size={15} /> خروج

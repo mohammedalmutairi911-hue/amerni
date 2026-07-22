@@ -3,6 +3,7 @@ import { Zap, MapPin, Clock, ChevronLeft, Plus, Loader2, CheckCircle } from 'luc
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
+import { goHome } from '../lib/homePage'
 import { useToast } from '../components/Toast'
 import { Task } from '../types'
 
@@ -13,7 +14,7 @@ const STATUS_COLOR: Record<string, string> = {
 }
 
 export function BountiesPage() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { navigate } = useApp()
   const { toast } = useToast()
   const [tasks, setTasks] = useState<Task[]>([])
@@ -74,7 +75,7 @@ export function BountiesPage() {
             <h1 className="text-3xl font-black mb-2">الطلبات المتاحة</h1>
             <p className="text-slate-400">طلبات حية من عملاء ينتظرون — اقبل وابدأ</p>
           </div>
-          <button onClick={() => navigate('dashboard')}
+          <button onClick={() => goHome(navigate, profile)}
             className="flex items-center gap-2 bg-primary-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-primary-400 transition-colors">
             <Plus size={15} /> أضف طلب
           </button>

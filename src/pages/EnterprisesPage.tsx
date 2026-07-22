@@ -834,7 +834,7 @@ export function EnterprisesPage() {
                 </nav>
 
                 <div className="p-3 border-t border-slate-800">
-                  <button onClick={() => navigate('landing')}
+                  <button onClick={() => setActiveTab('home')}
                     className="w-full flex items-center justify-center gap-2 px-3 py-2 text-slate-500 hover:text-slate-300 transition-colors text-sm">
                     <LogOut size={14} /> خروج من الداشبورد
                   </button>
@@ -1147,7 +1147,7 @@ export function EnterprisesPage() {
                   <Plus size={20} />
                   <span className="text-[10px] font-medium">طلب جديد</span>
                 </button>
-                <button onClick={() => navigate('landing')}
+                <button onClick={() => setActiveTab('home')}
                   className="flex flex-col items-center gap-1 px-6 py-1 text-slate-500">
                   <LogOut size={20} />
                   <span className="text-[10px] font-medium">خروج</span>

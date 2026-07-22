@@ -3,6 +3,7 @@ import { Search, Star, MapPin, CheckCircle, ArrowLeft, MessageSquare, Filter } f
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
+import { goHome } from '../lib/homePage'
 import { WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 
@@ -11,7 +12,7 @@ const CITIES = ['الكل', 'الرياض', 'جدة', 'مكة', 'المدينة'
 
 export function BrowseWorkers() {
   const { navigate } = useApp()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [workers, setWorkers] = useState<WorkerProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -96,7 +97,7 @@ export function BrowseWorkers() {
         )}
 
         {/* CTA */}
-        <button onClick={() => { if (user) navigate('dashboard'); else navigate('landing') }}
+        <button onClick={() => goHome(navigate, profile)}
           className="w-full bg-primary-500 text-white font-bold py-4 rounded-2xl text-base hover:bg-primary-400 transition-colors flex items-center justify-center gap-2">
           <MessageSquare size={18} /> اطلب من {selectedWorker.full_name.split(' ')[0]}
         </button>

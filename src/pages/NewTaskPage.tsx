@@ -5,6 +5,7 @@ import { filterContent } from '../lib/contentFilter'
 import { trackEvent } from '../lib/analytics'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
+import { goHome } from '../lib/homePage'
 
 const SUGGESTED_CATS = ['توصيل ومشاوير', 'تصوير ومحتوى', 'تحقق ومتابعة', 'تسوق ومشتريات', 'تعليم وشرح', 'مساعدة إدارية', 'استشارة قانونية', 'استشارة مالية', 'استشارة تغذية', 'تنسيق حفلات وفعاليات', 'ترجمة ومراجعة', 'تصميم وإبداع', 'أخرى']
 const CITIES = ['الرياض', 'جدة', 'مكة', 'المدينة', 'الدمام', 'الخبر', 'تبوك', 'أبها', 'حائل', 'جازان', 'القصيم', 'نجران']
@@ -24,7 +25,7 @@ const detectCategory = (title: string): string => {
 interface Props { initialTask?: string; onClose: () => void }
 
 export function NewTaskPage({ initialTask = '', onClose }: Props) {
-  const { user, signUp, signIn, signInWithGoogle } = useAuth()
+  const { user, profile, signUp, signIn, signInWithGoogle } = useAuth()
   const { navigate } = useApp()
   const [step, setStep] = useState<'details' | 'auth'>('details')
   
@@ -144,7 +145,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       setLoading(true)
       saveTask(user.id).then(ok => {
         setLoading(false)
-        if (ok) { navigate('dashboard'); onClose() }
+        if (ok) { goHome(navigate, profile); onClose() }
       })
     } else {
       goToAuth()
@@ -192,7 +193,8 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
         if (!ok) { setLoading(false); return }
       }
       setLoading(false)
-      navigate('dashboard')
+      // signup مضبوط على client/individuals — لذا goHome سيرجّع 'dashboard'
+      goHome(navigate, { role: 'client', platform: 'individuals' } as any)
       onClose()
       return
     } else {
@@ -211,7 +213,9 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     }
 
     setLoading(false)
-    navigate('dashboard')
+    // بعد تسجيل الدخول قد يكون المستخدم منصة منشآت — نجيب البروفايل فريش
+    const { data: prof } = await supabase.from('profiles').select('*').eq('id', uid).maybeSingle()
+    goHome(navigate, prof)
     onClose()
   }
 

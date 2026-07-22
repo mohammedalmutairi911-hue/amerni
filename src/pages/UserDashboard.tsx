@@ -3,6 +3,7 @@ import { Plus, CheckCircle, Clock, Loader2, MessageSquare, Star, DollarSign, Hom
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
+import { goHome } from '../lib/homePage'
 import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
 import { Chat } from '../components/chat/Chat'
@@ -328,7 +329,7 @@ export function UserDashboard() {
       {/* Sidebar Desktop */}
       <aside className="hidden lg:flex flex-col h-screen fixed right-0 border-l border-slate-200 bg-slate-900 w-64 z-50">
         <div className="p-6 border-b border-slate-800">
-          <button onClick={() => navigate('landing')} className="text-xl font-black text-amber-400 hover:opacity-80 transition-opacity">آمرني</button>
+          <button onClick={() => goHome(navigate, profile)} className="text-xl font-black text-amber-400 hover:opacity-80 transition-opacity">آمرني</button>
         </div>
 
         <div className="px-4 py-5 flex flex-col items-center border-b border-slate-800">
@@ -372,7 +373,7 @@ export function UserDashboard() {
 
         {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
-          <button onClick={() => navigate('landing')} className="text-lg font-black text-amber-400">آمرني</button>
+          <button onClick={() => goHome(navigate, profile)} className="text-lg font-black text-amber-400">آمرني</button>
           <button onClick={() => setShowNew(true)} className="flex items-center gap-1.5 bg-amber-400 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
             <Plus size={14} /> طلب جديد
           </button>

@@ -3,6 +3,7 @@ import { COMPANY } from '../lib/constants'
 import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
+import { goHome, getHomePage } from '../lib/homePage'
 import { supabase } from '../lib/supabase'
 import { NewTaskPage } from './NewTaskPage'
 import { ServiceBrowsePage } from './ServiceBrowsePage'
@@ -323,7 +324,7 @@ export function LandingPage() {
   }
 
   const handleStart = () => {
-    if (!taskInput.trim() && user) { navigate('dashboard'); return }
+    if (!taskInput.trim() && user) { goHome(navigate, profile); return }
     setShowNewTask(true)
   }
 
@@ -406,7 +407,7 @@ export function LandingPage() {
             ))}
           </div>
           {user ? (
-            <button onClick={() => navigate('dashboard')} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
+            <button onClick={() => goHome(navigate, profile)} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
               حسابي
             </button>
           ) : (
@@ -1080,7 +1081,17 @@ export function LandingPage() {
                 </button>
               ))}
             </div>
-            <DirectAuthForm mode={authDirectMode} onSuccess={() => { setShowAuthDirect(false); navigate('dashboard') }} />
+            <DirectAuthForm mode={authDirectMode} onSuccess={async () => {
+              setShowAuthDirect(false)
+              // نجيب البروفايل فريش لأن profile في closure قديم
+              const { data: { user: cu } } = await supabase.auth.getUser()
+              if (cu) {
+                const { data: prof } = await supabase.from('profiles').select('*').eq('id', cu.id).maybeSingle()
+                goHome(navigate, prof)
+              } else {
+                navigate('landing')
+              }
+            }} />
           </div>
         </div>
       )}
