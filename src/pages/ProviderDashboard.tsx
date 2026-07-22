@@ -12,6 +12,7 @@ import { ProviderReviews, ResponseSpeed } from '../components/enterprise/UXCompo
 import { NotificationBell } from '../components/ui/NotificationBell'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
+import { useToast } from '../components/Toast'
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   new:       { label: 'جديد', color: 'bg-blue-50 text-blue-600 border-blue-200' },
@@ -35,6 +36,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export function ProviderDashboard() {
   const { user, profile, signOut } = useAuth()
   const { navigate } = useApp()
+  const { toast } = useToast()
 
   const [tab, setTab] = useState<'overview' | 'available' | 'leads' | 'profile'>('overview')
   const [providerData, setProviderData] = useState<any>(null)
@@ -69,9 +71,9 @@ export function ProviderDashboard() {
     setAccepting(leadId)
     const { error } = await supabase.rpc('provider_accept_lead', { p_lead_id: leadId })
     if (error) {
-      alert(error.message.includes('قبله مزود') ? 'عذراً، قبِل هذا الطلب مزود آخر قبلك' : 'خطأ: ' + error.message)
+      toast(error.message.includes('قبله مزود') ? 'عذراً، قبِل هذا الطلب مزود آخر قبلك' : 'خطأ: ' + error.message, 'error')
     } else {
-      alert('✅ قبلت الطلب! تواصل مع الشركة الآن من تبويب "طلباتي"')
+      toast('✅ قبلت الطلب! تواصل مع الشركة من تبويب "طلباتي"', 'success')
     }
     await fetchAll()
     setAccepting(null)

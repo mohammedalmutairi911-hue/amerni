@@ -384,8 +384,7 @@ export function LandingPage() {
   const handleBounties = () => navigate('bounties')
   const handleEarn = () => navigate('earn')
 
-  if (showBrowse) return <ServiceBrowsePage onClose={() => setShowBrowse(false)} />
-  if (showNewTask) return <NewTaskPage onClose={() => setShowNewTask(false)} />
+  if (showBrowse) return <ServiceBrowsePage onClose={() => setShowBrowse(false)} onRequestService={(roleHint) => { setShowBrowse(false); if (roleHint) setTaskInput(roleHint); setShowNewTask(true) }} />
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
@@ -641,7 +640,7 @@ export function LandingPage() {
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                   <div>
                     <p className="font-black text-xl text-slate-900 mb-1">آمرني</p>
-                    <p className="text-slate-400 text-sm">نظام الخدمات المنزلية الذكي</p>
+                    <p className="text-slate-400 text-sm">منصة الخدمات والمهام اليومية</p>
                   </div>
                   <div className="flex flex-wrap gap-4 text-sm text-slate-400">
                     <button onClick={() => setActiveTab('privacy')} className="hover:text-slate-900 transition-colors">سياسة الخصوصية</button>
@@ -766,14 +765,14 @@ export function LandingPage() {
                   <span className="text-4xl font-black text-slate-900">آ</span>
                 </div>
                 <h2 className="text-4xl font-black text-slate-900 mb-4">من نحن</h2>
-                <p className="text-slate-500 text-lg leading-relaxed">منصة آمرني — نظام الخدمات المنزلية الذكي</p>
+                <p className="text-slate-500 text-lg leading-relaxed">منصة آمرني — منصة الخدمات والمهام اليومية</p>
               </div>
 
               <div className="space-y-6">
                 <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
                   <h3 className="text-xl font-bold text-slate-900 mb-4">من نحن؟</h3>
                   <p className="text-slate-500 leading-loose">
-                    نحن مؤسسة حلول الغد للخدمات الإلكترونية — نقدم منصة آمرني السعودية الرائدة التي تربطك بأفضل المحترفين المعتمدين في المملكة لضمان جودة منزلك وراحتك. بدأت الفكرة من حاجة حقيقية: كيف أجد محترفاً موثوقاً لإنجاز خدمة منزلية دون خوف أو تعقيد؟
+                    نحن مؤسسة حلول الغد للخدمات الإلكترونية — نقدم منصة آمرني السعودية التي تربطك بمقدّمي خدمات موثوقين في المملكة لإنجاز مهامك وخدماتك اليومية بسرعة وأمان. بدأت الفكرة من حاجة حقيقية: كيف أجد شخصاً موثوقاً يساعدني في مهمة — من توصيل أو تسوّق أو تصوير أو مساعدة إدارية — دون خوف أو تعقيد؟
                   </p>
                 </div>
 

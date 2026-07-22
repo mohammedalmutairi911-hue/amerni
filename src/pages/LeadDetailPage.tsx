@@ -7,6 +7,7 @@ import { ProviderProfileCard } from '../components/enterprise/ProviderProfileCar
 import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { StatusTimeline } from '../components/enterprise/UXComponents'
 import { ReviewBox } from '../components/enterprise/ReviewBox'
+import { useToast } from '../components/Toast'
 
 const STATUS_MAP: Record<string, { label: string; color: string; dot: string }> = {
   open:      { label: 'منشور — بانتظار مزود', color: 'bg-blue-50 text-blue-600 border-blue-200', dot: 'bg-blue-400' },
@@ -27,6 +28,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function LeadDetailPage() {
   const { navigate } = useApp()
+  const { toast } = useToast()
   const { user, profile } = useAuth()
   const [lead, setLead] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -66,8 +68,9 @@ export function LeadDetailPage() {
     setChanging(true)
     const { error } = await supabase.rpc('company_change_provider', { p_lead_id: lead.id })
     setChanging(false)
-    if (error) { alert('خطأ: ' + error.message); return }
+    if (error) { toast('خطأ: ' + error.message, 'error'); return }
     setLead((l: any) => ({ ...l, status: 'open', provider_id: null, company_accepted: false }))
+    toast('تم استبعاد المزود — طلبك الآن متاح لباقي المزودين', 'info')
     setTimeout(goBack, 1500)
   }
 
@@ -76,10 +79,10 @@ export function LeadDetailPage() {
     setClosing(true)
     const { data, error } = await supabase.rpc('close_enterprise_lead', { p_lead_id: lead.id, p_contract_value: num })
     setClosing(false)
-    if (error) { alert('خطأ: ' + error.message); return }
+    if (error) { toast('خطأ: ' + error.message, 'error'); return }
     setShowClose(false)
     setLead((l: any) => ({ ...l, status: 'closed' }))
-    alert('✅ تم إغلاق الطلب' + (data?.commission ? ` — العمولة المستحقة: ${data.commission} ريال` : ''))
+    toast('✅ تم إغلاق الطلب' + (data?.commission ? ` — العمولة المستحقة: ${data.commission} ريال` : ''), 'success')
   }
 
   if (loading) return (

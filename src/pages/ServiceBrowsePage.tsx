@@ -15,11 +15,18 @@ const PROFESSIONALS = [
   { id: 8, name: 'أحمد البقمي', role: 'تسوق ومشتريات شخصية', rating: '4.7', reviews: 148, jobs: '١٤٠+', price: '٤٠', category: '🛍️ تسوق', area: 'الرياض', badge: '' },
 ]
 
-export function ServiceBrowsePage({ onClose }: { onClose: () => void }) {
+export function ServiceBrowsePage({ onClose, onRequestService }: { onClose: () => void; onRequestService?: (roleHint?: string) => void }) {
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('الكل')
   const [showBooking, setShowBooking] = useState(false)
   const [sortBy, setSortBy] = useState<'rating'|'price'|'jobs'>('rating')
+
+  // الحجز الحقيقي يتم عبر تدفق "اطلب خدمة" (نشر طلب → مزوّد يقبل).
+  // لو ما توفّر onRequestService (استخدام قديم) نرجع لشاشة العرض التوضيحية.
+  const handleBook = (roleHint?: string) => {
+    if (onRequestService) { onRequestService(roleHint); return }
+    setShowBooking(true)
+  }
 
   if (showBooking) return <BookingPage onClose={() => setShowBooking(false)} />
 
@@ -75,7 +82,11 @@ export function ServiceBrowsePage({ onClose }: { onClose: () => void }) {
 
       {/* Results */}
       <div className="max-w-5xl mx-auto px-4 py-6">
-        <p className="text-sm text-slate-500 mb-4">{filtered.length} محترف متاح</p>
+        <div className="mb-4 flex items-start gap-2 bg-blue-50 border border-blue-100 rounded-xl px-3 py-2.5 text-xs text-blue-700">
+          <span className="text-sm leading-none">💡</span>
+          <span>هذه نماذج توضيحية لأنواع الخدمات المتاحة. اضغط "اطلب خدمة مشابهة" وسيصلك عرض من مزوّدين حقيقيين في منطقتك.</span>
+        </div>
+        <p className="text-sm text-slate-500 mb-4">{filtered.length} نموذج خدمة</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(pro => (
@@ -127,9 +138,9 @@ export function ServiceBrowsePage({ onClose }: { onClose: () => void }) {
                   <span className="text-slate-900 font-black text-base mr-1">{pro.price}</span>
                   <span className="text-xs text-slate-400"> ر.س/ساعة</span>
                 </div>
-                <button onClick={() => setShowBooking(true)}
+                <button onClick={() => handleBook(pro.role)}
                   className="bg-primary-500 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-primary-700 transition-colors flex items-center gap-1.5">
-                  احجز الآن <ArrowLeft size={13} />
+                  اطلب خدمة مشابهة <ArrowLeft size={13} />
                 </button>
               </div>
             </div>

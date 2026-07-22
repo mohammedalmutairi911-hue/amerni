@@ -21,7 +21,9 @@ export function AuthModal() {
   const submit = async () => {
     setError('')
     if (!form.email || !form.password) { setError('أكمل البيانات'); return }
-    if (tab === 'signup' && !form.name) { setError('أدخل اسمك'); return }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) { setError('أدخل بريداً إلكترونياً صحيحاً'); return }
+    if (tab === 'signup' && !form.name.trim()) { setError('أدخل اسمك'); return }
+    if (tab === 'signup' && form.password.length < 6) { setError('كلمة المرور 6 أحرف على الأقل'); return }
     setLoading(true)
     if (tab === 'login') {
       const { error } = await signIn(form.email, form.password)
@@ -39,7 +41,16 @@ export function AuthModal() {
       // في المنشآت الدور دائماً client (الشركة)، الفصل عبر platform
       const signupRole = isEnterprise ? 'client' : role
       const { error } = await signUp(form.email, form.password, form.name, signupRole, authPlatform)
-      if (error) { setError(error.message); setLoading(false); return }
+      if (error) {
+        // ترجمة أخطاء Supabase الشائعة للعربية بدل عرضها بالإنجليزية
+        const m = error.message?.toLowerCase() || ''
+        if (m.includes('already registered') || m.includes('already been registered') || m.includes('user already')) setError('هذا البريد مسجّل مسبقاً — سجّل الدخول')
+        else if (m.includes('password')) setError('كلمة المرور ضعيفة — 6 أحرف على الأقل')
+        else if (m.includes('invalid') && m.includes('email')) setError('بريد إلكتروني غير صحيح')
+        else if (m.includes('rate limit') || m.includes('too many')) setError('محاولات كثيرة — انتظر قليلاً ثم أعد المحاولة')
+        else setError('تعذّر إنشاء الحساب — حاول مجدداً')
+        setLoading(false); return
+      }
     }
     setLoading(false)
     closeAuth()
@@ -84,7 +95,7 @@ export function AuthModal() {
               <div>
                 <label className="block text-xs text-slate-400 mb-1">الاسم الكامل</label>
                 <input value={form.name} onChange={e => set('name', e.target.value)}
-                  placeholder="محمد العتيبي"
+                  autoComplete="name" placeholder="محمد العتيبي"
                   className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
               </div>
 
@@ -114,7 +125,7 @@ export function AuthModal() {
           <div>
             <label className="block text-xs text-slate-400 mb-1">البريد الإلكتروني</label>
             <input type="email" value={form.email} onChange={e => set('email', e.target.value)}
-              placeholder="example@gmail.com"
+              autoComplete="email" inputMode="email" dir="ltr" placeholder="example@gmail.com"
               className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
           </div>
 
@@ -122,6 +133,8 @@ export function AuthModal() {
             <label className="block text-xs text-slate-400 mb-1">كلمة المرور</label>
             <div className="relative">
               <input type={showPass ? 'text' : 'password'} value={form.password} onChange={e => set('password', e.target.value)}
+                autoComplete={tab === 'signup' ? 'new-password' : 'current-password'} dir="ltr"
+                onKeyDown={e => e.key === 'Enter' && submit()}
                 placeholder="••••••••"
                 className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
               <button type="button" onClick={() => setShowPass(!showPass)}
