@@ -8,13 +8,17 @@
    قواعد أساسية للموبايل (Mobile foundation)
    ═══════════════════════════════════════════ */
 
-html, body {
+html {
   margin: 0;
-  /* منع التمرير الأفقي كإجراء وقائي عام على جميع الشاشات */
-  overflow-x: hidden;
   /* منع التكبير التلقائي عند الدوران في iOS */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  /* منع التمرير الأفقي — على body فقط وليس html عشان ما يكسر السكرول العمودي */
+  overflow-x: hidden;
 }
 
 body {
