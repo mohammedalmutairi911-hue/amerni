@@ -137,17 +137,8 @@ export function WorkerRegister({ onSuccess }: Props) {
       // Update role to worker via secure RPC
       await supabase.rpc('set_role_to_worker')
       
-      // إشعار الأدمن بعامل جديد
-      const { data: admins } = await supabase.from('profiles_public').select('id').eq('role', 'admin')
-      if (admins?.length) {
-        await supabase.from('notifications').insert(
-          admins.map(a => ({
-            user_id: a.id,
-            title: 'عامل جديد ينتظر الموافقة 👤',
-            body: `${profile!.full_name} — ${form.city} — ${form.skills.join('، ')}`
-          }))
-        )
-      }
+      // إشعار الأدمن بعامل جديد — عبر RPC آمن (لا يسمح بحقن إشعارات لمستخدمين آخرين)
+      await supabase.rpc('notify_admins_new_worker', { p_city: form.city, p_skills: form.skills })
       
       await refreshProfile()
       onSuccess()
