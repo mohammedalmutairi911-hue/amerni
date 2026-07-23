@@ -3,7 +3,7 @@ import { COMPANY } from '../lib/constants'
 import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
-import { goHome, getHomePage, goToUserHome } from '../lib/homePage'
+import { goHome, getHomePage, goToUserHome, profilePlatform, isUserInPortal } from '../lib/homePage'
 import { supabase } from '../lib/supabase'
 import { NewTaskPage } from './NewTaskPage'
 import { ServiceBrowsePage } from './ServiceBrowsePage'
@@ -200,6 +200,9 @@ export function LandingPage() {
   const { navigate } = useApp()
   const { user, profile } = useAuth()
 
+  // عضوية بوابة الأفراد — حساب المنشآت هنا يُعامل كزائر (الأدمن استثناء)
+  const inPortal = !!(user && profile && isUserInPortal(profile, 'individuals'))
+
   // ── Gateway: أفراد أو منشآت ──────────────────
   // المستخدم المسجل يتجاوز الشاشة مباشرة.
   // نقرأ الاختيار من history.state بدل sessionStorage — عشان:
@@ -207,8 +210,11 @@ export function LandingPage() {
   //   2) إعادة تحميل الصفحة (F5) تحتفظ بالوضع الحالي
   //   3) زر رجوع في المتصفح يشتغل صح (يرجّع للـ gateway بدل ما يطلع من الموقع)
   const [mode, setModeRaw] = useState<'individuals' | 'enterprises' | null>(() => {
-    // لا نفرض 'individuals' على المستخدم المسجَّل — البوابة تُعرض للجميع
-    // ما لم يختر المستخدم وجهة صراحةً (محفوظة في history.state).
+    // مستخدم أفراد مسجَّل ⇒ Home الأفراد مباشرة (وليس شاشة الاختيار).
+    // الزائر ⇒ بوابة الاختيار. الأدمن ⇒ بوابة الاختيار ليختار البوابة التي يشرف عليها.
+    if (user && profile && profile.role !== 'admin' && profilePlatform(profile) === 'individuals') {
+      return 'individuals'
+    }
     return (window.history.state?.amerni_mode as 'individuals' | 'enterprises' | null) || null
   })
   const setMode = (m: 'individuals' | 'enterprises' | null) => {
@@ -418,7 +424,7 @@ export function LandingPage() {
               </button>
             ))}
           </div>
-          {user ? (
+          {inPortal ? (
             <button onClick={() => goToUserHome(navigate, profile)} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">
               حسابي
             </button>
@@ -440,7 +446,7 @@ export function LandingPage() {
         </div>
       </nav>
 
-      <div className="flex-1 pt-14">
+      <div className="flex-1 pt-[5.5rem] md:pt-14">
 
         {/* HOME */}
         {activeTab === 'home' && (

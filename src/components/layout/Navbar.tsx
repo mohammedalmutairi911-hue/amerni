@@ -4,7 +4,7 @@ import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown,
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
 import { getAvatar } from '../../lib/supabase'
-import { goHome, goToUserHome } from '../../lib/homePage'
+import { goHome, goToUserHome, isUserInPortal } from '../../lib/homePage'
 
 export function Navbar() {
   const { user, profile, signOut } = useAuth()
@@ -12,6 +12,10 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropOpen, setDropOpen] = useState(false)
   const dropRef = useRef<HTMLDivElement>(null)
+
+  // هل المستخدم عضو في بوابة الأفراد؟ (الأدمن استثناء يصل للجميع)
+  // حساب المنشآت داخل بوابة الأفراد يُعامل كزائر: لا نعيد استخدام جلسته.
+  const inPortal = !!(user && profile && isUserInPortal(profile, 'individuals'))
 
   // إغلاق قائمة الحساب عند الضغط خارجها (كانت تبقى مفتوحة)
   useEffect(() => {
@@ -37,7 +41,7 @@ export function Navbar() {
           <Logo size={28} />
         </button>
 
-        {!user && (
+        {!inPortal && (
           <div className="hidden md:flex items-center gap-6 text-sm text-slate-500">
             <button onClick={() => scrollTo('how-it-works')} className="hover:text-slate-900 transition-colors">كيف تشتغل</button>
             <button onClick={() => scrollTo('features')} className="hover:text-slate-900 transition-colors">المميزات</button>
@@ -50,14 +54,14 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-3">
-          {user && profile ? (
+          {inPortal && profile ? (
             <div className="relative" ref={dropRef}>
               <button
                 onClick={() => setDropOpen(!dropOpen)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-slate-100 transition-colors"
               >
                 <img src={profile.avatar_url || getAvatar(profile.full_name)} className="w-7 h-7 rounded-full" alt="" />
-                <span className="text-sm hidden sm:block">{profile.full_name}</span>
+                <span className="text-sm block max-w-[7rem] sm:max-w-none truncate">{profile.full_name}</span>
                 <ChevronDown size={14} className="text-slate-400" />
               </button>
 

@@ -10,7 +10,7 @@ import { COMPANY } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
-import { goHome } from '../lib/homePage'
+import { goHome, isUserInPortal } from '../lib/homePage'
 import {
   Building2, ChevronDown, ChevronUp, CheckCircle2, ArrowLeft,
   ShieldCheck, Scale, FileText, BadgeDollarSign, Award,
@@ -143,6 +143,9 @@ const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = 
 export function EnterprisesPage() {
   const { user, profile } = useAuth()
   const { navigate, openAuth } = useApp()
+
+  // عضوية بوابة المنشآت — حساب الأفراد هنا يُعامل كزائر (الأدمن استثناء)
+  const inPortal = !!(user && profile && isUserInPortal(profile, 'enterprises'))
 
   const [activeTab, setActiveTab] = useState<Tab>(() => {
     const saved = sessionStorage.getItem('enterprises_tab') as Tab
@@ -531,24 +534,24 @@ export function EnterprisesPage() {
             ))}
           </div>
           <div className="flex items-center gap-2">
-            {user && <NotificationBell />}
-            {!user && (
+            {inPortal && <NotificationBell />}
+            {!inPortal && (
               <button onClick={() => openAuth('login', 'enterprises')}
                 className="text-xs px-3 py-1.5 rounded-lg border border-primary-500 text-primary-500 font-bold hover:bg-primary-50 transition-colors">
                 تسجيل الدخول
               </button>
             )}
-            {user && (
+            {inPortal && (
               <button onClick={() => navigateTab('my-requests')}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${activeTab === 'my-requests' ? 'bg-primary-500 text-white border-primary-500' : 'border-slate-200 text-slate-600 hover:border-primary-300'}`}>
+                className={`hidden md:inline-flex text-xs px-3 py-1.5 rounded-lg border transition-colors ${activeTab === 'my-requests' ? 'bg-primary-500 text-white border-primary-500' : 'border-slate-200 text-slate-600 hover:border-primary-300'}`}>
                 طلباتي
               </button>
             )}
             <button onClick={() => setActiveTab('provider-register')}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${activeTab === 'provider-register' ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 text-slate-600 hover:border-slate-400'}`}>
+              className={`hidden md:inline-flex text-xs px-3 py-1.5 rounded-lg border transition-colors ${activeTab === 'provider-register' ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 text-slate-600 hover:border-slate-400'}`}>
               سجّل كمزود
             </button>
-            {user && (
+            {inPortal && (
               <button onClick={() => navigate('provider-dashboard')}
                 className="text-xs px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-white hover:bg-slate-700 transition-colors">
                 لوحة المزود
@@ -573,7 +576,7 @@ export function EnterprisesPage() {
         </div>
       </nav>
 
-      <div className="flex-1 pt-14">
+      <div className="flex-1 pt-[5.5rem] md:pt-14">
 
         {/* ══ HOME ══ */}
         {activeTab === 'home' && (
@@ -859,7 +862,7 @@ export function EnterprisesPage() {
                   {dashSection === 'dashboard' && (
                     <div className="space-y-5 animate-fade-in">
                       {/* Header Row */}
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                           <p className="text-slate-500 text-sm font-medium flex items-center gap-1.5">
                             👋 صباح الخير، {profile?.full_name || user.email?.split('@')[0]}

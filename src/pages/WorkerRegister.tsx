@@ -151,7 +151,7 @@ export function WorkerRegister({ onSuccess }: Props) {
   const STEP_LABELS = ['البيانات', 'الهوية', 'المهارات', 'الجدول']
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-20 px-4 pb-10">
+    <div className="min-h-screen bg-slate-50 pt-14 px-4 pb-10">
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold mb-1">سجّل كعامل في أمرني</h1>
