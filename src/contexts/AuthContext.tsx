@@ -65,14 +65,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!error && data.user) {
       // TikTok Pixel - تسجيل ناجح
       try { (window as any).ttq?.track('CompleteRegistration') } catch {}
+      // ملاحظة: إنشاء الـ profile يتم حصراً عبر trigger قاعدة البيانات
+      // (on_auth_user_created → handle_new_user) اعتماداً على بيانات التسجيل أعلاه.
+      // لا نكتب الـ profile من العميل حتى لا يوجد مساران لإنشاء نفس السجل.
       setTimeout(async () => {
-        try {
-          await supabase.from('profiles').upsert({
-            id: data.user!.id, email, full_name: fullName, role, platform, phone_verified: false
-          })
-        } catch {
-          // تجاهل الخطأ بصمت
-        }
         await fetchProfile(data.user!.id)
       }, 500)
     }
