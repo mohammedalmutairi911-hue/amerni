@@ -567,7 +567,7 @@ export function ProviderDashboard() {
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 right-0 w-full flex justify-around items-center h-16 bg-white border-t border-slate-200 z-50 shadow-lg">
+      <nav className="md:hidden fixed bottom-0 right-0 w-full flex justify-around items-center h-16 bg-white border-t border-slate-200 z-50 shadow-lg mobile-bottom-nav">
         {[
           { id: 'overview', icon: Home, label: 'الرئيسية' },
           { id: 'available', icon: Zap, label: 'المتاحة', badge: availableLeads.length },

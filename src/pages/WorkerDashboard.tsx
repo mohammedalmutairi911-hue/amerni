@@ -866,7 +866,7 @@ export function WorkerDashboard() {
       </div>{/* right column */}
 
       {/* ── Bottom Navigation — Mobile Only ── */}
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-lg z-50 flex flex-row-reverse justify-around items-center py-2 px-2">
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-lg z-50 flex flex-row-reverse justify-around items-center py-2 px-2 mobile-bottom-nav">
         {[
           { id: 'overview', icon: '🏠', label: 'الرئيسية' },
           { id: 'shifts', icon: '🕐', label: 'الورديات' },

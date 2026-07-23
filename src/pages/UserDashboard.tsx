@@ -659,7 +659,7 @@ export function UserDashboard() {
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="lg:hidden fixed bottom-0 right-0 w-full flex justify-around items-center h-16 bg-slate-900 border-t border-slate-800 z-50">
+      <nav className="lg:hidden fixed bottom-0 right-0 w-full flex justify-around items-center h-16 bg-slate-900 border-t border-slate-800 z-50 mobile-bottom-nav">
         {[
           { id: 'dashboard', icon: Home, label: 'الرئيسية' },
           { id: 'orders', icon: List, label: 'طلباتي', badge: tasks.filter(t=>t.status==='pending_confirmation').length },

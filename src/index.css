@@ -3,11 +3,83 @@
 @tailwind utilities;
 
 * { box-sizing: border-box; }
-body {
+
+/* ═══════════════════════════════════════════
+   قواعد أساسية للموبايل (Mobile foundation)
+   ═══════════════════════════════════════════ */
+
+html, body {
   margin: 0;
+  /* منع التمرير الأفقي كإجراء وقائي عام على جميع الشاشات */
+  overflow-x: hidden;
+  /* منع التكبير التلقائي عند الدوران في iOS */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
   background: #f8fafc;
   color: #18181b;
   font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+  /* التمرير الناعم على iOS */
+  -webkit-overflow-scrolling: touch;
+  /* منع التصرّف المطاطي (bounce) في iOS عند وصول أطراف الصفحة */
+  overscroll-behavior-y: none;
+  /* عرض النص أفضل على أجهزة الشاشات عالية الدقة */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* منع التفاف كلمات طويلة (URLs / إيميلات) للخارج على الموبايل */
+p, span, div, h1, h2, h3, h4, h5, h6, a, li, td, th, label {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* ───────────── منع تكبير iOS عند التركيز على input ─────────────
+   قاعدة iOS Safari: أي input أقل من 16px يسبّب zoom تلقائي عند focus.
+   نجبر جميع الحقول على 16px في شاشات ≤640px (mobile) لمنع هذا السلوك.
+*/
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* ───────────── إزالة تأخير النقر 300ms + تحسين اللمس ───────────── */
+button, a, [role="button"], input[type="button"], input[type="submit"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ───────────── دعم Safe Area (نوتش/شريط الهوم في iPhone) ───────────── */
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+}
+.safe-top {
+  padding-top: max(env(safe-area-inset-top), 0.5rem);
+}
+/* هامش من الأسفل لعناصر تحت الـ bottom nav على iOS */
+@supports (padding: max(0px)) {
+  .mobile-bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+    /* لضمان أن الـ bar نفسه لا يُقصّ خلف شريط الهوم */
+  }
+  .content-safe-bottom {
+    /* للـ main content فوق الـ bottom nav */
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* ───────────── وحدة svh/dvh لـ iOS Safari (bounce address bar) ─────────────
+   يستخدمها المكونات التي تعتمد min-h-screen — polyfill خفيف
+*/
+.min-h-screen-safe {
+  min-height: 100vh; /* fallback */
+  min-height: 100svh; /* small viewport height — iOS 15.4+ */
+  min-height: 100dvh; /* dynamic viewport height — أحدث */
 }
 
 /* Scrollbar */
