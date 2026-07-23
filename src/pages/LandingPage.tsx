@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
+import { Logo } from '../components/Logo'
 import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
@@ -287,7 +288,9 @@ export function LandingPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 flex items-center justify-center px-4" dir="rtl">
         <div className="w-full max-w-lg text-center">
           <div className="mb-10">
-            <h1 className="text-4xl font-black text-white mb-2">أمرني</h1>
+            <div className="bg-white inline-block rounded-3xl p-4 mb-4">
+              <Logo full size={90} />
+            </div>
             <p className="text-slate-400 text-sm">منصة الخدمات السعودية</p>
           </div>
 
@@ -411,7 +414,7 @@ export function LandingPage() {
       <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/95 backdrop-blur border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={() => setMode(null)} className="text-xl font-black text-primary-500">أمرني</button>
+            <button onClick={() => setMode(null)} className="flex items-center"><Logo size={28} /></button>
             <button onClick={() => setMode(null)} className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary-100 text-primary-600 border border-primary-200 hover:bg-primary-200 transition-colors">
               أفراد ↕
             </button>
@@ -1117,10 +1120,7 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200 py-8 px-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-primary-500 flex items-center justify-center text-xs font-black text-white">أ</div>
-            <span className="text-slate-500 text-sm font-bold">أمرني</span>
-          </div>
+          <Logo size={24} />
           <p className="text-slate-400 text-xs">© ٢٠٢٦ أمرني — جميع الحقوق محفوظة</p>
           <div className="flex items-center gap-4 text-xs text-slate-400">
             {TABS.slice(1).map(t => (
