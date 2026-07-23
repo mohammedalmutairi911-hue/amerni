@@ -481,7 +481,7 @@ export function AdminPanel() {
                 {workers.map((w, i) => {
                   const statusConf = w.is_approved
                     ? { label: 'موافق', color: 'bg-green-50 text-green-600 border-green-200' }
-                    : { label: i % 3 === 1 ? 'معلق' : 'جديد', color: i % 3 === 1 ? 'bg-amber-50 text-amber-500 border-amber-200' : 'bg-blue-50 text-blue-600 border-blue-200' }
+                    : { label: 'بانتظار المراجعة', color: 'bg-amber-50 text-amber-500 border-amber-200' }
                   return (
                     <div key={w.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
                       {/* Header */}
@@ -831,14 +831,13 @@ export function AdminPanel() {
                 </thead>
                 <tbody>
                   {users.map((u, i) => {
-                    const plans = ['باقة المؤسسات','الباقة الأساسية','الباقة المتقدمة']
-                    const statuses = [
-                      { label: 'نشط',               color: 'bg-green-50 text-green-600 border-green-200',  dot: 'bg-green-500' },
-                      { label: 'بانتظار التحقق',    color: 'bg-amber-50 text-amber-500 border-amber-200', dot: 'bg-amber-400' },
-                      { label: 'معلق',               color: 'bg-red-50 text-red-500 border-red-200',      dot: 'bg-red-400' },
-                    ]
-                    const st = statuses[i % 3]
-                    const pending = st.label === 'بانتظار التحقق'
+                    const ROLE_LABEL: Record<string, string> = { client: 'عميل', worker: 'عامل', admin: 'أدمن' }
+                    // حالة حقيقية: العامل غير المعتمد فقط هو "بانتظار التحقق"
+                    const wp = workers.find(w => w.user_id === u.id)
+                    const pending = u.role === 'worker' && !!wp && !wp.is_approved
+                    const st = pending
+                      ? { label: 'بانتظار التحقق', color: 'bg-amber-50 text-amber-500 border-amber-200', dot: 'bg-amber-400' }
+                      : { label: 'نشط',            color: 'bg-green-50 text-green-600 border-green-200',  dot: 'bg-green-500' }
                     return (
                       <tr key={u.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                         <td className="px-5 py-4">
@@ -859,7 +858,7 @@ export function AdminPanel() {
                         </td>
                         <td className="px-5 py-4">
                           <span className="text-xs bg-slate-100 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 w-fit">
-                            🏷️ {plans[i % plans.length]}
+                            🏷️ {ROLE_LABEL[u.role] || u.role}
                           </span>
                         </td>
                         <td className="px-5 py-4">
@@ -1299,14 +1298,15 @@ export function AdminPanel() {
                 </thead>
                 <tbody>
                   {tasks.slice(0,6).map((t, i) => {
-                    const types = ['دفع مورد','أتعاب وردية','تحصيل عقد','عمولة منصة','مدفوعات أخرى','رسوم خدمة']
-                    const statuses = [
-                      { label: 'تم التحويل', color: 'bg-green-50 text-green-600 border-green-200' },
-                      { label: 'قيد المعالجة', color: 'bg-amber-50 text-amber-500 border-amber-200' },
-                      { label: 'مستلم', color: 'bg-blue-50 text-blue-600 border-blue-200' },
-                    ]
-                    const st = statuses[i % 3]
-                    const amounts = [t.price_final || t.price_suggested || '—'].map(v => v ? String(v) : '—')
+                    const TX_STATUS: Record<string, { label: string; color: string }> = {
+                      completed:            { label: 'مكتمل — عمولة مستحقة', color: 'bg-green-50 text-green-600 border-green-200' },
+                      pending_confirmation: { label: 'بانتظار تأكيد العميل',  color: 'bg-purple-50 text-purple-600 border-purple-200' },
+                      in_progress:          { label: 'قيد التنفيذ',           color: 'bg-amber-50 text-amber-500 border-amber-200' },
+                      open:                 { label: 'مفتوح',                 color: 'bg-blue-50 text-blue-600 border-blue-200' },
+                      cancelled:            { label: 'ملغي',                  color: 'bg-slate-100 text-slate-500 border-slate-200' },
+                      disputed:             { label: 'نزاع',                  color: 'bg-red-50 text-red-500 border-red-200' },
+                    }
+                    const st = TX_STATUS[t.status] || { label: t.status, color: 'bg-slate-100 text-slate-500 border-slate-200' }
                     return (
                       <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                         <td className="px-5 py-3.5">
@@ -1320,7 +1320,7 @@ export function AdminPanel() {
                           </div>
                         </td>
                         <td className="px-5 py-3.5 font-black text-slate-800">{(t.price_final || t.price_suggested || "—").toLocaleString()} رس.</td>
-                        <td className="px-5 py-3.5 text-sm text-slate-500">{types[i % types.length]}</td>
+                        <td className="px-5 py-3.5 text-sm text-slate-500">{t.category || '—'}</td>
                         <td className="px-5 py-3.5">
                           <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full border ${st.color}`}>
                             <span className="w-1.5 h-1.5 rounded-full bg-current"/> {st.label}
