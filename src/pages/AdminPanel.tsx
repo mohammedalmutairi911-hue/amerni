@@ -4,6 +4,7 @@ import { COMPANY } from '../lib/constants'
 import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
+import { goHome } from '../lib/homePage'
 import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { Chat } from '../components/chat/Chat'
@@ -199,7 +200,9 @@ export function AdminPanel() {
       <aside className="hidden lg:flex flex-col h-screen sticky top-0 bg-white border-l border-slate-200 w-56 flex-shrink-0 shadow-sm">
         {/* Logo */}
         <div className="px-5 py-5 border-b border-slate-100">
-          <h1 className="flex items-center"><Logo size={28} /></h1>
+          <button onClick={() => goHome(navigate)} className="flex items-center hover:opacity-80 transition-opacity">
+            <Logo size={28} />
+          </button>
           <p className="text-xs text-slate-400 mt-0.5">لوحة التحكم الإدارية</p>
         </div>
 

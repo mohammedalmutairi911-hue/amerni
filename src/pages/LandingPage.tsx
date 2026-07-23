@@ -207,7 +207,8 @@ export function LandingPage() {
   //   2) إعادة تحميل الصفحة (F5) تحتفظ بالوضع الحالي
   //   3) زر رجوع في المتصفح يشتغل صح (يرجّع للـ gateway بدل ما يطلع من الموقع)
   const [mode, setModeRaw] = useState<'individuals' | 'enterprises' | null>(() => {
-    if (user) return 'individuals'
+    // لا نفرض 'individuals' على المستخدم المسجَّل — البوابة تُعرض للجميع
+    // ما لم يختر المستخدم وجهة صراحةً (محفوظة في history.state).
     return (window.history.state?.amerni_mode as 'individuals' | 'enterprises' | null) || null
   })
   const setMode = (m: 'individuals' | 'enterprises' | null) => {
@@ -252,14 +253,13 @@ export function LandingPage() {
 
   // popstate: لما المستخدم يضغط رجوع/تقدّم في المتصفح، sync الوضع مع history state
   useEffect(() => {
-    if (user) return
     const onPop = (e: PopStateEvent) => {
       const newMode = (e.state?.amerni_mode as 'individuals' | 'enterprises' | null) || null
       setModeRaw(newMode)
     }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
-  }, [user])
+  }, [])
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -269,10 +269,10 @@ export function LandingPage() {
     return () => clearInterval(t)
   }, [])
 
-  // لو وضع 'enterprises' محفوظ لكن المستخدم غير مسجل — روّحه لصفحة الشركات (بدون تلويث history)
+  // وضع 'enterprises' محفوظ ⇒ روّح المستخدم لبوابة الشركات (بدون تلويث history)
   useEffect(() => {
-    if (!user && mode === 'enterprises') navigate('enterprises', { replace: true })
-  }, [mode, user, navigate])
+    if (mode === 'enterprises') navigate('enterprises', { replace: true })
+  }, [mode, navigate])
 
   // البوابة (نقطة الدخول الرسمية) — تُعرَض لكل زائر أو مستخدم مسجَّل ما لم يختر وجهة.
   // المستخدم المسجَّل يحتفظ بجلسته، ونعرض له اختصار "لوحتي" للانتقال لدشبورده صراحةً.

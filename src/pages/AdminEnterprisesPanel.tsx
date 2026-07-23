@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { Building2, Users, Mail, CheckCircle, BarChart2, Clock, LogOut } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
+import { goHome } from '../lib/homePage'
 import { COMPANY } from '../lib/constants'
 
 type Tab = 'overview' | 'leads' | 'providers'
@@ -82,7 +83,12 @@ export function AdminEnterprisesPanel() {
       {/* Header */}
       <header className="sticky top-0 z-30 bg-slate-900 text-white px-6 py-4 flex items-center justify-between shadow-lg">
         <div className="flex items-center gap-4">
-          <h1 className="text-lg font-black"><Logo size={26} dark={true} className="ml-2" /><span className="text-lg font-bold text-white/80 mr-2">إدارة المنشآت</span></h1>
+          <h1 className="text-lg font-black flex items-center">
+            <button onClick={() => goHome(navigate)} className="flex items-center hover:opacity-80 transition-opacity">
+              <Logo size={26} dark={true} className="ml-2" />
+            </button>
+            <span className="text-lg font-bold text-white/80 mr-2">إدارة المنشآت</span>
+          </h1>
           <span className="text-xs bg-primary-500 px-2 py-0.5 rounded-full">B2B</span>
         </div>
         <div className="flex items-center gap-3">

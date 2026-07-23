@@ -1681,7 +1681,9 @@ export function EnterprisesPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div className="col-span-2 md:col-span-1">
-              <Logo size={26} dark={true} className="mb-2" />
+              <button onClick={() => goHome(navigate, profile)} className="flex items-center hover:opacity-80 transition-opacity mb-2">
+                <Logo size={26} dark={true} />
+              </button>
               <p className="text-slate-400 text-sm leading-relaxed">المنصة السعودية الأولى لخدمات B2B — نربط المنشآت بأفضل المستشارين في 18 تخصصاً.</p>
             </div>
             {[
