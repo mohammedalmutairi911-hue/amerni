@@ -624,8 +624,8 @@ export function LandingPage() {
                 </p>
               </div>
             )}
-            {/* Hero - full viewport */}
-            <section className="relative section-h-safe flex flex-col items-center justify-center px-4 overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white">
+            {/* Hero */}
+            <section className="relative py-16 sm:py-24 flex flex-col items-center justify-center px-4 overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white">
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary-500/5 blur-3xl" />
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e3a8a08_1px,transparent_1px),linear-gradient(to_bottom,#1e3a8a08_1px,transparent_1px)] bg-[size:60px_60px]" />
@@ -817,18 +817,18 @@ export function LandingPage() {
             </section>
 
             {/* Footer */}
-            <footer className="bg-slate-900 text-slate-900 py-10 px-4">
+            <footer className="bg-slate-900 text-white py-10 px-4">
               <div className="max-w-5xl mx-auto">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                   <div>
-                    <p className="font-black text-xl text-slate-900 mb-1">آمرني</p>
+                    <p className="font-black text-xl text-white mb-1">آمرني</p>
                     <p className="text-slate-400 text-sm">منصة الخدمات والمهام اليومية</p>
                   </div>
                   <div className="flex flex-wrap gap-4 text-sm text-slate-400">
-                    <button onClick={() => setActiveTab('privacy')} className="hover:text-slate-900 transition-colors">سياسة الخصوصية</button>
-                    <button onClick={() => setActiveTab('terms')} className="hover:text-slate-900 transition-colors">الشروط والأحكام</button>
-                    <button onClick={() => setActiveTab('support')} className="hover:text-slate-900 transition-colors">الدعم الفني</button>
-                    <button onClick={() => setActiveTab('contact')} className="hover:text-slate-900 transition-colors">اتصل بنا</button>
+                    <button onClick={() => setActiveTab('privacy')} className="hover:text-white transition-colors">سياسة الخصوصية</button>
+                    <button onClick={() => setActiveTab('terms')} className="hover:text-white transition-colors">الشروط والأحكام</button>
+                    <button onClick={() => setActiveTab('support')} className="hover:text-white transition-colors">الدعم الفني</button>
+                    <button onClick={() => setActiveTab('contact')} className="hover:text-white transition-colors">اتصل بنا</button>
                   </div>
                 </div>
                 <div className="border-t border-slate-800 mt-6 pt-6 text-center text-slate-500 text-xs">
@@ -841,7 +841,7 @@ export function LandingPage() {
 
         {/* HOW IT WORKS */}
         {activeTab === 'how' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
+          <section className="py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black text-slate-900 mb-3">كيف يعمل آمرني؟</h2>
@@ -872,7 +872,7 @@ export function LandingPage() {
 
         {/* FEATURES */}
         {activeTab === 'features' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4">
+          <section className="py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">مميزات أمرني</h2>
@@ -902,7 +902,7 @@ export function LandingPage() {
 
         {/* TRUST */}
         {activeTab === 'trust' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4">
+          <section className="py-12 sm:py-20 px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">الثقة والأمان</h2>
@@ -940,7 +940,7 @@ export function LandingPage() {
 
         {/* ABOUT */}
         {activeTab === 'about' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
+          <section className="py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-16">
                 <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center mx-auto mb-6">
@@ -1011,7 +1011,7 @@ export function LandingPage() {
 
         {/* CONTACT */}
         {activeTab === 'contact' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4">
+          <section className="py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">تواصل معنا</h2>
@@ -1071,7 +1071,7 @@ export function LandingPage() {
 
         {/* SUPPORT */}
         {activeTab === 'support' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4">
+          <section className="py-12 sm:py-20 px-4">
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-10">
                 <h2 className="text-4xl font-black mb-3">الدعم والمساعدة</h2>
@@ -1166,7 +1166,7 @@ export function LandingPage() {
 
       {/* PRIVACY */}
       {activeTab === 'privacy' && (
-        <section className="section-h-safe py-12 sm:py-20 px-4">
+        <section className="py-12 sm:py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black mb-3">سياسة الخصوصية والأمان</h2>
@@ -1215,7 +1215,7 @@ export function LandingPage() {
 
       {/* TERMS */}
       {activeTab === 'terms' && (
-        <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
+        <section className="py-12 sm:py-20 px-4 bg-slate-50">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black text-slate-900 mb-3">الشروط والأحكام</h2>
