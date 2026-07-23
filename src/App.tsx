@@ -102,7 +102,12 @@ export default function App() {
       }
     }
 
-    if (profile.role === 'admin' && page !== 'admin' && page !== 'admin-enterprises' && page !== 'landing') { navigate('admin', { replace: true }); return }
+    // الأدمن: حساب واحد يتصفّح كل البوابات كمشرف.
+    // نمنعه فقط من الصفحات الشخصية التي تتطلّب سجل عميل/عامل لا يملكه.
+    if (profile.role === 'admin') {
+      const personalOnlyPages = ['dashboard', 'worker', 'bounties', 'earn', 'referral', 'join']
+      if (personalOnlyPages.includes(page)) { navigate('admin', { replace: true }); return }
+    }
 
     // فصل المنصات: تصفح صفحة من منصة أخرى → إرجاع للـ landing (بوابة الاختيار)
     // بدل الذهاب المباشر للوحة (رغبة صريحة: لا فتح dashboard مباشرة)
@@ -146,14 +151,16 @@ export default function App() {
     if (page === 'earn') return <><Navbar /><JoinPage /></>
     if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
 
-    if (profile.role === 'admin') {
-      return <><Navbar /><AdminPanel /></>
-    }
     if (page === 'admin-enterprises') {
       return <AdminEnterprisesPanel />
     }
     if (page === 'lead-detail') {
       return <LeadDetailPage />
+    }
+
+    // احتياطي الأدمن — يأتي بعد الصفحات المحدّدة أعلاه وإلا صارت غير قابلة للوصول
+    if (profile.role === 'admin') {
+      return <><Navbar /><AdminPanel /></>
     }
 
     if (profile.role === 'worker') {
