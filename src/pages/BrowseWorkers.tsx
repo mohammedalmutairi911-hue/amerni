@@ -46,7 +46,7 @@ export function BrowseWorkers() {
         {/* Profile header */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-4">
           <div className="flex items-start gap-4 mb-5">
-            <img src={getAvatar(selectedWorker.full_name)} className="w-16 h-16 rounded-2xl" alt="" />
+            <img src={getAvatar(selectedWorker.full_name)} loading="lazy" className="w-16 h-16 rounded-2xl" alt="" />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="font-bold text-xl">{selectedWorker.full_name}</h2>
@@ -157,7 +157,7 @@ export function BrowseWorkers() {
                 className="bg-white border border-slate-200 hover:border-primary-500/30 rounded-2xl p-5 text-right transition-all">
                 <div className="flex items-start gap-3 mb-4">
                   <div className="relative flex-shrink-0">
-                    <img src={getAvatar(w.full_name)} className="w-12 h-12 rounded-xl" alt="" />
+                    <img src={getAvatar(w.full_name)} loading="lazy" className="w-12 h-12 rounded-xl" alt="" />
                     <div className={`absolute -bottom-1 -left-1 w-3.5 h-3.5 rounded-full border-2 border-[#0d0d0d] ${w.is_online ? 'bg-secondary-500' : 'bg-zinc-600'}`} />
                   </div>
                   <div className="flex-1 min-w-0">

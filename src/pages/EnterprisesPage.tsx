@@ -796,7 +796,7 @@ export function EnterprisesPage() {
         {/* ══ DASHBOARD / MY REQUESTS ══ */}
         {activeTab === 'my-requests' && (
           !user ? (
-            <section className="min-h-[calc(100vh-56px)] flex items-center justify-center px-4">
+            <section className="section-h-safe flex items-center justify-center px-4">
               <div className="text-center">
                 <Building2 size={48} className="mx-auto mb-4 text-slate-300" />
                 <h2 className="text-xl font-black text-slate-900 mb-2">سجّل دخول لعرض لوحة التحكم</h2>
@@ -804,7 +804,7 @@ export function EnterprisesPage() {
               </div>
             </section>
           ) : (
-            <div className="flex min-h-[calc(100vh-56px)]" dir="rtl">
+            <div className="flex section-h-safe" dir="rtl">
 
               {/* Sidebar Desktop */}
               <aside className="hidden lg:flex flex-col h-[calc(100vh-56px)] sticky top-14 border-l border-slate-200 bg-slate-900 w-56 flex-shrink-0">
@@ -845,7 +845,7 @@ export function EnterprisesPage() {
               </aside>
 
               {/* Main */}
-              <main className="flex-1 pb-24 lg:pb-0 overflow-auto">
+              <main className="flex-1 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-0 overflow-auto">
 
                 {/* Mobile Header */}
                 <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800">
@@ -1162,7 +1162,7 @@ export function EnterprisesPage() {
 
         {/* ══ PROVIDER REGISTER ══ */}
         {activeTab === 'provider-register' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 px-4">
+          <section className="section-h-safe py-12 px-4">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-2xl font-black text-slate-900 mb-2">سجّل كمزود خدمة</h2>
               <p className="text-slate-500 mb-8">انضم لشبكة مزودي الخدمات المعتمدين في أمرني للمنشآت</p>
@@ -1194,25 +1194,27 @@ export function EnterprisesPage() {
                         <label className="block text-xs font-semibold text-slate-700 mb-1">{provForm.provider_type === 'company' ? 'اسم الشركة / المؤسسة *' : 'الاسم التجاري *'}</label>
                         <input value={provForm.company_name} onChange={e => setProvForm(f => ({ ...f, company_name: e.target.value }))}
                           placeholder={provForm.provider_type === 'company' ? 'شركة المستقبل' : 'محمد للاستشارات'}
+                          type="text" autoComplete="organization"
                           className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" />
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">اسم المسؤول *</label>
                         <input value={provForm.contact_name} onChange={e => setProvForm(f => ({ ...f, contact_name: e.target.value }))}
                           placeholder="محمد العبدالله"
+                          type="text" autoComplete="name"
                           className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">البريد الإلكتروني *</label>
-                        <input type="email" value={provForm.contact_email} onChange={e => setProvForm(f => ({ ...f, contact_email: e.target.value }))}
+                        <input type="email" inputMode="email" autoComplete="email" value={provForm.contact_email} onChange={e => setProvForm(f => ({ ...f, contact_email: e.target.value }))}
                           placeholder="info@company.com"
                           className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" dir="ltr" />
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال *</label>
-                        <input value={provForm.contact_phone} maxLength={10} inputMode="numeric" placeholder="05XXXXXXXX" onChange={e => setProvForm(f => ({ ...f, contact_phone: e.target.value.replace(/[^0-9]/g, '').slice(0,10) }))}
+                        <input type="tel" autoComplete="tel" value={provForm.contact_phone} maxLength={10} inputMode="numeric" placeholder="05XXXXXXXX" onChange={e => setProvForm(f => ({ ...f, contact_phone: e.target.value.replace(/[^0-9]/g, '').slice(0,10) }))}
                           className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white" dir="ltr" />
                       </div>
                     </div>
@@ -1337,12 +1339,12 @@ export function EnterprisesPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1">LinkedIn</label>
-                      <input value={provForm.linkedin_url} onChange={e => setProvForm(f => ({ ...f, linkedin_url: e.target.value }))}
+                      <input type="url" inputMode="url" autoComplete="url" value={provForm.linkedin_url} onChange={e => setProvForm(f => ({ ...f, linkedin_url: e.target.value }))}
                         placeholder="linkedin.com/in/..." className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1">الموقع الإلكتروني</label>
-                      <input value={provForm.website_url} onChange={e => setProvForm(f => ({ ...f, website_url: e.target.value }))}
+                      <input type="url" inputMode="url" autoComplete="url" value={provForm.website_url} onChange={e => setProvForm(f => ({ ...f, website_url: e.target.value }))}
                         placeholder="www.company.com" className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
                     </div>
                   </div>
@@ -1378,7 +1380,7 @@ export function EnterprisesPage() {
 
         {/* ══ HOW ══ */}
         {activeTab === 'how' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
+          <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black text-slate-900 mb-3">كيف تعمل المنصة؟</h2>
@@ -1420,7 +1422,7 @@ export function EnterprisesPage() {
 
         {/* ══ FEATURES ══ */}
         {activeTab === 'features' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="section-h-safe py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">مميزات أمرني للمنشآت</h2>
@@ -1448,7 +1450,7 @@ export function EnterprisesPage() {
 
         {/* ══ TRUST ══ */}
         {activeTab === 'trust' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="section-h-safe py-12 sm:py-20 px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">الثقة والأمان</h2>
@@ -1482,7 +1484,7 @@ export function EnterprisesPage() {
 
         {/* ══ ABOUT ══ */}
         {activeTab === 'about' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
+          <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-16">
                 <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center mx-auto mb-6"><Building2 size={36} className="text-white" /></div>
@@ -1533,7 +1535,7 @@ export function EnterprisesPage() {
 
         {/* ══ CONTACT ══ */}
         {activeTab === 'contact' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="section-h-safe py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">تواصل معنا</h2>
@@ -1574,7 +1576,7 @@ export function EnterprisesPage() {
 
         {/* ══ SUPPORT ══ */}
         {activeTab === 'support' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="section-h-safe py-12 sm:py-20 px-4">
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-10">
                 <h2 className="text-4xl font-black mb-3">الدعم والمساعدة</h2>
@@ -1626,7 +1628,7 @@ export function EnterprisesPage() {
 
         {/* ══ PRIVACY ══ */}
         {activeTab === 'privacy' && (
-        <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+        <section className="section-h-safe py-12 sm:py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12"><h2 className="text-4xl font-black mb-3">سياسة الخصوصية</h2><p className="text-slate-400">آخر تحديث: يوليو ٢٠٢٦</p></div>
             <div className="space-y-6">
@@ -1652,7 +1654,7 @@ export function EnterprisesPage() {
 
         {/* ══ TERMS ══ */}
         {activeTab === 'terms' && (
-        <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
+        <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12"><h2 className="text-4xl font-black text-slate-900 mb-3">الشروط والأحكام</h2></div>
             <div className="space-y-4">
@@ -1817,10 +1819,11 @@ export function EnterprisesPage() {
                   <div className="border-t border-slate-100 pt-4 space-y-4">
                     <p className="text-xs font-bold text-slate-400">بيانات التواصل (تُحفظ لطلباتك القادمة)</p>
                     <div className="grid grid-cols-2 gap-3">
-                      {[['اسم الشركة *','company_name','شركة المستقبل'],['اسم المسؤول *','contact_name','محمد العبدالله']].map(([l,k,p]) => (
+                      {[['اسم الشركة *','company_name','شركة المستقبل','organization'],['اسم المسؤول *','contact_name','محمد العبدالله','name']].map(([l,k,p,ac]) => (
                         <div key={k}>
                           <label className="block text-xs font-semibold text-slate-700 mb-1">{l}</label>
                           <input value={(form as any)[k]} onChange={e => setF(k as keyof LeadForm, e.target.value)}
+                            type="text" autoComplete={ac}
                             placeholder={p} className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" />
                         </div>
                       ))}
@@ -1828,12 +1831,12 @@ export function EnterprisesPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">البريد الإلكتروني *</label>
-                        <input type="email" value={form.contact_email} onChange={e => setF('contact_email', e.target.value)}
+                        <input type="email" inputMode="email" autoComplete="email" value={form.contact_email} onChange={e => setF('contact_email', e.target.value)}
                           placeholder="info@company.com" className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">رقم الجوال</label>
-                        <input value={form.contact_phone} maxLength={10} inputMode="numeric" placeholder="05XXXXXXXX" onChange={e => setF('contact_phone', e.target.value.replace(/[^0-9]/g, '').slice(0,10))}
+                        <input type="tel" autoComplete="tel" value={form.contact_phone} maxLength={10} inputMode="numeric" placeholder="05XXXXXXXX" onChange={e => setF('contact_phone', e.target.value.replace(/[^0-9]/g, '').slice(0,10))}
                           className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-slate-50" dir="ltr" />
                       </div>
                     </div>

@@ -47,7 +47,7 @@ export function InstallPrompt() {
   if (!show) return null
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 max-w-sm mx-auto">
+    <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-4 right-4 z-50 max-w-sm mx-auto">
       <div className="bg-white border border-primary-500/30 rounded-2xl p-4 shadow-2xl">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3 flex-1">
@@ -56,7 +56,7 @@ export function InstallPrompt() {
             </div>
             <p className="font-bold text-slate-900 text-sm">أضف أمرني لشاشتك الرئيسية</p>
           </div>
-          <button onClick={handleDismiss} className="text-slate-400 hover:text-slate-500 flex-shrink-0">
+          <button onClick={handleDismiss} aria-label="إغلاق" className="text-slate-400 hover:text-slate-500 flex-shrink-0 w-9 h-9 -m-2 flex items-center justify-center">
             <X size={16} />
           </button>
         </div>

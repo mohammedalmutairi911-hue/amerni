@@ -184,7 +184,7 @@ export function ProviderDashboard() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 md:mr-64 min-h-screen pb-20 md:pb-0">
+      <main className="flex-1 md:mr-64 min-h-screen pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
 
         {/* Header */}
         <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex justify-between items-center gap-3 shadow-sm">

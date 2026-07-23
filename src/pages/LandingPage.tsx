@@ -462,7 +462,7 @@ export function LandingPage() {
               </div>
             )}
             {/* Hero - full viewport */}
-            <section className="relative min-h-[calc(100vh-56px)] flex flex-col items-center justify-center px-4 overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white">
+            <section className="relative section-h-safe flex flex-col items-center justify-center px-4 overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white">
               <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary-500/5 blur-3xl" />
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e3a8a08_1px,transparent_1px),linear-gradient(to_bottom,#1e3a8a08_1px,transparent_1px)] bg-[size:60px_60px]" />
@@ -678,7 +678,7 @@ export function LandingPage() {
 
         {/* HOW IT WORKS */}
         {activeTab === 'how' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
+          <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black text-slate-900 mb-3">كيف يعمل آمرني؟</h2>
@@ -709,7 +709,7 @@ export function LandingPage() {
 
         {/* FEATURES */}
         {activeTab === 'features' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="section-h-safe py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">مميزات أمرني</h2>
@@ -739,7 +739,7 @@ export function LandingPage() {
 
         {/* TRUST */}
         {activeTab === 'trust' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="section-h-safe py-12 sm:py-20 px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">الثقة والأمان</h2>
@@ -777,7 +777,7 @@ export function LandingPage() {
 
         {/* ABOUT */}
         {activeTab === 'about' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
+          <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-16">
                 <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center mx-auto mb-6">
@@ -848,7 +848,7 @@ export function LandingPage() {
 
         {/* CONTACT */}
         {activeTab === 'contact' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="section-h-safe py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">تواصل معنا</h2>
@@ -908,7 +908,7 @@ export function LandingPage() {
 
         {/* SUPPORT */}
         {activeTab === 'support' && (
-          <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+          <section className="section-h-safe py-12 sm:py-20 px-4">
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-10">
                 <h2 className="text-4xl font-black mb-3">الدعم والمساعدة</h2>
@@ -1003,7 +1003,7 @@ export function LandingPage() {
 
       {/* PRIVACY */}
       {activeTab === 'privacy' && (
-        <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4">
+        <section className="section-h-safe py-12 sm:py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black mb-3">سياسة الخصوصية والأمان</h2>
@@ -1052,7 +1052,7 @@ export function LandingPage() {
 
       {/* TERMS */}
       {activeTab === 'terms' && (
-        <section className="min-h-[calc(100vh-56px)] py-12 sm:py-20 px-4 bg-slate-50">
+        <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black text-slate-900 mb-3">الشروط والأحكام</h2>
@@ -1086,7 +1086,7 @@ export function LandingPage() {
       {/* Direct Auth Modal */}
       {showAuthDirect && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-2xl">
+          <div className="w-full max-w-sm bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-2xl max-h-[calc(100dvh-2rem)] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">{authDirectMode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب'}</h2>
               <button onClick={() => setShowAuthDirect(false)} className="text-slate-400 hover:text-slate-900">✕</button>

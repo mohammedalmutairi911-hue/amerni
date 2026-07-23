@@ -82,6 +82,13 @@ button, a, [role="button"], input[type="button"], input[type="submit"] {
   min-height: 100dvh; /* dynamic viewport height — أحدث */
 }
 
+/* نفس الفكرة لكن مطروح منها ارتفاع الهيدر (56px) — لأقسام الـ hero تحت هيدر ثابت */
+.section-h-safe {
+  min-height: calc(100vh - 56px); /* fallback */
+  min-height: calc(100svh - 56px);
+  min-height: calc(100dvh - 56px);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #f1f5f9; }

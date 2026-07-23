@@ -212,7 +212,7 @@ export function WorkerDashboard() {
   // Completion Modal
   if (completingTask) return (
     <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl">
+      <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl max-h-[calc(100dvh-2rem)] overflow-y-auto">
         <h3 className="text-lg font-bold text-slate-900 mb-1">إنهاء الطلب وتسليمه</h3>
         <p className="text-slate-500 text-sm mb-4">أضف السعر وملاحظة وارفع إثبات الإنجاز</p>
 
@@ -436,13 +436,13 @@ export function WorkerDashboard() {
         </header>
 
         {/* ── Content ── */}
-        <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 overflow-auto">
+        <main className="flex-1 p-4 lg:p-6 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-6 overflow-auto">
           <div className="max-w-5xl mx-auto">
 
         {/* Commission Modal */}
         {showCommission && pendingTask && (
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/80 p-0">
-            <div className="w-full max-w-sm bg-white rounded-t-2xl p-5 shadow-xl">
+            <div className="w-full max-w-sm bg-white rounded-t-2xl p-5 shadow-xl max-h-[calc(100dvh-2rem)] overflow-y-auto">
               <h2 className="text-base font-bold text-slate-900 text-center mb-3">شروط قبول الطلب</h2>
               <div className="bg-primary-50 border border-primary-200 rounded-xl p-3 mb-3">
                 <p className="text-sm font-bold">{pendingTask.title}</p>
@@ -641,7 +641,7 @@ export function WorkerDashboard() {
             {/* Completion Modal */}
             {completingTask && (
               <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-end justify-center">
-                <div className="bg-white rounded-t-2xl w-full max-w-sm p-5">
+                <div className="bg-white rounded-t-2xl w-full max-w-sm p-5 max-h-[calc(100dvh-2rem)] overflow-y-auto">
                   <h3 className="font-bold text-slate-900 mb-3">إنهاء الطلب</h3>
                   <input type="number" value={priceOffer} onChange={e => setPriceOffer(e.target.value)}
                     placeholder="السعر المقترح (ريال)" className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-primary-300" />

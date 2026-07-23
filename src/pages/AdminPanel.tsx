@@ -490,7 +490,7 @@ export function AdminPanel() {
                       {/* Header */}
                       <div className="flex items-start justify-between gap-3 mb-4">
                         <div className="flex items-center gap-3">
-                          <img src={getAvatar(w.full_name)} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" alt="" />
+                          <img src={getAvatar(w.full_name)} loading="lazy" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" alt="" />
                           <div>
                             <p className="font-black text-slate-900">{w.full_name}</p>
                             <p className="text-xs text-slate-400 mt-0.5">{w.city || 'غير محدد'}</p>
@@ -704,7 +704,7 @@ export function AdminPanel() {
                 <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
                   <div className="flex items-center gap-1">
                     {[1,2,3].map(n => (
-                      <button key={n} className={`w-7 h-7 rounded-lg font-bold ${n===1?'bg-primary-600 text-white':'hover:bg-slate-100 text-slate-500'}`}>{n}</button>
+                      <button key={n} className={`w-9 h-9 md:w-7 md:h-7 rounded-lg font-bold ${n===1?'bg-primary-600 text-white':'hover:bg-slate-100 text-slate-500'}`}>{n}</button>
                     ))}
                   </div>
                   <span>عرض 1-{Math.min(10, tasks.filter(t=>t.status==='disputed').length)} من أصل {tasks.filter(t=>t.status==='disputed').length} نزاع</span>
@@ -877,11 +877,11 @@ export function AdminPanel() {
                                 تحقق الآن
                               </button>
                             ) : (
-                              <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50">
+                              <button className="w-9 h-9 md:w-7 md:h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50">
                                 <Eye size={14} />
                               </button>
                             )}
-                            <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50">⋮</button>
+                            <button className="w-9 h-9 md:w-7 md:h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-slate-50">⋮</button>
                           </div>
                         </td>
                       </tr>
@@ -898,11 +898,11 @@ export function AdminPanel() {
               {users.length > 0 && (
                 <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
                   <div className="flex items-center gap-1">
-                    <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">‹</button>
+                    <button className="w-9 h-9 md:w-7 md:h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">‹</button>
                     {[1,2,3].map(n => (
-                      <button key={n} className={`w-7 h-7 rounded-lg font-bold ${n===1?'bg-primary-700 text-white':'border border-slate-200 text-slate-500 hover:bg-slate-50'}`}>{n}</button>
+                      <button key={n} className={`w-9 h-9 md:w-7 md:h-7 rounded-lg font-bold ${n===1?'bg-primary-700 text-white':'border border-slate-200 text-slate-500 hover:bg-slate-50'}`}>{n}</button>
                     ))}
-                    <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">›</button>
+                    <button className="w-9 h-9 md:w-7 md:h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">›</button>
                   </div>
                   <span>عرض 1-{Math.min(10, users.length)} من أصل {users.length} مستخدم</span>
                 </div>
@@ -1344,8 +1344,8 @@ export function AdminPanel() {
               {tasks.length > 0 && (
                 <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
                   <div className="flex items-center gap-1">
-                    <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">›</button>
-                    <button className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">‹</button>
+                    <button className="w-9 h-9 md:w-7 md:h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">›</button>
+                    <button className="w-9 h-9 md:w-7 md:h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">‹</button>
                   </div>
                   <span>عرض 1-{Math.min(6, tasks.length)} من أصل {tasks.length} معاملة</span>
                 </div>

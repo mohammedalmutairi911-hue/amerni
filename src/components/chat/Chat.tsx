@@ -227,7 +227,7 @@ export function Chat({ taskId, taskTitle }: Props) {
             <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
               <div className="max-w-[75%]">
                 {isImage(m.content) ? (
-                  <img src={m.content} alt="صورة" className="rounded-2xl max-w-full max-h-48 object-cover border border-slate-200 shadow-sm" />
+                  <img src={m.content} alt="صورة" loading="lazy" className="rounded-2xl max-w-full max-h-48 object-cover border border-slate-200 shadow-sm" />
                 ) : isAudio(m.content) ? (
                   <div className={`rounded-2xl px-3 py-2.5 ${isMe ? 'bg-primary-500' : 'bg-white border border-slate-200'}`}>
                     <audio src={m.content.replace('🎤 ', '')} controls className="h-8 max-w-[200px]" />

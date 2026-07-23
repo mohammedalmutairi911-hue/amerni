@@ -181,13 +181,14 @@ export function WorkerRegister({ onSuccess }: Props) {
             <div className="space-y-4">
               <h2 className="font-bold text-lg mb-4">بياناتك الشخصية</h2>
               {[
-                { k: 'phone', label: 'رقم الجوال *', ph: '05XXXXXXXX أو رقم دولي' },
-                { k: 'city', label: 'مدينتك *', ph: 'الرياض' },
-                { k: 'nationality', label: 'الجنسية', ph: 'سعودي' },
-              ].map(({ k, label, ph }) => (
+                { k: 'phone', label: 'رقم الجوال *', ph: '05XXXXXXXX أو رقم دولي', type: 'tel', inputMode: 'tel' as const, autoComplete: 'tel' },
+                { k: 'city', label: 'مدينتك *', ph: 'الرياض', type: 'text', inputMode: 'text' as const, autoComplete: 'address-level2' },
+                { k: 'nationality', label: 'الجنسية', ph: 'سعودي', type: 'text', inputMode: 'text' as const, autoComplete: 'country-name' },
+              ].map(({ k, label, ph, type, inputMode, autoComplete }) => (
                 <div key={k}>
                   <label className="block text-xs text-slate-400 mb-1.5">{label}</label>
                   <input placeholder={ph} value={(form as any)[k]} onChange={e => set(k, e.target.value)}
+                    type={type} inputMode={inputMode} autoComplete={autoComplete}
                     className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
                 </div>
               ))}
@@ -208,7 +209,7 @@ export function WorkerRegister({ onSuccess }: Props) {
               </div>
               <div>
                 <label className="block text-xs text-slate-400 mb-1.5">رقم الهوية الوطنية *</label>
-                <input type="text" placeholder="1XXXXXXXXX" maxLength={10}
+                <input type="text" inputMode="numeric" pattern="[0-9]*" autoComplete="off" placeholder="1XXXXXXXXX" maxLength={10}
                   value={form.id_number} onChange={e => set('id_number', e.target.value.replace(/\D/g, ''))}
                   className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
               </div>

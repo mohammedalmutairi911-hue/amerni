@@ -46,7 +46,7 @@ export function WorkerProfile({ workerId }: Props) {
         {/* Header */}
         <div className="bg-gradient-to-br from-primary-500/10 to-[#0d0d0d] border border-primary-500/20 rounded-2xl p-6 mb-4">
           <div className="flex items-start gap-4 mb-4">
-            <img src={getAvatar(worker.full_name)} className="w-20 h-20 rounded-2xl" alt="" />
+            <img src={getAvatar(worker.full_name)} loading="lazy" className="w-20 h-20 rounded-2xl" alt="" />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-xl font-black text-slate-900">{worker.full_name}</h1>

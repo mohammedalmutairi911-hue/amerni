@@ -290,7 +290,7 @@ export function UserDashboard() {
                 <div className="mb-4 p-3 bg-white rounded-xl border border-purple-100">
                   <p className="text-xs text-slate-500 mb-2">إثبات الإنجاز:</p>
                   {selectedTask.completion_proof.match(/\.(jpg|jpeg|png|gif|webp)/i) ? (
-                    <img src={selectedTask.completion_proof} alt="إثبات" className="w-full rounded-lg max-h-48 object-cover" />
+                    <img src={selectedTask.completion_proof} alt="إثبات" loading="lazy" className="w-full rounded-lg max-h-48 object-cover" />
                   ) : (
                     <a href={selectedTask.completion_proof} target="_blank" rel="noreferrer"
                       className="text-primary-500 text-sm underline">📎 عرض الملف المرفق</a>
@@ -383,7 +383,7 @@ export function UserDashboard() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 lg:mr-64 pb-20 lg:pb-0">
+      <main className="flex-1 lg:mr-64 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
 
         {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-30">

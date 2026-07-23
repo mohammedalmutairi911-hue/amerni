@@ -235,7 +235,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 py-4 sm:py-8 pb-20">
+      <div className="max-w-lg mx-auto px-4 py-4 sm:py-8 pb-[calc(5rem+env(safe-area-inset-bottom))]">
         {/* Step 1: Task details */}
         {step === 'details' && (
           <div className="space-y-5">

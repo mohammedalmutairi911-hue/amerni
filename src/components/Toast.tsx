@@ -30,14 +30,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none">
+      <div className="fixed top-[calc(1rem+env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none">
         {toasts.map(t => {
           const Icon = icons[t.type]
           return (
             <div key={t.id} className={`flex items-center gap-3 px-4 py-3 rounded-2xl border shadow-lg pointer-events-auto animate-in slide-in-from-top-2 ${colors[t.type]}`}>
               <Icon size={18} className={`flex-shrink-0 ${iconColors[t.type]}`} />
               <p className="text-sm font-medium flex-1">{t.message}</p>
-              <button onClick={() => setToasts(p => p.filter(x => x.id !== t.id))} className="opacity-50 hover:opacity-100">
+              <button onClick={() => setToasts(p => p.filter(x => x.id !== t.id))} aria-label="إغلاق" className="opacity-50 hover:opacity-100 w-9 h-9 -m-2 flex items-center justify-center flex-shrink-0">
                 <X size={14} />
               </button>
             </div>

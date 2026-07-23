@@ -135,7 +135,7 @@ export function ReferralPage() {
           ) : referrals.map(r => (
             <div key={r.id} className="flex items-center justify-between py-3 border-b border-slate-200 last:border-0">
               <div className="flex items-center gap-3">
-                <img src={getAvatar(r.profiles?.full_name || 'م')} className="w-8 h-8 rounded-lg" alt="" />
+                <img src={getAvatar(r.profiles?.full_name || 'م')} loading="lazy" className="w-8 h-8 rounded-lg" alt="" />
                 <div>
                   <p className="text-sm font-medium">{r.title}</p>
                   <p className="text-xs text-slate-400">{r.profiles?.full_name}</p>
