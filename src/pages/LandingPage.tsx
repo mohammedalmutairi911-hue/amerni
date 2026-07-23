@@ -284,62 +284,222 @@ export function LandingPage() {
   // البوابة (نقطة الدخول الرسمية) — تُعرَض لكل زائر أو مستخدم مسجَّل ما لم يختر وجهة.
   // المستخدم المسجَّل يحتفظ بجلسته، ونعرض له اختصار "لوحتي" للانتقال لدشبورده صراحةً.
   if (!mode) {
+    const LANDING_FEATURES = [
+      { icon: UserCheck, title: 'محترفون معتمدون', desc: 'كل مزوّد خدمة يمر بفحص هوية وتدقيق قبل قبوله في المنصة.', color: 'text-primary-500', bg: 'bg-primary-50' },
+      { icon: Shield, title: 'دفع آمن ومضمون', desc: 'الطلب يكتمل فقط بعد تأكيدك استلام الخدمة — حقوقك محفوظة.', color: 'text-secondary-500', bg: 'bg-secondary-50' },
+      { icon: MessageCircle, title: 'محادثة محمية', desc: 'تواصل مباشر داخل المنصة بدون مشاركة أرقامك الشخصية.', color: 'text-accent-500', bg: 'bg-accent-50' },
+      { icon: Star, title: 'تقييم شفاف', desc: 'كل طلب ينتهي بتقييم حقيقي يبني سمعة مقدّم الخدمة.', color: 'text-blue-500', bg: 'bg-blue-50' },
+    ]
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 flex items-center justify-center px-4" dir="rtl">
-        <div className="w-full max-w-lg text-center">
-          <div className="mb-10">
-            <div className="bg-white inline-block rounded-3xl p-4 mb-4">
-              <Logo full size={90} />
+      <div className="min-h-screen bg-slate-50 text-slate-900" dir="rtl">
+        {/* ===== Hero + بوابة الاختيار ===== */}
+        <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 px-4 pt-14 pb-20 overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none opacity-60">
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary-500/10 blur-3xl" />
+          </div>
+          <div className="relative max-w-3xl mx-auto text-center">
+            <div className="bg-white inline-block rounded-3xl p-3.5 mb-5">
+              <Logo full size={72} />
             </div>
-            <p className="text-slate-400 text-sm">منصة الخدمات السعودية</p>
+            <h1 className="text-3xl sm:text-5xl font-black text-white mb-4 leading-[1.15]">
+              حوّل حاجتك إلى{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-400 to-accent-400">إنجاز فوري</span>
+            </h1>
+            <p className="text-slate-300 text-sm sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+              منصة سعودية تربط الأفراد بمحترفين موثوقين للمهام اليومية، وتربط المنشآت بخبراء معتمدين في ١٨ تخصصاً — كل ذلك بثقة وأمان.
+            </p>
+
+            {/* الاختيار الكبير: أفراد / منشآت */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <button
+                onClick={() => chooseMode('individuals')}
+                className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-400/50 rounded-3xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-primary-500/20 group-hover:bg-primary-500/30 flex items-center justify-center mx-auto mb-4 transition-colors">
+                  <span className="text-3xl">🙋</span>
+                </div>
+                <h2 className="text-white font-black text-lg mb-1">أفراد</h2>
+                <p className="text-slate-400 text-xs leading-relaxed">اطلب أي خدمة يومية بسرعة وأمان</p>
+                <div className="mt-4 text-xs text-primary-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">ابدأ الآن ←</div>
+              </button>
+
+              <button
+                onClick={() => chooseMode('enterprises')}
+                className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-accent-400/50 rounded-3xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent-500/20"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-accent-500/20 group-hover:bg-accent-500/30 flex items-center justify-center mx-auto mb-4 transition-colors">
+                  <span className="text-3xl">🏢</span>
+                </div>
+                <h2 className="text-white font-black text-lg mb-1">منشآت</h2>
+                <p className="text-slate-400 text-xs leading-relaxed">حلول B2B لشركتك في ١٨ تخصصاً</p>
+                <div className="mt-4 text-xs text-accent-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">اكتشف الخدمات ←</div>
+              </button>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-500 mb-6">
+              {['موثوق ومرخص', 'بيانات محمية', 'دعم ٢٤/٧'].map(t => (
+                <div key={t} className="flex items-center gap-1.5">
+                  <CheckCircle size={11} className="text-primary-400" />
+                  <span>{t}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* اختصار "لوحتي" للمستخدم المسجَّل */}
+            {user && profile && (
+              <button
+                onClick={() => goToUserHome(navigate, profile)}
+                className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 px-4 py-2 rounded-full transition-all"
+              >
+                <span>الذهاب للوحتي</span>
+                <span aria-hidden>←</span>
+              </button>
+            )}
           </div>
+        </section>
 
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <button
-              onClick={() => chooseMode('individuals')}
-              className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-400/50 rounded-3xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-primary-500/20 group-hover:bg-primary-500/30 flex items-center justify-center mx-auto mb-4 transition-colors">
-                <span className="text-3xl">🙋</span>
-              </div>
-              <h2 className="text-white font-black text-lg mb-1">أفراد</h2>
-              <p className="text-slate-400 text-xs leading-relaxed">اطلب أي خدمة يومية بسرعة وأمان</p>
-              <div className="mt-4 text-xs text-primary-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">ابدأ الآن ←</div>
-            </button>
-
-            <button
-              onClick={() => chooseMode('enterprises')}
-              className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-accent-400/50 rounded-3xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent-500/20"
-            >
-              <div className="w-16 h-16 rounded-2xl bg-accent-500/20 group-hover:bg-accent-500/30 flex items-center justify-center mx-auto mb-4 transition-colors">
-                <span className="text-3xl">🏢</span>
-              </div>
-              <h2 className="text-white font-black text-lg mb-1">منشآت</h2>
-              <p className="text-slate-400 text-xs leading-relaxed">حلول B2B لشركتك في ١٨ تخصصاً</p>
-              <div className="mt-4 text-xs text-accent-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">اكتشف الخدمات ←</div>
-            </button>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-500 mb-6">
-            {['موثوق ومرخص', 'بيانات محمية', 'دعم ٢٤/٧'].map(t => (
-              <div key={t} className="flex items-center gap-1.5">
-                <CheckCircle size={11} className="text-primary-400" />
-                <span>{t}</span>
+        {/* ===== الإحصائيات ===== */}
+        <section className="py-8 px-4 bg-white border-b border-slate-100">
+          <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            {[['١٨', 'تخصصاً للمنشآت'], ['موثّق', 'عبر أبشر'], ['آمن', 'دفع مضمون'], ['٢٤/٧', 'دعم متواصل']].map(([v, l]) => (
+              <div key={l}>
+                <div className="text-2xl sm:text-3xl font-black text-primary-500">{v}</div>
+                <div className="text-xs text-slate-400 mt-1">{l}</div>
               </div>
             ))}
           </div>
+        </section>
 
-          {/* اختصار "لوحتي" للمستخدم المسجَّل — الزر المخصّص للعودة للوحة التحكم */}
-          {user && profile && (
-            <button
-              onClick={() => goToUserHome(navigate, profile)}
-              className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 px-4 py-2 rounded-full transition-all"
-            >
-              <span>الذهاب للوحتي</span>
-              <span aria-hidden>←</span>
-            </button>
-          )}
-        </div>
+        {/* ===== أقسام الخدمات ===== */}
+        <section className="py-16 px-4 bg-slate-50">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-black text-slate-900 mb-2">أقسام الخدمات</h2>
+              <p className="text-slate-500">كل خدمة تحتاجها — لشخصك أو لمنشأتك</p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6">
+                <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2"><span className="text-xl">🙋</span> للأفراد</h3>
+                <div className="grid grid-cols-3 gap-2.5">
+                  {[
+                    { icon: '🚗', label: 'توصيل' },
+                    { icon: '📸', label: 'تصوير' },
+                    { icon: '🔍', label: 'تحقق' },
+                    { icon: '🛍️', label: 'تسوق' },
+                    { icon: '📚', label: 'تعليم' },
+                    { icon: '✨', label: 'أخرى' },
+                  ].map(({ icon, label }) => (
+                    <button key={label} onClick={() => chooseMode('individuals')}
+                      className="bg-slate-50 border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-xl p-3 text-center transition-all group">
+                      <div className="text-xl mb-1">{icon}</div>
+                      <p className="text-xs font-semibold text-slate-600 group-hover:text-primary-500">{label}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-2xl p-6">
+                <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2"><span className="text-xl">🏢</span> للمنشآت — ١٨ تخصصاً</h3>
+                <div className="grid grid-cols-3 gap-2.5">
+                  {[
+                    { icon: '📋', label: 'حوكمة' },
+                    { icon: '👥', label: 'سعودة' },
+                    { icon: '⚖️', label: 'قانوني' },
+                    { icon: '💰', label: 'مالي/زكاة' },
+                    { icon: '✅', label: 'جودة/آيزو' },
+                    { icon: '🛡️', label: 'أمن سيبراني' },
+                  ].map(({ icon, label }) => (
+                    <button key={label} onClick={() => chooseMode('enterprises')}
+                      className="bg-slate-50 border border-slate-200 hover:border-accent-500 hover:bg-accent-50 rounded-xl p-3 text-center transition-all group">
+                      <div className="text-xl mb-1">{icon}</div>
+                      <p className="text-xs font-semibold text-slate-600 group-hover:text-accent-500">{label}</p>
+                    </button>
+                  ))}
+                </div>
+                <button onClick={() => chooseMode('enterprises')} className="mt-3 text-xs text-accent-500 font-semibold hover:underline">عرض كل الـ ١٨ تخصص ←</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== المميزات ===== */}
+        <section className="py-16 px-4 bg-white">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-black text-slate-900 mb-2">لماذا آمرني؟</h2>
+              <p className="text-slate-500">لأنه يجمع لك كل خدمة تحتاجها في مكان واحد</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {LANDING_FEATURES.map(({ icon: Icon, title, desc, color, bg }) => (
+                <div key={title} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                  <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center mb-4`}>
+                    <Icon size={20} className={color} />
+                  </div>
+                  <h3 className="font-bold text-slate-900 mb-2 text-sm">{title}</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ===== طريقة العمل ===== */}
+        <section className="py-16 px-4 bg-slate-50">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-black text-slate-900 mb-2">كيف يعمل آمرني؟</h2>
+              <p className="text-slate-500">من الطلب للإنجاز في دقائق</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {STEPS.map(({ n, icon: Icon, title, desc }) => (
+                <div key={n} className="bg-white border border-slate-200 rounded-2xl p-7 hover:shadow-md transition-all">
+                  <div className="text-5xl font-black text-slate-100 mb-4">{n}</div>
+                  <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center mb-4">
+                    <Icon size={19} className="text-primary-500" />
+                  </div>
+                  <h3 className="font-bold text-slate-900 mb-2 text-lg">{title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ===== CTA احترافي ===== */}
+        <section className="py-16 px-4 bg-primary-600">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl font-black text-white mb-3">جاهز تبدأ؟</h2>
+            <p className="text-blue-100 mb-8">اختر بوابتك الآن — فرد يبحث عن خدمة، أو منشأة تبحث عن خبير</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <button onClick={() => chooseMode('individuals')} className="bg-white text-primary-600 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
+                ابدأ كفرد
+              </button>
+              <button onClick={() => chooseMode('enterprises')} className="border-2 border-white text-white font-bold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors">
+                ابدأ كمنشأة
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== Footer كامل ===== */}
+        <footer className="bg-slate-900 text-white py-10 px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div>
+                <p className="font-black text-xl text-white mb-1">آمرني</p>
+                <p className="text-slate-400 text-sm">منصة الخدمات للأفراد والمنشآت</p>
+              </div>
+              <div className="flex flex-wrap gap-4 text-sm text-slate-400">
+                <button onClick={() => { chooseMode('individuals'); setActiveTab('privacy') }} className="hover:text-white transition-colors">سياسة الخصوصية</button>
+                <button onClick={() => { chooseMode('individuals'); setActiveTab('terms') }} className="hover:text-white transition-colors">الشروط والأحكام</button>
+                <button onClick={() => { chooseMode('individuals'); setActiveTab('support') }} className="hover:text-white transition-colors">الدعم الفني</button>
+                <button onClick={() => { chooseMode('individuals'); setActiveTab('contact') }} className="hover:text-white transition-colors">اتصل بنا</button>
+              </div>
+            </div>
+            <div className="border-t border-slate-800 mt-6 pt-6 text-center text-slate-500 text-xs">
+              © ٢٠٢٦ آمرني — جميع الحقوق محفوظة
+            </div>
+          </div>
+        </footer>
       </div>
     )
   }

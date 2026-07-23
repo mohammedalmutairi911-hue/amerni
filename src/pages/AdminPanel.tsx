@@ -10,6 +10,7 @@ import { getAvatar } from '../lib/supabase'
 import { Chat } from '../components/chat/Chat'
 
 type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises' | 'providers' | 'financial'
+  | 'categories' | 'verifications' | 'notifications' | 'reports' | 'system-logs' | 'ai-monitoring'
 
 export function AdminPanel() {
   const { navigate } = useApp()
@@ -190,7 +191,13 @@ export function AdminPanel() {
     { id: 'enterprises',   icon: Building2,     label: 'المنشآت',       badge: leads.filter(l=>l.status==='open').length },
     { id: 'conversations', icon: MessageSquare, label: 'المحادثات',     badge: stats.disputed },
     { id: 'providers',     icon: ShieldAlert,   label: 'مزودو الخدمة', badge: providers.filter(p=>!p.is_approved).length },
+    { id: 'verifications', icon: CheckCircle,   label: 'التحقق والاعتماد', badge: stats.pending + providers.filter(p=>!p.is_approved).length },
     { id: 'financial',     icon: Briefcase,     label: 'التقارير المالية', badge: 0 },
+    { id: 'reports',       icon: BarChart3,     label: 'التقارير والتحليلات', badge: 0 },
+    { id: 'categories',    icon: Building2,     label: 'الفئات والتصنيفات', badge: 0 },
+    { id: 'notifications', icon: Mail,          label: 'الإشعارات', badge: 0 },
+    { id: 'system-logs',   icon: AlertTriangle, label: 'سجلات النظام', badge: 0 },
+    { id: 'ai-monitoring', icon: ShieldAlert,   label: 'مراقبة الذكاء الاصطناعي', badge: 0 },
   ]
 
   return (
@@ -1350,6 +1357,140 @@ export function AdminPanel() {
                   <span>عرض 1-{Math.min(6, tasks.length)} من أصل {tasks.length} معاملة</span>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* ══ VERIFICATIONS — طابور تحقق موحّد للعمال ومزودي الخدمة ══ */}
+        {tab === 'verifications' && (
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">التحقق والاعتماد</h2>
+              <p className="text-slate-400 text-sm mt-0.5">مراجعة طلبات انضمام العمال ومزودي الخدمة الجديدة للمنصة.</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'عمال بانتظار الموافقة', value: stats.pending, iconBg: 'bg-amber-50', icon: '⏳' },
+                { label: 'مزودو خدمة بانتظار الموافقة', value: providers.filter(p=>!p.is_approved).length, iconBg: 'bg-amber-50', icon: '⏳' },
+                { label: 'منشآت طلبات مفتوحة', value: leads.filter(l=>l.status==='open').length, iconBg: 'bg-blue-50', icon: '🏢' },
+                { label: 'إجمالي المعتمدين', value: stats.workers + providers.filter(p=>p.is_approved).length, iconBg: 'bg-green-50', icon: '✅' },
+              ].map(({ label, value, iconBg, icon }) => (
+                <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
+                  <div className={`w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center text-lg mb-4`}>{icon}</div>
+                  <p className="text-3xl font-black text-slate-900">{value}</p>
+                  <p className="text-xs text-slate-400 mt-1">{label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button onClick={() => setTab('workers')} className="bg-white border border-slate-200 hover:border-primary-500 rounded-2xl p-5 text-right transition-colors">
+                <p className="font-bold text-slate-900 mb-1">مراجعة طلبات العمال ←</p>
+                <p className="text-xs text-slate-400">قبول أو رفض حسابات العمال الجديدة</p>
+              </button>
+              <button onClick={() => setTab('providers')} className="bg-white border border-slate-200 hover:border-primary-500 rounded-2xl p-5 text-right transition-colors">
+                <p className="font-bold text-slate-900 mb-1">مراجعة مزودي الخدمة ←</p>
+                <p className="text-xs text-slate-400">قبول أو رفض مزودي خدمة المنشآت</p>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ══ REPORTS & ANALYTICS ══ */}
+        {tab === 'reports' && (
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">التقارير والتحليلات</h2>
+                <p className="text-slate-400 text-sm mt-0.5">مؤشرات أداء المنصة الإجمالية عبر الزمن.</p>
+              </div>
+              <button onClick={() => exportCSV('tasks')}
+                className="flex items-center gap-2 bg-primary-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-primary-800 transition-colors shadow-sm">
+                📥 تصدير
+              </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'معدل الإنجاز', value: tasks.length ? `${Math.round(stats.completed / tasks.length * 100)}%` : '٠%', icon: '📈', iconBg: 'bg-green-50' },
+                { label: 'إجمالي الطلبات', value: tasks.length, icon: '📋', iconBg: 'bg-blue-50' },
+                { label: 'عمال نشطون', value: stats.workers, icon: '👷', iconBg: 'bg-primary-50' },
+                { label: 'منشآت مسجّلة', value: leads.length, icon: '🏢', iconBg: 'bg-purple-50' },
+              ].map(({ label, value, icon, iconBg }) => (
+                <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
+                  <div className={`w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center text-lg mb-4`}>{icon}</div>
+                  <p className="text-3xl font-black text-slate-900">{value}</p>
+                  <p className="text-xs text-slate-400 mt-1">{label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 text-center text-slate-400 text-sm">
+              📊 الرسوم البيانية التفصيلية (اتجاه شهري، توزيع حسب الفئة) قيد الربط ببيانات Supabase التاريخية.
+            </div>
+          </div>
+        )}
+
+        {/* ══ CATEGORIES ══ */}
+        {tab === 'categories' && (
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">الفئات والتصنيفات</h2>
+              <p className="text-slate-400 text-sm mt-0.5">تصنيفات خدمات الأفراد وتخصصات منصة المنشآت (١٨ تخصصاً).</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-6">
+              <h3 className="font-bold text-slate-900 mb-4">تخصصات المنشآت (١٨)</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {['الحوكمة والامتثال','نطاقات والسعودة','الاستشارات القانونية','التدقيق والمراجعة','المالية والزكاة','التأمين','المشتريات','الاستراتيجية','التقنية والأمن السيبراني','التسويق الرقمي','الترجمة والتعريب','الاستدامة وESG','التدريب والتطوير','السلامة المهنية','الجودة وISO','العلاقات الحكومية','إدارة المشاريع','العقارات والمرافق'].map(c => (
+                  <div key={c} className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-600 text-center">{c}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ NOTIFICATIONS ══ */}
+        {tab === 'notifications' && (
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">الإشعارات</h2>
+              <p className="text-slate-400 text-sm mt-0.5">إشعارات النظام المرسلة للمستخدمين — قيد الربط بجدول notifications.</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center text-slate-400 text-sm">
+              🔔 سجل الإشعارات التفصيلي (لكل مستخدم، نوع الإشعار، حالة القراءة) قيد الربط مباشرة بجدول notifications في Supabase.
+            </div>
+          </div>
+        )}
+
+        {/* ══ SYSTEM LOGS ══ */}
+        {tab === 'system-logs' && (
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">سجلات النظام</h2>
+              <p className="text-slate-400 text-sm mt-0.5">سجل الأخطاء والأحداث التقنية على المنصة.</p>
+            </div>
+            {fetchErrors.length > 0 ? (
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-2">
+                {fetchErrors.map((e, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">
+                    <AlertTriangle size={16} className="flex-shrink-0" /> {e}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center text-slate-400 text-sm">
+                ✅ لا توجد أخطاء مسجّلة حالياً في هذه الجلسة.
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══ AI MONITORING ══ */}
+        {tab === 'ai-monitoring' && (
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">مراقبة الذكاء الاصطناعي</h2>
+              <p className="text-slate-400 text-sm mt-0.5">استخدام مساعد الدعم الفني الذكي والدوال الذكية على المنصة.</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center text-slate-400 text-sm">
+              🤖 مقاييس استخدام الذكاء الاصطناعي (عدد المحادثات، معدل الحل التلقائي) قيد الربط بسجلات Supabase Edge Functions.
             </div>
           </div>
         )}
