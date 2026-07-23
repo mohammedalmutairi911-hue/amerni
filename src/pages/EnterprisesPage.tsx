@@ -582,7 +582,7 @@ export function EnterprisesPage() {
         {activeTab === 'home' && (
           <div>
             {/* ══ HERO ══ */}
-            <section className="relative bg-[#07101f] text-white overflow-hidden" style={{minHeight:'100vh',display:'flex',flexDirection:'column',justifyContent:'center'}}>
+            <section className="relative bg-[#07101f] text-white overflow-hidden" style={{display:'flex',flexDirection:'column',justifyContent:'center'}}>
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:60px_60px]" />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/8 blur-3xl pointer-events-none" />
               <div className="relative max-w-6xl mx-auto w-full px-4 py-20">
@@ -796,7 +796,7 @@ export function EnterprisesPage() {
         {/* ══ DASHBOARD / MY REQUESTS ══ */}
         {activeTab === 'my-requests' && (
           !user ? (
-            <section className="section-h-safe flex items-center justify-center px-4">
+            <section className="py-16 flex items-center justify-center px-4">
               <div className="text-center">
                 <Building2 size={48} className="mx-auto mb-4 text-slate-300" />
                 <h2 className="text-xl font-black text-slate-900 mb-2">سجّل دخول لعرض لوحة التحكم</h2>
@@ -804,7 +804,7 @@ export function EnterprisesPage() {
               </div>
             </section>
           ) : (
-            <div className="flex section-h-safe" dir="rtl">
+            <div className="flex min-h-[calc(100vh-56px)]" dir="rtl">
 
               {/* Sidebar Desktop */}
               <aside className="hidden lg:flex flex-col h-[calc(100vh-56px)] sticky top-14 border-l border-slate-200 bg-slate-900 w-56 flex-shrink-0">
@@ -1162,7 +1162,7 @@ export function EnterprisesPage() {
 
         {/* ══ PROVIDER REGISTER ══ */}
         {activeTab === 'provider-register' && (
-          <section className="section-h-safe py-12 px-4">
+          <section className="py-12 px-4">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-2xl font-black text-slate-900 mb-2">سجّل كمزود خدمة</h2>
               <p className="text-slate-500 mb-8">انضم لشبكة مزودي الخدمات المعتمدين في أمرني للمنشآت</p>
@@ -1380,7 +1380,7 @@ export function EnterprisesPage() {
 
         {/* ══ HOW ══ */}
         {activeTab === 'how' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
+          <section className="py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black text-slate-900 mb-3">كيف تعمل المنصة؟</h2>
@@ -1422,7 +1422,7 @@ export function EnterprisesPage() {
 
         {/* ══ FEATURES ══ */}
         {activeTab === 'features' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4">
+          <section className="py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">مميزات أمرني للمنشآت</h2>
@@ -1450,7 +1450,7 @@ export function EnterprisesPage() {
 
         {/* ══ TRUST ══ */}
         {activeTab === 'trust' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4">
+          <section className="py-12 sm:py-20 px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">الثقة والأمان</h2>
@@ -1484,7 +1484,7 @@ export function EnterprisesPage() {
 
         {/* ══ ABOUT ══ */}
         {activeTab === 'about' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
+          <section className="py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-3xl mx-auto">
               <div className="text-center mb-16">
                 <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center mx-auto mb-6"><Building2 size={36} className="text-white" /></div>
@@ -1535,7 +1535,7 @@ export function EnterprisesPage() {
 
         {/* ══ CONTACT ══ */}
         {activeTab === 'contact' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4">
+          <section className="py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-4xl font-black mb-3">تواصل معنا</h2>
@@ -1576,7 +1576,7 @@ export function EnterprisesPage() {
 
         {/* ══ SUPPORT ══ */}
         {activeTab === 'support' && (
-          <section className="section-h-safe py-12 sm:py-20 px-4">
+          <section className="py-12 sm:py-20 px-4">
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-10">
                 <h2 className="text-4xl font-black mb-3">الدعم والمساعدة</h2>
@@ -1628,7 +1628,7 @@ export function EnterprisesPage() {
 
         {/* ══ PRIVACY ══ */}
         {activeTab === 'privacy' && (
-        <section className="section-h-safe py-12 sm:py-20 px-4">
+        <section className="py-12 sm:py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12"><h2 className="text-4xl font-black mb-3">سياسة الخصوصية</h2><p className="text-slate-400">آخر تحديث: يوليو ٢٠٢٦</p></div>
             <div className="space-y-6">
@@ -1654,7 +1654,7 @@ export function EnterprisesPage() {
 
         {/* ══ TERMS ══ */}
         {activeTab === 'terms' && (
-        <section className="section-h-safe py-12 sm:py-20 px-4 bg-slate-50">
+        <section className="py-12 sm:py-20 px-4 bg-slate-50">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12"><h2 className="text-4xl font-black text-slate-900 mb-3">الشروط والأحكام</h2></div>
             <div className="space-y-4">
