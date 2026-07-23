@@ -9,10 +9,9 @@ function getPageFromHash(): Page {
   // المسار الكامل (مثل lead-detail/uuid) — خذ الجزء الأول
   const basePage = hash.split('/')[0]
   if (basePage && VALID_PAGES.includes(basePage as Page)) return basePage as Page
-  // backup من sessionStorage — نأخذ الـ basePage منه أيضاً
-  const saved = sessionStorage.getItem('current_page') || ''
-  const savedBase = saved.split('/')[0] as Page
-  if (savedBase && VALID_PAGES.includes(savedBase) && savedBase !== 'landing') return savedBase
+  // لا يوجد hash صالح ⇒ الدومين الرئيسي "/" ⇒ بوابة الاختيار دائماً.
+  // (لا نسترجع صفحة محفوظة هنا: ذلك كان يفتح الـ dashboard مباشرة
+  //  ويكسر زر الرجوع عند العودة للجذر)
   return 'landing'
 }
 
@@ -30,9 +29,6 @@ function setHash(p: string, replace = false) {
       window.history.pushState({ page: p }, '', hash)
     }
   }
-  // احفظ المسار الكامل في sessionStorage كـ backup
-  if (p !== 'landing') sessionStorage.setItem('current_page', p)
-  else sessionStorage.removeItem('current_page')
 }
 
 interface AppCtx {
