@@ -74,7 +74,7 @@ export function UserDashboard() {
     setShowReceipt(task.status === 'completed')
 
     if (task.worker_id) {
-      const { data: wp } = await supabase.from('profiles').select('full_name').eq('id', task.worker_id).maybeSingle()
+      const { data: wp } = await supabase.from('profiles_public').select('full_name').eq('id', task.worker_id).maybeSingle()
       if (wp?.full_name) setWorkerName(wp.full_name)
     }
 

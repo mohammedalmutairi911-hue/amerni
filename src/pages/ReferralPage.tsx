@@ -20,11 +20,17 @@ export function ReferralPage() {
   const fetchReferrals = async () => {
     // جيب الطلبات اللي جاءت من رابط الإحالة
     const { data } = await supabase.from('tasks')
-      .select('*, profiles(full_name)')
+      .select('*')
       .eq('referred_by', user!.id)
       .order('created_at', { ascending: false })
-    
+
     const list = data || []
+    const ownerIds = [...new Set(list.map((t: any) => t.user_id || t.client_id).filter(Boolean))]
+    if (ownerIds.length) {
+      const { data: names } = await supabase.from('profiles_public').select('id, full_name').in('id', ownerIds)
+      const nameMap = new Map((names || []).map((n: any) => [n.id, n.full_name]))
+      list.forEach((t: any) => { t.profiles = { full_name: nameMap.get(t.user_id || t.client_id) || null } })
+    }
     // النموذج الاقتصادي المُصحَّح: المكافأة = 30% من عمولة المنصة الفعلية (2%)
     // وليس 5% من قيمة الطلب كما كان سابقاً — الصيغة القديمة كانت تجعل المنصة
     // تخسر 3 نقاط مئوية صافية على كل طلب محال (تدفع أكثر مما تكسب أصلاً)

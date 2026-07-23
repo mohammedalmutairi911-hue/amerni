@@ -138,7 +138,7 @@ export function WorkerRegister({ onSuccess }: Props) {
       await supabase.rpc('set_role_to_worker')
       
       // إشعار الأدمن بعامل جديد
-      const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin')
+      const { data: admins } = await supabase.from('profiles_public').select('id').eq('role', 'admin')
       if (admins?.length) {
         await supabase.from('notifications').insert(
           admins.map(a => ({

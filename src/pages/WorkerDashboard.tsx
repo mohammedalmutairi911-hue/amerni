@@ -66,8 +66,15 @@ export function WorkerDashboard() {
   }
 
   const fetchFeedTasks = async () => {
-    const { data } = await supabase.from('tasks').select('*, profiles(full_name)').eq('status', 'open').order('created_at', { ascending: false }).limit(50)
-    setFeedTasks(data || [])
+    const { data } = await supabase.from('tasks').select('*').eq('status', 'open').order('created_at', { ascending: false }).limit(50)
+    const tasks = data || []
+    const clientIds = [...new Set(tasks.map((t: any) => t.user_id || t.client_id).filter(Boolean))]
+    if (clientIds.length) {
+      const { data: names } = await supabase.from('profiles_public').select('id, full_name').in('id', clientIds)
+      const nameMap = new Map((names || []).map((n: any) => [n.id, n.full_name]))
+      tasks.forEach((t: any) => { t.profiles = { full_name: nameMap.get(t.user_id || t.client_id) || null } })
+    }
+    setFeedTasks(tasks)
   }
 
   const fetchMyTasks = async () => {
