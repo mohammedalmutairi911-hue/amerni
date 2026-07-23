@@ -319,15 +319,14 @@ export function AdminPanel() {
               {/* KPI Row 2 — Tasks */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { label: 'إجمالي الطلبات', value: tasks.length,            active: tab === 'tasks' },
-                  { label: 'طلبات مكتملة',   value: stats.completed,         },
-                  { label: 'طلبات جارية',    value: stats.activeTasks,       },
-                  { label: 'طلبات مفتوحة',   value: stats.openTasks,         },
-                ].map(({ label, value, active }) => (
-                  <div key={label} className={`bg-white border-2 rounded-2xl p-5 shadow-sm cursor-pointer card-hover ${active ? 'border-primary-400' : 'border-slate-200'}`}
+                  { label: 'إجمالي الطلبات', value: tasks.length },
+                  { label: 'طلبات مكتملة',   value: stats.completed },
+                  { label: 'طلبات جارية',    value: stats.activeTasks },
+                  { label: 'طلبات مفتوحة',   value: stats.openTasks },
+                ].map(({ label, value }) => (
+                  <div key={label} className="bg-white border-2 border-slate-200 rounded-2xl p-5 shadow-sm cursor-pointer card-hover"
                     onClick={() => setTab('tasks')}>
                     <div className="flex items-center gap-2 mb-2">
-                      {active && <Briefcase size={14} className="text-primary-400" />}
                       <p className="text-sm text-slate-500 font-medium">{label}</p>
                     </div>
                     <p className="text-3xl font-black text-slate-900">{value}</p>
@@ -510,7 +509,7 @@ export function AdminPanel() {
                         <div className="bg-slate-50 rounded-xl p-3">
                           <p className="text-xs text-slate-400 mb-0.5">معدل الإنجاز</p>
                           <p className="font-black text-slate-800 flex items-center gap-1">
-                            {w.completion_rate ? w.completion_rate + "%" : "—"} <span className="text-green-500 text-sm">✓</span>
+                            {w.total_tasks ? Math.round((w.completed_tasks / w.total_tasks) * 100) + "%" : "—"} <span className="text-green-500 text-sm">✓</span>
                           </p>
                         </div>
                       </div>

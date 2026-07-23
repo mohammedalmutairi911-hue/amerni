@@ -6,6 +6,12 @@ export interface Profile {
   role: 'client' | 'worker' | 'admin'
   phone_verified: boolean
   avatar_url?: string
+  city?: string
+  rating?: number
+  total_reviews?: number
+  referral_code?: string
+  referred_by?: string
+  platform?: 'individuals' | 'enterprises'
   created_at: string
 }
 
@@ -25,7 +31,9 @@ export interface WorkerProfile {
   is_online: boolean
   availability_status: 'online' | 'offline' | 'busy'
   rating: number
+  completed_tasks: number
   total_tasks: number
+  total_earnings?: number
   schedule: Record<string, { from: string; to: string; active: boolean }>
   created_at: string
   profiles?: Profile

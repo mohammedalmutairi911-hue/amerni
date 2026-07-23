@@ -147,7 +147,6 @@ export default function App() {
     if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
 
     if (profile.role === 'admin') {
-      if (page === 'landing') return <><LandingPage /></>
       return <><Navbar /><AdminPanel /></>
     }
     if (page === 'admin-enterprises') {
@@ -187,7 +186,6 @@ export default function App() {
       return <><Navbar /><WorkerDashboard /></>
     }
 
-    if (page === 'landing') return <><LandingPage />{authOpen && <AuthModal />}</>
     if (page === 'dashboard') return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
     return <><Navbar /><NotFoundPage /></>
   }

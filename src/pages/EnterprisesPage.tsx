@@ -971,7 +971,7 @@ export function EnterprisesPage() {
                                   return (
                                     <button key={lead.id} onClick={() => navigate(`lead-detail/${lead.id}`)}
                                       className="w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors text-right group">
-                                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${st.bg || 'bg-slate-100'}`}>
+                                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${st.color?.split(' ')[0] || 'bg-slate-100'}`}>
                                         <Building2 size={18} className={st.color?.split(' ')[1] || 'text-slate-500'} />
                                       </div>
                                       <div className="flex-1 min-w-0">

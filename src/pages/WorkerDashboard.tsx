@@ -27,6 +27,7 @@ export function WorkerDashboard() {
   const { toast } = useToast()
   const [tab, setTab] = useState<'overview' | 'shifts' | 'my-tasks' | 'chat' | 'analytics' | 'achievements'>('overview')
   const [workerProfile, setWorkerProfile] = useState<WorkerProfile | null>(null)
+  const [reviewCount, setReviewCount] = useState(0)
   const [feedTasks, setFeedTasks] = useState<Task[]>([])
   const [myTasks, setMyTasks] = useState<Task[]>([])
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
@@ -60,10 +61,12 @@ export function WorkerDashboard() {
   const fetchWorkerProfile = async () => {
     const { data } = await supabase.from('worker_profiles').select('*').eq('user_id', user!.id).maybeSingle()
     if (data) setWorkerProfile(data)
+    const { count } = await supabase.from('ratings').select('id', { count: 'exact', head: true }).eq('worker_id', user!.id)
+    setReviewCount(count || 0)
   }
 
   const fetchFeedTasks = async () => {
-    const { data } = await supabase.from('tasks').select('*').eq('status', 'open').order('created_at', { ascending: false }).limit(50)
+    const { data } = await supabase.from('tasks').select('*, profiles(full_name)').eq('status', 'open').order('created_at', { ascending: false }).limit(50)
     setFeedTasks(data || [])
   }
 
@@ -293,12 +296,12 @@ export function WorkerDashboard() {
   ]
   // SHIFTS: تُبنى من الطلبات المتاحة الحقيقية
   const SHIFTS = filteredFeed.slice(0, 6).map(t => ({
-    name: t.client_name || 'عميل',
+    name: (t as any).profiles?.full_name || 'عميل',
     role: t.category || 'خدمة',
     type: t.created_at && new Date(t.created_at).getHours() < 12 ? 'صباحي' : new Date(t.created_at).getHours() < 18 ? 'مسائي' : 'ليلي',
     typeIcon: new Date(t.created_at).getHours() < 12 ? '🌤️' : new Date(t.created_at).getHours() < 18 ? '🌅' : '🌙',
     date: new Date(t.created_at).toLocaleDateString('ar-SA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
-    time: t.time_preference || 'مرن',
+    time: 'مرن',
     id: t.id,
   }))
   const HEATMAP_DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس']
@@ -459,7 +462,7 @@ export function WorkerDashboard() {
               {[
                 { label: 'طلبات مكتملة', value: completedTasks.length, icon: '✅', sub: `+${thisMonth} هذا الشهر` },
                 { label: 'إجمالي الأرباح', value: `${totalEarnings.toLocaleString()} ر`, icon: '💰', sub: 'بعد العمولة' },
-                { label: 'تقييمي', value: `${workerProfile?.rating?.toFixed(1) || '0.0'} ⭐`, icon: '⭐', sub: `${workerProfile?.total_reviews || 0} تقييم` },
+                { label: 'تقييمي', value: `${workerProfile?.rating?.toFixed(1) || '0.0'} ⭐`, icon: '⭐', sub: `${reviewCount} تقييم` },
                 { label: 'طلبات نشطة', value: activeTasks.length, icon: '🔄', sub: 'جارٍ تنفيذها' },
               ].map(({ label, value, icon, sub }) => (
                 <div key={label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
