@@ -57,6 +57,17 @@ export function UserDashboard() {
 
   useEffect(() => { if (user) fetchTasks() }, [user?.id])
 
+  // تنظيف قناة الـ realtime عند إزالة المكوّن — بدونها تتسرّب القنوات
+  // إذا انتقل المستخدم لصفحة أخرى والطلب مفتوح
+  useEffect(() => {
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current)
+        channelRef.current = null
+      }
+    }
+  }, [])
+
   const fetchTasks = async () => {
     setLoading(true)
     const { data } = await supabase.from('tasks').select('*')
@@ -89,7 +100,10 @@ export function UserDashboard() {
   const closeTask = () => {
     setSelectedTask(null)
     setShowReceipt(false)
-    if (channelRef.current) supabase.removeChannel(channelRef.current)
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current)
+      channelRef.current = null
+    }
   }
 
   const confirmPayment = async (taskId: string) => {

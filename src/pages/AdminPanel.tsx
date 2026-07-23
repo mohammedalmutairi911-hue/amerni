@@ -649,7 +649,7 @@ export function AdminPanel() {
             </div>
 
             {/* Table */}
-            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-x-auto shadow-sm">
               <table className="w-full text-sm" dir="rtl">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50">
@@ -820,6 +820,7 @@ export function AdminPanel() {
               </div>
 
               {/* Table */}
+              <div className="overflow-x-auto">
               <table className="w-full text-sm" dir="rtl">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50">
@@ -889,6 +890,7 @@ export function AdminPanel() {
                   )}
                 </tbody>
               </table>
+              </div>
 
               {/* Pagination */}
               {users.length > 0 && (
@@ -1286,6 +1288,7 @@ export function AdminPanel() {
                 </div>
                 <h3 className="font-bold text-slate-900">أحدث المعاملات</h3>
               </div>
+              <div className="overflow-x-auto">
               <table className="w-full text-sm" dir="rtl">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50">
@@ -1334,6 +1337,7 @@ export function AdminPanel() {
                   )}
                 </tbody>
               </table>
+              </div>
               {tasks.length > 0 && (
                 <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
                   <div className="flex items-center gap-1">
