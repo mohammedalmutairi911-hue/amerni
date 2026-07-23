@@ -48,8 +48,37 @@ export function ProviderDashboard() {
   const [isAvailable, setIsAvailable] = useState(true)
   const [toggling, setToggling] = useState(false)
 
+  // مصدر الحقيقة الوحيد لأرقام لوحة مزود الخدمة — نفس الطبقة المركزية
+  const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)
+  const [statsLoading, setStatsLoading] = useState(true)
+
+  const fetchStats = async () => {
+    setStatsLoading(true)
+    const { data, error } = await supabase.rpc('get_provider_dashboard_stats')
+    if (error) console.error('[ProviderDashboard] central stats:', error)
+    else setCentralStats(data)
+    setStatsLoading(false)
+  }
+
   useEffect(() => {
-    if (user) fetchAll()
+    if (user) { fetchAll(); fetchStats() }
+  }, [user?.id])
+
+  // تحديث فوري: قبول طلب أو إغلاقه ينعكس على الأرقام مباشرة بدون Refresh
+  useEffect(() => {
+    if (!user) return
+    let ch: any = null
+    try {
+      ch = supabase.channel(`provider-stats-${user.id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'enterprise_leads' }, () => {
+          fetchAll(); fetchStats()
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'enterprise_providers', filter: `user_id=eq.${user.id}` }, () => {
+          fetchAll(); fetchStats()
+        })
+        .subscribe()
+    } catch (e) { console.warn('Stats realtime not available:', e) }
+    return () => { try { if (ch) supabase.removeChannel(ch) } catch {} }
   }, [user?.id])
 
   const fetchAll = async () => {
@@ -115,8 +144,11 @@ export function ProviderDashboard() {
   try { details = JSON.parse(providerData.description || '{}') } catch {}
 
   const activeCats = (providerData.categories || []).map((id: string) => CATEGORY_LABELS[id] || id)
-  const matchedCount = matchedLeads.filter(l => l.status === 'matched').length
-  const closedCount = matchedLeads.filter(l => l.status === 'closed').length
+  // الأرقام المعروضة — من الطبقة المركزية حصراً (متطابقة مع لوحة الإدارة)
+  const matchedCount = centralStats?.leads_matched ?? matchedLeads.filter(l => l.status === 'matched').length
+  const closedCount = centralStats?.leads_closed ?? matchedLeads.filter(l => l.status === 'closed').length
+  const availableCount = centralStats?.leads_available ?? availableLeads.length
+  const commissionPending = centralStats?.commission_pending ?? 0
 
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans" dir="rtl">
@@ -148,7 +180,7 @@ export function ProviderDashboard() {
         <nav className="flex-1 p-3 space-y-1">
           {[
             { id: 'overview', icon: BarChart2, label: 'نظرة عامة' },
-            { id: 'available', icon: Zap, label: 'الطلبات المتاحة', badge: availableLeads.length },
+            { id: 'available', icon: Zap, label: 'الطلبات المتاحة', badge: availableCount },
             { id: 'leads', icon: Briefcase, label: 'طلباتي', badge: matchedLeads.length },
             { id: 'profile', icon: User, label: 'ملفي الشخصي' },
           ].map(({ id, icon: Icon, label, badge }: any) => (
@@ -225,7 +257,7 @@ export function ProviderDashboard() {
               {/* KPI Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {[
-                  { icon: DollarSign, label: 'عمولة مستحقة', value: matchedLeads.filter(l => l.status === 'closed' && !l.commission_paid).length > 0 ? `${matchedLeads.filter(l => l.status === 'closed' && !l.commission_paid).length} غير مدفوعة` : '٠ ريال', badge: 'IBAN: SA54...7', badgeColor: 'bg-primary-50 text-primary-600', iconBg: 'bg-primary-50', iconColor: 'text-primary-500' },
+                  { icon: DollarSign, label: 'عمولة مستحقة', value: commissionPending > 0 ? `${commissionPending} غير مدفوعة` : '٠ ريال', badge: 'IBAN: SA54...7', badgeColor: 'bg-primary-50 text-primary-600', iconBg: 'bg-primary-50', iconColor: 'text-primary-500' },
                   { icon: Briefcase, label: 'طلبات مطابقة', value: matchedCount.toString(), badge: `${closedCount} مكتملة`, badgeColor: 'bg-green-50 text-green-600', iconBg: 'bg-green-50', iconColor: 'text-green-500' },
                   { icon: Star, label: 'التقييم', value: providerData.rating ? providerData.rating.toFixed(1) : '—', badge: providerData.deals_count ? `${providerData.deals_count} صفقة` : 'لا صفقات بعد', badgeColor: 'bg-amber-50 text-amber-600', iconBg: 'bg-amber-50', iconColor: 'text-amber-500' },
                 ].map(({ icon: Icon, label, value, badge, badgeColor, iconBg, iconColor }) => (
@@ -253,7 +285,7 @@ export function ProviderDashboard() {
               )}
 
               {/* Commission reminder */}
-              {matchedLeads.filter(l => l.status === 'matched').length > 0 && (
+              {matchedCount > 0 && (
                 <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-5 flex items-center justify-between gap-3">
                   <div>
                     <p className="font-bold text-green-700">✅ لديك طلبات مطابقة!</p>
@@ -570,7 +602,7 @@ export function ProviderDashboard() {
       <nav className="md:hidden fixed bottom-0 right-0 w-full flex justify-around items-center h-16 bg-white border-t border-slate-200 z-50 shadow-lg mobile-bottom-nav">
         {[
           { id: 'overview', icon: Home, label: 'الرئيسية' },
-          { id: 'available', icon: Zap, label: 'المتاحة', badge: availableLeads.length },
+          { id: 'available', icon: Zap, label: 'المتاحة', badge: availableCount },
           { id: 'leads', icon: Briefcase, label: 'طلباتي', badge: matchedLeads.length },
           { id: 'profile', icon: User, label: 'ملفي' },
         ].map(({ id, icon: Icon, label, badge }: any) => (

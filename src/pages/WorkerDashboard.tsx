@@ -43,12 +43,43 @@ export function WorkerDashboard() {
   const [uploadingProof, setUploadingProof] = useState(false)
   const [cityFilter, setCityFilter] = useState('smart')
 
+  // مصدر الحقيقة الوحيد لأرقام لوحة العامل — نفس الطبقة المركزية
+  const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)
+  const [statsLoading, setStatsLoading] = useState(true)
+
+  const fetchStats = async () => {
+    setStatsLoading(true)
+    const { data, error } = await supabase.rpc('get_worker_dashboard_stats')
+    if (error) console.error('[WorkerDashboard] central stats:', error)
+    else setCentralStats(data)
+    setStatsLoading(false)
+  }
+
   useEffect(() => {
     if (user) {
       fetchAll()
+      fetchStats()
       registerServiceWorker()
       setTimeout(() => requestNotificationPermission(), 2000)
     }
+  }, [user?.id])
+
+  // تحديث فوري للأرقام بعد أي عملية (قبول طلب، تسليم، تقييم) بدون Refresh
+  useEffect(() => {
+    if (!user) return
+    let ch: any = null
+    try {
+      ch = supabase.channel(`worker-stats-${user.id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+          fetchFeedTasks(); fetchMyTasks(); fetchStats()
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'ratings' }, fetchStats)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'worker_profiles', filter: `user_id=eq.${user.id}` }, () => {
+          fetchWorkerProfile(); fetchStats()
+        })
+        .subscribe()
+    } catch (e) { console.warn('Stats realtime not available:', e) }
+    return () => { try { if (ch) supabase.removeChannel(ch) } catch {} }
   }, [user?.id])
 
   const fetchAll = async () => {
@@ -157,10 +188,19 @@ export function WorkerDashboard() {
     </div>
   )
 
+  // قوائم العرض
   const completedTasks = myTasks.filter(t => t.status === 'completed')
   const activeTasks = myTasks.filter(t => ['in_progress', 'pending_confirmation'].includes(t.status))
-  const totalEarnings = completedTasks.reduce((s, t) => s + (t.price_final || t.price_suggested || 0), 0)
-  const thisMonth = completedTasks.filter(t => new Date(t.created_at).getMonth() === new Date().getMonth()).length
+
+  // الأرقام المعروضة — من الطبقة المركزية حصراً
+  const wCounts = {
+    completed: centralStats?.tasks_completed ?? completedTasks.length,
+    active: centralStats?.tasks_active ?? activeTasks.length,
+    ratingsCount: centralStats?.ratings_count ?? reviewCount,
+    ratingAvg: centralStats?.rating_avg ?? (workerProfile?.rating || 0),
+  }
+  const totalEarnings = centralStats?.earnings_total ?? completedTasks.reduce((s, t) => s + (t.price_final || 0), 0)
+  const thisMonth = centralStats?.tasks_completed_this_month ?? 0
 
   const filteredFeed = feedTasks.filter(t => {
     if (cityFilter === 'all') return true
@@ -296,8 +336,8 @@ export function WorkerDashboard() {
     { icon: '🔒', label: 'منقذ الموقف', sub: 'قريباً...', locked: true },
   ]
   // LEADERBOARD: يُبنى من بيانات حقيقية (العامل الحالي + إشارة لترتيبه)
-  const myRating = workerProfile?.rating || 0
-  const myCompleted = completedTasks.length
+  const myRating = wCounts.ratingAvg
+  const myCompleted = wCounts.completed
   const LEADERBOARD = [
     { rank: 1, name: profile?.full_name || 'أنت', dept: workerProfile?.city || 'غير محدد', score: myRating > 0 ? `${myRating.toFixed(1)}⭐` : `${myCompleted} مكتمل`, me: true },
   ]
@@ -324,7 +364,7 @@ export function WorkerDashboard() {
   const NAV = [
     { id: 'overview', icon: Home, label: 'الرئيسية' },
     { id: 'shifts', icon: Calendar, label: 'الورديات' },
-    { id: 'my-tasks', icon: Briefcase, label: 'الطلبات', badge: activeTasks.length },
+    { id: 'my-tasks', icon: Briefcase, label: 'الطلبات', badge: wCounts.active },
     { id: 'analytics', icon: BarChart2, label: 'التحليلات' },
     { id: 'achievements', icon: Star, label: 'الإنجازات' },
   ]
@@ -357,9 +397,9 @@ export function WorkerDashboard() {
           {/* Stats mini */}
           <div className="grid grid-cols-3 gap-2 mt-3">
             {[
-              { label: 'مكتمل', value: completedTasks.length },
-              { label: 'تقييم', value: `${workerProfile?.rating?.toFixed(1) || '0'}⭐` },
-              { label: 'نشط', value: activeTasks.length },
+              { label: 'مكتمل', value: wCounts.completed },
+              { label: 'تقييم', value: `${Number(wCounts.ratingAvg).toFixed(1)}⭐` },
+              { label: 'نشط', value: wCounts.active },
             ].map(s => (
               <div key={s.label} className="text-center bg-slate-50 rounded-xl py-2">
                 <p className="text-sm font-black text-slate-900">{s.value}</p>
@@ -374,7 +414,7 @@ export function WorkerDashboard() {
           {[
             { id: 'overview',      emoji: '🏠', label: 'الرئيسية' },
             { id: 'shifts',        emoji: '🕐', label: 'سوق الشفتات' },
-            { id: 'my-tasks',      emoji: '📋', label: 'الطلبات',     badge: activeTasks.length },
+            { id: 'my-tasks',      emoji: '📋', label: 'الطلبات',     badge: wCounts.active },
             { id: 'analytics',     emoji: '📊', label: 'التحليلات الاستباقية' },
             { id: 'achievements',  emoji: '⭐', label: 'الإنجازات والالتزام' },
           ].map(({ id, emoji, label, badge }) => (
@@ -467,10 +507,10 @@ export function WorkerDashboard() {
             {/* KPI */}
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: 'طلبات مكتملة', value: completedTasks.length, icon: '✅', sub: `+${thisMonth} هذا الشهر` },
-                { label: 'إجمالي الأرباح', value: `${totalEarnings.toLocaleString()} ر`, icon: '💰', sub: 'بعد العمولة' },
-                { label: 'تقييمي', value: `${workerProfile?.rating?.toFixed(1) || '0.0'} ⭐`, icon: '⭐', sub: `${reviewCount} تقييم` },
-                { label: 'طلبات نشطة', value: activeTasks.length, icon: '🔄', sub: 'جارٍ تنفيذها' },
+                { label: 'طلبات مكتملة', value: wCounts.completed, icon: '✅', sub: `+${thisMonth} هذا الشهر` },
+                { label: 'إجمالي الأرباح', value: `${(totalEarnings - (centralStats?.commission_due ?? 0)).toLocaleString()} ر`, icon: '💰', sub: `صافي بعد عمولة ٢٪ (${(centralStats?.commission_due ?? 0).toLocaleString()} ر)` },
+                { label: 'تقييمي', value: `${Number(wCounts.ratingAvg).toFixed(1)} ⭐`, icon: '⭐', sub: `${wCounts.ratingsCount} تقييم` },
+                { label: 'طلبات نشطة', value: wCounts.active, icon: '🔄', sub: 'جارٍ تنفيذها' },
               ].map(({ label, value, icon, sub }) => (
                 <div key={label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
                   <p className="text-2xl mb-1">{icon}</p>
@@ -694,9 +734,9 @@ export function WorkerDashboard() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
                   <span className="text-xl">👥</span>
                   <p className="text-xs text-slate-400 mt-1">كفاءة التوزيع</p>
-                  <p className="text-2xl font-black text-primary-700 mt-1">{myCompleted > 0 ? Math.round((myCompleted / Math.max(myCompleted + activeTasks.length, 1)) * 100) + "%" : "—"}</p>
+                  <p className="text-2xl font-black text-primary-700 mt-1">{myCompleted > 0 ? Math.round((myCompleted / Math.max(myCompleted + wCounts.active, 1)) * 100) + "%" : "—"}</p>
                   <div className="w-full bg-slate-100 h-1.5 rounded-full mt-1">
-                    <div className="bg-primary-600 h-1.5 rounded-full" style={{width: myCompleted > 0 ? Math.round((myCompleted / Math.max(myCompleted + activeTasks.length, 1)) * 100) + "%" : "0%"}}/>
+                    <div className="bg-primary-600 h-1.5 rounded-full" style={{width: myCompleted > 0 ? Math.round((myCompleted / Math.max(myCompleted + wCounts.active, 1)) * 100) + "%" : "0%"}}/>
                   </div>
                 </div>
               </div>
@@ -870,7 +910,7 @@ export function WorkerDashboard() {
         {[
           { id: 'overview', icon: '🏠', label: 'الرئيسية' },
           { id: 'shifts', icon: '🕐', label: 'الورديات' },
-          { id: 'my-tasks', icon: '📋', label: 'الطلبات', badge: activeTasks.length },
+          { id: 'my-tasks', icon: '📋', label: 'الطلبات', badge: wCounts.active },
           { id: 'analytics', icon: '📊', label: 'التحليلات' },
           { id: 'achievements', icon: '⭐', label: 'الإنجازات' },
         ].map(({ id, icon, label, badge }) => (

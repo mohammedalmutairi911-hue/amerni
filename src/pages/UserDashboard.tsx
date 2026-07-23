@@ -54,8 +54,39 @@ export function UserDashboard() {
   const [ratingDone, setRatingDone] = useState(false)
   const [showReceipt, setShowReceipt] = useState(false)
   const channelRef = useRef<any>(null)
+  // مصدر الحقيقة الوحيد لأرقام لوحة الفرد — نفس الطبقة المركزية المستخدمة في لوحة الإدارة
+  const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)
+  const [statsLoading, setStatsLoading] = useState(true)
+  const statsChannelRef = useRef<any>(null)
 
-  useEffect(() => { if (user) fetchTasks() }, [user?.id])
+  const fetchStats = async () => {
+    setStatsLoading(true)
+    const { data, error } = await supabase.rpc('get_client_dashboard_stats')
+    if (error) console.error('[UserDashboard] central stats:', error)
+    else setCentralStats(data)
+    setStatsLoading(false)
+  }
+
+  useEffect(() => { if (user) { fetchTasks(); fetchStats() } }, [user?.id])
+
+  // تحديث فوري: أي تغيير على طلبات هذا المستخدم يعيد حساب الأرقام مباشرة
+  // بدون Refresh أو إعادة تسجيل دخول
+  useEffect(() => {
+    if (!user) return
+    try {
+      const ch = supabase.channel(`client-stats-${user.id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+          fetchTasks(); fetchStats()
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'ratings', filter: `rater_id=eq.${user.id}` }, fetchStats)
+        .subscribe()
+      statsChannelRef.current = ch
+    } catch (e) { console.warn('Stats realtime not available:', e) }
+    return () => {
+      try { if (statsChannelRef.current) supabase.removeChannel(statsChannelRef.current) } catch {}
+      statsChannelRef.current = null
+    }
+  }, [user?.id])
 
   // تنظيف قناة الـ realtime عند إزالة المكوّن — بدونها تتسرّب القنوات
   // إذا انتقل المستخدم لصفحة أخرى والطلب مفتوح
@@ -128,11 +159,22 @@ export function UserDashboard() {
     if (!error) setRatingDone(true)
   }
 
+  // قوائم العرض (البطاقات نفسها) — تُبنى من الطلبات المحمّلة
   const activeTasks = tasks.filter(t => ['in_progress', 'pending_confirmation'].includes(t.status))
   const completedTasks = tasks.filter(t => t.status === 'completed')
   const openTasks = tasks.filter(t => t.status === 'open')
   const allActiveTasks = [...activeTasks, ...openTasks]
-  const totalSpent = completedTasks.reduce((s, t) => s + (t.price_final || t.price_suggested || 0), 0)
+
+  // الأرقام المعروضة — من الطبقة المركزية حصراً (مطابقة تماماً للوحة الإدارة)
+  const counts = {
+    open: centralStats?.tasks_open ?? openTasks.length,
+    inProgress: centralStats?.tasks_active ?? tasks.filter(t => t.status === 'in_progress').length,
+    pendingConfirmation: centralStats?.tasks_pending_confirmation ?? tasks.filter(t => t.status === 'pending_confirmation').length,
+    completed: centralStats?.tasks_completed ?? completedTasks.length,
+    cancelled: centralStats?.tasks_cancelled ?? tasks.filter(t => t.status === 'cancelled').length,
+    total: centralStats?.tasks_total ?? tasks.length,
+  }
+  const totalSpent = centralStats?.spent_total ?? completedTasks.reduce((s, t) => s + (t.price_final || 0), 0)
 
   if (showNew) return <NewTaskPage onClose={() => { setShowNew(false); fetchTasks() }} />
 
@@ -357,7 +399,7 @@ export function UserDashboard() {
         <nav className="flex-1 px-3 py-4 space-y-1">
           {[
             { id: 'dashboard', icon: Home, label: 'لوحة التحكم', badge: 0 },
-            { id: 'orders', icon: List, label: 'طلباتي', badge: tasks.length },
+            { id: 'orders', icon: List, label: 'طلباتي', badge: counts.total },
             { id: 'wallet', icon: Wallet, label: 'المحفظة', badge: 0 },
           ].map(({ id, icon: Icon, label, badge }) => (
             <button key={id} onClick={() => setActiveSection(id as any)}
@@ -408,13 +450,15 @@ export function UserDashboard() {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 {[
-                  { label: 'إجمالي الطلبات', value: tasks.length, color: 'text-slate-900', bg: 'bg-white' },
-                  { label: 'نشطة', value: activeTasks.length + openTasks.length, color: 'text-blue-600', bg: 'bg-blue-50' },
-                  { label: 'بانتظار تأكيدك', value: tasks.filter(t => t.status === 'pending_confirmation').length, color: 'text-purple-600', bg: 'bg-purple-50' },
-                  { label: 'مكتملة', value: completedTasks.length, color: 'text-green-600', bg: 'bg-green-50' },
+                  { label: 'إجمالي الطلبات', value: counts.total, color: 'text-slate-900', bg: 'bg-white' },
+                  { label: 'نشطة', value: counts.open + counts.inProgress + counts.pendingConfirmation, color: 'text-blue-600', bg: 'bg-blue-50' },
+                  { label: 'بانتظار تأكيدك', value: counts.pendingConfirmation, color: 'text-purple-600', bg: 'bg-purple-50' },
+                  { label: 'مكتملة', value: counts.completed, color: 'text-green-600', bg: 'bg-green-50' },
                 ].map(({ label, value, color, bg }) => (
                   <div key={label} className={`${bg} border border-slate-200 rounded-2xl p-4 shadow-sm`}>
-                    <div className={`text-3xl font-black ${color}`}>{value}</div>
+                    {statsLoading && !centralStats
+                      ? <div className="h-9 w-12 bg-slate-200 rounded-lg animate-pulse" />
+                      : <div className={`text-3xl font-black ${color}`}>{value}</div>}
                     <div className="text-xs text-slate-500 mt-1">{label}</div>
                   </div>
                 ))}
@@ -610,7 +654,7 @@ export function UserDashboard() {
               <div className="bg-gradient-to-l from-primary-500 to-primary-700 rounded-2xl p-6 text-white mb-5 shadow-lg">
                 <p className="text-blue-100 text-sm mb-1">إجمالي ما صرفته</p>
                 <p className="text-4xl font-black">{totalSpent.toLocaleString()} <span className="text-xl">ر.س</span></p>
-                <p className="text-blue-100 text-xs mt-2">على {completedTasks.length} طلب مكتمل</p>
+                <p className="text-blue-100 text-xs mt-2">على {counts.completed} طلب مكتمل</p>
               </div>
 
               {/* Referral */}
@@ -662,7 +706,7 @@ export function UserDashboard() {
       <nav className="lg:hidden fixed bottom-0 right-0 w-full flex justify-around items-center h-16 bg-slate-900 border-t border-slate-800 z-50 mobile-bottom-nav">
         {[
           { id: 'dashboard', icon: Home, label: 'الرئيسية' },
-          { id: 'orders', icon: List, label: 'طلباتي', badge: tasks.filter(t=>t.status==='pending_confirmation').length },
+          { id: 'orders', icon: List, label: 'طلباتي', badge: counts.pendingConfirmation },
           { id: 'wallet', icon: Wallet, label: 'المحفظة' },
         ].map(({ id, icon: Icon, label, badge }: any) => (
           <button key={id} onClick={() => setActiveSection(id as any)}

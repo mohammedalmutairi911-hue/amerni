@@ -26,10 +26,23 @@ export function AdminPanel() {
   const [leadNote, setLeadNote] = useState<Record<string, string>>({})
   const [providers, setProviders] = useState<any[]>([])
   const [overdueLeads, setOverdueLeads] = useState<any[]>([])
+  // مصدر الحقيقة الوحيد للأرقام: محسوبة في قاعدة البيانات عبر get_admin_dashboard_stats()
+  // وليس عبر .filter().length على بيانات محمّلة في المتصفح (كانت تسبب اختلافات وأرقام وهمية)
+  const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)
+  const [statsLoading, setStatsLoading] = useState(true)
+
+  const fetchStats = async () => {
+    setStatsLoading(true)
+    const { data, error } = await supabase.rpc('get_admin_dashboard_stats')
+    if (error) { console.error('[Admin] central stats:', error) }
+    else setCentralStats(data)
+    setStatsLoading(false)
+  }
 
   useEffect(() => {
     fetchAll()
-    
+    fetchStats()
+
     let ch: any = null
     try {
       ch = supabase.channel('admin-notifications')
@@ -46,19 +59,40 @@ export function AdminPanel() {
               }
             } catch {}
             fetchAll()
+            fetchStats()
           })
         .subscribe()
     } catch (e) {
       console.warn('Realtime not available:', e)
     }
-    
+
+    // أي تغيير على الجداول التي تغذي الأرقام يعيد حساب الإحصائيات المركزية فوراً
+    // (بدون Refresh للصفحة) — يغطي: إنشاء/تعديل/حذف طلب، قبول/رفض عامل أو مزود،
+    // تقييم جديد، تغيير حالة طلب منشأة.
+    let statsCh: any = null
+    try {
+      statsCh = supabase.channel('admin-stats-live')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, fetchStats)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'worker_profiles' }, fetchStats)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, fetchStats)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'ratings' }, fetchStats)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'enterprise_leads' }, fetchStats)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'enterprise_providers' }, fetchStats)
+        .subscribe()
+    } catch (e) {
+      console.warn('Stats realtime not available:', e)
+    }
+
     try {
       if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
         Notification.requestPermission()
       }
     } catch {}
-    
-    return () => { try { if (ch) supabase.removeChannel(ch) } catch {} }
+
+    return () => {
+      try { if (ch) supabase.removeChannel(ch) } catch {}
+      try { if (statsCh) supabase.removeChannel(statsCh) } catch {}
+    }
   }, [])
 
   const fetchAll = async () => {
@@ -146,7 +180,22 @@ export function AdminPanel() {
     setLeads(p => p.map(l => l.id === leadId ? { ...l, notes: note } : l))
   }
 
-  const stats = {
+  // كل رقم هنا يأتي من get_admin_dashboard_stats() (طبقة الإحصائيات المركزية في قاعدة
+  // البيانات). عند عدم توفرها مؤقتاً (أول تحميل) نستخدم حساب محلي من نفس البيانات
+  // المجلوبة كنسخة احتياطية فقط، حتى لا تظهر أصفار قبل اكتمال التحميل.
+  const stats = centralStats ? {
+    users: centralStats.users_total,
+    workers: centralStats.workers_approved,
+    pending: centralStats.workers_pending,
+    openTasks: centralStats.tasks_open,
+    activeTasks: centralStats.tasks_in_progress,
+    completed: centralStats.tasks_completed,
+    disputed: centralStats.tasks_disputed,
+    revenue: centralStats.revenue_total,
+    revenuePending: centralStats.revenue_pending,
+    ratingAvg: centralStats.ratings_avg,
+    ratingCount: centralStats.ratings_count,
+  } : {
     users: users.length,
     workers: workers.filter(w => w.is_approved).length,
     pending: workers.filter(w => !w.is_approved).length,
@@ -154,6 +203,10 @@ export function AdminPanel() {
     activeTasks: tasks.filter(t => t.status === 'in_progress').length,
     completed: tasks.filter(t => t.status === 'completed').length,
     disputed: tasks.filter(t => t.status === 'disputed').length,
+    revenue: 0,
+    revenuePending: 0,
+    ratingAvg: 0,
+    ratingCount: 0,
   }
 
   const TABS = [
@@ -308,7 +361,7 @@ export function AdminPanel() {
                   { label: 'نزاعات مفتوحة',    value: stats.disputed,  icon: AlertTriangle, iconBg: 'bg-red-50',    iconColor: 'text-red-400' },
                   { label: 'بانتظار الموافقة',  value: stats.pending,   icon: Shield,        iconBg: 'bg-amber-50',  iconColor: 'text-amber-400' },
                   { label: 'عمال نشطون',        value: stats.workers,   icon: CheckCircle,   iconBg: 'bg-green-50',  iconColor: 'text-green-500', badge: 'نشط' },
-                  { label: 'إجمالي المستخدمين', value: stats.users,     icon: Users,         iconBg: 'bg-blue-50',   iconColor: 'text-blue-500', growth: '+12%' },
+                  { label: 'إجمالي المستخدمين', value: stats.users,     icon: Users,         iconBg: 'bg-blue-50',   iconColor: 'text-blue-500' },
                 ].map(({ label, value, icon: Icon, iconBg, iconColor, badge, growth }) => (
                   <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
                     <div className="flex items-start justify-between mb-4">
@@ -376,9 +429,9 @@ export function AdminPanel() {
                   </div>
                   <div className="grid grid-cols-3 gap-4 mb-5">
                     {[
-                      { label: 'إجمالي الإيرادات', value: tasks.filter(t=>t.status==='completed').length * 0, unit: 'رس', color: 'text-slate-900' },
-                      { label: 'مدفوعات معلقة',    value: tasks.filter(t=>t.status==='in_progress').length * 0, unit: 'رس', color: 'text-slate-900' },
-                      { label: 'معدل النجاح',       value: stats.workers > 0 ? Math.round((stats.completed/(tasks.length||1))*100) : 98, unit: '%', color: 'text-green-500' },
+                      { label: 'إجمالي الإيرادات (عمولة 2%)', value: stats.revenue, unit: 'رس', color: 'text-slate-900' },
+                      { label: 'عمولة معلقة (طلبات بانتظار التأكيد)', value: stats.revenuePending, unit: 'رس', color: 'text-slate-900' },
+                      { label: 'معدل النجاح',       value: tasks.length > 0 ? Math.round((stats.completed/tasks.length)*100) : 0, unit: '%', color: 'text-green-500' },
                     ].map(({ label, value, unit, color }) => (
                       <div key={label} className="border-l border-slate-100 pl-4 last:border-0 text-left">
                         <p className="text-xs text-slate-400 mb-1 text-right">{label}</p>
@@ -625,7 +678,7 @@ export function AdminPanel() {
             {/* KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'إجمالي النزاعات',      value: tasks.filter(t=>t.status==='disputed').length + stats.completed,  growth: '+12%', icon: null },
+                { label: 'إجمالي النزاعات',      value: stats.disputed,  icon: null },
                 { label: 'تمت التسوية (هذا الشهر)', value: stats.completed,  icon: '✓', iconColor: 'text-slate-400' },
                 { label: 'نزاعات مفتوحة',          value: tasks.filter(t=>t.status==='disputed').length, highlight: true, icon: '!' },
                 { label: 'تحت المراجعة',            value: tasks.filter(t=>t.status==='in_progress').length, icon: '—' },
@@ -793,10 +846,9 @@ export function AdminPanel() {
             {/* KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'إجمالي المنشآت',     value: leads.length || 1284, growth: '+١٢٪', icon: '🏢', iconBg: 'bg-blue-50' },
-                { label: 'المستخدمين النشطين', value: users.length || 8420, growth: '+٥٪',  icon: '👤', iconBg: 'bg-slate-50' },
-                { label: 'بانتظار التحقق',     value: workers.filter(w=>!w.is_approved).length || 42, badge: 'هام', icon: '⏳', iconBg: 'bg-red-50' },
-                { label: 'وقت الاستجابة', value: '24س', sub: 'متوسط الرد على الطلبات', icon: '⚡', iconBg: 'bg-blue-50' },
+                { label: 'إجمالي المنشآت',     value: centralStats?.enterprise_leads_total ?? leads.length, icon: '🏢', iconBg: 'bg-blue-50' },
+                { label: 'المستخدمين النشطين', value: stats.users, icon: '👤', iconBg: 'bg-slate-50' },
+                { label: 'بانتظار التحقق',     value: stats.pending, badge: stats.pending > 0 ? 'هام' : undefined, icon: '⏳', iconBg: 'bg-red-50' },
               ].map(({ label, value, growth, badge, sub, icon, iconBg }) => (
                 <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
                   <div className="flex items-start justify-between mb-3">
@@ -1190,26 +1242,25 @@ export function AdminPanel() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 {
-                  label: 'إجمالي الإيرادات', value: tasks.filter(t=>t.status==='completed').reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0).toLocaleString('ar-SA') || '٠', unit: 'رس.',
-                  growth: '+١٢٪', iconBg: 'bg-blue-50', icon: '💰',
+                  label: 'إجمالي قيمة الطلبات المكتملة', value: tasks.filter(t=>t.status==='completed').reduce((s,t)=>s+(t.price_final||t.final_price||0),0).toLocaleString('ar-SA'), unit: 'رس.',
+                  iconBg: 'bg-blue-50', icon: '💰',
                   badge: null
                 },
                 {
-                  label: 'رسوم المنصة', value: (tasks.filter(t=>t.status==='completed').reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0)*0.02).toLocaleString('ar-SA') || '٠', unit: 'رس.',
-                  sub: 'عمولة ٥٪', iconBg: 'bg-slate-50', icon: '🏷️',
+                  label: 'رسوم المنصة', value: (stats.revenue).toLocaleString('ar-SA'), unit: 'رس.',
+                  sub: 'عمولة ٢٪', iconBg: 'bg-slate-50', icon: '🏷️',
                   badge: null
                 },
                 {
-                  label: 'مدفوعات الموردين', value: (tasks.filter(t=>t.status==='completed').reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0)*0.98).toLocaleString('ar-SA') || '٠', unit: 'رس.',
+                  label: 'مستحقات العمال', value: (tasks.filter(t=>t.status==='completed').reduce((s,t)=>s+(t.price_final||t.final_price||0),0) - stats.revenue).toLocaleString('ar-SA'), unit: 'رس.',
                   iconBg: 'bg-red-50', icon: '📤',
-                  badge: `${tasks.filter(t=>t.status==='in_progress').length} طلبات معلقة`
+                  badge: `${stats.activeTasks} طلبات معلقة`
                 },
-              ].map(({ label, value, unit, growth, sub, iconBg, icon, badge }) => (
+              ].map(({ label, value, unit, sub, iconBg, icon, badge }) => (
                 <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
                   <div className="flex items-start justify-between mb-4">
                     <div className={`w-11 h-11 ${iconBg} rounded-xl flex items-center justify-center text-xl`}>{icon}</div>
                     <div className="text-left">
-                      {growth && <span className="text-xs text-green-500 font-bold">↗ {growth}</span>}
                       {sub && <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">{sub}</span>}
                       {badge && <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-bold">{badge}</span>}
                     </div>
