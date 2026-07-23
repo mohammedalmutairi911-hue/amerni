@@ -185,7 +185,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
         </div>
       ) : (
         <>
-          {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-xl">{error}</p>}
+          {error && <p className="text-sm text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded-xl">{error}</p>}
           <button onClick={handle} disabled={loading}
             className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             {loading && <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />}

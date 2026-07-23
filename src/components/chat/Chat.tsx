@@ -82,7 +82,12 @@ export function Chat({ taskId, taskTitle }: Props) {
     const ext = file.name.split('.').pop()
     const path = `chat/${taskId}/${Date.now()}.${ext}`
     const { error } = await supabase.storage.from('chat-media').upload(path, file)
-    if (error) { console.error('upload error:', error); return null }
+    if (error) {
+      console.error('upload error:', error)
+      setBlocked('فشل رفع الصورة — تحقق من الاتصال وحاول مجدداً')
+      setTimeout(() => setBlocked(''), 4000)
+      return null
+    }
     const { data } = supabase.storage.from('chat-media').getPublicUrl(path)
     return data.publicUrl
   }
@@ -91,7 +96,12 @@ export function Chat({ taskId, taskTitle }: Props) {
   const uploadAudio = async (blob: Blob): Promise<string | null> => {
     const path = `chat/${taskId}/${Date.now()}.webm`
     const { error } = await supabase.storage.from('chat-media').upload(path, blob, { contentType: 'audio/webm' })
-    if (error) { console.error('audio upload error:', error); return null }
+    if (error) {
+      console.error('audio upload error:', error)
+      setBlocked('فشل رفع التسجيل الصوتي — حاول مجدداً')
+      setTimeout(() => setBlocked(''), 4000)
+      return null
+    }
     const { data } = supabase.storage.from('chat-media').getPublicUrl(path)
     return data.publicUrl
   }
@@ -293,13 +303,15 @@ export function Chat({ taskId, taskTitle }: Props) {
         <div className={`flex items-center gap-2 bg-slate-50 border rounded-2xl px-3 py-2.5 transition-colors ${blocked ? 'border-red-300' : 'border-slate-200 focus-within:border-primary-400'}`}>
           {/* Image upload */}
           <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
-          <button onClick={() => fileRef.current?.click()} title="إرفاق صورة"
+          <button onClick={() => fileRef.current?.click()} title="إرفاق صورة" aria-label="إرفاق صورة"
             className="text-slate-400 hover:text-primary-500 transition-colors flex-shrink-0">
             <Image size={18} />
           </button>
 
           {/* Voice recording */}
-          <button onClick={recording ? stopRecording : startRecording} title={recording ? 'إيقاف التسجيل' : 'تسجيل صوتي'}
+          <button onClick={recording ? stopRecording : startRecording}
+            title={recording ? 'إيقاف التسجيل' : 'تسجيل صوتي'}
+            aria-label={recording ? 'إيقاف التسجيل الصوتي' : 'بدء تسجيل صوتي'}
             className={`flex-shrink-0 transition-colors ${recording ? 'text-red-500 animate-pulse' : 'text-slate-400 hover:text-primary-500'}`}>
             {recording ? <MicOff size={18} /> : <Mic size={18} />}
           </button>
@@ -309,11 +321,13 @@ export function Chat({ taskId, taskTitle }: Props) {
             onChange={e => { setInput(e.target.value); if(blocked) setBlocked('') }}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
             placeholder="اكتب رسالة..."
+            aria-label="اكتب رسالة"
             className="flex-1 bg-transparent text-sm outline-none placeholder-slate-400 text-slate-900"
           />
 
           <button onClick={send}
             disabled={(!input.trim() && !imageFile && !audioBlob) || sending}
+            aria-label="إرسال الرسالة"
             className="bg-primary-500 hover:bg-primary-700 disabled:opacity-30 text-white w-8 h-8 rounded-xl flex items-center justify-center transition-colors flex-shrink-0">
             {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
           </button>

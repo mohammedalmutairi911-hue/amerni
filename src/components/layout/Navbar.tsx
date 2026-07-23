@@ -1,6 +1,6 @@
 import { Logo } from '../Logo'
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, LayoutDashboard, Briefcase, Shield, Bell, Menu, X, ChevronDown, Users, Gift, Building2 } from 'lucide-react'
+import { LogOut, LayoutDashboard, Shield, ChevronDown, Users, Building2 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
 import { getAvatar } from '../../lib/supabase'
@@ -9,7 +9,6 @@ import { goHome, goToUserHome, isUserInPortal } from '../../lib/homePage'
 export function Navbar() {
   const { user, profile, signOut } = useAuth()
   const { navigate, openAuth } = useApp()
-  const [menuOpen, setMenuOpen] = useState(false)
   const [dropOpen, setDropOpen] = useState(false)
   const dropRef = useRef<HTMLDivElement>(null)
 
@@ -30,7 +29,6 @@ export function Navbar() {
   const scrollTo = (id: string) => {
     const el = document.getElementById(id)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
-    setMenuOpen(false)
   }
 
   return (
@@ -107,7 +105,7 @@ export function Navbar() {
                       </button>
                     )}
                     <button onClick={() => { signOut(); setDropOpen(false) }}
-                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-950/30 rounded-lg transition-colors">
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                       <LogOut size={15} /> خروج
                     </button>
                   </div>

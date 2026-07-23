@@ -9,6 +9,7 @@ import { useApp } from '../contexts/AppContext'
 import { goHome } from '../lib/homePage'
 import { Task, WorkerProfile } from '../types'
 import { Chat } from '../components/chat/Chat'
+import { NotificationBell } from '../components/ui/NotificationBell'
 import { useToast } from '../components/Toast'
 
 const STATUS_LABEL: Record<string, string> = { open: 'مفتوح', in_progress: 'جاري', pending_confirmation: 'بانتظار تأكيد العميل', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع' }
@@ -288,15 +289,26 @@ export function WorkerDashboard() {
                 onChange={async (e) => {
                   const file = e.target.files?.[0]
                   if (!file) return
+                  if (file.size > 10 * 1024 * 1024) { toast('حجم الملف كبير — الحد الأقصى 10 ميجا', 'error'); return }
+                  setUploadingProof(true)
                   const ext = file.name.split('.').pop()
                   const path = `completions/${completingTask.id}/${Date.now()}.${ext}`
                   const { error } = await supabase.storage.from('chat-media').upload(path, file)
-                  if (!error) {
+                  if (error) {
+                    toast('فشل رفع الملف — حاول مجدداً', 'error')
+                  } else {
                     const { data } = supabase.storage.from('chat-media').getPublicUrl(path)
                     setProofUrl(data.publicUrl)
+                    toast('تم رفع الملف ✅', 'success')
                   }
+                  setUploadingProof(false)
                 }} />
-              {proofUrl ? (
+              {uploadingProof ? (
+                <>
+                  <Loader2 size={16} className="text-primary-500 animate-spin" />
+                  <span className="text-primary-600 text-sm font-bold">جاري الرفع...</span>
+                </>
+              ) : proofUrl ? (
                 <span className="text-green-600 text-sm font-bold">✅ تم رفع الملف</span>
               ) : (
                 <>
@@ -471,7 +483,7 @@ export function WorkerDashboard() {
             <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-white font-black text-sm">
               {profile?.full_name?.[0] || '؟'}
             </div>
-            <button className="relative w-9 h-9 flex items-center justify-center text-slate-400 hover:bg-slate-100 rounded-full transition-colors text-lg">🔔</button>
+            <NotificationBell />
           </div>
         </header>
 

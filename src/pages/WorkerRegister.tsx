@@ -313,7 +313,7 @@ export function WorkerRegister({ onSuccess }: Props) {
             </div>
           )}
 
-          {error && <p className="mt-4 text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-lg">{error}</p>}
+          {error && <p className="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">{error}</p>}
 
           <div className="flex gap-3 mt-6">
             {step > 1 && (

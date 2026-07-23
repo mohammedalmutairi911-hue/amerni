@@ -174,7 +174,7 @@ export function AuthModal() {
             </div>
           ) : (
             <>
-              {error && <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-lg">{error}</p>}
+              {error && <p className="text-sm text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">{error}</p>}
               <button onClick={submit} disabled={loading}
                 className="w-full bg-primary-500 text-white font-bold py-2.5 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading && <Loader2 size={15} className="animate-spin" />}

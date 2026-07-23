@@ -5,12 +5,14 @@ import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
 import { goToUserHome } from '../lib/homePage'
 import { getAvatar } from '../lib/supabase'
+import { useToast } from '../components/Toast'
 
 interface Props { workerId: string }
 
 export function WorkerProfile({ workerId }: Props) {
   const { navigate } = useApp()
   const { profile } = useAuth()
+  const { toast } = useToast()
   const [worker, setWorker] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -44,7 +46,7 @@ export function WorkerProfile({ workerId }: Props) {
         </button>
 
         {/* Header */}
-        <div className="bg-gradient-to-br from-primary-500/10 to-[#0d0d0d] border border-primary-500/20 rounded-2xl p-6 mb-4">
+        <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-200 rounded-2xl p-6 mb-4 shadow-sm">
           <div className="flex items-start gap-4 mb-4">
             <img src={getAvatar(worker.full_name)} loading="lazy" className="w-20 h-20 rounded-2xl" alt="" />
             <div className="flex-1">
@@ -99,7 +101,20 @@ export function WorkerProfile({ workerId }: Props) {
           <MessageSquare size={18} /> اطلب من {worker.full_name.split(' ')[0]}
         </button>
 
-        <button onClick={() => navigator.share ? navigator.share({ title: worker.full_name, url: shareUrl }) : navigator.clipboard.writeText(shareUrl)}
+        <button onClick={async () => {
+          if (navigator.share) {
+            try {
+              await navigator.share({ title: worker.full_name, url: shareUrl })
+            } catch { /* user cancelled */ }
+          } else {
+            try {
+              await navigator.clipboard.writeText(shareUrl)
+              toast('تم نسخ الرابط ✅', 'success')
+            } catch {
+              toast('تعذّر نسخ الرابط — انسخه يدوياً', 'error')
+            }
+          }
+        }}
           className="w-full border border-slate-300 text-slate-500 font-medium py-3 rounded-xl text-sm hover:border-slate-300 transition-colors">
           🔗 شارك البروفايل
         </button>

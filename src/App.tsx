@@ -66,7 +66,7 @@ export class ErrorBoundary extends React.Component<{children: React.ReactNode}, 
           <div className="text-center max-w-sm">
             <div className="text-4xl font-black text-primary-400 mb-4">أمرني</div>
             <p className="text-slate-500 mb-2">حدث خطأ</p>
-            <p className="text-red-400 text-xs mb-4 bg-red-950/30 p-2 rounded-lg" dir="ltr">
+            <p className="text-red-700 text-xs mb-4 bg-red-50 border border-red-200 p-2 rounded-lg" dir="ltr">
               {(this.state as any).error?.message || 'Unknown error'}
             </p>
             <button onClick={() => window.location.reload()}

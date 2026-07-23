@@ -44,10 +44,15 @@ export function ReferralPage() {
     setLoading(false)
   }
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(referralLink)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2500)
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(referralLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      // Fallback: تحديد النص للنسخ اليدوي
+      alert('تعذّر النسخ التلقائي — استخدم النسخ اليدوي:\n\n' + referralLink)
+    }
   }
 
   const shareLink = () => {
@@ -111,7 +116,7 @@ export function ReferralPage() {
             {[
               { n: '١', text: 'شارك رابطك مع أصدقائك وعائلتك' },
               { n: '٢', text: 'لما يسجلون عن طريق رابطك وينشرون طلب' },
-              { n: '٣', text: 'لما الطلب يكتمل — تكسب 5% من قيمته تلقائياً' },
+              { n: '٣', text: 'لما الطلب يكتمل — تكسب 30% من عمولة المنصة تلقائياً' },
               { n: '٤', text: 'ما في حد أقصى — كلما أحلت أكثر كسبت أكثر' },
             ].map(({ n, text }) => (
               <div key={n} className="flex items-center gap-3">

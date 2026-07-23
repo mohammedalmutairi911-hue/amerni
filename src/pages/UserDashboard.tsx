@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Plus, CheckCircle, Clock, Loader2, MessageSquare, Star, DollarSign, Home, List, Wallet, LogOut, MapPin, Zap, ChevronRight, X } from 'lucide-react'
+import { Plus, CheckCircle, Clock, Loader2, Star, Home, List, Wallet, LogOut, Zap, ChevronRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
@@ -7,6 +7,7 @@ import { goHome } from '../lib/homePage'
 import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
 import { Chat } from '../components/chat/Chat'
+import { NotificationBell } from '../components/ui/NotificationBell'
 import { useToast } from '../components/Toast'
 
 const STATUS_LABEL: Record<string, string> = {
@@ -53,6 +54,8 @@ export function UserDashboard() {
   const [rating, setRating] = useState(0)
   const [ratingDone, setRatingDone] = useState(false)
   const [showReceipt, setShowReceipt] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [showDisputeConfirm, setShowDisputeConfirm] = useState(false)
   const channelRef = useRef<any>(null)
   // مصدر الحقيقة الوحيد لأرقام لوحة الفرد — نفس الطبقة المركزية المستخدمة في لوحة الإدارة
   const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)
@@ -356,12 +359,8 @@ export function UserDashboard() {
           <div className="bg-white border border-slate-200 rounded-xl p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs text-slate-500 leading-relaxed">مشكلة في الخدمة؟ فريق آمرني يراجع خلال 24 ساعة</p>
-              <button onClick={async () => {
-                if (confirm('رفع نزاع؟ سيراجع الفريق ويتواصل معك خلال 24 ساعة.')) {
-                  await supabase.rpc('raise_dispute', { p_task_id: selectedTask.id })
-                  setSelectedTask(p => p ? { ...p, status: 'disputed' } : null)
-                }
-              }} className="flex-shrink-0 text-xs text-red-400 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 whitespace-nowrap">
+              <button onClick={() => setShowDisputeConfirm(true)}
+                className="flex-shrink-0 text-xs text-red-600 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 whitespace-nowrap">
                 رفع نزاع
               </button>
             </div>
@@ -373,6 +372,33 @@ export function UserDashboard() {
           <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
         )}
       </div>
+
+      {/* Dispute Confirmation Modal */}
+      {showDisputeConfirm && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <div className="text-center mb-5">
+              <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-3 text-2xl">⚠️</div>
+              <h3 className="text-lg font-black text-slate-900 mb-1">رفع نزاع؟</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">سيراجع فريق أمرني الطلب ويتواصل معك خلال 24 ساعة</p>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setShowDisputeConfirm(false)}
+                className="flex-1 border border-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm hover:bg-slate-50 transition-colors">
+                إلغاء
+              </button>
+              <button onClick={async () => {
+                setShowDisputeConfirm(false)
+                await supabase.rpc('raise_dispute', { p_task_id: selectedTask.id })
+                setSelectedTask(p => p ? { ...p, status: 'disputed' } : null)
+                toast('تم رفع النزاع — سيتواصل معك الفريق قريباً', 'info')
+              }} className="flex-1 bg-red-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-red-600 transition-colors">
+                نعم، ارفع النزاع
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 
@@ -384,8 +410,9 @@ export function UserDashboard() {
 
       {/* Sidebar Desktop */}
       <aside className="hidden lg:flex flex-col h-screen fixed right-0 border-l border-slate-200 bg-slate-900 w-64 z-50">
-        <div className="p-6 border-b border-slate-800">
+        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
           <button onClick={() => goHome(navigate, profile)} className="text-xl font-black text-amber-400 hover:opacity-80 transition-opacity">آمرني</button>
+          <NotificationBell />
         </div>
 
         <div className="px-4 py-5 flex flex-col items-center border-b border-slate-800">
@@ -430,9 +457,12 @@ export function UserDashboard() {
         {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
           <button onClick={() => goHome(navigate, profile)} className="text-lg font-black text-amber-400">آمرني</button>
-          <button onClick={() => setShowNew(true)} className="flex items-center gap-1.5 bg-amber-400 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
-            <Plus size={14} /> طلب جديد
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <button onClick={() => setShowNew(true)} className="flex items-center gap-1.5 bg-amber-400 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
+              <Plus size={14} /> طلب جديد
+            </button>
+          </div>
         </div>
 
         <div className="p-4 md:p-8 max-w-5xl mx-auto">
@@ -665,9 +695,13 @@ export function UserDashboard() {
                   <div className="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-slate-600 font-mono truncate">
                     amerniksa.com?ref={user?.id?.slice(0,8)}
                   </div>
-                  <button onClick={() => {
-                    navigator.clipboard.writeText(`https://amerniksa.com?ref=${user?.id?.slice(0,8)}`)
-                    toast('✅ تم نسخ الرابط!', 'success')
+                  <button onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(`https://amerniksa.com?ref=${user?.id?.slice(0,8)}`)
+                      toast('✅ تم نسخ الرابط!', 'success')
+                    } catch {
+                      toast('تعذّر النسخ — انسخ الرابط يدوياً', 'error')
+                    }
                   }} className="bg-amber-400 text-slate-900 font-bold px-4 py-2 rounded-xl text-sm hover:bg-amber-500 transition-colors flex-shrink-0">
                     نسخ
                   </button>
@@ -716,12 +750,37 @@ export function UserDashboard() {
             {badge > 0 && <span className="absolute top-0 right-2 w-4 h-4 bg-purple-500 text-white rounded-full text-[9px] flex items-center justify-center font-bold">{badge}</span>}
           </button>
         ))}
-        <button onClick={async () => { await signOut(); navigate('landing') }}
-          className="flex flex-col items-center gap-1 px-4 py-1 text-red-400 transition-all">
+        <button onClick={() => setShowLogoutConfirm(true)}
+          className="flex flex-col items-center gap-1 px-4 py-1 text-red-500 transition-all">
           <LogOut size={20} />
           <span className="text-[10px] font-medium">خروج</span>
         </button>
       </nav>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl">
+            <div className="text-center mb-5">
+              <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-3">
+                <LogOut size={22} className="text-red-500" />
+              </div>
+              <h3 className="text-lg font-black text-slate-900 mb-1">تسجيل الخروج؟</h3>
+              <p className="text-sm text-slate-500">راح تحتاج تسجّل دخول مرة ثانية</p>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 border border-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm hover:bg-slate-50 transition-colors">
+                إلغاء
+              </button>
+              <button onClick={async () => { setShowLogoutConfirm(false); await signOut(); navigate('landing') }}
+                className="flex-1 bg-red-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-red-600 transition-colors">
+                خروج
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

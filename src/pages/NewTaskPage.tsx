@@ -342,7 +342,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               </div>
             </div>
 
-            {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
+            {error && <p className="text-sm text-red-700 bg-red-50 border border-red-200 px-4 py-3 rounded-xl">{error}</p>}
 
             <button onClick={handleNext} disabled={loading}
               className="w-full bg-primary-500 hover:bg-primary-400 text-white font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
@@ -483,7 +483,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                 </div>
               ) : (
                 <>
-                  {error && <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 px-4 py-3 rounded-xl">{error}</p>}
+                  {error && <p className="text-sm text-red-700 bg-red-50 border border-red-200 px-4 py-3 rounded-xl">{error}</p>}
                   <button onClick={handleAuth} disabled={loading}
                     className="w-full bg-primary-500 hover:bg-primary-400 text-white font-bold py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
                     {loading && <Loader2 size={18} className="animate-spin" />}

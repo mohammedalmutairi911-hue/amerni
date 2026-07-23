@@ -37,6 +37,7 @@ export function LeadDetailPage() {
   const [accepting, setAccepting] = useState(false)
   const [contractVal, setContractVal] = useState('')
   const [showClose, setShowClose] = useState(false)
+  const [showChangeConfirm, setShowChangeConfirm] = useState(false)
 
   const leadId = window.location.hash.split('/')[2]
 
@@ -64,7 +65,7 @@ export function LeadDetailPage() {
   }
 
   const changeProvider = async () => {
-    if (!confirm('تغيير المزود؟ سيُستبعد الحالي نهائياً ويعود طلبك لباقي المزودين.')) return
+    setShowChangeConfirm(false)
     setChanging(true)
     const { error } = await supabase.rpc('company_change_provider', { p_lead_id: lead.id })
     setChanging(false)
@@ -86,8 +87,8 @@ export function LeadDetailPage() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-      <Loader2 size={32} className="animate-spin text-primary-400" />
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <Loader2 size={32} className="animate-spin text-primary-500" />
     </div>
   )
   if (!lead) return null
@@ -235,7 +236,7 @@ export function LeadDetailPage() {
                       <CheckCircle2 size={14} /> تم التعاقد — أغلق الطلب
                     </button>
                   )}
-                  <button onClick={changeProvider} disabled={changing}
+                  <button onClick={() => setShowChangeConfirm(true)} disabled={changing}
                     className="w-full mt-2 border border-red-200 text-red-500 hover:bg-red-50 py-2 rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
                     {changing ? <Loader2 size={14} className="animate-spin" /> : 'تغيير المزود'}
                   </button>
@@ -271,7 +272,7 @@ export function LeadDetailPage() {
                     providerId={lead.provider_id}
                     showActions={true}
                     onAccept={acceptProvider}
-                    onReject={changeProvider}
+                    onReject={() => setShowChangeConfirm(true)}
                     accepting={accepting}
                     rejecting={changing}
                   />
@@ -326,6 +327,31 @@ export function LeadDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Change Provider Confirmation Modal */}
+      {showChangeConfirm && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <div className="text-center mb-5">
+              <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-3">
+                <AlertCircle size={22} className="text-red-500" />
+              </div>
+              <h3 className="text-lg font-black text-slate-900 mb-1">تغيير المزود؟</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">سيُستبعد المزود الحالي نهائياً ويعود طلبك متاحاً لباقي المزودين</p>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setShowChangeConfirm(false)}
+                className="flex-1 border border-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm hover:bg-slate-50 transition-colors">
+                إلغاء
+              </button>
+              <button onClick={changeProvider}
+                className="flex-1 bg-red-500 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-red-600 transition-colors">
+                نعم، غيّر المزود
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
