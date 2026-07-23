@@ -1,6 +1,6 @@
 import { Logo } from '../Logo'
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, LayoutDashboard, Shield, ChevronDown, Users, Building2 } from 'lucide-react'
+import { LogOut, LayoutDashboard, Shield, ChevronDown, Users, Building2, Bell } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
 import { getAvatar } from '../../lib/supabase'
@@ -104,6 +104,10 @@ export function Navbar() {
                         <Building2 size={15} /> المنشآت
                       </button>
                     )}
+                    <button onClick={() => { navigate('notification-settings'); setDropOpen(false) }}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                      <Bell size={15} /> الإشعارات
+                    </button>
                     <button onClick={() => { signOut(); setDropOpen(false) }}
                       className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                       <LogOut size={15} /> خروج

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { Bell, Check } from 'lucide-react'
+import { Bell, Check, Settings } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
+import { useApp } from '../../contexts/AppContext'
 
 interface Notif {
   id: string
@@ -13,6 +14,7 @@ interface Notif {
 
 export function NotificationBell() {
   const { user } = useAuth()
+  const { navigate } = useApp()
   const [notifs, setNotifs] = useState<Notif[]>([])
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -80,11 +82,18 @@ export function NotificationBell() {
         <div className="absolute left-0 mt-2 w-80 max-w-[90vw] bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden" dir="rtl">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
             <p className="font-bold text-slate-800 text-sm">الإشعارات</p>
-            {unread > 0 && (
-              <button onClick={markAllRead} className="text-xs text-primary-500 flex items-center gap-1 hover:text-primary-700">
-                <Check size={12} /> تعليم الكل مقروء
+            <div className="flex items-center gap-3">
+              {unread > 0 && (
+                <button onClick={markAllRead} className="text-xs text-primary-500 flex items-center gap-1 hover:text-primary-700">
+                  <Check size={12} /> تعليم الكل مقروء
+                </button>
+              )}
+              <button onClick={() => { setOpen(false); navigate('notification-settings') }}
+                aria-label="إعدادات الإشعارات"
+                className="text-slate-400 hover:text-slate-700 transition-colors">
+                <Settings size={14} />
               </button>
-            )}
+            </div>
           </div>
           <div className="max-h-96 overflow-y-auto">
             {notifs.length === 0 ? (

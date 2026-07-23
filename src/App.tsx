@@ -10,6 +10,7 @@ import { UserDashboard } from './pages/UserDashboard'
 import { WorkerDashboard } from './pages/WorkerDashboard'
 import { WorkerRegister } from './pages/WorkerRegister'
 import { InstallPrompt } from './components/InstallPrompt'
+import { PushPrompt } from './components/PushPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
 
@@ -25,6 +26,7 @@ const JoinPage = React.lazy(() => import('./pages/JoinPage').then(m => ({ defaul
 const WorkerProfile = React.lazy(() => import('./pages/WorkerProfile').then(m => ({ default: m.WorkerProfile })))
 const EnterprisesPage = React.lazy(() => import('./pages/EnterprisesPage').then(m => ({ default: m.EnterprisesPage })))
 const ProviderDashboard = React.lazy(() => import('./pages/ProviderDashboard').then(m => ({ default: m.ProviderDashboard })))
+const NotificationSettings = React.lazy(() => import('./pages/NotificationSettings').then(m => ({ default: m.NotificationSettings })))
 import { ToastProvider } from './components/Toast'
 
 // Handle worker profile URL param
@@ -147,6 +149,7 @@ export default function App() {
     if (page === 'browse') return <><Navbar /><BrowseWorkers /></>
     if (page === 'bounties') return <><Navbar /><BountiesPage /></>
     if (page === 'referral') return <><Navbar /><ReferralPage /></>
+    if (page === 'notification-settings') return <><Navbar /><NotificationSettings /></>
     if (page === 'join') return <JoinPage />
     if (page === 'earn') return <><Navbar /><JoinPage /></>
     if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
@@ -197,5 +200,5 @@ export default function App() {
     return <><Navbar /><NotFoundPage /></>
   }
 
-  return <ErrorBoundary><ToastProvider><React.Suspense fallback={<PageLoader />}>{renderContent()}</React.Suspense></ToastProvider></ErrorBoundary>
+  return <ErrorBoundary><ToastProvider><React.Suspense fallback={<PageLoader />}>{renderContent()}{user && <PushPrompt />}</React.Suspense></ToastProvider></ErrorBoundary>
 }

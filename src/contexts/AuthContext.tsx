@@ -89,6 +89,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
+    // احذف اشتراك Push من الجهاز و DB قبل تسجيل الخروج
+    try {
+      const { disablePushNotifications } = await import('../lib/push')
+      await disablePushNotifications()
+    } catch { /* soft-fail */ }
     await supabase.auth.signOut()
     setProfile(null)
   }

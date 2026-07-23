@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1E3A8A">
+  <title>أنت خارج الشبكة — أمرني</title>
+  <link rel="icon" href="/icon-192.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'IBM Plex Sans Arabic', 'Tahoma', sans-serif;
+      background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
+      color: #0f172a;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .container {
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    .icon-wrap {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 24px;
+      background: white;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(30, 58, 138, 0.1);
+    }
+    .icon-wrap svg { width: 44px; height: 44px; color: #1E3A8A; }
+    h1 {
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      color: #0f172a;
+    }
+    p {
+      color: #64748b;
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    button {
+      background: #1E3A8A;
+      color: white;
+      font-weight: 700;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 14px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      min-height: 48px;
+      width: 100%;
+      max-width: 220px;
+    }
+    button:hover { background: #1e40af; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    .brand {
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      margin-inline-end: 6px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon-wrap">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M18.364 5.636l-1.414 1.414M12 5V3m0 18v-2m-6.364-.636l1.414-1.414M3 12h2m14 0h2M5.636 5.636l1.414 1.414M9 12a3 3 0 116 0 3 3 0 01-6 0z" />
+        <line x1="3" y1="3" x2="21" y2="21" stroke-linecap="round" stroke-width="2.2"/>
+      </svg>
+    </div>
+    <h1>أنت خارج الشبكة</h1>
+    <p><span class="status-dot"></span>لا يوجد اتصال بالإنترنت الآن. تحقّق من اتصالك وأعد المحاولة.</p>
+    <button onclick="location.reload()">أعد المحاولة</button>
+  </div>
+  <div class="brand">أمرني ⚡</div>
+
+  <script>
+    // Auto-reload when back online
+    window.addEventListener('online', () => setTimeout(() => location.reload(), 500))
+  </script>
+</body>
+</html>

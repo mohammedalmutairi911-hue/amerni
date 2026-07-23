@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react'
 import { X, Download } from 'lucide-react'
 
+const DISMISS_KEY = 'pwa-dismissed-at'
+const REASK_DAYS = 7
+
+function shouldShowPrompt(): boolean {
+  const dismissedAt = localStorage.getItem(DISMISS_KEY)
+  if (!dismissedAt) return true
+  const days = (Date.now() - parseInt(dismissedAt, 10)) / (1000 * 60 * 60 * 24)
+  return days >= REASK_DAYS
+}
+
 export function InstallPrompt() {
   const [show, setShow] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
@@ -9,7 +19,10 @@ export function InstallPrompt() {
   useEffect(() => {
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) return
-    if (localStorage.getItem('pwa-dismissed')) return
+    // Also check iOS Safari standalone flag
+    if ((window.navigator as any).standalone === true) return
+    // Respect recent dismissal
+    if (!shouldShowPrompt()) return
 
     // iOS detection
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -41,7 +54,7 @@ export function InstallPrompt() {
 
   const handleDismiss = () => {
     setShow(false)
-    localStorage.setItem('pwa-dismissed', '1')
+    localStorage.setItem(DISMISS_KEY, Date.now().toString())
   }
 
   if (!show) return null
