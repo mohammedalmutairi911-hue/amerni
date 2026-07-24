@@ -1,7 +1,7 @@
 import { Logo } from '../components/Logo'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
-import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown } from 'lucide-react'
+import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown, Menu, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import { goHome } from '../lib/homePage'
@@ -15,6 +15,7 @@ type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enter
 export function AdminPanel() {
   const { navigate } = useApp()
   const [tab, setTab] = useState<Tab>('overview')
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [workers, setWorkers] = useState<WorkerProfile[]>([])
   const [tasks, setTasks] = useState<Task[]>([])
   const [users, setUsers] = useState<Profile[]>([])
@@ -38,6 +39,12 @@ export function AdminPanel() {
     else setCentralStats(data)
     setStatsLoading(false)
   }
+
+  useEffect(() => {
+    if (!mobileNavOpen) return
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [mobileNavOpen])
 
   useEffect(() => {
     fetchAll()
@@ -310,12 +317,68 @@ export function AdminPanel() {
         </div>
       </aside>
 
+      {/* ── Sidebar Mobile Drawer ── */}
+      {mobileNavOpen && (
+        <div className="lg:hidden fixed inset-0 z-[110]">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-fade-in" onClick={() => setMobileNavOpen(false)} />
+          <aside className="absolute top-0 right-0 h-full w-72 max-w-[85vw] bg-white flex flex-col shadow-2xl animate-slide-right safe-top">
+            <div className="px-5 py-5 border-b border-slate-100 flex items-center justify-between">
+              <button onClick={() => { goHome(navigate); setMobileNavOpen(false) }} className="flex items-center hover:opacity-80 transition-opacity">
+                <Logo size={26} />
+              </button>
+              <button onClick={() => setMobileNavOpen(false)} aria-label="إغلاق القائمة"
+                className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100">
+                <X size={20} />
+              </button>
+            </div>
+
+            <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+              {NAV_ITEMS.map(({ id, icon: Icon, label, badge }) => (
+                <button key={id} onClick={() => { setTab(id as Tab); setMobileNavOpen(false) }}
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all ${
+                    tab === id
+                      ? 'bg-primary-50 text-primary-700 font-bold'
+                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                  }`}>
+                  <Icon size={16} className={tab === id ? 'text-primary-600' : 'text-slate-400'} />
+                  <span className="flex-1 text-right">{label}</span>
+                  {badge > 0 && (
+                    <span className={`text-xs font-black w-5 h-5 rounded-full flex items-center justify-center ${tab === id ? 'bg-primary-500 text-white' : 'bg-red-500 text-white'}`}>
+                      {badge > 9 ? '9+' : badge}
+                    </span>
+                  )}
+                </button>
+              ))}
+
+              <div className="pt-3 mt-3 border-t border-slate-100">
+                <button onClick={() => { navigate('admin-enterprises'); setMobileNavOpen(false) }}
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+                  <Building2 size={16} className="text-slate-400" />
+                  <span className="flex-1 text-right">إدارة المنشآت</span>
+                </button>
+              </div>
+            </nav>
+
+            <div className="p-4 border-t border-slate-100 safe-bottom">
+              <button onClick={() => navigate('landing')}
+                className="w-full flex items-center justify-center gap-2 text-xs text-red-400 hover:text-red-600 py-2.5 rounded-lg hover:bg-red-50 transition-colors font-medium">
+                <span>→</span> تسجيل الخروج
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
+
       {/* ── Main ── */}
       <div className="flex-1 flex flex-col min-h-screen">
 
         {/* ── Top Header ── */}
-        <header className="bg-white border-b border-slate-200 px-6 py-3.5 flex items-center gap-4 shadow-sm sticky top-0 z-30">
-          <h2 className="font-black text-slate-800 text-lg flex-1">
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 flex items-center gap-3 sm:gap-4 shadow-sm sticky top-0 z-30">
+          <button onClick={() => setMobileNavOpen(true)} aria-label="فتح القائمة"
+            className="lg:hidden flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50">
+            <Menu size={20} />
+          </button>
+          <h2 className="font-black text-slate-800 text-base sm:text-lg flex-1 truncate">
             {NAV_ITEMS.find(n => n.id === tab)?.label || 'نظرة عامة'}
           </h2>
           {/* Search */}
@@ -427,13 +490,13 @@ export function AdminPanel() {
                     <button className="text-xs text-primary-500 hover:underline font-medium">عرض التقارير</button>
                     <h3 className="font-bold text-slate-900">الملخص المالي</h3>
                   </div>
-                  <div className="grid grid-cols-3 gap-4 mb-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
                     {[
                       { label: 'إجمالي الإيرادات (عمولة 2%)', value: stats.revenue, unit: 'رس', color: 'text-slate-900' },
                       { label: 'عمولة معلقة (طلبات بانتظار التأكيد)', value: stats.revenuePending, unit: 'رس', color: 'text-slate-900' },
                       { label: 'معدل النجاح',       value: tasks.length > 0 ? Math.round((stats.completed/tasks.length)*100) : 0, unit: '%', color: 'text-green-500' },
                     ].map(({ label, value, unit, color }) => (
-                      <div key={label} className="border-l border-slate-100 pl-4 last:border-0 text-left">
+                      <div key={label} className="sm:border-l border-slate-100 pl-0 sm:pl-4 last:border-0 text-left">
                         <p className="text-xs text-slate-400 mb-1 text-right">{label}</p>
                         <p className={`text-2xl font-black ${color}`}>{value} <span className="text-sm font-medium">{unit}</span></p>
                       </div>

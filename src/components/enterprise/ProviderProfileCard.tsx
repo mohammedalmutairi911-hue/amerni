@@ -104,7 +104,7 @@ export function ProviderProfileCard({ providerId, onAccept, onReject, accepting,
           <Mail size={14} className="text-slate-400" />
           <p className="text-sm font-bold text-slate-600">معلومات التواصل</p>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {provider.city && (
             <div className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-3">
               <div className="flex items-center justify-between mb-1">
@@ -137,7 +137,7 @@ export function ProviderProfileCard({ providerId, onAccept, onReject, accepting,
 
       {/* ── بيانات الشركة (السجل + الخبرة + الطلبات) ── */}
       <div className="px-5 pb-4">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* طلبات مكتملة */}
           <div className="bg-green-50 border border-green-100 rounded-xl px-3 py-3">
             <div className="flex items-center justify-between mb-1">

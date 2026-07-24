@@ -550,7 +550,7 @@ export function UserDashboard() {
                   {/* Quick Services */}
                   <div>
                     <p className="text-xs text-slate-400 mb-2 font-medium">خدمات سريعة</p>
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {QUICK_SERVICES.map(({ icon, label }) => (
                         <button key={label} onClick={() => setShowNew(true)}
                           className="bg-white border border-slate-200 rounded-xl p-3 text-center hover:border-primary-500 hover:shadow-md transition-all group">
