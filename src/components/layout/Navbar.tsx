@@ -77,13 +77,11 @@ export function Navbar() {
                     </span>
                   </div>
                   <div className="p-1">
-                    {/* "حسابي" — الزر المخصّص للعودة للوحة التحكم (استثناء صريح من قاعدة "الشعار للـ landing") */}
-                    {profile.role !== 'admin' && (
-                      <button onClick={() => { goToUserHome(navigate, profile); setDropOpen(false) }}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-                        <LayoutDashboard size={15} /> حسابي
-                      </button>
-                    )}
+                    {/* "حسابي" — الزر المخصّص للعودة للوحة التحكم. يظهر لكل الأدوار بما فيها الأدمن (goToUserHome يوجّهه تلقائياً إلى 'admin'). */}
+                    <button onClick={() => { goToUserHome(navigate, profile); setDropOpen(false) }}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                      <LayoutDashboard size={15} /> حسابي
+                    </button>
                     {/* "تصفح العمال" — خاص بمنصة الأفراد فقط (browse تصفّح العمال الأفراد) */}
                     {(profile.role === 'client' || profile.role === 'admin') && (profile as any).platform !== 'enterprises' && (
                       <button onClick={() => { navigate('browse'); setDropOpen(false) }}
@@ -97,11 +95,12 @@ export function Navbar() {
                         <Shield size={15} /> الإدارة
                       </button>
                     )}
-                    {/* رابط المنشآت — يُظهَر فقط لمستخدمي الأفراد (لتصفح القسم) والأدمن، مخفي لمن هو أصلاً في المنشآت */}
+                    {/* رابط المنشآت — يُظهَر فقط لمستخدمي الأفراد (لتصفح القسم) والأدمن، مخفي لمن هو أصلاً في المنشآت.
+                        للأدمن: يفتح لوحة إدارة المنشآت (admin-enterprises) وليس السوق العام. */}
                     {(profile as any).platform !== 'enterprises' && (
-                      <button onClick={() => { navigate('enterprises'); setDropOpen(false) }}
+                      <button onClick={() => { navigate(profile.role === 'admin' ? 'admin-enterprises' : 'enterprises'); setDropOpen(false) }}
                         className="w-full flex items-center gap-3 px-3 py-2 text-sm text-primary-500 hover:bg-primary-50 rounded-lg transition-colors font-medium">
-                        <Building2 size={15} /> المنشآت
+                        <Building2 size={15} /> {profile.role === 'admin' ? 'إدارة المنشآت' : 'المنشآت'}
                       </button>
                     )}
                     <button onClick={() => { navigate('notification-settings'); setDropOpen(false) }}
