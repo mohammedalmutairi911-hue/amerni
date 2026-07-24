@@ -1,78 +1,64 @@
-# 🔔 Push Notifications — الخطوات الأخيرة
+# 🔔 Push Notifications — دليل الإعداد
 
-كل البنية التحتية جاهزة ومنشورة. تبقّى خطوتان أنت تسويهم:
+## الحالة الحالية
 
-## VAPID Keys الجاهزة
+كل شيء منشور ويعمل. الـ Edge Function مباشرة على السيرفر، pg_net trigger مثبَّت، والاختبار عبر SQL يرجع `200 OK`.
 
-```
-Public:  BIQwYXD3COvkMJ2XQ0idXKdUxRMRsp0p5PygMZiBLoO6FgZlW3QDHfAU6ragZ67xeU7LIvYN5V9GIqr2iPYyy6U
-Private: 33y1J-aOpfCQCoosXWIqzpP00WByQtSqVUoDA1X9gJY
-```
-
-المفتاح العام (Public) مدمج في الكود. المفتاح الخاص (Private) لازم يروح كـ Supabase secret.
+الشيء الوحيد المتبقّي: أنت (كأدمن) تفعّل إذن Push من متصفح جوالك.
 
 ---
 
-## الخطوة 1: نشر Edge Function `send-push`
+## VAPID Keys
 
-من جهازك:
+- **Public key** موجود في `src/lib/push.ts` (آمن للنشر — المتصفحات تحتاجه)
+- **Private key** موجود فقط داخل الـ Edge Function المنشورة (متغيّر بيئة/ثابت داخلي)
+
+**لا تشارك الـ private key، ولا تدرجه في git.**
+
+### تدوير المفاتيح عند الحاجة
 
 ```bash
-cd amerni3
+# 1) ولّد keys جديدة
+npx web-push generate-vapid-keys
 
-# 1) سجّل الأسرار (مرة واحدة)
-supabase secrets set VAPID_PUBLIC_KEY='BIQwYXD3COvkMJ2XQ0idXKdUxRMRsp0p5PygMZiBLoO6FgZlW3QDHfAU6ragZ67xeU7LIvYN5V9GIqr2iPYyy6U'
-supabase secrets set VAPID_PRIVATE_KEY='33y1J-aOpfCQCoosXWIqzpP00WByQtSqVUoDA1X9gJY'
-supabase secrets set VAPID_SUBJECT='mailto:support@amerniksa.com'
-
-# 2) انشر الدالة
+# 2) حدّث Public في src/lib/push.ts
+# 3) أعد نشر الـ Edge Function مع Private الجديد كسر (Supabase secret أو دمج مباشر)
+supabase secrets set VAPID_PRIVATE_KEY='<الجديد>'
 supabase functions deploy send-push --project-ref urgqapqkbwhornmgqaav
+
+# 4) commit للـ src/lib/push.ts فقط (بدون private)
 ```
 
-## الخطوة 2: ربط Database Webhook
-
-في Supabase Dashboard:
-
-1. اذهب لـ **Database → Webhooks → Create a new hook**
-2. عبّي:
-   - **Name:** `notif-to-push`
-   - **Table:** `notifications`
-   - **Events:** ✅ INSERT
-   - **Type:** Supabase Edge Functions
-   - **Function:** `send-push`
-   - **Method:** POST
-   - **HTTP Headers:** خلّها الافتراضية
-3. احفظ.
+**ملاحظة:** تدوير المفاتيح يبطل جميع الاشتراكات الحالية — على المستخدمين تفعيل الإشعارات من جديد.
 
 ---
 
-## اختبار
+## الاختبار على الموقع
 
-بعد إتمام الخطوتين، من أي متصفح:
+1. افتح https://amerniksa.com من جوالك.
+2. **iPhone فقط:** أضف الموقع للشاشة الرئيسية أولاً:
+   - اضغط زر Share ⬆️
+   - اختر "إضافة إلى الشاشة الرئيسية"
+   - افتح الموقع من الأيقونة على الشاشة الرئيسية.
+3. سجّل دخول كـ أدمن (`moodi199@gmail.com`).
+4. من قائمة الحساب → **الإشعارات** → اضغط **تفعيل**.
+5. اقبل إذن الإشعارات من الجوال.
+6. من متصفح ثاني، أنشئ طلب أو سجّل حساب → إشعار Push يوصلك خلال ثوانٍ.
 
-1. سجّل دخول كأدمن (moodi199@gmail.com)
-2. روح لـ **الإشعارات** من قائمة الحساب
-3. اضغط **تفعيل** لإذن Push
-4. من جهاز/متصفح ثاني، سجّل حساب جديد أو أنشئ طلب
+للتحقق من نجاح الاشتراك:
+```sql
+select device_type, created_at
+from push_subscriptions
+where user_id = '<your-admin-uuid>';
+```
 
-راح يوصلك إشعار Push فوراً على الجوال — حتى لو المتصفح مغلق.
-
----
-
-## استكشاف الأخطاء
-
-**ما وصلني إشعار:**
-- تحقق: `Database → Webhooks → notif-to-push → Logs` — هل استُدعيت الدالة؟
-- تحقق: `Edge Functions → send-push → Logs` — هل رجعت 200؟
-- تحقق: جدول `push_subscriptions` — هل جهازك مسجّل؟
-
-**iOS ما يظهر خيار "تفعيل":**
-- المستخدم لازم يضيف الموقع للشاشة الرئيسية أولاً (زر "شارك → إضافة للشاشة الرئيسية")
-- iOS Safari يدعم Push فقط داخل PWA المثبَّت
-
-**التوكن انتهت صلاحيته:**
-- الدالة تحذف الاشتراك تلقائياً إذا رجع Push service بـ 404 أو 410
-- الـ SW يعيد التسجيل تلقائياً عند `pushsubscriptionchange`
+للتحقق من نجاح الإرسال (بعد أي حدث):
+```sql
+select status_code, content
+from net._http_response
+order by id desc limit 3;
+```
+`status_code = 200` ومحتوى الرد `{"sent": N, "total": N}` = الإشعار وصل الأجهزة.
 
 ---
 
@@ -95,4 +81,4 @@ supabase functions deploy send-push --project-ref urgqapqkbwhornmgqaav
 | مطابقة مزود | `enterprise_leads UPDATE (matched)` | كل الأدمنز |
 | إغلاق طلب منشأة | `enterprise_leads UPDATE (closed)` | كل الأدمنز |
 
-كل حدث يحترم تفضيلات الأدمن في `notification_preferences` — الأدمن يقدر يوقف نوعاً معيّناً من صفحة الإشعارات.
+كل حدث يحترم تفضيلات الأدمن في `notification_preferences`.

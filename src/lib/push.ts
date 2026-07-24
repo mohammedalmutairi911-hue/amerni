@@ -4,7 +4,7 @@
 
 import { supabase } from './supabase'
 
-const VAPID_PUBLIC_KEY = 'BIQwYXD3COvkMJ2XQ0idXKdUxRMRsp0p5PygMZiBLoO6FgZlW3QDHfAU6ragZ67xeU7LIvYN5V9GIqr2iPYyy6U'
+const VAPID_PUBLIC_KEY = 'BLx_rzUW80oYiKvOClv4epN4LVYCjO9qWtC6nqaY2p8s0FvQLsjTu9_jKxFav7UYOCMrNE6b_BqfaphHt8L_yYg'
 
 const PROMPT_DELAY_KEY = 'amerni_notif_prompt_last'
 const PROMPT_DENIED_DAYS = 7 // إعادة السؤال بعد 7 أيام
