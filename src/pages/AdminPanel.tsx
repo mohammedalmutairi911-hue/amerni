@@ -370,7 +370,7 @@ export function AdminPanel() {
       )}
 
       {/* ── Main ── */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
 
         {/* ── Top Header ── */}
         <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 flex items-center gap-3 sm:gap-4 shadow-sm sticky top-0 z-30">
@@ -654,7 +654,7 @@ export function AdminPanel() {
                       </div>
 
                       {/* Actions */}
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <button onClick={() => rejectWorker(w.user_id)}
                           className="border-2 border-red-200 text-red-500 font-bold py-2 rounded-xl text-xs hover:bg-red-50 transition-colors">
                           رفض

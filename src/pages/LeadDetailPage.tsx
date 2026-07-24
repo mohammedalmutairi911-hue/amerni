@@ -156,7 +156,7 @@ export function LeadDetailPage() {
       <div className="flex-1 flex flex-col min-h-screen">
 
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3.5 flex items-center gap-3 shadow-sm">
+        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-3 sm:px-5 py-3 sm:py-3.5 flex items-center gap-2 sm:gap-3 shadow-sm">
           <button onClick={goBack}
             className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-primary-500 transition-colors font-medium">
             <ArrowRight size={16} /> طلباتي

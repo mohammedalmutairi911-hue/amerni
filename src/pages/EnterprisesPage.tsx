@@ -727,7 +727,7 @@ export function EnterprisesPage() {
             {/* ══ STATS ══ */}
             <section className="py-16 px-4 bg-slate-50 border-y border-slate-200">
               <div className="max-w-5xl mx-auto">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center">
                   {[{value:'18+',label:'تخصصاً توفره'},{value:'24س',label:'سرعة الاستجابة'},{value:'100%',label:'خبراء معتمدون'},{value:'1%',label:'عمولة تنافسية'}].map(({value,label}) => (
                     <div key={label}>
                       <p className="text-4xl sm:text-5xl font-black text-primary-700 mb-2">{value}</p>
@@ -1684,7 +1684,7 @@ export function EnterprisesPage() {
       {/* Footer */}
       <footer className="bg-[#07101f] text-white py-12 px-4 mt-auto">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-8">
             <div className="col-span-2 md:col-span-1">
               <button onClick={() => goHome(navigate, profile)} className="flex items-center hover:opacity-80 transition-opacity mb-2">
                 <Logo size={26} dark={true} />

@@ -208,7 +208,7 @@ export function Chat({ taskId, taskTitle }: Props) {
   const isAudio = (content: string) => content.startsWith('🎤 ')
 
   return (
-    <div className="flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden h-[520px] shadow-sm">
+    <div className="flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden h-[420px] sm:h-[520px] shadow-sm">
       {/* Header */}
       <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div>

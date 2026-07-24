@@ -267,7 +267,7 @@ export function ProviderDashboard() {
                       <span className={`text-xs font-bold px-2 py-1 rounded-full ${badgeColor}`}>{badge}</span>
                     </div>
                     <p className="text-slate-500 text-sm">{label}</p>
-                    <p className="text-3xl font-black text-primary-500 mt-1">{value}</p>
+                    <p className="text-2xl sm:text-3xl font-black text-primary-500 mt-1">{value}</p>
                   </div>
                 ))}
               </div>
@@ -286,7 +286,7 @@ export function ProviderDashboard() {
 
               {/* Commission reminder */}
               {matchedCount > 0 && (
-                <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-5 flex items-center justify-between gap-3">
+                <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <p className="font-bold text-green-700">✅ لديك طلبات مطابقة!</p>
                     <p className="text-xs text-green-600 mt-0.5">تذكر دفع عمولة ١٪ من قيمة العقد خلال ٧٢ ساعة من التوقيع</p>

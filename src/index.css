@@ -171,3 +171,31 @@ button, a, [role="button"], input[type="button"], input[type="submit"] {
   background-size: 400px 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
+
+/* ═══════════════════════════════════════════
+   أدوات مساعدة للـ Responsive
+   ═══════════════════════════════════════════ */
+
+/* إخفاء شريط التمرير الأفقي (مع الاحتفاظ بالتمرير) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* تأكيد منع overflow الأفقي على مستوى root */
+#root {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* تحسين touch targets — الحد الأدنى 44px */
+@media (max-width: 640px) {
+  .touch-target-min {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

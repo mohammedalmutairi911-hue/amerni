@@ -301,7 +301,7 @@ export function LandingPage() {
             <div className="bg-white inline-block rounded-3xl p-3.5 mb-5">
               <Logo full size={72} />
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black text-white mb-4 leading-[1.15]">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-4 leading-[1.15]">
               حوّل حاجتك إلى{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-400 to-accent-400">إنجاز فوري</span>
             </h1>
@@ -313,9 +313,9 @@ export function LandingPage() {
             <div className="grid grid-cols-2 gap-4 mb-8">
               <button
                 onClick={() => chooseMode('individuals')}
-                className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-400/50 rounded-3xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20"
+                className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-400/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20"
               >
-                <div className="w-16 h-16 rounded-2xl bg-primary-500/20 group-hover:bg-primary-500/30 flex items-center justify-center mx-auto mb-4 transition-colors">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary-500/20 group-hover:bg-primary-500/30 flex items-center justify-center mx-auto mb-3 sm:mb-4 transition-colors">
                   <span className="text-3xl">🙋</span>
                 </div>
                 <h2 className="text-white font-black text-lg mb-1">أفراد</h2>
@@ -325,9 +325,9 @@ export function LandingPage() {
 
               <button
                 onClick={() => chooseMode('enterprises')}
-                className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-accent-400/50 rounded-3xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent-500/20"
+                className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-accent-400/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent-500/20"
               >
-                <div className="w-16 h-16 rounded-2xl bg-accent-500/20 group-hover:bg-accent-500/30 flex items-center justify-center mx-auto mb-4 transition-colors">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-accent-500/20 group-hover:bg-accent-500/30 flex items-center justify-center mx-auto mb-3 sm:mb-4 transition-colors">
                   <span className="text-3xl">🏢</span>
                 </div>
                 <h2 className="text-white font-black text-lg mb-1">منشآت</h2>
@@ -599,7 +599,7 @@ export function LandingPage() {
           )}
         </div>
         {/* Mobile tabs */}
-        <div className="md:hidden flex gap-1 px-4 pb-2 overflow-x-auto">
+        <div className="md:hidden flex gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide">
           {TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as Tab)}
               className={`px-3 py-1 rounded-lg text-xs transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary-500 text-white font-bold' : 'text-slate-400 hover:text-slate-900'}`}>
@@ -634,7 +634,7 @@ export function LandingPage() {
                 <div className="inline-flex items-center gap-2 bg-primary-500/10 border border-primary-500/20 rounded-full px-4 py-1.5 text-sm text-primary-500 mb-8">
                   <Sparkles size={13} /> آمرني — اطلب أي شيء في السعودية
                 </div>
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-4 sm:mb-6 leading-[1.1]">
+                <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black tracking-tight mb-4 sm:mb-6 leading-[1.1]">
                   <span className="text-slate-900">دليل الخدمات</span>{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-500 to-accent-500">المتكامل</span>
                 </h1>
@@ -844,7 +844,7 @@ export function LandingPage() {
           <section className="py-12 sm:py-20 px-4 bg-slate-50">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
-                <h2 className="text-4xl font-black text-slate-900 mb-3">كيف يعمل آمرني؟</h2>
+                <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mb-3">كيف يعمل آمرني؟</h2>
                 <p className="text-slate-500">من الطلب للإنجاز في دقائق</p>
               </div>
               <div className="grid md:grid-cols-3 gap-6 mb-16">
@@ -875,7 +875,7 @@ export function LandingPage() {
           <section className="py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
-                <h2 className="text-4xl font-black mb-3">مميزات أمرني</h2>
+                <h2 className="text-2xl sm:text-4xl font-black mb-3">مميزات أمرني</h2>
                 <p className="text-slate-400">مختلفون عن الكل</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
@@ -905,7 +905,7 @@ export function LandingPage() {
           <section className="py-12 sm:py-20 px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-14">
-                <h2 className="text-4xl font-black mb-3">الثقة والأمان</h2>
+                <h2 className="text-2xl sm:text-4xl font-black mb-3">الثقة والأمان</h2>
                 <p className="text-slate-400 max-w-lg mx-auto">جميع مقدمي الخدمة موثقون عبر منصة أبشر — ونضمن حقوقك المالية حتى اكتمال الخدمة.</p>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
@@ -946,7 +946,7 @@ export function LandingPage() {
                 <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center mx-auto mb-6">
                   <span className="text-4xl font-black text-slate-900">آ</span>
                 </div>
-                <h2 className="text-4xl font-black text-slate-900 mb-4">من نحن</h2>
+                <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mb-4">من نحن</h2>
                 <p className="text-slate-500 text-lg leading-relaxed">منصة آمرني — منصة الخدمات والمهام اليومية</p>
               </div>
 
@@ -1014,7 +1014,7 @@ export function LandingPage() {
           <section className="py-12 sm:py-20 px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-14">
-                <h2 className="text-4xl font-black mb-3">تواصل معنا</h2>
+                <h2 className="text-2xl sm:text-4xl font-black mb-3">تواصل معنا</h2>
                 <p className="text-slate-400">نحن هنا للمساعدة — تواصل معنا بأي طريقة تناسبك</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
@@ -1074,7 +1074,7 @@ export function LandingPage() {
           <section className="py-12 sm:py-20 px-4">
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-10">
-                <h2 className="text-4xl font-black mb-3">الدعم والمساعدة</h2>
+                <h2 className="text-2xl sm:text-4xl font-black mb-3">الدعم والمساعدة</h2>
                 <p className="text-slate-400">مساعد أمرني الذكي متاح ٢٤/٧ — اسأله أي شيء</p>
               </div>
 
@@ -1169,7 +1169,7 @@ export function LandingPage() {
         <section className="py-12 sm:py-20 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-black mb-3">سياسة الخصوصية والأمان</h2>
+              <h2 className="text-2xl sm:text-4xl font-black mb-3">سياسة الخصوصية والأمان</h2>
               <p className="text-slate-400">آخر تحديث: يونيو ٢٠٢٦</p>
             </div>
             <div className="space-y-6">
@@ -1218,7 +1218,7 @@ export function LandingPage() {
         <section className="py-12 sm:py-20 px-4 bg-slate-50">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-black text-slate-900 mb-3">الشروط والأحكام</h2>
+              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mb-3">الشروط والأحكام</h2>
               <p className="text-slate-500">يُرجى قراءة هذه الشروط بعناية قبل استخدام المنصة</p>
             </div>
             <div className="space-y-4">
@@ -1282,7 +1282,7 @@ export function LandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <Logo size={24} />
           <p className="text-slate-400 text-xs">© ٢٠٢٦ أمرني — جميع الحقوق محفوظة</p>
-          <div className="flex items-center gap-4 text-xs text-slate-400">
+          <div className="flex flex-wrap justify-center sm:justify-end gap-3 text-xs text-slate-400">
             {TABS.slice(1).map(t => (
               <button key={t.id} onClick={() => setActiveTab(t.id as Tab)} className="hover:text-slate-700 transition-colors">{t.label}</button>
             ))}

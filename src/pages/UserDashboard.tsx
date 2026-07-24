@@ -473,7 +473,7 @@ export function UserDashboard() {
               {/* Welcome */}
               <div className="mb-6">
                 <p className="text-slate-500 text-sm font-medium">مرحباً بك 👋</p>
-                <h1 className="text-3xl font-black text-slate-900 mt-0.5">{profile?.full_name?.split(' ')[0] || 'عزيزي العميل'}</h1>
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-0.5">{profile?.full_name?.split(' ')[0] || 'عزيزي العميل'}</h1>
                 <p className="text-slate-400 text-sm mt-1">تتبع طلباتك الحالية واكتشف الخدمات المتاحة</p>
               </div>
 
@@ -496,7 +496,7 @@ export function UserDashboard() {
 
               {/* Pending confirmation alert */}
               {tasks.filter(t => t.status === 'pending_confirmation').length > 0 && (
-                <div className="bg-purple-50 border-2 border-purple-300 rounded-2xl p-4 mb-5 flex items-center justify-between gap-3">
+                <div className="bg-purple-50 border-2 border-purple-300 rounded-2xl p-4 mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <p className="font-bold text-purple-700">⚡ يوجد طلب بانتظار تأكيدك!</p>
                     <p className="text-xs text-purple-500 mt-0.5">مقدم الخدمة أكمل العمل — راجع وأكّد</p>
