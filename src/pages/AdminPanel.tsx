@@ -1,7 +1,7 @@
 import { Logo } from '../components/Logo'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
-import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown, Menu, X } from 'lucide-react'
+import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown, Menu, X, Activity } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import { goHome } from '../lib/homePage'
@@ -10,7 +10,7 @@ import { getAvatar } from '../lib/supabase'
 import { Chat } from '../components/chat/Chat'
 
 type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises' | 'providers' | 'financial'
-  | 'categories' | 'verifications' | 'notifications' | 'reports' | 'system-logs' | 'ai-monitoring'
+  | 'categories' | 'verifications' | 'notifications' | 'reports' | 'system-logs' | 'ai-monitoring' | 'activity'
 
 export function AdminPanel() {
   const { navigate } = useApp()
@@ -27,6 +27,7 @@ export function AdminPanel() {
   const [leadNote, setLeadNote] = useState<Record<string, string>>({})
   const [providers, setProviders] = useState<any[]>([])
   const [overdueLeads, setOverdueLeads] = useState<any[]>([])
+  const [reviews, setReviews] = useState<any[]>([])
   // مصدر الحقيقة الوحيد للأرقام: محسوبة في قاعدة البيانات عبر get_admin_dashboard_stats()
   // وليس عبر .filter().length على بيانات محمّلة في المتصفح (كانت تسبب اختلافات وأرقام وهمية)
   const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)
@@ -85,6 +86,7 @@ export function AdminPanel() {
         .on('postgres_changes', { event: '*', schema: 'public', table: 'ratings' }, fetchStats)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'enterprise_leads' }, fetchStats)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'enterprise_providers' }, fetchStats)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'enterprise_reviews' }, () => { fetchStats(); fetchAll() })
         .subscribe()
     } catch (e) {
       console.warn('Stats realtime not available:', e)
@@ -104,13 +106,14 @@ export function AdminPanel() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const [wRes, tRes, uRes, lRes, pRes, oRes] = await Promise.all([
+    const [wRes, tRes, uRes, lRes, pRes, oRes, rRes] = await Promise.all([
       supabase.from('worker_profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('tasks').select('*').order('created_at', { ascending: false }),
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('enterprise_leads').select('*').order('created_at', { ascending: false }),
       supabase.from('enterprise_providers').select('*').order('created_at', { ascending: false }),
-      supabase.rpc('get_overdue_enterprise_leads')
+      supabase.rpc('get_overdue_enterprise_leads'),
+      supabase.from('enterprise_reviews').select('*').order('created_at', { ascending: false }).limit(100)
     ])
     const errs: string[] = []
     if (wRes.error) { console.error('[Admin] workers:', wRes.error); errs.push('العمال: ' + wRes.error.message) }
@@ -123,10 +126,95 @@ export function AdminPanel() {
     setLeads(lRes.data || [])
     setProviders(pRes.data || [])
     setOverdueLeads(oRes.data || [])
+    setReviews(rRes.data || [])
     setLoading(false)
   }
 
   const refresh = async () => { setRefreshing(true); await fetchAll(); setRefreshing(false) }
+
+  // ── سجل النشاطات الحقيقي ──
+  // كل عنصر يُبنى من الجدول الفعلي في قاعدة البيانات (وليس نصاً ثابتاً)، بنفس
+  // مصفوفات users/tasks/leads/providers/reviews المستخدمة في أرقام KPI، فتبقى
+  // الإحصائيات ومحتوى السجل متطابقين دائماً لأنهما يقرآن من نفس المصدر.
+  type ActivityItem = {
+    id: string; ts: number; emoji: string; bg: string; fg: string
+    title: string; name: string; statusLabel?: string; statusColor?: string
+    onClick?: () => void
+  }
+
+  const timeAgoAr = (iso: string) => {
+    const diffMs = Date.now() - new Date(iso).getTime()
+    const min = Math.floor(diffMs / 60000)
+    if (min < 1) return 'الآن'
+    if (min < 60) return `منذ ${min} دقيقة`
+    const hr = Math.floor(min / 60)
+    if (hr < 24) return `منذ ${hr} ${hr === 1 ? 'ساعة' : 'ساعات'}`
+    const day = Math.floor(hr / 24)
+    if (day < 30) return `منذ ${day} ${day === 1 ? 'يوم' : 'أيام'}`
+    return new Date(iso).toLocaleDateString('ar-SA')
+  }
+
+  const buildActivityFeed = (): ActivityItem[] => {
+    const items: ActivityItem[] = []
+
+    // تسجيل حسابات — من profiles، مصنّفة حسب role + platform الفعليين
+    users.forEach(u => {
+      const platform = (u as any).platform === 'enterprises' ? 'enterprises' : 'individuals'
+      if (u.role === 'admin') {
+        items.push({ id: `u-${u.id}`, ts: new Date(u.created_at).getTime(), emoji: '👑', bg: 'bg-amber-50', fg: 'text-amber-600', title: 'إنشاء حساب مدير', name: u.full_name || u.email, onClick: () => setTab('users') })
+      } else if (u.role === 'client' && platform === 'enterprises') {
+        items.push({ id: `u-${u.id}`, ts: new Date(u.created_at).getTime(), emoji: '🏢', bg: 'bg-blue-50', fg: 'text-blue-600', title: 'تسجيل منشأة جديدة', name: u.full_name || u.email, onClick: () => setTab('enterprises') })
+      } else if (u.role === 'worker') {
+        items.push({ id: `u-${u.id}`, ts: new Date(u.created_at).getTime(), emoji: '👤', bg: 'bg-primary-50', fg: 'text-primary-600', title: 'تسجيل عامل جديد', name: u.full_name || u.email, statusLabel: workers.find(w => w.user_id === u.id)?.is_approved ? 'Approved' : 'Pending', statusColor: workers.find(w => w.user_id === u.id)?.is_approved ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700', onClick: () => setTab('workers') })
+      } else {
+        items.push({ id: `u-${u.id}`, ts: new Date(u.created_at).getTime(), emoji: '👤', bg: 'bg-primary-50', fg: 'text-primary-600', title: 'تسجيل فرد جديد', name: u.full_name || u.email, onClick: () => setTab('users') })
+      }
+    })
+
+    // تسجيل مزودي خدمة المنشآت — من enterprise_providers
+    providers.forEach(p => {
+      items.push({
+        id: `p-${p.id}`, ts: new Date(p.created_at).getTime(), emoji: '🛠️', bg: 'bg-purple-50', fg: 'text-purple-600',
+        title: 'تسجيل مزود خدمة جديد', name: p.company_name || p.contact_name,
+        statusLabel: p.is_approved ? 'Approved' : 'Pending', statusColor: p.is_approved ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700',
+        onClick: () => setTab('providers')
+      })
+    })
+
+    // طلبات الأفراد — tasks (حالة الطلب الحالية)
+    tasks.forEach(t => {
+      const map: Record<string, { emoji: string; bg: string; fg: string; title: string; status: string; color: string }> = {
+        open:                 { emoji: '📦', bg: 'bg-slate-100',  fg: 'text-slate-600',  title: 'طلب جديد',        status: 'مفتوح',   color: 'bg-slate-100 text-slate-600' },
+        accepted:             { emoji: '✅', bg: 'bg-green-50',   fg: 'text-green-600',  title: 'تم قبول طلب',     status: 'مقبول',   color: 'bg-green-100 text-green-700' },
+        in_progress:          { emoji: '📦', bg: 'bg-blue-50',    fg: 'text-blue-600',   title: 'طلب قيد التنفيذ', status: 'جاري',    color: 'bg-blue-100 text-blue-700' },
+        pending_confirmation: { emoji: '📦', bg: 'bg-amber-50',   fg: 'text-amber-600',  title: 'بانتظار تأكيد الإكمال', status: 'بانتظار التأكيد', color: 'bg-amber-100 text-amber-700' },
+        completed:            { emoji: '💰', bg: 'bg-emerald-50', fg: 'text-emerald-600',title: 'اكتمل طلب وتحصيل عمولة', status: 'مكتمل',  color: 'bg-emerald-100 text-emerald-700' },
+        cancelled:            { emoji: '❌', bg: 'bg-red-50',     fg: 'text-red-600',    title: 'تم إلغاء طلب',    status: 'ملغى',    color: 'bg-red-100 text-red-700' },
+        disputed:             { emoji: '❌', bg: 'bg-red-50',     fg: 'text-red-600',    title: 'نزاع على طلب',    status: 'نزاع',    color: 'bg-red-100 text-red-700' },
+      }
+      const m = map[t.status] || map.open
+      items.push({ id: `t-${t.id}`, ts: new Date(t.created_at).getTime(), emoji: m.emoji, bg: m.bg, fg: m.fg, title: `${m.title} — ${t.title || t.category}`, name: t.city || '', statusLabel: m.status, statusColor: m.color, onClick: () => setTab('tasks') })
+    })
+
+    // طلبات المنشآت — enterprise_leads
+    leads.forEach(l => {
+      const map: Record<string, { emoji: string; bg: string; fg: string; title: string; status: string; color: string }> = {
+        open:      { emoji: '📦', bg: 'bg-slate-100',  fg: 'text-slate-600',  title: 'طلب منشأة جديد',      status: 'مفتوح',  color: 'bg-slate-100 text-slate-600' },
+        matched:   { emoji: '✅', bg: 'bg-green-50',   fg: 'text-green-600',  title: 'تم قبول طلب منشأة',   status: 'مطابَق', color: 'bg-green-100 text-green-700' },
+        closed:    { emoji: '💰', bg: 'bg-emerald-50', fg: 'text-emerald-600',title: 'إغلاق طلب منشأة وتحصيل عمولة', status: 'مغلق', color: 'bg-emerald-100 text-emerald-700' },
+        cancelled: { emoji: '❌', bg: 'bg-red-50',     fg: 'text-red-600',    title: 'تم رفض/إلغاء طلب منشأة', status: 'ملغى', color: 'bg-red-100 text-red-700' },
+      }
+      const m = map[l.status] || map.open
+      items.push({ id: `l-${l.id}`, ts: new Date(l.updated_at || l.created_at).getTime(), emoji: m.emoji, bg: m.bg, fg: m.fg, title: `${m.title} — ${l.category}`, name: l.company_name, statusLabel: m.status, statusColor: m.color, onClick: () => navigate(`lead-detail/${l.id}`) })
+    })
+
+    // التقييمات — enterprise_reviews
+    reviews.forEach(r => {
+      items.push({ id: `r-${r.id}`, ts: new Date(r.created_at).getTime(), emoji: '⭐', bg: 'bg-yellow-50', fg: 'text-yellow-600', title: `تقييم جديد (${r.stars}/5)`, name: r.comment ? r.comment.slice(0, 40) : '', onClick: () => navigate(`lead-detail/${r.lead_id}`) })
+    })
+
+    return items.sort((a, b) => b.ts - a.ts)
+  }
 
   const exportCSV = (type: 'users' | 'tasks' | 'workers') => {
     let rows: string[] = []
@@ -245,6 +333,7 @@ export function AdminPanel() {
 
   const NAV_ITEMS = [
     { id: 'overview',      icon: BarChart3,     label: 'نظرة عامة',    badge: 0 },
+    { id: 'activity',      icon: Activity,      label: 'سجل النشاطات', badge: 0 },
     { id: 'workers',       icon: Shield,        label: 'العمال',        badge: stats.pending },
     { id: 'tasks',         icon: Briefcase,     label: 'الطلبات',       badge: stats.disputed },
     { id: 'users',         icon: Users,         label: 'المستخدمون',    badge: 0 },
@@ -462,24 +551,27 @@ export function AdminPanel() {
 
               {/* Bottom: Activity + Financial */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-                {/* آخر النشاطات */}
+                {/* آخر النشاطات — من بيانات حقيقية (profiles/tasks/leads/providers/reviews) */}
                 <div className="md:col-span-4 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                   <h3 className="font-bold text-slate-900 mb-4 text-right">آخر النشاطات</h3>
                   <div className="space-y-3">
-                    {users.slice(0, 3).map((u, i) => (
-                      <div key={u.id} className="flex items-start gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-black flex-shrink-0 ${i===0?'bg-primary-500':i===1?'bg-slate-600':'bg-red-400'}`}>
-                          {u.full_name?.[0] || '؟'}
+                    {buildActivityFeed().slice(0, 6).map(item => (
+                      <button key={item.id} onClick={item.onClick} className="w-full flex items-start gap-3 text-right hover:bg-slate-50 rounded-xl p-1.5 -m-1.5 transition-colors">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${item.bg} ${item.fg}`}>
+                          {item.emoji}
                         </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-800">{i===0?'انضمام مستخدم جديد':i===1?'تم تحديث حالة طلب':'تم رفض طلب منشأة'}</p>
-                          <p className="text-xs text-slate-400">منذ {i===0?'ساعتين':i===1?'5 ساعات':'8 ساعات'} • {u.full_name || u.email}</p>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="text-sm font-bold text-slate-800">{item.title}</p>
+                            {item.statusLabel && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.statusColor}`}>{item.statusLabel}</span>}
+                          </div>
+                          <p className="text-xs text-slate-400 truncate">{timeAgoAr(new Date(item.ts).toISOString())} • {item.name}</p>
                         </div>
-                      </div>
+                      </button>
                     ))}
-                    {users.length === 0 && <p className="text-xs text-slate-400 text-center py-4">لا توجد نشاطات</p>}
+                    {buildActivityFeed().length === 0 && <p className="text-xs text-slate-400 text-center py-4">لا توجد نشاطات</p>}
                   </div>
-                  <button className="w-full mt-4 border border-slate-200 text-slate-500 text-xs font-medium py-2 rounded-xl hover:bg-slate-50 transition-colors">
+                  <button onClick={() => setTab('activity' as Tab)} className="w-full mt-4 border border-slate-200 text-slate-500 text-xs font-medium py-2 rounded-xl hover:bg-slate-50 transition-colors">
                     مشاهدة السجل الكامل
                   </button>
                 </div>
@@ -1569,6 +1661,36 @@ export function AdminPanel() {
             </div>
             <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center text-slate-400 text-sm">
               🔔 سجل الإشعارات التفصيلي (لكل مستخدم، نوع الإشعار، حالة القراءة) قيد الربط مباشرة بجدول notifications في Supabase.
+            </div>
+          </div>
+        )}
+
+        {/* ══ ACTIVITY FEED (سجل النشاطات الكامل) ══ */}
+        {tab === 'activity' && (
+          <div className="space-y-6 animate-fade-in" dir="rtl">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">سجل النشاطات</h2>
+              <p className="text-slate-400 text-sm mt-0.5">كل الأحداث الحقيقية على المنصة — تسجيل حسابات، طلبات، تقييمات وعمليات مالية، مرتبة زمنياً.</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100">
+              {buildActivityFeed().map(item => (
+                <button key={item.id} onClick={item.onClick} className="w-full flex items-start gap-3 text-right p-4 hover:bg-slate-50 transition-colors">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-base flex-shrink-0 ${item.bg} ${item.fg}`}>
+                    {item.emoji}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-bold text-slate-800">{item.title}</p>
+                      {item.statusLabel && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.statusColor}`}>{item.statusLabel}</span>}
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5">{item.name}</p>
+                  </div>
+                  <p className="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">{timeAgoAr(new Date(item.ts).toISOString())}</p>
+                </button>
+              ))}
+              {buildActivityFeed().length === 0 && (
+                <p className="text-sm text-slate-400 text-center py-10">لا توجد نشاطات مسجّلة بعد.</p>
+              )}
             </div>
           </div>
         )}
