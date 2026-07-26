@@ -591,11 +591,11 @@ export function EnterprisesPage() {
                     <Building2 size={14} /><span>المنصة السعودية الأولى لخدمات المنشآت</span>
                   </div>
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
-                    حوّل رؤيتك إلى واقع مع<br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-cyan-300">خبرات عند الطلب</span>
+                    استأجر شركة<br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-cyan-300">تنجز أعمالك!</span>
                   </h1>
                   <p className="text-slate-400 text-base sm:text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
-                    المنصة السعودية الأول لتمكين النمو من خلال ربط المنشآت بنخبة من المستشارين والخبراء المعتمدين في أكثر من 18 تخصصاً استراتيجياً.
+                    سواء كنت تدوّر مورد، مقاول، أو شركة متخصصة، أمرني يوصلك بالجهة المناسبة لتنفيذ أعمالك بسرعة وثقة.
                   </p>
 
                   {/* ── صندوق البحث السريع (مثل صفحة الأفراد) ── */}

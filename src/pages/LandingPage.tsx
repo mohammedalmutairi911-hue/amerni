@@ -331,7 +331,7 @@ export function LandingPage() {
                   <span className="text-3xl">🏢</span>
                 </div>
                 <h2 className="text-white font-black text-lg mb-1">منشآت</h2>
-                <p className="text-slate-400 text-xs leading-relaxed">حلول B2B لشركتك في ١٨ تخصصاً</p>
+                <p className="text-slate-400 text-xs leading-relaxed">حوّل رؤيتك إلى واقع مع خبرات عند الطلب.</p>
                 <div className="mt-4 text-xs text-accent-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">اكتشف الخدمات ←</div>
               </button>
             </div>
@@ -635,11 +635,11 @@ export function LandingPage() {
                   <Sparkles size={13} /> آمرني — اطلب أي شيء في السعودية
                 </div>
                 <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black tracking-tight mb-4 sm:mb-6 leading-[1.1]">
-                  <span className="text-slate-900">دليل الخدمات</span>{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-500 to-accent-500">المتكامل</span>
+                  <span className="text-slate-900">استأجر شخص</span>{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-500 to-accent-500">لتنفيذ مهامك!</span>
                 </h1>
                 <p className="text-slate-500 text-base sm:text-xl mb-8 sm:mb-10 max-w-xl mx-auto leading-relaxed px-2">
-                  منصة سعودية تربطك بشخص ثقة وكفو يسوي لك أي خدمة — بسرعة وبثقة.
+                  الذكاء الاصطناعي يساعدك، لكنه ما يقدر ينفذ المهام على أرض الواقع. هنا يجي دور أمرني. اطلب أي مهمة، وحنا نوصلك بالشخص المناسب ينفذها لك.
                 </p>
 
                 {/* Search bar */}
