@@ -3,7 +3,7 @@ import { supabase, getAvatar } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import {
   Loader2, Search, X, Users, Building2, Shield, CheckCircle, Clock,
-  Mail, Phone, MapPin, Calendar, LogIn, BadgeCheck, FileText, Star, RefreshCw,
+  Mail, BadgeCheck, FileText, Star, RefreshCw, History,
 } from 'lucide-react'
 
 // ملاحظة: كل البيانات تأتي من دوال أدمن آمنة (SECURITY DEFINER + فحص أدمن) في Supabase.
@@ -50,6 +50,7 @@ export function AccountsCenter({ view }: { view: 'accounts' | 'diagnostics' }) {
 
   const [q, setQ] = useState('')
   const [platformFilter, setPlatformFilter] = useState<'all' | 'individuals' | 'enterprises'>('all')
+  const [sortBy, setSortBy] = useState<'created_desc' | 'login_desc' | 'orders_desc' | 'name_asc'>('created_desc')
   const [selected, setSelected] = useState<string | null>(null)
   const [detail, setDetail] = useState<any>(null)
   const [detailLoading, setDetailLoading] = useState(false)
@@ -94,6 +95,13 @@ export function AccountsCenter({ view }: { view: 'accounts' | 'diagnostics' }) {
     if (!q.trim()) return true
     const s = q.trim().toLowerCase()
     return [a.full_name, a.email, a.phone, a.id].some(v => (v || '').toLowerCase().includes(s))
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case 'login_desc': return (new Date(b.last_sign_in_at || 0).getTime()) - (new Date(a.last_sign_in_at || 0).getTime())
+      case 'orders_desc': return b.orders_total - a.orders_total
+      case 'name_asc': return (a.full_name || '').localeCompare(b.full_name || '', 'ar')
+      default: return (new Date(b.created_at).getTime()) - (new Date(a.created_at).getTime())
+    }
   })
 
   // ─────────────────────────── DIAGNOSTICS VIEW ───────────────────────────
@@ -204,6 +212,13 @@ export function AccountsCenter({ view }: { view: 'accounts' | 'diagnostics' }) {
               className={`px-3.5 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${platformFilter === id ? 'bg-primary-700 text-white' : 'text-slate-500 hover:bg-slate-50'}`}>{label}</button>
           ))}
         </div>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
+          className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-primary-400 flex-shrink-0">
+          <option value="created_desc">الأحدث تسجيلاً</option>
+          <option value="login_desc">آخر دخول</option>
+          <option value="orders_desc">الأكثر طلبات</option>
+          <option value="name_asc">الاسم (أ–ي)</option>
+        </select>
       </div>
 
       {loading ? (
@@ -447,6 +462,64 @@ function AccountDetail({ accountId, base, detail, loading, onClose, onNavigate, 
             <Row label="طلبات المنشآت" value={leads.length} />
             <Row label="عدد التقييمات" value={ratings.length} />
             {wp && <Row label="إجمالي الأرباح" value={wp.total_earnings ? `${wp.total_earnings} ﷼` : undefined} />}
+          </Section>
+
+          {/* سجل النشاط (Timeline) — مبني من الأحداث الفعلية مرتبة زمنياً */}
+          <Section title="سجل النشاط" icon={History}>
+            {(() => {
+              type Ev = { ts: number; emoji: string; title: string; detail?: string }
+              const ev: Ev[] = []
+              const push = (d: any, emoji: string, title: string, detail?: string) => {
+                if (!d) return
+                const ts = new Date(d).getTime()
+                if (!isNaN(ts)) ev.push({ ts, emoji, title, detail })
+              }
+              push(auth?.created_at || p?.created_at, '🆕', 'إنشاء الحساب')
+              if (wp) {
+                push(wp.created_at, '🧰', 'إنشاء ملف مقدم خدمة')
+                if (wp.id_verified) push(wp.updated_at || wp.created_at, '🪪', 'توثيق الهوية')
+                if (wp.is_approved) push(wp.updated_at || wp.created_at, '✅', 'اعتماد كمقدم خدمة')
+              }
+              if (cp) push(cp.updated_at, '🏢', 'إنشاء/تحديث ملف المنشأة', cp.company_name)
+              if (ep) {
+                push(ep.created_at, '📨', 'طلب اعتماد كمزوّد منشآت')
+                if (ep.nda_accepted_at) push(ep.nda_accepted_at, '🔒', 'قبول اتفاقية السرية')
+                if (ep.is_approved) push(ep.updated_at || ep.created_at, '✅', 'اعتماد الجهة')
+              }
+              tasks.forEach(t => {
+                push(t.created_at, '📝', 'إنشاء طلب', t.title || t.category)
+                if (t.status === 'completed') push(t.updated_at || t.created_at, '🎉', 'تنفيذ طلب', t.title || t.category)
+                if (t.status === 'cancelled') push(t.updated_at || t.created_at, '🚫', 'إلغاء طلب', t.title || t.category)
+              })
+              leads.forEach(l => {
+                push(l.created_at, '📨', 'إرسال طلب منشأة', l.category)
+                if (['closed', 'completed'].includes(l.status)) push(l.updated_at || l.created_at, '🎉', 'إغلاق طلب منشأة', l.category)
+              })
+              ratings.forEach(r => push(r.created_at, '⭐', `استلام تقييم (${r.stars}/5)`, r.comment || undefined))
+              push(auth?.last_sign_in_at, '🔑', 'آخر تسجيل دخول')
+
+              ev.sort((a, b) => b.ts - a.ts)
+              if (ev.length === 0) return <p className="text-xs text-slate-400">لا يوجد نشاط بعد</p>
+              return (
+                <div className="space-y-0">
+                  {ev.map((e, i) => (
+                    <div key={i} className="flex gap-3 pb-3 last:pb-0">
+                      <div className="flex flex-col items-center flex-shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-sm">{e.emoji}</div>
+                        {i < ev.length - 1 && <div className="w-px flex-1 bg-slate-200 my-1" />}
+                      </div>
+                      <div className="min-w-0 flex-1 -mt-0.5">
+                        <p className="text-sm font-bold text-slate-800">{e.title}</p>
+                        {e.detail && <p className="text-xs text-slate-500 truncate">{e.detail}</p>}
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          {new Date(e.ts).toLocaleString('ar-SA', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            })()}
           </Section>
 
           {/* Admin tools */}
