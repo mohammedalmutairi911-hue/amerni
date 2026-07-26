@@ -40,12 +40,21 @@ export function NotificationBell() {
     return () => { supabase.removeChannel(ch) }
   }, [user?.id])
 
-  // إغلاق عند النقر خارجاً
+  // إغلاق عند النقر خارجاً — pointerdown يغطي اللمس والماوس بشكل موثوق
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
+    const handler = (e: Event) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    document.addEventListener('pointerdown', handler)
+    return () => document.removeEventListener('pointerdown', handler)
   }, [])
+
+  // منع تمرير الصفحة الخلفية أثناء فتح اللوحة على الجوال فقط (لا يؤثر على سطح المكتب)
+  useEffect(() => {
+    if (!open) return
+    if (!window.matchMedia('(max-width: 640px)').matches) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [open])
 
   const markAllRead = async () => {
     if (!user || unread === 0) return
@@ -79,7 +88,11 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute left-0 mt-2 w-80 max-w-[90vw] bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden" dir="rtl">
+        <div className="fixed inset-0 z-40 sm:hidden" onClick={() => setOpen(false)} aria-hidden />
+      )}
+
+      {open && (
+        <div className="absolute right-0 mt-2 w-80 max-w-[90vw] bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden" dir="rtl">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
             <p className="font-bold text-slate-800 text-sm">الإشعارات</p>
             <div className="flex items-center gap-3">
@@ -95,7 +108,7 @@ export function NotificationBell() {
               </button>
             </div>
           </div>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-96 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
             {notifs.length === 0 ? (
               <p className="text-center text-slate-400 text-sm py-8">لا توجد إشعارات</p>
             ) : notifs.map(n => (

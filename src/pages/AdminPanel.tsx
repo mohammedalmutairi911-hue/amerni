@@ -15,6 +15,7 @@ type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enter
 export function AdminPanel() {
   const { navigate } = useApp()
   const [tab, setTab] = useState<Tab>('overview')
+  const [usersScope, setUsersScope] = useState<'all' | 'individuals' | 'enterprises'>('all')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [workers, setWorkers] = useState<WorkerProfile[]>([])
   const [tasks, setTasks] = useState<Task[]>([])
@@ -304,6 +305,33 @@ export function AdminPanel() {
     ratingCount: 0,
   }
 
+  // ── فصل البيانات: أفراد مقابل منشآت (محسوب من البيانات الفعلية المجلوبة) ──
+  const platformOf = (u: any) => ((u?.platform === 'enterprises') ? 'enterprises' : 'individuals')
+  const indivUsers = users.filter(u => platformOf(u) === 'individuals')
+  const entUsers = users.filter(u => platformOf(u) === 'enterprises')
+  const visibleUsers = usersScope === 'individuals' ? indivUsers : usersScope === 'enterprises' ? entUsers : users
+  const sectionStats = {
+    individuals: {
+      users: indivUsers.length,
+      workers: workers.filter(w => w.is_approved).length,
+      pending: workers.filter(w => !w.is_approved).length,
+      tasks: tasks.length,
+      open: tasks.filter(t => t.status === 'open').length,
+      active: tasks.filter(t => t.status === 'in_progress').length,
+      completed: tasks.filter(t => t.status === 'completed').length,
+      disputed: tasks.filter(t => t.status === 'disputed').length,
+    },
+    enterprises: {
+      users: entUsers.length,
+      providers: providers.length,
+      providersPending: providers.filter(p => !p.is_approved).length,
+      leads: leads.length,
+      open: leads.filter(l => l.status === 'open').length,
+      inProgress: leads.filter(l => ['in_progress', 'accepted', 'assigned'].includes(l.status)).length,
+      closed: leads.filter(l => ['closed', 'completed', 'done'].includes(l.status)).length,
+    },
+  }
+
   const TABS = [
     { id: 'overview', icon: BarChart3, label: 'نظرة عامة' },
     { id: 'workers', icon: Shield, label: `العمال (${stats.pending > 0 ? `${stats.pending} بانتظار` : stats.workers})` },
@@ -349,6 +377,15 @@ export function AdminPanel() {
     { id: 'ai-monitoring', icon: ShieldAlert,   label: 'مراقبة الذكاء الاصطناعي', badge: 0 },
   ]
 
+  // ── تجميع التبويبات في أقسام واضحة: لا خلط بين الأفراد والمنشآت ──
+  const NAV_GROUPS: { title: string | null; ids: string[] }[] = [
+    { title: null,            ids: ['overview', 'activity', 'reports'] },
+    { title: 'إدارة الأفراد',  ids: ['workers', 'tasks', 'users', 'conversations'] },
+    { title: 'إدارة المنشآت',  ids: ['enterprises', 'providers'] },
+    { title: 'عام والنظام',    ids: ['verifications', 'financial', 'categories', 'notifications', 'system-logs', 'ai-monitoring'] },
+  ]
+  const navItem = (id: string) => NAV_ITEMS.find(n => n.id === id)
+
   return (
     <div className="min-h-screen flex bg-[#F0F2F5]" dir="rtl">
 
@@ -364,30 +401,40 @@ export function AdminPanel() {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          {NAV_ITEMS.map(({ id, icon: Icon, label, badge }) => (
-            <button key={id} onClick={() => setTab(id as Tab)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                tab === id
-                  ? 'bg-primary-50 text-primary-700 font-bold'
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-              }`}>
-              <Icon size={16} className={tab === id ? 'text-primary-600' : 'text-slate-400'} />
-              <span className="flex-1 text-right">{label}</span>
-              {badge > 0 && (
-                <span className={`text-xs font-black w-5 h-5 rounded-full flex items-center justify-center ${tab === id ? 'bg-primary-500 text-white' : 'bg-red-500 text-white'}`}>
-                  {badge > 9 ? '9+' : badge}
-                </span>
+          {NAV_GROUPS.map((group, gi) => (
+            <div key={gi} className={gi > 0 ? 'pt-2 mt-2 border-t border-slate-100' : ''}>
+              {group.title && (
+                <p className="px-3 pt-1 pb-1 text-[11px] font-bold text-slate-400 tracking-wide">{group.title}</p>
               )}
-            </button>
+              {group.ids.map(id => {
+                const item = navItem(id); if (!item) return null
+                const Icon = item.icon; const badge = item.badge
+                return (
+                  <button key={id} onClick={() => setTab(id as Tab)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      tab === id
+                        ? 'bg-primary-50 text-primary-700 font-bold'
+                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                    }`}>
+                    <Icon size={16} className={tab === id ? 'text-primary-600' : 'text-slate-400'} />
+                    <span className="flex-1 text-right">{item.label}</span>
+                    {badge > 0 && (
+                      <span className={`text-xs font-black w-5 h-5 rounded-full flex items-center justify-center ${tab === id ? 'bg-primary-500 text-white' : 'bg-red-500 text-white'}`}>
+                        {badge > 9 ? '9+' : badge}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+              {group.title === 'إدارة المنشآت' && (
+                <button onClick={() => navigate('admin-enterprises')}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+                  <Building2 size={16} className="text-slate-400" />
+                  <span className="flex-1 text-right">لوحة المنشآت المفصّلة ↗</span>
+                </button>
+              )}
+            </div>
           ))}
-
-          <div className="pt-3 mt-3 border-t border-slate-100">
-            <button onClick={() => navigate('admin-enterprises')}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800">
-              <Building2 size={16} className="text-slate-400" />
-              <span className="flex-1 text-right">إدارة المنشآت</span>
-            </button>
-          </div>
         </nav>
 
         {/* Admin Profile */}
@@ -422,30 +469,40 @@ export function AdminPanel() {
             </div>
 
             <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-              {NAV_ITEMS.map(({ id, icon: Icon, label, badge }) => (
-                <button key={id} onClick={() => { setTab(id as Tab); setMobileNavOpen(false) }}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all ${
-                    tab === id
-                      ? 'bg-primary-50 text-primary-700 font-bold'
-                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
-                  }`}>
-                  <Icon size={16} className={tab === id ? 'text-primary-600' : 'text-slate-400'} />
-                  <span className="flex-1 text-right">{label}</span>
-                  {badge > 0 && (
-                    <span className={`text-xs font-black w-5 h-5 rounded-full flex items-center justify-center ${tab === id ? 'bg-primary-500 text-white' : 'bg-red-500 text-white'}`}>
-                      {badge > 9 ? '9+' : badge}
-                    </span>
+              {NAV_GROUPS.map((group, gi) => (
+                <div key={gi} className={gi > 0 ? 'pt-2 mt-2 border-t border-slate-100' : ''}>
+                  {group.title && (
+                    <p className="px-3 pt-1 pb-1 text-[11px] font-bold text-slate-400 tracking-wide">{group.title}</p>
                   )}
-                </button>
+                  {group.ids.map(id => {
+                    const item = navItem(id); if (!item) return null
+                    const Icon = item.icon; const badge = item.badge
+                    return (
+                      <button key={id} onClick={() => { setTab(id as Tab); setMobileNavOpen(false) }}
+                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all ${
+                          tab === id
+                            ? 'bg-primary-50 text-primary-700 font-bold'
+                            : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                        }`}>
+                        <Icon size={16} className={tab === id ? 'text-primary-600' : 'text-slate-400'} />
+                        <span className="flex-1 text-right">{item.label}</span>
+                        {badge > 0 && (
+                          <span className={`text-xs font-black w-5 h-5 rounded-full flex items-center justify-center ${tab === id ? 'bg-primary-500 text-white' : 'bg-red-500 text-white'}`}>
+                            {badge > 9 ? '9+' : badge}
+                          </span>
+                        )}
+                      </button>
+                    )
+                  })}
+                  {group.title === 'إدارة المنشآت' && (
+                    <button onClick={() => { navigate('admin-enterprises'); setMobileNavOpen(false) }}
+                      className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+                      <Building2 size={16} className="text-slate-400" />
+                      <span className="flex-1 text-right">لوحة المنشآت المفصّلة ↗</span>
+                    </button>
+                  )}
+                </div>
               ))}
-
-              <div className="pt-3 mt-3 border-t border-slate-100">
-                <button onClick={() => { navigate('admin-enterprises'); setMobileNavOpen(false) }}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-800">
-                  <Building2 size={16} className="text-slate-400" />
-                  <span className="flex-1 text-right">إدارة المنشآت</span>
-                </button>
-              </div>
             </nav>
 
             <div className="p-4 border-t border-slate-100 safe-bottom">
@@ -547,6 +604,52 @@ export function AdminPanel() {
                     <p className="text-3xl font-black text-slate-900">{value}</p>
                   </div>
                 ))}
+              </div>
+
+              {/* تفصيل حسب القسم — فصل واضح بين بيانات الأفراد وبيانات المنشآت */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-black text-slate-900 flex items-center gap-2"><span className="text-lg">🙋</span> إدارة الأفراد</h3>
+                    <button onClick={() => setTab('tasks')} className="text-xs text-primary-500 font-bold hover:underline">التفاصيل ←</button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { l: 'مستخدمون', v: sectionStats.individuals.users },
+                      { l: 'عمال نشطون', v: sectionStats.individuals.workers },
+                      { l: 'بانتظار التحقق', v: sectionStats.individuals.pending },
+                      { l: 'إجمالي الطلبات', v: sectionStats.individuals.tasks },
+                      { l: 'طلبات جارية', v: sectionStats.individuals.active },
+                      { l: 'نزاعات', v: sectionStats.individuals.disputed },
+                    ].map(({ l, v }) => (
+                      <div key={l} className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-center">
+                        <p className="text-2xl font-black text-slate-900">{v}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{l}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-black text-slate-900 flex items-center gap-2"><span className="text-lg">🏢</span> إدارة المنشآت</h3>
+                    <button onClick={() => setTab('enterprises')} className="text-xs text-blue-600 font-bold hover:underline">التفاصيل ←</button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { l: 'منشآت', v: sectionStats.enterprises.users },
+                      { l: 'مزودو خدمة', v: sectionStats.enterprises.providers },
+                      { l: 'مزودون بانتظار', v: sectionStats.enterprises.providersPending },
+                      { l: 'إجمالي الطلبات', v: sectionStats.enterprises.leads },
+                      { l: 'طلبات مفتوحة', v: sectionStats.enterprises.open },
+                      { l: 'قيد التنفيذ', v: sectionStats.enterprises.inProgress },
+                    ].map(({ l, v }) => (
+                      <div key={l} className="bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-center">
+                        <p className="text-2xl font-black text-slate-900">{v}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{l}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* Bottom: Activity + Financial */}
@@ -1030,8 +1133,13 @@ export function AdminPanel() {
                   <Eye size={15} className="absolute right-3 top-2.5 text-slate-300" />
                 </div>
                 <div className="flex border border-slate-200 rounded-xl overflow-hidden flex-shrink-0">
-                  {['المنشآت','المستخدمون'].map((t, i) => (
-                    <button key={t} className={`px-4 py-2 text-sm font-medium transition-colors ${i===0 ? 'bg-primary-700 text-white' : 'text-slate-500 hover:bg-slate-50'}`}>{t}</button>
+                  {([
+                    { id: 'all', label: `الكل (${users.length})` },
+                    { id: 'individuals', label: `أفراد (${indivUsers.length})` },
+                    { id: 'enterprises', label: `منشآت (${entUsers.length})` },
+                  ] as const).map(({ id, label }) => (
+                    <button key={id} onClick={() => setUsersScope(id)}
+                      className={`px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap ${usersScope === id ? 'bg-primary-700 text-white' : 'text-slate-500 hover:bg-slate-50'}`}>{label}</button>
                   ))}
                 </div>
               </div>
@@ -1047,7 +1155,7 @@ export function AdminPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u, i) => {
+                  {visibleUsers.map((u, i) => {
                     const ROLE_LABEL: Record<string, string> = { client: 'عميل', worker: 'عامل', admin: 'أدمن' }
                     // حالة حقيقية: العامل غير المعتمد فقط هو "بانتظار التحقق"
                     const wp = workers.find(w => w.user_id === u.id)
@@ -1101,7 +1209,7 @@ export function AdminPanel() {
                       </tr>
                     )
                   })}
-                  {users.length === 0 && (
+                  {visibleUsers.length === 0 && (
                     <tr><td colSpan={5} className="px-5 py-12 text-center text-slate-400 text-sm">لا يوجد مستخدمون بعد</td></tr>
                   )}
                 </tbody>
@@ -1109,7 +1217,7 @@ export function AdminPanel() {
               </div>
 
               {/* Pagination */}
-              {users.length > 0 && (
+              {visibleUsers.length > 0 && (
                 <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
                   <div className="flex items-center gap-1">
                     <button className="w-9 h-9 md:w-7 md:h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">‹</button>
@@ -1118,7 +1226,7 @@ export function AdminPanel() {
                     ))}
                     <button className="w-9 h-9 md:w-7 md:h-7 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50">›</button>
                   </div>
-                  <span>عرض 1-{Math.min(10, users.length)} من أصل {users.length} مستخدم</span>
+                  <span>عرض 1-{Math.min(10, visibleUsers.length)} من أصل {visibleUsers.length} مستخدم</span>
                 </div>
               )}
             </div>

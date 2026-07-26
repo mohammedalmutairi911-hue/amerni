@@ -19,11 +19,11 @@ export function Navbar() {
   // إغلاق قائمة الحساب عند الضغط خارجها (كانت تبقى مفتوحة)
   useEffect(() => {
     if (!dropOpen) return
-    const onDown = (e: MouseEvent) => {
+    const onDown = (e: Event) => {
       if (dropRef.current && !dropRef.current.contains(e.target as Node)) setDropOpen(false)
     }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
+    document.addEventListener('pointerdown', onDown)
+    return () => document.removeEventListener('pointerdown', onDown)
   }, [dropOpen])
 
   const scrollTo = (id: string) => {
@@ -64,7 +64,7 @@ export function Navbar() {
               </button>
 
               {dropOpen && (
-                <div className="absolute left-0 top-full mt-2 w-52 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden z-50">
+                <div className="absolute right-0 top-full mt-2 w-52 max-w-[calc(100vw-2rem)] bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden z-50">
                   <div className="px-4 py-3 border-b border-slate-200">
                     <p className="text-sm font-medium">{profile.full_name}</p>
                     <p className="text-xs text-slate-400">{user.email}</p>

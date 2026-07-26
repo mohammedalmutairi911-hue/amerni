@@ -229,6 +229,12 @@ export function ProviderDashboard() {
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
+            {profile?.role === 'admin' && (
+              <button onClick={() => navigate('admin')}
+                className="text-xs px-3 py-1.5 rounded-lg border border-purple-300 bg-purple-50 text-purple-700 font-bold hover:bg-purple-100 transition-colors">
+                الإدارة
+              </button>
+            )}
             {!providerData.is_approved && (
               <span className="text-xs bg-amber-50 text-amber-600 border border-amber-200 px-3 py-1.5 rounded-full font-bold">
                 ⏳ قيد المراجعة
