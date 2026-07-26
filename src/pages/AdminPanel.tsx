@@ -1,16 +1,18 @@
 import { Logo } from '../components/Logo'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
-import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown, Menu, X, Activity } from 'lucide-react'
+import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown, Menu, X, Activity, UserCircle, Stethoscope } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import { goHome } from '../lib/homePage'
 import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { Chat } from '../components/chat/Chat'
+import { AccountsCenter } from './AccountsCenter'
 
 type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises' | 'providers' | 'financial'
   | 'categories' | 'verifications' | 'notifications' | 'reports' | 'system-logs' | 'ai-monitoring' | 'activity'
+  | 'accounts' | 'diagnostics'
 
 export function AdminPanel() {
   const { navigate } = useApp()
@@ -361,6 +363,7 @@ export function AdminPanel() {
 
   const NAV_ITEMS = [
     { id: 'overview',      icon: BarChart3,     label: 'نظرة عامة',    badge: 0 },
+    { id: 'accounts',      icon: UserCircle,    label: 'جميع الحسابات', badge: 0 },
     { id: 'activity',      icon: Activity,      label: 'سجل النشاطات', badge: 0 },
     { id: 'workers',       icon: Shield,        label: 'العمال',        badge: stats.pending },
     { id: 'tasks',         icon: Briefcase,     label: 'الطلبات',       badge: stats.disputed },
@@ -375,14 +378,15 @@ export function AdminPanel() {
     { id: 'notifications', icon: Mail,          label: 'الإشعارات', badge: 0 },
     { id: 'system-logs',   icon: AlertTriangle, label: 'سجلات النظام', badge: 0 },
     { id: 'ai-monitoring', icon: ShieldAlert,   label: 'مراقبة الذكاء الاصطناعي', badge: 0 },
+    { id: 'diagnostics',   icon: Stethoscope,   label: 'تشخيص المنصة', badge: 0 },
   ]
 
   // ── تجميع التبويبات في أقسام واضحة: لا خلط بين الأفراد والمنشآت ──
   const NAV_GROUPS: { title: string | null; ids: string[] }[] = [
-    { title: null,            ids: ['overview', 'activity', 'reports'] },
+    { title: null,            ids: ['overview', 'accounts', 'activity', 'reports'] },
     { title: 'إدارة الأفراد',  ids: ['workers', 'tasks', 'users', 'conversations'] },
     { title: 'إدارة المنشآت',  ids: ['enterprises', 'providers'] },
-    { title: 'عام والنظام',    ids: ['verifications', 'financial', 'categories', 'notifications', 'system-logs', 'ai-monitoring'] },
+    { title: 'عام والنظام',    ids: ['verifications', 'financial', 'categories', 'notifications', 'system-logs', 'ai-monitoring', 'diagnostics'] },
   ]
   const navItem = (id: string) => NAV_ITEMS.find(n => n.id === id)
 
@@ -557,6 +561,9 @@ export function AdminPanel() {
           )}
 
           {/* ══ OVERVIEW ══ */}
+          {tab === 'accounts' && <AccountsCenter view="accounts" />}
+          {tab === 'diagnostics' && <AccountsCenter view="diagnostics" />}
+
           {tab === 'overview' && (
             <div className="space-y-6 animate-fade-in">
               <div>
