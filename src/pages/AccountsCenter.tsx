@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase, getAvatar } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
+import { adminAction, startImpersonation } from '../lib/adminActions'
 import {
   Loader2, Search, X, Users, Building2, Shield, CheckCircle, Clock,
   Mail, BadgeCheck, FileText, Star, RefreshCw, History,
@@ -40,10 +41,11 @@ const fmtDateTime = (d?: string | null) =>
 
 const shortId = (id: string) => id.slice(0, 8)
 
-export function AccountsCenter({ view }: { view: 'accounts' | 'diagnostics' }) {
+export function AccountsCenter({ view }: { view: 'accounts' | 'diagnostics' | 'audit' }) {
   const { navigate } = useApp()
   const [accounts, setAccounts] = useState<Account[]>([])
   const [diag, setDiag] = useState<Record<string, number> | null>(null)
+  const [auditRows, setAuditRows] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -58,7 +60,12 @@ export function AccountsCenter({ view }: { view: 'accounts' | 'diagnostics' }) {
   const load = async () => {
     setErr(null)
     try {
-      if (view === 'diagnostics') {
+      if (view === 'audit') {
+        const { data, error } = await supabase.from('admin_audit_log')
+          .select('*').order('created_at', { ascending: false }).limit(200)
+        if (error) throw error
+        setAuditRows(data || [])
+      } else if (view === 'diagnostics') {
         const { data, error } = await supabase.rpc('admin_platform_diagnostics')
         if (error) throw error
         setDiag(data as any)
@@ -359,25 +366,49 @@ function AccountDetail({ accountId, base, detail, loading, onClose, onNavigate, 
     </div>
   )
 
+  const flash = (m: string) => { setMsg(m); setTimeout(() => setMsg(null), 3000) }
+
+  const run = async (fn: () => Promise<{ ok: boolean; error?: string }>, okMsg: string, after?: boolean) => {
+    setBusy(true)
+    const r = await fn()
+    setBusy(false)
+    flash(r.ok ? okMsg : `تعذّر التنفيذ: ${r.error || ''}`)
+    if (r.ok && after) onChanged()
+  }
+
   const sendNotification = async () => {
     const title = window.prompt('عنوان الإشعار:')
     if (!title) return
     const body = window.prompt('نص الإشعار:') || ''
-    setBusy(true)
-    const { error } = await supabase.rpc('admin_send_notification', { p_user: accountId, p_title: title, p_body: body })
-    setBusy(false)
-    setMsg(error ? 'تعذّر الإرسال' : 'تم إرسال الإشعار ✓')
-    setTimeout(() => setMsg(null), 2500)
+    await run(() => adminAction('send_notification', { target_user_id: accountId, title, body }), 'تم إرسال الإشعار ✓')
   }
-
-  const toggleApproval = async (kind: 'worker' | 'provider', next: boolean) => {
+  const toggleApproval = (kind: 'worker' | 'provider', next: boolean) =>
+    run(() => adminAction('set_approval', { target_user_id: accountId, kind, approved: next }), 'تم التحديث ✓', true)
+  const loginAs = async () => {
+    if (!window.confirm('الدخول لهذا الحساب مؤقتاً لغرض الدعم الفني؟ ستظهر لك أداة العودة لحسابك.')) return
     setBusy(true)
-    const table = kind === 'worker' ? 'worker_profiles' : 'enterprise_providers'
-    const { error } = await supabase.from(table).update({ is_approved: next }).eq('user_id', accountId)
+    const r = await startImpersonation(accountId)
     setBusy(false)
-    setMsg(error ? 'تعذّر التحديث' : 'تم التحديث ✓')
-    setTimeout(() => setMsg(null), 2500)
-    if (!error) onChanged()
+    if (!r.ok) flash(`تعذّر الدخول: ${r.error || ''}`)
+  }
+  const disableUser = () => { if (window.confirm('تعطيل هذا الحساب؟ لن يستطيع تسجيل الدخول.')) run(() => adminAction('disable_user', { target_user_id: accountId }), 'تم تعطيل الحساب ✓') }
+  const enableUser = () => run(() => adminAction('enable_user', { target_user_id: accountId }), 'تم تفعيل الحساب ✓')
+  const resetPassword = () => { if (window.confirm('إرسال رابط رسمي لإعادة تعيين كلمة المرور لبريد المستخدم؟')) run(() => adminAction('reset_password', { target_user_id: accountId }), 'تم إرسال الرابط ✓') }
+
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [impact, setImpact] = useState<any>(null)
+  const openDelete = async () => {
+    setConfirmDelete(true); setImpact(null)
+    const r = await adminAction('delete_impact', { target_user_id: accountId })
+    if (r.ok) setImpact(r.impact)
+  }
+  const doDelete = async () => {
+    setBusy(true)
+    const r = await adminAction('delete_user', { target_user_id: accountId })
+    setBusy(false)
+    setConfirmDelete(false)
+    if (r.ok) { flash('تم حذف الحساب نهائياً'); onChanged(); onClose() }
+    else flash(`تعذّر الحذف: ${r.error || ''}`)
   }
 
   return (
@@ -522,9 +553,9 @@ function AccountDetail({ accountId, base, detail, loading, onClose, onNavigate, 
             })()}
           </Section>
 
-          {/* Admin tools */}
+          {/* Admin tools — كلها عبر Edge Function آمنة (service_role) مع تسجيل تدقيق */}
           <Section title="أدوات الإدارة" icon={Shield}>
-            {msg && <p className="text-xs font-bold text-green-600 mb-2">{msg}</p>}
+            {msg && <p className="text-xs font-bold text-slate-700 mb-2 bg-slate-100 rounded-lg px-2 py-1.5">{msg}</p>}
             <div className="grid grid-cols-2 gap-2">
               {base?.has_worker && (
                 <button onClick={() => { (window as any).__workerProfileId = accountId; onNavigate('worker-profile') }} disabled={busy}
@@ -532,9 +563,25 @@ function AccountDetail({ accountId, base, detail, loading, onClose, onNavigate, 
                   عرض ملف المزود
                 </button>
               )}
+              <button onClick={loginAs} disabled={busy}
+                className="text-xs font-bold px-3 py-2 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50">
+                الدخول كمستخدم
+              </button>
               <button onClick={sendNotification} disabled={busy}
                 className="text-xs font-bold px-3 py-2 rounded-lg border border-primary-200 text-primary-600 hover:bg-primary-50 transition-colors disabled:opacity-50">
                 إرسال إشعار
+              </button>
+              <button onClick={resetPassword} disabled={busy}
+                className="text-xs font-bold px-3 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50">
+                إعادة تعيين كلمة المرور
+              </button>
+              <button onClick={disableUser} disabled={busy}
+                className="text-xs font-bold px-3 py-2 rounded-lg border border-amber-200 text-amber-600 hover:bg-amber-50 transition-colors disabled:opacity-50">
+                تعطيل الحساب
+              </button>
+              <button onClick={enableUser} disabled={busy}
+                className="text-xs font-bold px-3 py-2 rounded-lg border border-green-200 text-green-600 hover:bg-green-50 transition-colors disabled:opacity-50">
+                تفعيل الحساب
               </button>
               {base?.has_worker && (
                 <button onClick={() => toggleApproval('worker', !base?.worker_approved)} disabled={busy}
@@ -548,11 +595,41 @@ function AccountDetail({ accountId, base, detail, loading, onClose, onNavigate, 
                   {base?.provider_approved ? 'إلغاء اعتماد الجهة' : 'اعتماد الجهة'}
                 </button>
               )}
+              <button onClick={openDelete} disabled={busy}
+                className="text-xs font-bold px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50 col-span-2">
+                حذف الحساب نهائياً
+              </button>
             </div>
-            <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
-              إجراءات الحظر والحذف وإعادة تعيين كلمة المرور و«الدخول كمستخدم» تتطلّب صلاحية service_role عبر Edge Function آمن — لم تُفعّل هنا حفاظاً على أمان الحسابات وعدم حذف أي بيانات.
-            </p>
           </Section>
+
+          {/* Delete confirmation */}
+          {confirmDelete && (
+            <div className="fixed inset-0 z-[140] flex items-center justify-center p-4" dir="rtl">
+              <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setConfirmDelete(false)} />
+              <div className="relative bg-white rounded-2xl p-5 max-w-sm w-full shadow-2xl">
+                <h4 className="font-black text-slate-900 text-lg mb-1">تأكيد حذف الحساب</h4>
+                <p className="text-sm text-slate-500 mb-3">سيُحذف الحساب وكل بياناته نهائياً. لا يمكن التراجع.</p>
+                {impact ? (
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 space-y-1 mb-4">
+                    <p>البريد: <span className="font-bold dir-ltr">{impact.email}</span></p>
+                    <p>الطلبات المتأثرة: <span className="font-bold">{impact.tasks}</span> طلب أفراد، <span className="font-bold">{impact.leads}</span> طلب منشآت</p>
+                    <p>الرسائل: <span className="font-bold">{(impact.task_messages || 0) + (impact.enterprise_messages || 0)}</span> · التقييمات: <span className="font-bold">{impact.ratings}</span></p>
+                    <p>الملفات الفرعية: {impact.worker_profile ? 'مقدم خدمة' : ''} {impact.company_profile ? 'منشأة' : ''} {impact.enterprise_provider ? 'مزوّد' : ''} {(!impact.worker_profile && !impact.company_profile && !impact.enterprise_provider) ? 'لا يوجد' : ''}</p>
+                  </div>
+                ) : (
+                  <div className="py-4 flex justify-center"><Loader2 className="animate-spin text-slate-300" size={20} /></div>
+                )}
+                <div className="flex gap-2">
+                  <button onClick={() => setConfirmDelete(false)} disabled={busy}
+                    className="flex-1 text-sm font-bold px-3 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50">إلغاء</button>
+                  <button onClick={doDelete} disabled={busy || impact?.is_super_admin}
+                    className="flex-1 text-sm font-bold px-3 py-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 disabled:opacity-50">
+                    {busy ? 'جارٍ الحذف...' : impact?.is_super_admin ? 'لا يمكن حذف مدير' : 'حذف نهائي'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

@@ -13,6 +13,7 @@ import { InstallPrompt } from './components/InstallPrompt'
 import { PushPrompt } from './components/PushPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { ImpersonationBanner } from './components/ImpersonationBanner'
 
 // Lazy-loaded pages — code splitting لتسريع التحميل الأول
 const AdminPanel = React.lazy(() => import('./pages/AdminPanel').then(m => ({ default: m.AdminPanel })))
@@ -200,5 +201,5 @@ export default function App() {
     return <><Navbar /><NotFoundPage /></>
   }
 
-  return <ErrorBoundary><ToastProvider><React.Suspense fallback={<PageLoader />}>{renderContent()}{user && <PushPrompt />}</React.Suspense></ToastProvider></ErrorBoundary>
+  return <ErrorBoundary><ToastProvider><ImpersonationBanner /><React.Suspense fallback={<PageLoader />}>{renderContent()}{user && <PushPrompt />}</React.Suspense></ToastProvider></ErrorBoundary>
 }
