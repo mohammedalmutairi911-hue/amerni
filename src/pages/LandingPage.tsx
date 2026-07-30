@@ -255,6 +255,14 @@ export function LandingPage() {
     if (!window.history.state?.amerni_mode) {
       window.history.pushState({ amerni_mode: 'individuals' }, '')
     }
+    // الدخول من البوابة يبدأ دائماً من الصفحة الرئيسية للأفراد.
+    // المكوّن لا يُفكَّك عند الرجوع للبوابة عبر الشعار، لذا تبقى حالة العرض
+    // الداخلية (التبويب / صفحة الخدمات / نموذج طلب جديد) محفوظة وتُعيد فتح
+    // آخر صفحة كان فيها المستخدم. نصفّرها هنا حتى يبدأ دائماً من "الرئيسية".
+    // ملاحظة: هذا لا يمسّ زر رجوع/تقدّم المتصفح (history) ولا التنقّل داخل القسم.
+    setActiveTab('home')
+    setShowBrowse(false)
+    setShowNewTask(false)
     setModeRaw('individuals')
   }
 
