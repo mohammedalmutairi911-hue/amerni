@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
 const PUBLIC = resolve(ROOT, 'public')
-const BASE = 'https://amerniksa.com'
+const BASE = 'https://www.amerniksa.com'
 
 // نظّف مخرجات التوليد السابقة فقط (لا نلمس بقية public)
 for (const d of ['khadamat', 'munshaat']) {
