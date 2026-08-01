@@ -118,6 +118,8 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
 
     // TikTok Pixel - نشر طلب ناجح
     try { (window as any).ttq?.track('SubmitForm') } catch {}
+    // Google Ads / GA4 - حدث تحويل: إرسال طلب خدمة
+    try { (window as any).gtag?.('event', 'generate_lead', { category: finalCategory, city: task.city }) } catch {}
 
     return true
   }
