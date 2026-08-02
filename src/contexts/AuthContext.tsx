@@ -65,8 +65,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!error && data.user) {
       // TikTok Pixel - تسجيل ناجح
       try { (window as any).ttq?.track('CompleteRegistration') } catch {}
-      // Google Ads / GA4 - حدث تحويل: تسجيل عميل جديد
+      // GA4 - حدث تسجيل (تحليلات)
       try { (window as any).gtag?.('event', 'sign_up', { method: 'email' }) } catch {}
+      // Google Ads - تحويل: تسجيل عميل جديد
+      try {
+        (window as any).gtag?.('event', 'conversion', {
+          send_to: 'AW-18363493738/07BvCIuX2docEOrasrRE',
+          value: 1.0,
+          currency: 'SAR',
+        })
+      } catch {}
       // ملاحظة: إنشاء الـ profile يتم حصراً عبر trigger قاعدة البيانات
       // (on_auth_user_created → handle_new_user) اعتماداً على بيانات التسجيل أعلاه.
       // لا نكتب الـ profile من العميل حتى لا يوجد مساران لإنشاء نفس السجل.
