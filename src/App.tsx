@@ -28,6 +28,8 @@ const WorkerProfile = React.lazy(() => import('./pages/WorkerProfile').then(m =>
 const EnterprisesPage = React.lazy(() => import('./pages/EnterprisesPage').then(m => ({ default: m.EnterprisesPage })))
 const ProviderDashboard = React.lazy(() => import('./pages/ProviderDashboard').then(m => ({ default: m.ProviderDashboard })))
 const NotificationSettings = React.lazy(() => import('./pages/NotificationSettings').then(m => ({ default: m.NotificationSettings })))
+const VerifyPage = React.lazy(() => import('./pages/VerifyPage').then(m => ({ default: m.VerifyPage })))
+const VerifyReportPage = React.lazy(() => import('./pages/VerifyReportPage').then(m => ({ default: m.VerifyReportPage })))
 import { ToastProvider } from './components/Toast'
 
 // Handle worker profile URL param
@@ -143,6 +145,9 @@ export default function App() {
   const renderContent = () => {
     if (page === 'enterprises') return <><Navbar /><EnterprisesPage />{authOpen && <AuthModal />}</>
 
+    // Verify — صفحة الدخول متاحة للزوار (تطلب تسجيل عند الإرسال)
+    if (page === 'verify') return <><Navbar /><VerifyPage />{authOpen && <AuthModal />}</>
+
     if (!user || !profile) return <><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
     if (page === 'landing') return <><LandingPage />{authOpen && <AuthModal />}</>
     if (page === 'provider-dashboard') return <><ProviderDashboard />{authOpen && <AuthModal />}</>
@@ -151,6 +156,7 @@ export default function App() {
     if (page === 'bounties') return <><Navbar /><BountiesPage /></>
     if (page === 'referral') return <><Navbar /><ReferralPage /></>
     if (page === 'notification-settings') return <><Navbar /><NotificationSettings /></>
+    if (page === 'verify-report') return <><Navbar /><VerifyReportPage /></>
     if (page === 'join') return <JoinPage />
     if (page === 'earn') return <><Navbar /><JoinPage /></>
     if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>

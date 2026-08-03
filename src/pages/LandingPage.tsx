@@ -344,6 +344,21 @@ export function LandingPage() {
               </button>
             </div>
 
+            {/* تأكد من المورد — نظام الثقة (Verify) */}
+            <button
+              onClick={() => navigate('verify')}
+              className="group w-full flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-400/50 rounded-2xl p-4 mb-8 text-right transition-all"
+            >
+              <div className="w-11 h-11 rounded-xl bg-primary-500/20 group-hover:bg-primary-500/30 flex items-center justify-center flex-shrink-0 transition-colors">
+                <Shield size={22} className="text-primary-300" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-white font-bold text-sm">تأكد من المورد قبل التعامل</div>
+                <div className="text-slate-400 text-xs">تقرير رسمي + درجة ثقة + أعلام حمراء</div>
+              </div>
+              <span className="text-primary-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden>←</span>
+            </button>
+
             <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-500 mb-6">
               {['موثوق ومرخص', 'بيانات محمية', 'دعم ٢٤/٧'].map(t => (
                 <div key={t} className="flex items-center gap-1.5">
