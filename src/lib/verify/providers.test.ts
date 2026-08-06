@@ -86,6 +86,50 @@ describe('WathqProvider', () => {
     )
   })
 
+  it('429 يُعزَل كـ Quota Violation مميّز عن wathq_error العام', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('', { status: 429 }))
+    await expect(new WathqProvider('k', 'https://api.wathq.sa/v5').lookup('1010101010', null)).rejects.toThrow(
+      /wathq_quota_exceeded/,
+    )
+  })
+
+  it('يرسل apikey و accept و content-type في كل نداء', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }))
+    await new WathqProvider('secret-key', 'https://api.wathq.sa/v5').lookup('1010101010', null)
+    const [, init] = spy.mock.calls[0]
+    expect(init?.headers).toMatchObject({
+      apikey: 'secret-key',
+      accept: 'application/json',
+      'content-type': 'application/json',
+    })
+  })
+
+  it('فشل شبكة أول محاولة ثم نجاح ثاني محاولة → لا يرمي (retry مرة واحدة)', async () => {
+    const spy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockRejectedValueOnce(new TypeError('network down'))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ crName: 'شركة بعد إعادة المحاولة' }), { status: 200 }))
+    const r = await new WathqProvider('k', 'https://api.wathq.sa/v5').lookup('1010101010', null)
+    expect(spy).toHaveBeenCalledTimes(2)
+    expect(r.name).toBe('شركة بعد إعادة المحاولة')
+  })
+
+  it('فشل شبكة في المحاولتين → wathq_network_error (بلا محاولة ثالثة)', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('network down'))
+    await expect(new WathqProvider('k', 'https://api.wathq.sa/v5').lookup('1010101010', null)).rejects.toThrow(
+      /wathq_network_error/,
+    )
+    expect(spy).toHaveBeenCalledTimes(2)
+  })
+
+  it('انتهاء المهلة (AbortError) في المحاولتين → wathq_timeout', async () => {
+    const abortError = Object.assign(new Error('aborted'), { name: 'AbortError' })
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(abortError)
+    await expect(new WathqProvider('k', 'https://api.wathq.sa/v5').lookup('1010101010', null)).rejects.toThrow(
+      /wathq_timeout/,
+    )
+  })
+
   it('استجابة سليمة تُخرَّط للعقد الموحّد', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({ crName: 'مؤسسة الوفاء', status: { name: 'نشط' }, capital: 500000 }), {

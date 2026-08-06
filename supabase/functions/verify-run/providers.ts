@@ -95,17 +95,19 @@ export class MockProvider implements OfficialProvider {
 }
 
 // ── WathqProvider ───────────────────────────────────────────────────────────
-// ⚠️ مراجعة تكامل (2026-08-06) — قبل تفعيل مفتاح واثق حقيقي، لازم تأكيد يدوي:
-//   • الأسعار لم تعد مجانية: باقة تجريبية 100 استعلام/30 يوم (5 طلبات/ثانية)،
-//     وبعدها مدفوعة إلزامياً (تبدأ 5,000 ريال/شهر). استعلام fullinfo = 12 ريال/نداء.
-//   • واثق أطلق جيلاً جديداً "السجل التجاري (التشريعات الجديدة)" (Sandbox API v6)
-//     منفصل عن الـAPI العام القديم (v4/v5) اللي هذا الكود مبني على مساره الحالي
-//     (commercialregistration/fullinfo). المسار/بنية الاستجابة للجيل الجديد لم
-//     تُؤكَّد بعد (موثّقة خلف تسجيل دخول في developer.wathq.sa) — يحتاج تسجيل
-//     حساب فعلي ومراجعة Swagger كامل قبل التفعيل، ثم تحديث baseUrl/path هنا فقط
-//     إذا لزم (بدون تغيير عقد OfficialProvider أو أي طبقة فوقه).
-//   • Rate limit المتوقع في التطوير: 5 طلبات/ثانية — الكود الحالي لا يطبّق أي
-//     throttling/backoff، يُنصح إضافته هنا عند التفعيل الحقيقي.
+// ✅ مراجعة تكامل (2026-08-06، مُحدَّثة): تأكّد base URL + مسار fullinfo عبر مصدرين:
+//   (1) مثال إنتاجي حقيقي مؤرَّخ فبراير 2026: https://api.wathq.sa/v5/commercialregistration/{op}/{id}
+//       بترويسة apiKey — مطابق تماماً لما هذا الكود يستخدمه (baseUrl الافتراضي
+//       ونمط المسار). (2) توثيق OpenAPI الرسمي (Sandbox v6.7.0، سبتمبر 2025)
+//       يؤكد وجود GET /fullinfo/{id} بنفس الدلالة. base URL/path الحاليان صحيحان،
+//       لا حاجة لتغييرهما.
+//   ⚠️ لم يُتحقّق: v6 "التشريعات الجديدة" (api/32 في بوابة المطورين) قد يكون
+//     مساراً/بنية استجابة مختلفة تماماً — يبدو بيئة Sandbox منفصلة لم تُعمَّم
+//     على الإنتاج بعد اعتباراً من هذا التاريخ؛ يُعاد فحصه دورياً.
+//   💰 الأسعار لم تعد مجانية: تجربة 100 استعلام/30 يوم (5 طلبات/ثانية)، ثم مدفوعة
+//     (fullinfo = 12 ريال/نداء، باقات تبدأ 5,000 ريال/شهر).
+//   🔁 429 = "Quota Violation" رسمياً (نفاد حصة حساب) — لا يُعاد محاولته تلقائياً
+//     (انظر wathq_quota_exceeded أدناه)، بعكس فشل الشبكة/Timeout (محاولة واحدة إضافية).
 // خريطة حالة السجل من مسميات واثق العربية إلى enum الموحّد.
 export const WATHQ_STATUS_MAP: Record<string, CrStatus> = {
   نشط: 'active',
@@ -141,15 +143,44 @@ export class WathqProvider implements OfficialProvider {
   readonly source = 'wathq' as const
   constructor(private apiKey: string, private baseUrl: string) {}
 
+  private async fetchOnce(cr: string, timeoutMs: number): Promise<Response> {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), timeoutMs)
+    try {
+      return await fetch(`${this.baseUrl}/commercialregistration/fullinfo/${cr}`, {
+        headers: { apikey: this.apiKey, accept: 'application/json', 'content-type': 'application/json' },
+        signal: controller.signal,
+      })
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+
   async lookup(cr: string | null, name: string | null): Promise<OfficialData> {
     if (!cr) {
       // واثق يتطلب رقم سجل — بدونه نرجّع unknown قابلاً للإكمال Concierge.
       return { cr_number: null, name: name ?? 'غير معروف', cr_status: 'unknown' }
     }
-    const res = await fetch(`${this.baseUrl}/commercialregistration/fullinfo/${cr}`, {
-      headers: { apikey: this.apiKey, accept: 'application/json' },
-    })
+
+    const TIMEOUT_MS = 8000 // مطلوب صراحة: الكود الأصلي لم يكن يضبط أي مهلة على fetch()
+    let res: Response
+    try {
+      res = await this.fetchOnce(cr, TIMEOUT_MS)
+    } catch (e) {
+      // إعادة محاولة واحدة فقط على فشل الشبكة/الانتهاء — أخطاء HTTP الحتمية (401/403/429/4xx)
+      // لا تُعاد محاولتها هنا لأن التكرار لن يغيّر نتيجتها.
+      const isAbort = e instanceof Error && e.name === 'AbortError'
+      try {
+        res = await this.fetchOnce(cr, TIMEOUT_MS)
+      } catch {
+        throw new Error(isAbort ? 'wathq_timeout' : 'wathq_network_error')
+      }
+    }
+
     if (res.status === 404) return { cr_number: cr, name: name ?? 'سجل غير موجود', cr_status: 'unknown' }
+    // 429 = "Quota Violation" حسب توثيق واثق الرسمي — نفاد حصة الحساب، وليس throttle عابر
+    // يستفيد من إعادة المحاولة؛ يُعزَل عن wathq_error_<status> العام ليتعامل معه المستدعي بوضوح.
+    if (res.status === 429) throw new Error('wathq_quota_exceeded')
     if (!res.ok) throw new Error(`wathq_error_${res.status}`)
     return mapWathqPayload(cr, name, await res.json())
   }
