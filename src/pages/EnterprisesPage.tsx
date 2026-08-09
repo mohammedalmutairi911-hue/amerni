@@ -334,8 +334,9 @@ export function EnterprisesPage() {
         company_name: sanitize(effective.company_name),
         contact_name: sanitize(effective.contact_name),
         contact_email: effective.contact_email.toLowerCase(),
-        contact_phone: sanitize(effective.contact_phone),
-        company_size: effective.company_size,
+        // الحقول الاختيارية: نرسل null بدل '' — قيد CHECK يسمح بـ NULL أو قيمة صحيحة فقط ويرفض السلسلة الفارغة
+        contact_phone: sanitize(effective.contact_phone) || null,
+        company_size: effective.company_size || null,
         category: form.category,
         description: sanitize(form.description),
         budget_range: form.budget_range,
@@ -383,8 +384,9 @@ export function EnterprisesPage() {
           company_name: savedForm.company_name || sp?.company_name || '',
           contact_name: savedForm.contact_name || sp?.contact_name || '',
           contact_email: savedForm.contact_email || user.email || '',
-          contact_phone: savedForm.contact_phone || sp?.contact_phone || '',
-          company_size: savedForm.company_size || sp?.company_size || '',
+          // الحقول الاختيارية: null بدل '' حتى لا يرفض قيد CHECK الإدراج
+          contact_phone: savedForm.contact_phone || sp?.contact_phone || null,
+          company_size: savedForm.company_size || sp?.company_size || null,
           category: savedForm.category,
           description: savedForm.description,
           budget_range: savedForm.budget_range,
