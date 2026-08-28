@@ -7,6 +7,7 @@ import { goHome } from '../lib/homePage'
 import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
 import { Chat } from '../components/chat/Chat'
+import { PaymobButton } from '../components/PaymobButton'
 import { NotificationBell } from '../components/ui/NotificationBell'
 import { useToast } from '../components/Toast'
 
@@ -324,6 +325,24 @@ export function UserDashboard() {
                     ✅ موافق
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* دفع عبر Paymob */}
+            {(selectedTask as any).negotiation_status === 'accepted' && (selectedTask.price_final || (selectedTask as any).worker_price_offer) && (
+              <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5">
+                <p className="font-bold text-amber-700 mb-1">💳 ادفع مقابل الخدمة</p>
+                <p className="text-3xl font-black text-amber-600 my-2">
+                  {selectedTask.price_final || (selectedTask as any).worker_price_offer} ريال
+                </p>
+                <PaymobButton
+                  amount={Number(selectedTask.price_final || (selectedTask as any).worker_price_offer)}
+                  taskId={selectedTask.id}
+                  description={selectedTask.title}
+                  label="ادفع الآن"
+                  className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all active:scale-95 mt-2"
+                />
+                <p className="text-xs text-amber-600 mt-2 text-center">🔒 دفع آمن عبر Paymob — مدى / فيزا / ماستركارد</p>
               </div>
             )}
 
