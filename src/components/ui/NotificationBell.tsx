@@ -33,7 +33,10 @@ export function NotificationBell() {
     if (!user) return
     load()
     // realtime: إشعار جديد يظهر فوراً
-    const ch = supabase.channel(`notif_${user.id}`)
+    // اسم قناة فريد لكل نسخة من المكوّن — لأن <NotificationBell/> يُركّب أكثر من مرة
+    // (هيدر سطح المكتب + هيدر الجوال). بدون التفرّد يعيد supabase-js نفس القناة المشتركة
+    // فيُرمى الخطأ: "cannot add postgres_changes callbacks after subscribe()" ويسقط الصفحة.
+    const ch = supabase.channel(`notif_${user.id}_${Math.random().toString(36).slice(2)}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
         (payload) => setNotifs(p => [payload.new as Notif, ...p]))
       .subscribe()
