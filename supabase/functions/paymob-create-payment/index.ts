@@ -17,6 +17,12 @@ const cors = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } })
 
+// أرقام تكامل Paymob الحية: بطاقة + Apple Pay (قابلة للتجاوز عبر متغير البيئة)
+function integrationIds(): number[] {
+  const raw = Deno.env.get('PAYMOB_INTEGRATION_IDS') || '32960,32959'
+  return raw.split(',').map((s) => Number(s.trim())).filter((n) => Number.isFinite(n))
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405)
@@ -82,7 +88,7 @@ Deno.serve(async (req: Request) => {
       body: JSON.stringify({
         amount: Math.round(amount * 100),
         currency: 'SAR',
-        payment_methods: ['card'],
+        payment_methods: integrationIds(),
         items: [{ name: task?.title || 'خدمة أمرني', amount: Math.round(amount * 100), description: task?.title || '', quantity: 1 }],
         billing_data: {
           first_name: firstName || 'عميل', last_name: lastName,
