@@ -6,6 +6,7 @@ import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
 import { goHome, getHomePage, goToUserHome, profilePlatform, isUserInPortal } from '../lib/homePage'
 import { supabase } from '../lib/supabase'
+import { trackEvent } from '../lib/analytics'
 import { NewTaskPage } from './NewTaskPage'
 import { ServiceBrowsePage } from './ServiceBrowsePage'
 
@@ -18,9 +19,24 @@ const EXAMPLES = [
   'أحتاج أحد يوصلني لمكان',
 ]
 
+// وعد زمن الرد — يظهر في أكثر من مكان. لا يُغيَّر إلا بعد التأكد أن الفريق يقدر يلتزم به فعلياً.
+const RESPONSE_PROMISE = 'نرد عليك خلال ساعة'
+
+// أمثلة على ما يُطلب — أمثلة توضيحية فقط (ليست مهام منفّذة) وتُعرض مُعنوَنة كذلك.
+const REQUEST_IDEAS = [
+  { icon: '🛒', text: 'أبي أحد يشتري لي غرض من السوق ويوصله لي' },
+  { icon: '📄', text: 'أحتاج أحد يراجع لي معاملة في دائرة حكومية' },
+  { icon: '📸', text: 'أبي أحد يصوّر لي موقع أو منتج ويرسل الصور' },
+  { icon: '🔍', text: 'أحتاج أحد يتحقق لي من معلومة أو عنوان على أرض الواقع' },
+  { icon: '🚗', text: 'أبي أحد يوصّل لي طرد أو يستلمه عني' },
+  { icon: '🧾', text: 'أحتاج أحد يقف لي في طابور أو يحجز لي موعد' },
+  { icon: '🎁', text: 'أبي أحد يجهّز لي هدية ويوصلها لشخص في مدينة ثانية' },
+  { icon: '✨', text: 'عندي طلب غريب ما لقيت له منصة…' },
+]
+
 const TRUST = [
-  'التحقق من الهوية الوطنية عبر أبشر',
-  'جميع مقدمي الخدمة موثقون أمنياً',
+  'مراجعة بيانات مقدمي الخدمة قبل قبولهم في المنصة',
+  'التواصل داخل المنصة بدون مشاركة رقمك',
   'ادفع إلكترونياً بأمان — مدى أو أبل باي',
   'دعم ٢٤/٧ باللغة العربية',
   'خصوصيتك محمية وبياناتك سرية',
@@ -289,6 +305,20 @@ export function LandingPage() {
     if (mode === 'enterprises') navigate('enterprises', { replace: true })
   }, [mode, navigate])
 
+  // القياس: أول مشاهدة للبوابة (يُستدعى دائماً قبل أي return مبكر)
+  useEffect(() => {
+    trackEvent('landing_view', user?.id, { mode: mode ?? 'gateway' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const startFromGateway = (text: string) => {
+    const t = text.trim()
+    trackEvent('request_started', user?.id, { source: 'gateway', has_text: !!t, len: t.length })
+    chooseMode('individuals')
+    if (t) setTaskInput(t)
+    setShowNewTask(true)
+  }
+
   // البوابة (نقطة الدخول الرسمية) — تُعرَض لكل زائر أو مستخدم مسجَّل ما لم يختر وجهة.
   // المستخدم المسجَّل يحتفظ بجلسته، ونعرض له اختصار "لوحتي" للانتقال لدشبورده صراحةً.
   if (!mode) {
@@ -309,58 +339,45 @@ export function LandingPage() {
             <div className="bg-white inline-block rounded-3xl p-3.5 mb-5">
               <Logo full size={72} />
             </div>
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-4 leading-[1.15]">
-              حوّل حاجتك إلى{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-400 to-accent-400">إنجاز فوري</span>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4 leading-[1.15]">
+              استأجر شخص{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-400 to-accent-400">لتنفيذ مهامك!</span>
             </h1>
-            <p className="text-slate-300 text-sm sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
-              منصة سعودية تربط الأفراد بمحترفين موثوقين للمهام اليومية، وتربط المنشآت بخبراء معتمدين في ١٨ تخصصاً — كل ذلك بثقة وأمان.
+            <p className="text-slate-300 text-sm sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+              اكتب أي طلب — حتى لو ما لقيت له منصة — ويتولاه شخص من أمرني. بدون تسجيل أولاً، وبدون ما تدور وتقارن.
             </p>
 
-            {/* الاختيار الكبير: أفراد / منشآت */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <button
-                onClick={() => chooseMode('individuals')}
-                className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-400/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20"
-              >
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary-500/20 group-hover:bg-primary-500/30 flex items-center justify-center mx-auto mb-3 sm:mb-4 transition-colors">
-                  <span className="text-3xl">🙋</span>
-                </div>
-                <h2 className="text-white font-black text-lg mb-1">أفراد</h2>
-                <p className="text-slate-400 text-xs leading-relaxed">اطلب أي خدمة يومية بسرعة وأمان</p>
-                <div className="mt-4 text-xs text-primary-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">ابدأ الآن ←</div>
-              </button>
+            {/* صندوق الطلب الواحد — الوعد الأساسي */}
+            <form
+              onSubmit={e => { e.preventDefault(); startFromGateway(taskInput) }}
+              className="max-w-xl mx-auto mb-3"
+            >
+              <div className="flex items-center gap-2 bg-white rounded-2xl p-2 shadow-2xl shadow-black/20 focus-within:ring-4 focus-within:ring-primary-400/40 transition-all">
+                <input
+                  value={taskInput} onChange={e => setTaskInput(e.target.value)}
+                  placeholder={visible ? EXAMPLES[idx] : ''}
+                  aria-label="اكتب طلبك"
+                  className="flex-1 min-w-0 bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base px-3 py-3 outline-none text-right"
+                />
+                <button type="submit"
+                  className="bg-primary-500 hover:bg-primary-700 text-white font-bold text-sm sm:text-base px-5 sm:px-7 py-3 rounded-xl transition-colors flex-shrink-0 flex items-center gap-1.5">
+                  اطلب <ArrowLeft size={16} />
+                </button>
+              </div>
+            </form>
+            <p className="text-primary-300 text-xs sm:text-sm mb-6 font-medium">{RESPONSE_PROMISE} · تتفاوض على السعر قبل ما تدفع</p>
 
-              <button
-                onClick={() => chooseMode('enterprises')}
-                className="group relative bg-white/5 hover:bg-white/10 border border-white/10 hover:border-accent-400/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent-500/20"
-              >
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-accent-500/20 group-hover:bg-accent-500/30 flex items-center justify-center mx-auto mb-3 sm:mb-4 transition-colors">
-                  <span className="text-3xl">🏢</span>
-                </div>
-                <h2 className="text-white font-black text-lg mb-1">منشآت</h2>
-                <p className="text-slate-400 text-xs leading-relaxed">حوّل رؤيتك إلى واقع مع خبرات عند الطلب.</p>
-                <div className="mt-4 text-xs text-accent-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">اكتشف الخدمات ←</div>
-              </button>
+            <div className="flex flex-wrap justify-center gap-2 mb-10">
+              {REQUEST_IDEAS.slice(0, 5).map(r => (
+                <button key={r.text} onClick={() => startFromGateway(r.text)}
+                  className="bg-white/5 hover:bg-white/15 border border-white/10 hover:border-primary-400/50 text-slate-200 text-xs sm:text-sm px-3.5 py-2 rounded-full transition-all">
+                  {r.icon} {r.text}
+                </button>
+              ))}
             </div>
 
-            {/* تأكد من المورد — نظام الثقة (Verify) */}
-            <button
-              onClick={() => navigate('verify')}
-              className="group w-full flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-400/50 rounded-2xl p-4 mb-8 text-right transition-all"
-            >
-              <div className="w-11 h-11 rounded-xl bg-primary-500/20 group-hover:bg-primary-500/30 flex items-center justify-center flex-shrink-0 transition-colors">
-                <Shield size={22} className="text-primary-300" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-white font-bold text-sm">تأكد من المورد قبل التعامل</div>
-                <div className="text-slate-400 text-xs">تقرير رسمي + درجة ثقة + أعلام حمراء</div>
-              </div>
-              <span className="text-primary-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden>←</span>
-            </button>
-
-            <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-500 mb-6">
-              {['موثوق ومرخص', 'بيانات محمية', 'دعم ٢٤/٧'].map(t => (
+            <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-300 mb-6">
+              {['تواصل داخل المنصة', 'دفع محفوظ لين تأكيد الإنجاز', 'بياناتك محمية'].map(t => (
                 <div key={t} className="flex items-center gap-1.5">
                   <CheckCircle size={11} className="text-primary-400" />
                   <span>{t}</span>
@@ -378,69 +395,45 @@ export function LandingPage() {
                 <span aria-hidden>←</span>
               </button>
             )}
+
+            {/* روابط ثانوية: المنشآت + التحقق من المورد */}
+            <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs sm:text-sm text-slate-400">
+              <button onClick={() => chooseMode('enterprises')} className="hover:text-white underline-offset-4 hover:underline transition-colors">🏢 منشأة؟ خبراء عند الطلب للمنشآت</button>
+              <button onClick={() => navigate('verify')} className="hover:text-white underline-offset-4 hover:underline transition-colors">🛡️ تأكد من مورد قبل التعامل معه</button>
+            </div>
           </div>
         </section>
 
-        {/* ===== الإحصائيات ===== */}
+        {/* ===== نقاط الوعد (بدون أرقام مصطنعة) ===== */}
         <section className="py-8 px-4 bg-white border-b border-slate-100">
           <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-            {[['١٨', 'تخصصاً للمنشآت'], ['موثّق', 'عبر أبشر'], ['آمن', 'دفع مضمون'], ['٢٤/٧', 'دعم متواصل']].map(([v, l]) => (
+            {[['✍️', 'اكتب طلبك بكلامك'], ['🤝', 'تتفق على السعر أولاً'], ['🔒', 'الدفع محفوظ لين تأكيد الإنجاز'], ['💬', 'محادثة داخل المنصة']].map(([i, l]) => (
               <div key={l}>
-                <div className="text-2xl sm:text-3xl font-black text-primary-500">{v}</div>
-                <div className="text-xs text-slate-400 mt-1">{l}</div>
+                <div className="text-2xl sm:text-3xl mb-1">{i}</div>
+                <div className="text-xs sm:text-sm text-slate-600 font-medium leading-snug">{l}</div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ===== أقسام الخدمات ===== */}
+        {/* ===== أمثلة على ما يُطلب ===== */}
         <section className="py-16 px-4 bg-slate-50">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-black text-slate-900 mb-2">أقسام الخدمات</h2>
-              <p className="text-slate-500">كل خدمة تحتاجها — لشخصك أو لمنشأتك</p>
+              <h2 className="text-3xl font-black text-slate-900 mb-2">وش تقدر تطلب؟</h2>
+              <p className="text-slate-500">أي شيء قانوني ينفَّذ على أرض الواقع — هذه أمثلة فقط، اكتب طلبك بكلامك</p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white border border-slate-200 rounded-2xl p-6">
-                <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2"><span className="text-xl">🙋</span> للأفراد</h3>
-                <div className="grid grid-cols-3 gap-2.5">
-                  {[
-                    { icon: '🚗', label: 'توصيل' },
-                    { icon: '📸', label: 'تصوير' },
-                    { icon: '🔍', label: 'تحقق' },
-                    { icon: '🛍️', label: 'تسوق' },
-                    { icon: '📚', label: 'تعليم' },
-                    { icon: '✨', label: 'أخرى' },
-                  ].map(({ icon, label }) => (
-                    <button key={label} onClick={() => chooseMode('individuals')}
-                      className="bg-slate-50 border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-xl p-3 text-center transition-all group">
-                      <div className="text-xl mb-1">{icon}</div>
-                      <p className="text-xs font-semibold text-slate-600 group-hover:text-primary-500">{label}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-white border border-slate-200 rounded-2xl p-6">
-                <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2"><span className="text-xl">🏢</span> للمنشآت — ١٨ تخصصاً</h3>
-                <div className="grid grid-cols-3 gap-2.5">
-                  {[
-                    { icon: '📋', label: 'حوكمة' },
-                    { icon: '👥', label: 'سعودة' },
-                    { icon: '⚖️', label: 'قانوني' },
-                    { icon: '💰', label: 'مالي/زكاة' },
-                    { icon: '✅', label: 'جودة/آيزو' },
-                    { icon: '🛡️', label: 'أمن سيبراني' },
-                  ].map(({ icon, label }) => (
-                    <button key={label} onClick={() => chooseMode('enterprises')}
-                      className="bg-slate-50 border border-slate-200 hover:border-accent-500 hover:bg-accent-50 rounded-xl p-3 text-center transition-all group">
-                      <div className="text-xl mb-1">{icon}</div>
-                      <p className="text-xs font-semibold text-slate-600 group-hover:text-accent-500">{label}</p>
-                    </button>
-                  ))}
-                </div>
-                <button onClick={() => chooseMode('enterprises')} className="mt-3 text-xs text-accent-500 font-semibold hover:underline">عرض كل الـ ١٨ تخصص ←</button>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {REQUEST_IDEAS.map(r => (
+                <button key={r.text} onClick={() => startFromGateway(r.text)}
+                  className="flex items-center gap-3 bg-white border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-2xl p-4 text-right transition-all group">
+                  <span className="text-2xl flex-shrink-0">{r.icon}</span>
+                  <span className="flex-1 text-sm text-slate-700 group-hover:text-primary-600 font-medium">{r.text}</span>
+                  <ArrowLeft size={16} className="text-slate-300 group-hover:text-primary-500 flex-shrink-0" />
+                </button>
+              ))}
             </div>
+            <p className="text-center text-xs text-slate-400 mt-4">أمثلة توضيحية — ليست مهام منفَّذة</p>
           </div>
         </section>
 
@@ -487,17 +480,17 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* ===== CTA احترافي ===== */}
+        {/* ===== CTA ===== */}
         <section className="py-16 px-4 bg-primary-600">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-black text-white mb-3">جاهز تبدأ؟</h2>
-            <p className="text-blue-100 mb-8">اختر بوابتك الآن — فرد يبحث عن خدمة، أو منشأة تبحث عن خبير</p>
+            <h2 className="text-3xl font-black text-white mb-3">عندك طلب؟ اكتبه الحين</h2>
+            <p className="text-blue-100 mb-8">{RESPONSE_PROMISE} — وبدون تسجيل أولاً</p>
             <div className="flex flex-wrap justify-center gap-3">
-              <button onClick={() => chooseMode('individuals')} className="bg-white text-primary-600 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
-                ابدأ كفرد
+              <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="bg-white text-primary-600 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
+                اكتب طلبك
               </button>
-              <button onClick={() => chooseMode('enterprises')} className="border-2 border-white text-white font-bold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors">
-                ابدأ كمنشأة
+              <button onClick={() => chooseMode('enterprises')} className="border-2 border-white/60 text-white font-medium px-6 py-3 rounded-xl hover:bg-white/10 transition-colors text-sm">
+                أمثّل منشأة
               </button>
             </div>
           </div>
@@ -677,7 +670,7 @@ export function LandingPage() {
                     />
                     <button onClick={handleStart}
                       className="bg-primary-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-colors flex-shrink-0 flex items-center gap-1.5">
-                      بحث <ArrowLeft size={14} />
+                      اطلب <ArrowLeft size={14} />
                     </button>
                   </div>
                 </div>
@@ -695,10 +688,10 @@ export function LandingPage() {
 
                 {/* Stats */}
                 <div className="flex justify-center gap-6 sm:gap-12 text-center mb-8">
-                  {[['جديد', 'قيد الإطلاق'], ['موثوق', 'عمال معتمدون'], ['آمن', 'دفع مضمون'], ['٢٤/٧', 'دعم متواصل']].map(([v, l]) => (
+                  {[['✍️', 'اكتب طلبك بكلامك'], ['🤝', 'تتفق على السعر أولاً'], ['🔒', 'دفع محفوظ لين الإنجاز'], ['💬', 'محادثة داخل المنصة']].map(([v, l]) => (
                     <div key={l}>
-                      <div className="text-2xl sm:text-3xl font-black text-primary-500">{v}</div>
-                      <div className="text-xs text-slate-400 mt-1">{l}</div>
+                      <div className="text-2xl sm:text-3xl">{v}</div>
+                      <div className="text-xs text-slate-500 mt-1">{l}</div>
                     </div>
                   ))}
                 </div>
@@ -728,57 +721,33 @@ export function LandingPage() {
               </div>
             </section>
 
-            {/* Top rated professionals */}
+            {/* أمثلة على ما يُطلب (توضيحية) */}
             <section className="py-16 px-4 bg-slate-50">
               <div className="max-w-5xl mx-auto">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h2 className="text-2xl font-black text-slate-900">المحترفون الأعلى تقييماً</h2>
-                    <p className="text-slate-500 text-sm mt-1">اختر من بين نخبة الفنيين الذين حازوا على ثقة آلاف العملاء</p>
-                  </div>
-                  <button onClick={() => setShowNewTask(true)} className="text-primary-500 text-sm font-semibold hover:underline">عرض الكل</button>
+                <div className="mb-8">
+                  <h2 className="text-2xl font-black text-slate-900">أمثلة على ما تقدر تطلبه</h2>
+                  <p className="text-slate-500 text-sm mt-1">اضغط على أي مثال وعدّله على كيفك — أو اكتب طلبك من الصفر</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {[
-                    { name: 'سارة المطيري', role: 'مساعدة إدارية وتنظيم', jobs: '+٣٠٠ مهمة', price: '٨٠', rating: '4.9' },
-                    { name: 'محمد الشهري', role: 'توصيل ومشاوير', jobs: '+٨٠٠ مهمة', price: '٥٠', rating: '4.8' },
-                    { name: 'نورة القحطاني', role: 'تصوير ومحتوى', jobs: '+٢٠٠ مهمة', price: '١٢٠', rating: '5.0' },
-                    { name: 'ريم الدوسري', role: 'استشارات تغذية وصحة', jobs: '+١٨٠ مهمة', price: '١٥٠', rating: '4.9' },
-                  ].map(({ name, role, jobs, price, rating }) => (
-                    <div key={name} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all group">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center text-primary-500 font-bold text-lg">
-                          {name[2]}
-                        </div>
-                        <span className="text-xs bg-green-100 text-green-600 font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                          <CheckCircle size={10} /> موثق
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-slate-900 text-sm mb-1">{name}</h4>
-                      <p className="text-slate-500 text-xs mb-2">{role}</p>
-                      <div className="flex items-center gap-1 mb-3">
-                        <Star size={11} className="text-accent-500 fill-accent-500" />
-                        <span className="text-xs font-bold text-slate-700">{rating}</span>
-                        <span className="text-xs text-slate-400 mr-1">• {jobs}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400">يبدأ من <span className="text-slate-900 font-bold">{price} ر.س</span></span>
-                        <button onClick={() => setShowNewTask(true)}
-                          className="text-xs bg-primary-500 text-white px-3 py-1.5 rounded-lg hover:bg-primary-700 transition-colors font-bold">
-                          احجز الآن
-                        </button>
-                      </div>
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {REQUEST_IDEAS.map(r => (
+                    <button key={r.text}
+                      onClick={() => { trackEvent('request_started', user?.id, { source: 'home_example', len: r.text.length }); setTaskInput(r.text); setShowNewTask(true) }}
+                      className="flex items-center gap-3 bg-white border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-2xl p-4 text-right transition-all group">
+                      <span className="text-2xl flex-shrink-0">{r.icon}</span>
+                      <span className="flex-1 text-sm text-slate-700 group-hover:text-primary-600 font-medium">{r.text}</span>
+                      <ArrowLeft size={16} className="text-slate-300 group-hover:text-primary-500 flex-shrink-0" />
+                    </button>
                   ))}
                 </div>
+                <p className="text-xs text-slate-400 mt-4">أمثلة توضيحية — ليست مهام منفَّذة.</p>
               </div>
             </section>
 
             {/* CTA for workers */}
             <section className="py-16 px-4 bg-primary-500">
               <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-3xl font-black text-slate-900 mb-3">جاهز لتقديم خدماتك؟</h2>
-                <p className="text-blue-100 mb-8">انضم إلى آلاف المحترفين في آمرني وضاعف دخلك من خلال الوصول إلى آلاف العملاء في منطقتك.</p>
+                <h2 className="text-3xl font-black text-white mb-3">عندك وقت أو مهارة؟ اكسب منها</h2>
+                <p className="text-blue-100 mb-8">سجّل في دقيقة، واستقبل طلبات الناس في منطقتك — تنفّذ الي تقدر عليه وتحدد سعرك وتستلم فلوسك في محفظتك.</p>
                 <div className="flex flex-wrap justify-center gap-3">
                   <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }}
                     className="bg-white text-primary-500 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
@@ -929,7 +898,7 @@ export function LandingPage() {
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-14">
                 <h2 className="text-2xl sm:text-4xl font-black mb-3">الثقة والأمان</h2>
-                <p className="text-slate-400 max-w-lg mx-auto">جميع مقدمي الخدمة موثقون عبر منصة أبشر — ونضمن حقوقك المالية حتى اكتمال الخدمة.</p>
+                <p className="text-slate-400 max-w-lg mx-auto">نراجع بيانات مقدمي الخدمة قبل قبولهم — ودفعك محفوظ حتى تأكد اكتمال الخدمة.</p>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
                 <div className="space-y-2.5">
@@ -944,7 +913,7 @@ export function LandingPage() {
                 </div>
                 <div className="space-y-4">
                   <div className="bg-white border border-slate-200 rounded-2xl p-6">
-                    <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-secondary-500" /> موثق عبر أبشر</h3>
+                    <h3 className="font-bold text-lg mb-3 flex items-center gap-2"><Shield size={18} className="text-secondary-500" /> مراجعة هوية مقدمي الخدمة</h3>
                     <p className="text-slate-400 text-sm leading-relaxed">يخضع جميع مزودي الخدمة لدينا لعملية فحص وتدقيق صارمة لضمان أعلى معايير الجودة والأمان.</p>
                   </div>
                   <div className="bg-white border border-slate-200 rounded-2xl p-6">
@@ -992,7 +961,7 @@ export function LandingPage() {
                   <h3 className="text-xl font-bold text-slate-900 mb-5">قيمنا</h3>
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { emoji: '🆔', title: 'محترفون معتمدون', desc: 'موثق عبر أبشر وخاضع لفحص صارم' },
+                      { emoji: '🆔', title: 'محترفون معتمدون', desc: 'تُراجع بياناتهم قبل قبولهم في المنصة' },
                       { emoji: '⚡', title: 'استجابة سريعة', desc: 'يصلك رد المحترف في دقائق' },
                       { emoji: '💳', title: 'مدفوعات آمنة', desc: 'مدى وأبل باي — مضمون حتى الإنجاز' },
                       { emoji: '⭐', title: 'جودة مضمونة', desc: 'تقييمات حقيقية من عملاء حقيقيين' },
