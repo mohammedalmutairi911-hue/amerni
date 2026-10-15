@@ -335,6 +335,21 @@ export function LandingPage() {
           <div className="absolute inset-0 pointer-events-none opacity-60">
             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary-500/10 blur-3xl" />
           </div>
+          {/* شريط علوي: روابط المنصة + الدخول */}
+          <div className="relative max-w-5xl mx-auto -mt-6 mb-8 flex items-center justify-between gap-3 text-xs sm:text-sm">
+            <div className="flex items-center gap-3 sm:gap-5 text-slate-300 overflow-x-auto scrollbar-hide whitespace-nowrap">
+              <button onClick={() => { chooseMode('individuals'); setActiveTab('about') }} className="hover:text-white transition-colors">من نحن</button>
+              <button onClick={() => { chooseMode('individuals'); setActiveTab('privacy') }} className="hover:text-white transition-colors">الخصوصية</button>
+              <button onClick={() => { chooseMode('individuals'); setActiveTab('terms') }} className="hover:text-white transition-colors">الشروط</button>
+              <button onClick={() => { chooseMode('individuals'); setActiveTab('support') }} className="hover:text-white transition-colors">الدعم</button>
+              {profile?.role === 'admin' && <button onClick={() => navigate('admin')} className="text-primary-300 hover:text-white transition-colors">الإدارة</button>}
+            </div>
+            {user && profile ? (
+              <button onClick={() => goToUserHome(navigate, profile)} className="flex-shrink-0 bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-1.5 rounded-lg transition-colors">حسابي</button>
+            ) : (
+              <button onClick={() => { chooseMode('individuals'); setAuthDirectMode('login'); setShowAuthDirect(true) }} className="flex-shrink-0 bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-1.5 rounded-lg transition-colors">دخول</button>
+            )}
+          </div>
           <div className="relative max-w-3xl mx-auto text-center">
             <div className="bg-white inline-block rounded-3xl p-3.5 mb-5">
               <Logo full size={72} />
@@ -525,8 +540,12 @@ export function LandingPage() {
                 <p className="text-slate-400 text-sm">منصة الخدمات للأفراد والمنشآت</p>
               </div>
               <div className="flex flex-wrap gap-4 text-sm text-slate-400">
+                <button onClick={() => { chooseMode('individuals'); setActiveTab('about') }} className="hover:text-white transition-colors">من نحن</button>
                 <button onClick={() => { chooseMode('individuals'); setActiveTab('privacy') }} className="hover:text-white transition-colors">سياسة الخصوصية</button>
                 <button onClick={() => { chooseMode('individuals'); setActiveTab('terms') }} className="hover:text-white transition-colors">الشروط والأحكام</button>
+                {profile?.role === 'admin' && (
+                  <button onClick={() => navigate('admin')} className="text-primary-300 hover:text-white transition-colors">لوحة الإدارة</button>
+                )}
                 <button onClick={() => { chooseMode('individuals'); setActiveTab('support') }} className="hover:text-white transition-colors">الدعم الفني</button>
                 <button onClick={() => { chooseMode('individuals'); setActiveTab('contact') }} className="hover:text-white transition-colors">اتصل بنا</button>
               </div>
