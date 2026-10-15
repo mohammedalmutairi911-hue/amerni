@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Logo } from '../components/Logo'
-import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X } from 'lucide-react'
+import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X, ShoppingBag, FileText, Camera, Search, Truck, Clock, Gift, PenLine, Handshake, Lock, Building2, ShieldCheck, Scale, Landmark, BadgeCheck, Cpu, Users2 } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
 import { goHome, getHomePage, goToUserHome, profilePlatform, isUserInPortal } from '../lib/homePage'
@@ -24,14 +24,14 @@ const RESPONSE_PROMISE = 'نرد عليك خلال ساعة'
 
 // أمثلة على ما يُطلب — أمثلة توضيحية فقط (ليست مهام منفّذة) وتُعرض مُعنوَنة كذلك.
 const REQUEST_IDEAS = [
-  { icon: '🛒', text: 'أبي أحد يشتري لي غرض من السوق ويوصله لي' },
-  { icon: '📄', text: 'أحتاج أحد يراجع لي معاملة في دائرة حكومية' },
-  { icon: '📸', text: 'أبي أحد يصوّر لي موقع أو منتج ويرسل الصور' },
-  { icon: '🔍', text: 'أحتاج أحد يتحقق لي من معلومة أو عنوان على أرض الواقع' },
-  { icon: '🚗', text: 'أبي أحد يوصّل لي طرد أو يستلمه عني' },
-  { icon: '🧾', text: 'أحتاج أحد يقف لي في طابور أو يحجز لي موعد' },
-  { icon: '🎁', text: 'أبي أحد يجهّز لي هدية ويوصلها لشخص في مدينة ثانية' },
-  { icon: '✨', text: 'عندي طلب غريب ما لقيت له منصة…' },
+  { icon: ShoppingBag, text: 'أبي أحد يشتري لي غرض من السوق ويوصله لي' },
+  { icon: FileText, text: 'أحتاج أحد يراجع لي معاملة في دائرة حكومية' },
+  { icon: Camera, text: 'أبي أحد يصوّر لي موقع أو منتج ويرسل الصور' },
+  { icon: Search, text: 'أحتاج أحد يتحقق لي من معلومة أو عنوان على أرض الواقع' },
+  { icon: Truck, text: 'أبي أحد يوصّل لي طرد أو يستلمه عني' },
+  { icon: Clock, text: 'أحتاج أحد يقف لي في طابور أو يحجز لي موعد' },
+  { icon: Gift, text: 'أبي أحد يجهّز لي هدية ويوصلها لشخص في مدينة ثانية' },
+  { icon: Sparkles, text: 'عندي طلب غريب ما لقيت له منصة…' },
 ]
 
 const TRUST = [
@@ -371,7 +371,7 @@ export function LandingPage() {
               {REQUEST_IDEAS.slice(0, 5).map(r => (
                 <button key={r.text} onClick={() => startFromGateway(r.text)}
                   className="bg-white/5 hover:bg-white/15 border border-white/10 hover:border-primary-400/50 text-slate-200 text-xs sm:text-sm px-3.5 py-2 rounded-full transition-all">
-                  {r.icon} {r.text}
+                  <r.icon size={14} className="inline -mt-0.5 ml-1.5 text-primary-300" strokeWidth={1.75} />{r.text}
                 </button>
               ))}
             </div>
@@ -398,8 +398,8 @@ export function LandingPage() {
 
             {/* روابط ثانوية: المنشآت + التحقق من المورد */}
             <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs sm:text-sm text-slate-400">
-              <button onClick={() => chooseMode('enterprises')} className="hover:text-white underline-offset-4 hover:underline transition-colors">🏢 منشأة؟ خبراء عند الطلب للمنشآت</button>
-              <button onClick={() => navigate('verify')} className="hover:text-white underline-offset-4 hover:underline transition-colors">🛡️ تأكد من مورد قبل التعامل معه</button>
+              <button onClick={() => chooseMode('enterprises')} className="hover:text-white underline-offset-4 hover:underline transition-colors"><Building2 size={15} className="inline -mt-0.5 ml-1.5" />منشأة؟ خبراء عند الطلب للمنشآت</button>
+              <button onClick={() => navigate('verify')} className="hover:text-white underline-offset-4 hover:underline transition-colors"><ShieldCheck size={15} className="inline -mt-0.5 ml-1.5" />تأكد من مورد قبل التعامل معه</button>
             </div>
           </div>
         </section>
@@ -407,9 +407,9 @@ export function LandingPage() {
         {/* ===== نقاط الوعد (بدون أرقام مصطنعة) ===== */}
         <section className="py-8 px-4 bg-white border-b border-slate-100">
           <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-            {[['✍️', 'اكتب طلبك بكلامك'], ['🤝', 'تتفق على السعر أولاً'], ['🔒', 'الدفع محفوظ لين تأكيد الإنجاز'], ['💬', 'محادثة داخل المنصة']].map(([i, l]) => (
+            {[[PenLine, 'اكتب طلبك بكلامك'], [Handshake, 'تتفق على السعر أولاً'], [Lock, 'الدفع محفوظ لين تأكيد الإنجاز'], [MessageCircle, 'محادثة داخل المنصة']].map(([I, l]: any) => (
               <div key={l}>
-                <div className="text-2xl sm:text-3xl mb-1">{i}</div>
+                <div className="w-12 h-12 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center mx-auto mb-2"><I size={22} strokeWidth={1.75} /></div>
                 <div className="text-xs sm:text-sm text-slate-600 font-medium leading-snug">{l}</div>
               </div>
             ))}
@@ -427,13 +427,33 @@ export function LandingPage() {
               {REQUEST_IDEAS.map(r => (
                 <button key={r.text} onClick={() => startFromGateway(r.text)}
                   className="flex items-center gap-3 bg-white border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-2xl p-4 text-right transition-all group">
-                  <span className="text-2xl flex-shrink-0">{r.icon}</span>
+                  <span className="w-10 h-10 rounded-xl bg-primary-50 group-hover:bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0 transition-colors"><r.icon size={20} strokeWidth={1.75} /></span>
                   <span className="flex-1 text-sm text-slate-700 group-hover:text-primary-600 font-medium">{r.text}</span>
                   <ArrowLeft size={16} className="text-slate-300 group-hover:text-primary-500 flex-shrink-0" />
                 </button>
               ))}
             </div>
             <p className="text-center text-xs text-slate-400 mt-4">أمثلة توضيحية — ليست مهام منفَّذة</p>
+          </div>
+        </section>
+
+        {/* ===== أمرني للمنشآت (قسم ثانوي — محفوظ بالكامل) ===== */}
+        <section className="py-14 px-4 bg-slate-900">
+          <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8">
+            <div className="flex-1 text-center lg:text-right">
+              <p className="text-accent-400 text-xs font-bold mb-2">أمرني للمنشآت</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">خبراء معتمدون عند الطلب لمنشأتك</h2>
+              <p className="text-slate-400 text-sm leading-relaxed mb-5">حوكمة، توطين، قانوني، مالي وزكاة، جودة وآيزو، أمن سيبراني — اطلب خبيراً بدل ما توظف بدوام كامل.</p>
+              <button onClick={() => chooseMode('enterprises')} className="bg-white text-slate-900 font-bold text-sm px-6 py-2.5 rounded-xl hover:bg-slate-100 transition-colors">استكشف خدمات المنشآت</button>
+            </div>
+            <div className="grid grid-cols-3 gap-3 w-full lg:w-auto">
+              {[[Landmark, 'حوكمة'], [Users2, 'توطين'], [Scale, 'قانوني'], [FileText, 'مالي/زكاة'], [BadgeCheck, 'جودة/آيزو'], [Cpu, 'أمن سيبراني']].map(([I, l]: any) => (
+                <button key={l} onClick={() => chooseMode('enterprises')} className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-4 text-center transition-colors">
+                  <I size={22} strokeWidth={1.75} className="text-accent-400 mx-auto mb-2" />
+                  <p className="text-xs text-slate-200 font-medium">{l}</p>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -688,9 +708,9 @@ export function LandingPage() {
 
                 {/* Stats */}
                 <div className="flex justify-center gap-6 sm:gap-12 text-center mb-8">
-                  {[['✍️', 'اكتب طلبك بكلامك'], ['🤝', 'تتفق على السعر أولاً'], ['🔒', 'دفع محفوظ لين الإنجاز'], ['💬', 'محادثة داخل المنصة']].map(([v, l]) => (
+                  {[[PenLine, 'اكتب طلبك بكلامك'], [Handshake, 'تتفق على السعر أولاً'], [Lock, 'دفع محفوظ لين الإنجاز'], [MessageCircle, 'محادثة داخل المنصة']].map(([I, l]: any) => (
                     <div key={l}>
-                      <div className="text-2xl sm:text-3xl">{v}</div>
+                      <div className="w-12 h-12 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center mx-auto mb-2"><I size={22} strokeWidth={1.75} /></div>
                       <div className="text-xs text-slate-500 mt-1">{l}</div>
                     </div>
                   ))}
@@ -733,7 +753,7 @@ export function LandingPage() {
                     <button key={r.text}
                       onClick={() => { trackEvent('request_started', user?.id, { source: 'home_example', len: r.text.length }); setTaskInput(r.text); setShowNewTask(true) }}
                       className="flex items-center gap-3 bg-white border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-2xl p-4 text-right transition-all group">
-                      <span className="text-2xl flex-shrink-0">{r.icon}</span>
+                      <span className="w-10 h-10 rounded-xl bg-primary-50 group-hover:bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0 transition-colors"><r.icon size={20} strokeWidth={1.75} /></span>
                       <span className="flex-1 text-sm text-slate-700 group-hover:text-primary-600 font-medium">{r.text}</span>
                       <ArrowLeft size={16} className="text-slate-300 group-hover:text-primary-500 flex-shrink-0" />
                     </button>
