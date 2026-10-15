@@ -141,8 +141,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
       return
     }
     
-    if (!task.category) { setError('حدد تصنيف الطلب'); return }
-    if (task.category === 'أخرى' && !task.customCategory.trim()) { setError('اكتب التصنيف في خانة أخرى'); return }
+    // التصنيف اختياري — يُصنَّف تلقائياً أو يبقى "أخرى" (أي طلب مقبول)
     if (user) {
       setLoading(true)
       saveTask(user.id).then(ok => {
@@ -257,7 +256,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             {/* Category - buttons + free text for أخرى */}
             <div>
               <label className="block text-xs text-slate-500 mb-2 font-medium flex items-center gap-1.5">
-                <Tag size={12} className="text-primary-500" /> التصنيف *
+                <Tag size={12} className="text-primary-500" /> التصنيف (اختياري)
                 {task.category && task.category !== 'أخرى' && !task.customCategory && (
                   <span className="text-primary-400 text-xs">— تم اكتشافه تلقائياً ✨</span>
                 )}
