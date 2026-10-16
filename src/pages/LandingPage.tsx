@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Logo } from '../components/Logo'
-import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X, ShoppingBag, FileText, Camera, Search, Truck, Clock, Gift, PenLine, Handshake, Lock, Building2, ShieldCheck, Scale, Landmark, BadgeCheck, Cpu, Users2, ChevronDown, type LucideIcon } from 'lucide-react'
+import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X, ShoppingBag, FileText, Camera, Search, Truck, Clock, Gift, PenLine, Handshake, Lock, Building2, ShieldCheck, Scale, Landmark, BadgeCheck, Cpu, Users2 } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
 import { goHome, getHomePage, goToUserHome, profilePlatform, isUserInPortal } from '../lib/homePage'
 import { supabase } from '../lib/supabase'
 import { trackEvent } from '../lib/analytics'
-import { LANDING_IMG, type LandingImgKey } from '../lib/landingImages'
 import { NewTaskPage } from './NewTaskPage'
 import { ServiceBrowsePage } from './ServiceBrowsePage'
 
@@ -25,92 +24,15 @@ const RESPONSE_PROMISE = 'نرد عليك خلال ساعة'
 
 // أمثلة على ما يُطلب — أمثلة توضيحية فقط (ليست مهام منفّذة) وتُعرض مُعنوَنة كذلك.
 const REQUEST_IDEAS = [
-  { icon: ShoppingBag, label: 'تسوّق وتوصيل', img: 'shopping' as LandingImgKey, text: 'أبي أحد يشتري لي غرض من السوق ويوصله لي' },
-  { icon: FileText, label: 'معاملات ومراجعات', img: 'gov' as LandingImgKey, text: 'أحتاج أحد يراجع لي معاملة في دائرة حكومية' },
-  { icon: Camera, label: 'تصوير', img: 'photo' as LandingImgKey, text: 'أبي أحد يصوّر لي موقع أو منتج ويرسل الصور' },
-  { icon: Search, label: 'تحقق ميداني', img: 'verify' as LandingImgKey, text: 'أحتاج أحد يتحقق لي من معلومة أو عنوان على أرض الواقع' },
-  { icon: Truck, label: 'توصيل واستلام', img: 'delivery' as LandingImgKey, text: 'أبي أحد يوصّل لي طرد أو يستلمه عني' },
-  { icon: Clock, label: 'حجز وطوابير', img: 'queue' as LandingImgKey, text: 'أحتاج أحد يقف لي في طابور أو يحجز لي موعد' },
-  { icon: Gift, label: 'هدايا', img: 'gift' as LandingImgKey, text: 'أبي أحد يجهّز لي هدية ويوصلها لشخص في مدينة ثانية' },
-  { icon: Sparkles, label: 'طلب خاص', img: 'other' as LandingImgKey, text: 'عندي طلب غريب ما لقيت له منصة…' },
+  { icon: ShoppingBag, text: 'أبي أحد يشتري لي غرض من السوق ويوصله لي' },
+  { icon: FileText, text: 'أحتاج أحد يراجع لي معاملة في دائرة حكومية' },
+  { icon: Camera, text: 'أبي أحد يصوّر لي موقع أو منتج ويرسل الصور' },
+  { icon: Search, text: 'أحتاج أحد يتحقق لي من معلومة أو عنوان على أرض الواقع' },
+  { icon: Truck, text: 'أبي أحد يوصّل لي طرد أو يستلمه عني' },
+  { icon: Clock, text: 'أحتاج أحد يقف لي في طابور أو يحجز لي موعد' },
+  { icon: Gift, text: 'أبي أحد يجهّز لي هدية ويوصلها لشخص في مدينة ثانية' },
+  { icon: Sparkles, text: 'عندي طلب غريب ما لقيت له منصة…' },
 ]
-
-
-// صورة مع بديل أنيق: لو الملف غير موجود تظهر بطاقة تدرّج + أيقونة بدل صورة مكسورة
-function Photo({ src, icon: Icon, className = '' }: { src: string; icon: LucideIcon; className?: string }) {
-  const [failed, setFailed] = useState(false)
-  if (failed) {
-    return (
-      <div className={`bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 flex items-center justify-center ${className}`}>
-        <Icon size={44} strokeWidth={1.25} className="text-white/25" />
-      </div>
-    )
-  }
-  return <img src={src} alt="" loading="lazy" onError={() => setFailed(true)} className={`object-cover ${className}`} />
-}
-
-function PhotoCard({ idea, onPick, photoClass = 'aspect-[4/5]', tone = 'dark' }: { idea: typeof REQUEST_IDEAS[number]; onPick: (t: string) => void; photoClass?: string; tone?: 'dark' | 'light' }) {
-  // نتحقق أن الصورة موجودة فعلاً: بدونها تظهر بطاقة مدمجة أنيقة (لا مربعات فارغة كبيرة)
-  const [hasPhoto, setHasPhoto] = useState(false)
-  const src = LANDING_IMG[idea.img]
-  useEffect(() => {
-    const im = new Image()
-    im.onload = () => setHasPhoto(im.naturalWidth > 0)
-    im.onerror = () => setHasPhoto(false)
-    im.src = src
-  }, [src])
-
-  const focus = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-300'
-  if (!hasPhoto) {
-    const dark = tone === 'dark'
-    return (
-      <button onClick={() => onPick(idea.text)}
-        className={`group w-full flex items-center gap-3 rounded-2xl p-3.5 text-right transition-colors border ${focus} ${dark ? 'bg-white/10 hover:bg-white/15 border-white/10 text-white' : 'bg-white hover:bg-primary-50 border-slate-200 hover:border-primary-300 text-slate-800 shadow-sm'}`}>
-        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${dark ? 'bg-white/10 text-primary-200' : 'bg-primary-50 text-primary-600'}`}>
-          <idea.icon size={20} strokeWidth={1.75} />
-        </span>
-        <span className="text-sm font-medium leading-snug">{idea.label}</span>
-      </button>
-    )
-  }
-  return (
-    <button onClick={() => onPick(idea.text)}
-      className={`group relative overflow-hidden rounded-2xl text-right block w-full ${photoClass} ${focus}`}>
-      <img src={src} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
-      <div className="absolute bottom-0 inset-x-0 p-3.5 flex items-center gap-2 text-white">
-        <idea.icon size={16} strokeWidth={1.75} className="text-primary-200 flex-shrink-0" />
-        <span className="text-sm font-medium">{idea.label}</span>
-      </div>
-    </button>
-  )
-}
-
-const FAQ = [
-  { q: 'لازم أسجّل قبل ما أكتب طلبي؟', a: 'لا. تكتب طلبك أولاً، وتسجّل في آخر خطوة عشان نربطه بحسابك.' },
-  { q: 'كم أنتظر لين يرد علي أحد؟', a: RESPONSE_PROMISE + '.' },
-  { q: 'متى أدفع؟', a: 'تتفق على السعر أولاً. الدفع يتم عبر بوابة الدفع ويبقى محفوظاً في المنصة، ولا يصل لمقدم الخدمة إلا بعد ما تأكّد اكتمال الطلب.' },
-  { q: 'أي طلب ينقبل؟', a: 'أي طلب ينفَّذ على أرض الواقع ويتوافق مع الأنظمة السعودية. الطلبات المخالفة تُرفض تلقائياً.' },
-  { q: 'كيف أشتغل معكم كمقدم خدمة؟', a: 'تسجّل كمقدم خدمة وتُراجع بياناتك قبل القبول، وبعدها تستقبل الطلبات المناسبة لمهاراتك ومدينتك وتستلم أرباحك في محفظتك.' },
-]
-
-function FaqList() {
-  const [open, setOpen] = useState<number | null>(0)
-  return (
-    <div className="divide-y divide-slate-200 border-y border-slate-200">
-      {FAQ.map((f, i) => (
-        <div key={f.q}>
-          <button onClick={() => setOpen(open === i ? null : i)} aria-expanded={open === i}
-            className="w-full flex items-center justify-between gap-4 py-4 text-right">
-            <span className="font-medium text-slate-900">{f.q}</span>
-            <ChevronDown size={18} className={`text-slate-400 flex-shrink-0 transition-transform ${open === i ? 'rotate-180' : ''}`} />
-          </button>
-          {open === i && <p className="pb-4 text-sm text-slate-600 leading-relaxed max-w-prose">{f.a}</p>}
-        </div>
-      ))}
-    </div>
-  )
-}
 
 const TRUST = [
   'مراجعة بيانات مقدمي الخدمة قبل قبولهم في المنصة',
@@ -408,84 +330,99 @@ export function LandingPage() {
     ]
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900" dir="rtl">
-        {/* ===== شريط علوي: الشعار + تبديل الجمهور + الدخول ===== */}
-        <header className="bg-slate-950 border-b border-white/10">
-          <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-              <div className="bg-white rounded-xl px-2 py-1 flex-shrink-0"><Logo size={30} /></div>
+        {/* ===== Hero + بوابة الاختيار ===== */}
+        <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 px-4 pt-14 pb-20 overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none opacity-60">
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary-500/10 blur-3xl" />
+          </div>
+          {/* شريط علوي: روابط المنصة + الدخول */}
+          <div className="relative max-w-5xl mx-auto -mt-6 mb-8 flex items-center justify-between gap-3 text-xs sm:text-sm">
+            <div className="flex items-center gap-3 sm:gap-5 text-slate-300 overflow-x-auto scrollbar-hide whitespace-nowrap">
               {/* تبديل الجمهور: أفراد (الحالي) | منشآت (يفتح صفحة المنشآت) */}
-              <nav aria-label="نوع الحساب" className="flex items-center bg-white/10 rounded-full p-1 text-xs sm:text-sm">
+              <nav aria-label="نوع الحساب" className="flex items-center bg-white/10 rounded-full p-1 flex-shrink-0">
                 <span className="bg-white text-slate-900 font-bold rounded-full px-3 sm:px-4 py-1.5">أفراد</span>
-                <button onClick={() => chooseMode('enterprises')}
-                  className="flex items-center gap-1.5 text-slate-200 hover:text-white rounded-full px-3 sm:px-4 py-1.5 transition-colors">
-                  <span className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0">
-                    <Photo src={LANDING_IMG.enterprises} icon={Building2} className="w-full h-full" />
-                  </span>
-                  منشآت
+                <button onClick={() => chooseMode('enterprises')} className="flex items-center gap-1.5 text-slate-200 hover:text-white rounded-full px-3 sm:px-4 py-1.5 transition-colors">
+                  <Building2 size={14} /> منشآت
                 </button>
               </nav>
+              <button onClick={() => { chooseMode('individuals'); setActiveTab('about') }} className="hover:text-white transition-colors">من نحن</button>
+              <button onClick={() => { chooseMode('individuals'); setActiveTab('privacy') }} className="hover:text-white transition-colors">الخصوصية</button>
+              <button onClick={() => { chooseMode('individuals'); setActiveTab('terms') }} className="hover:text-white transition-colors">الشروط</button>
+              <button onClick={() => { chooseMode('individuals'); setActiveTab('support') }} className="hover:text-white transition-colors">الدعم</button>
+              {profile?.role === 'admin' && <button onClick={() => navigate('admin')} className="text-primary-300 hover:text-white transition-colors">الإدارة</button>}
             </div>
-            <div className="flex items-center gap-3 sm:gap-5 text-xs sm:text-sm">
-              <div className="hidden md:flex items-center gap-5 text-slate-300">
-                <button onClick={() => { chooseMode('individuals'); setActiveTab('about') }} className="hover:text-white transition-colors">من نحن</button>
-                <button onClick={() => { chooseMode('individuals'); setActiveTab('support') }} className="hover:text-white transition-colors">الدعم</button>
-                {profile?.role === 'admin' && <button onClick={() => navigate('admin')} className="text-primary-300 hover:text-white transition-colors">الإدارة</button>}
-              </div>
-              {user && profile ? (
-                <button onClick={() => goToUserHome(navigate, profile)} className="bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-lg transition-colors">حسابي</button>
-              ) : (
-                <button onClick={() => { chooseMode('individuals'); setAuthDirectMode('login'); setShowAuthDirect(true) }} className="bg-white text-slate-900 font-bold px-4 py-2 rounded-lg hover:bg-slate-100 transition-colors">دخول</button>
-              )}
-            </div>
+            {user && profile ? (
+              <button onClick={() => goToUserHome(navigate, profile)} className="flex-shrink-0 bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-1.5 rounded-lg transition-colors">حسابي</button>
+            ) : (
+              <button onClick={() => { chooseMode('individuals'); setAuthDirectMode('login'); setShowAuthDirect(true) }} className="flex-shrink-0 bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-1.5 rounded-lg transition-colors">دخول</button>
+            )}
           </div>
-        </header>
+          <div className="relative max-w-3xl mx-auto text-center">
+            <div className="bg-white inline-block rounded-3xl p-3.5 mb-5">
+              <Logo full size={72} />
+            </div>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4 leading-[1.15]">
+              استأجر شخص{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-400 to-accent-400">لتنفيذ مهامك!</span>
+            </h1>
+            <p className="text-slate-300 text-sm sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+              اكتب أي طلب — حتى لو ما لقيت له منصة — ويتولاه شخص من أمرني. بدون تسجيل أولاً، وبدون ما تدور وتقارن.
+            </p>
 
-        {/* ===== Hero ===== */}
-        <section className="relative bg-gradient-to-br from-slate-950 via-primary-950 to-primary-900 px-4 py-12 sm:py-20 overflow-hidden">
-          <div className="relative max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-            <div className="min-w-0">
-              <h1 className="text-3xl sm:text-5xl lg:text-5xl font-bold text-white mb-5 leading-[1.3] [text-wrap:balance]">
-                استأجر شخص لتنفيذ مهامك
-              </h1>
-              <p className="text-slate-300 text-base sm:text-lg max-w-lg mb-8 leading-relaxed">
-                اكتب أي طلب، حتى لو ما لقيت له منصة، ويتولاه شخص من أمرني. بدون تسجيل أولاً وبدون ما تدور وتقارن.
-              </p>
+            {/* صندوق الطلب الواحد — الوعد الأساسي */}
+            <form
+              onSubmit={e => { e.preventDefault(); startFromGateway(taskInput) }}
+              className="max-w-xl mx-auto mb-3"
+            >
+              <div className="flex items-center gap-2 bg-white rounded-2xl p-2 shadow-2xl shadow-black/20 focus-within:ring-4 focus-within:ring-primary-400/40 transition-all">
+                <input
+                  value={taskInput} onChange={e => setTaskInput(e.target.value)}
+                  placeholder={visible ? EXAMPLES[idx] : ''}
+                  aria-label="اكتب طلبك"
+                  className="flex-1 min-w-0 bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base px-3 py-3 outline-none text-right"
+                />
+                <button type="submit"
+                  className="bg-primary-500 hover:bg-primary-700 text-white font-bold text-sm sm:text-base px-5 sm:px-7 py-3 rounded-xl transition-colors flex-shrink-0 flex items-center gap-1.5">
+                  اطلب <ArrowLeft size={16} />
+                </button>
+              </div>
+            </form>
+            <p className="text-primary-300 text-xs sm:text-sm mb-6 font-medium">{RESPONSE_PROMISE} · تتفاوض على السعر قبل ما تدفع</p>
 
-              <form onSubmit={e => { e.preventDefault(); startFromGateway(taskInput) }} className="max-w-xl mb-3">
-                <div className="flex items-center gap-2 bg-white rounded-2xl p-2 shadow-2xl shadow-black/30 focus-within:ring-4 focus-within:ring-primary-300/40 transition-all">
-                  <input
-                    value={taskInput} onChange={e => setTaskInput(e.target.value)}
-                    placeholder={visible ? EXAMPLES[idx] : ''}
-                    aria-label="اكتب طلبك"
-                    className="flex-1 min-w-0 bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base px-3 py-3 outline-none text-right"
-                  />
-                  <button type="submit"
-                    className="bg-primary-500 hover:bg-primary-700 text-white font-bold text-sm sm:text-base px-5 sm:px-7 py-3 rounded-xl transition-colors flex-shrink-0 flex items-center gap-1.5">
-                    اطلب <ArrowLeft size={16} />
-                  </button>
+            <div className="flex flex-wrap justify-center gap-2 mb-10">
+              {REQUEST_IDEAS.slice(0, 5).map(r => (
+                <button key={r.text} onClick={() => startFromGateway(r.text)}
+                  className="bg-white/5 hover:bg-white/15 border border-white/10 hover:border-primary-400/50 text-slate-200 text-xs sm:text-sm px-3.5 py-2 rounded-full transition-all">
+                  <r.icon size={14} className="inline -mt-0.5 ml-1.5 text-primary-300" strokeWidth={1.75} />{r.text}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-300 mb-6">
+              {['تواصل داخل المنصة', 'دفع محفوظ لين تأكيد الإنجاز', 'بياناتك محمية'].map(t => (
+                <div key={t} className="flex items-center gap-1.5">
+                  <CheckCircle size={11} className="text-primary-400" />
+                  <span>{t}</span>
                 </div>
-              </form>
-              <p className="text-primary-200 text-sm mb-8">{RESPONSE_PROMISE}، وتتفاوض على السعر قبل ما تدفع.</p>
-
-              <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs sm:text-sm text-slate-300">
-                {['تواصل داخل المنصة', 'دفع محفوظ لين تأكيد الإنجاز', 'بياناتك محمية'].map(t => (
-                  <div key={t} className="flex items-center gap-1.5"><CheckCircle size={13} className="text-primary-300" /><span>{t}</span></div>
-                ))}
-              </div>
+              ))}
             </div>
 
-            {/* بطاقات المهام — صور عند توفرها، وإلا بطاقات مدمجة. كل بطاقة تبدأ طلباً */}
-            <div>
-              <p className="text-slate-400 text-sm mb-3">أو ابدأ من مثال:</p>
-              <div className="grid grid-cols-2 gap-3">
-                {REQUEST_IDEAS.slice(0, 6).map(r => (
-                  <PhotoCard key={r.text} idea={r} onPick={startFromGateway} photoClass="aspect-[4/3]" />
-                ))}
-              </div>
+            {/* اختصار "لوحتي" للمستخدم المسجَّل */}
+            {user && profile && (
+              <button
+                onClick={() => goToUserHome(navigate, profile)}
+                className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 px-4 py-2 rounded-full transition-all"
+              >
+                <span>الذهاب للوحتي</span>
+                <span aria-hidden>←</span>
+              </button>
+            )}
+
+            {/* روابط ثانوية: المنشآت + التحقق من المورد */}
+            <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs sm:text-sm text-slate-400">
+              <button onClick={() => chooseMode('enterprises')} className="hover:text-white underline-offset-4 hover:underline transition-colors"><Building2 size={15} className="inline -mt-0.5 ml-1.5" />منشأة؟ خبراء عند الطلب للمنشآت</button>
+              <button onClick={() => navigate('verify')} className="hover:text-white underline-offset-4 hover:underline transition-colors"><ShieldCheck size={15} className="inline -mt-0.5 ml-1.5" />تأكد من مورد قبل التعامل معه</button>
             </div>
-          </div>
-          <div className="relative max-w-6xl mx-auto mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs sm:text-sm text-slate-400">
-            <button onClick={() => navigate('verify')} className="flex items-center gap-1.5 hover:text-white transition-colors"><ShieldCheck size={15} />تأكد من مورد قبل التعامل معه</button>
           </div>
         </section>
 
@@ -526,7 +463,8 @@ export function LandingPage() {
         <section className="py-14 px-4 bg-slate-900">
           <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8">
             <div className="flex-1 text-center lg:text-right">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">أمرني للمنشآت: خبراء معتمدون عند الطلب</h2>
+              <p className="text-accent-400 text-xs font-bold mb-2">أمرني للمنشآت</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">خبراء معتمدون عند الطلب لمنشأتك</h2>
               <p className="text-slate-400 text-sm leading-relaxed mb-5">حوكمة، توطين، قانوني، مالي وزكاة، جودة وآيزو، أمن سيبراني — اطلب خبيراً بدل ما توظف بدوام كامل.</p>
               <button onClick={() => chooseMode('enterprises')} className="bg-white text-slate-900 font-bold text-sm px-6 py-2.5 rounded-xl hover:bg-slate-100 transition-colors">استكشف خدمات المنشآت</button>
             </div>
@@ -562,52 +500,25 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* ===== مثال من الطلب للإنجاز (تسلسل فعلي) ===== */}
+        {/* ===== طريقة العمل ===== */}
         <section className="py-16 px-4 bg-slate-50">
-          <div className="max-w-5xl mx-auto grid lg:grid-cols-5 gap-10 items-start">
-            <div className="lg:col-span-2">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">من الطلب للإنجاز</h2>
-              <p className="text-slate-600 leading-relaxed">هذا مثال على مسار طلب عادي، نفس الخطوات تنطبق على أي شيء تطلبه.</p>
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-black text-slate-900 mb-2">كيف يعمل آمرني؟</h2>
+              <p className="text-slate-500">من الطلب للإنجاز في دقائق</p>
             </div>
-            <ol className="lg:col-span-3 space-y-0 border-r-2 border-primary-100 pr-6">
-              {[
-                ['تكتب طلبك', '«أبي أحد يشتري لي غرض من السوق ويوصله لي» بكلامك، بدون نماذج طويلة.'],
-                ['يصلك عرض بسعر', 'مقدم خدمة يقبل الطلب ويقترح سعراً. توافق، أو تتفاوض، أو ترفض.'],
-                ['تدفع والمبلغ ينحفظ', 'الدفع يبقى محفوظاً في المنصة ولا يُحوَّل لمقدم الخدمة قبل ما تأكّد الاستلام.'],
-                ['تتابع وتؤكد', 'محادثة داخل المنصة طوال التنفيذ. لما يوصلك الطلب تؤكّد ويُحوَّل المبلغ.'],
-              ].map(([t, d], i) => (
-                <li key={t} className="relative pb-8 last:pb-0">
-                  <span className="absolute -right-[2.1rem] top-0.5 w-6 h-6 rounded-full bg-primary-500 text-white text-xs font-bold flex items-center justify-center">{i + 1}</span>
-                  <h3 className="font-bold text-slate-900 mb-1">{t}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed max-w-md">{d}</p>
-                </li>
+            <div className="grid md:grid-cols-3 gap-6">
+              {STEPS.map(({ n, icon: Icon, title, desc }) => (
+                <div key={n} className="bg-white border border-slate-200 rounded-2xl p-7 hover:shadow-md transition-all">
+                  <div className="text-5xl font-black text-slate-100 mb-4">{n}</div>
+                  <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center mb-4">
+                    <Icon size={19} className="text-primary-500" />
+                  </div>
+                  <h3 className="font-bold text-slate-900 mb-2 text-lg">{title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
+                </div>
               ))}
-            </ol>
-          </div>
-        </section>
-
-        {/* ===== مقدمو الخدمة ===== */}
-        <section className="bg-white">
-          <div className="max-w-6xl mx-auto grid md:grid-cols-2">
-            <div className="relative min-h-[260px] md:min-h-[360px]">
-              <Photo src={LANDING_IMG.provider} icon={Users} className="absolute inset-0 w-full h-full" />
             </div>
-            <div className="px-6 py-12 md:py-16 flex flex-col justify-center">
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">عندك وقت أو مهارة؟ اكسب منها</h2>
-              <p className="text-slate-600 leading-relaxed mb-6 max-w-md">سجّل كمقدم خدمة، وتُراجع بياناتك قبل القبول، واستقبل الطلبات المناسبة لمدينتك ومهاراتك. تحدد سعرك وتستلم أرباحك في محفظتك.</p>
-              <div>
-                <button onClick={() => { chooseMode('individuals'); setAuthDirectMode('register'); setShowAuthDirect(true) }}
-                  className="bg-primary-500 hover:bg-primary-700 text-white font-bold px-7 py-3 rounded-xl transition-colors">سجّل كمقدم خدمة</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== أسئلة شائعة ===== */}
-        <section className="py-16 px-4 bg-white">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">أسئلة شائعة</h2>
-            <FaqList />
           </div>
         </section>
 
@@ -813,13 +724,14 @@ export function LandingPage() {
                   </div>
                 </div>
 
-                {/* بطاقات صور: ابدأ من مثال */}
-                <p className="text-sm text-slate-500 mb-3 text-right">ابدأ من مثال:</p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
-                  {REQUEST_IDEAS.slice(0, 4).map(r => (
-                    <PhotoCard key={r.text} idea={r} tone="light"
-                      onPick={t => { trackEvent('request_started', user?.id, { source: 'home_card', len: t.length }); setTaskInput(t); setShowNewTask(true) }}
-                      photoClass="aspect-[4/5]" />
+                {/* Popular services */}
+                <p className="text-xs text-slate-400 mb-3">خدمات شائعة:</p>
+                <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-10 px-2">
+                  {['🚗 توصيل','📸 تصوير','🔍 تحقق','🛍️ تسوق','📚 تعليم','✨ أخرى'].map(cat => (
+                    <button key={cat} onClick={() => { setTaskInput(cat.split(' ')[1]); setShowNewTask(true) }}
+                      className="px-4 py-2 bg-white border border-slate-200 hover:border-primary-500 hover:text-primary-500 rounded-full text-sm text-slate-600 transition-all shadow-sm">
+                      {cat}
+                    </button>
                   ))}
                 </div>
 
