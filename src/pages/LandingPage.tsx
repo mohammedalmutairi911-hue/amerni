@@ -49,11 +49,34 @@ function Photo({ src, icon: Icon, className = '' }: { src: string; icon: LucideI
   return <img src={src} alt="" loading="lazy" onError={() => setFailed(true)} className={`object-cover ${className}`} />
 }
 
-function PhotoCard({ idea, onPick, className = '' }: { idea: typeof REQUEST_IDEAS[number]; onPick: (t: string) => void; className?: string }) {
+function PhotoCard({ idea, onPick, photoClass = 'aspect-[4/5]', tone = 'dark' }: { idea: typeof REQUEST_IDEAS[number]; onPick: (t: string) => void; photoClass?: string; tone?: 'dark' | 'light' }) {
+  // نتحقق أن الصورة موجودة فعلاً: بدونها تظهر بطاقة مدمجة أنيقة (لا مربعات فارغة كبيرة)
+  const [hasPhoto, setHasPhoto] = useState(false)
+  const src = LANDING_IMG[idea.img]
+  useEffect(() => {
+    const im = new Image()
+    im.onload = () => setHasPhoto(im.naturalWidth > 0)
+    im.onerror = () => setHasPhoto(false)
+    im.src = src
+  }, [src])
+
+  const focus = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-300'
+  if (!hasPhoto) {
+    const dark = tone === 'dark'
+    return (
+      <button onClick={() => onPick(idea.text)}
+        className={`group w-full flex items-center gap-3 rounded-2xl p-3.5 text-right transition-colors border ${focus} ${dark ? 'bg-white/10 hover:bg-white/15 border-white/10 text-white' : 'bg-white hover:bg-primary-50 border-slate-200 hover:border-primary-300 text-slate-800 shadow-sm'}`}>
+        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${dark ? 'bg-white/10 text-primary-200' : 'bg-primary-50 text-primary-600'}`}>
+          <idea.icon size={20} strokeWidth={1.75} />
+        </span>
+        <span className="text-sm font-medium leading-snug">{idea.label}</span>
+      </button>
+    )
+  }
   return (
     <button onClick={() => onPick(idea.text)}
-      className={`group relative overflow-hidden rounded-2xl text-right focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-300 ${className}`}>
-      <Photo src={LANDING_IMG[idea.img]} icon={idea.icon} className="absolute inset-0 w-full h-full transition-transform duration-500 group-hover:scale-105" />
+      className={`group relative overflow-hidden rounded-2xl text-right block w-full ${photoClass} ${focus}`}>
+      <img src={src} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
       <div className="absolute bottom-0 inset-x-0 p-3.5 flex items-center gap-2 text-white">
         <idea.icon size={16} strokeWidth={1.75} className="text-primary-200 flex-shrink-0" />
@@ -451,15 +474,13 @@ export function LandingPage() {
               </div>
             </div>
 
-            {/* فسيفساء صور المهام الحقيقية — كل بطاقة تبدأ طلباً */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="space-y-3 sm:space-y-4">
-                <PhotoCard idea={REQUEST_IDEAS[0]} onPick={startFromGateway} className="block w-full aspect-square sm:aspect-[4/5]" />
-                <PhotoCard idea={REQUEST_IDEAS[2]} onPick={startFromGateway} className="block w-full aspect-[4/3] sm:aspect-square" />
-              </div>
-              <div className="space-y-3 sm:space-y-4 pt-5 sm:pt-10">
-                <PhotoCard idea={REQUEST_IDEAS[1]} onPick={startFromGateway} className="block w-full aspect-[4/3] sm:aspect-square" />
-                <PhotoCard idea={REQUEST_IDEAS[4]} onPick={startFromGateway} className="block w-full aspect-square sm:aspect-[4/5]" />
+            {/* بطاقات المهام — صور عند توفرها، وإلا بطاقات مدمجة. كل بطاقة تبدأ طلباً */}
+            <div>
+              <p className="text-slate-400 text-sm mb-3">أو ابدأ من مثال:</p>
+              <div className="grid grid-cols-2 gap-3">
+                {REQUEST_IDEAS.slice(0, 6).map(r => (
+                  <PhotoCard key={r.text} idea={r} onPick={startFromGateway} photoClass="aspect-[4/3]" />
+                ))}
               </div>
             </div>
           </div>
@@ -796,9 +817,9 @@ export function LandingPage() {
                 <p className="text-sm text-slate-500 mb-3 text-right">ابدأ من مثال:</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
                   {REQUEST_IDEAS.slice(0, 4).map(r => (
-                    <PhotoCard key={r.text} idea={r}
+                    <PhotoCard key={r.text} idea={r} tone="light"
                       onPick={t => { trackEvent('request_started', user?.id, { source: 'home_card', len: t.length }); setTaskInput(t); setShowNewTask(true) }}
-                      className="block w-full aspect-[4/5]" />
+                      photoClass="aspect-[4/5]" />
                   ))}
                 </div>
 
