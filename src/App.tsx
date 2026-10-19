@@ -143,7 +143,8 @@ export default function App() {
   if (loading || (profile?.role === 'worker' && checking)) return <PageLoader />
 
   const renderContent = () => {
-    if (page === 'enterprises') return <><Navbar /><EnterprisesPage />{authOpen && <AuthModal />}</>
+    // بوابة المنشآت لها شريطها الخاص — لا نعرض شريط الأفراد المشترك فوقها
+    if (page === 'enterprises') return <><EnterprisesPage />{authOpen && <AuthModal />}</>
 
     // Verify — صفحة الدخول متاحة للزوار (تطلب تسجيل عند الإرسال)
     if (page === 'verify') return <><Navbar /><VerifyPage />{authOpen && <AuthModal />}</>

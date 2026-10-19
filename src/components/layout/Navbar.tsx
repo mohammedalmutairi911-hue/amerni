@@ -43,10 +43,6 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-6 text-sm text-slate-500">
             <button onClick={() => scrollTo('how-it-works')} className="hover:text-slate-900 transition-colors">كيف تشتغل</button>
             <button onClick={() => scrollTo('features')} className="hover:text-slate-900 transition-colors">المميزات</button>
-            <button onClick={() => navigate('enterprises')} className="flex items-center gap-1.5 text-primary-500 font-semibold hover:text-primary-600 transition-colors">
-              <Building2 size={14} />
-              <span>المنشآت</span>
-            </button>
           </div>
         )}
 
@@ -97,10 +93,10 @@ export function Navbar() {
                     )}
                     {/* رابط المنشآت — يُظهَر فقط لمستخدمي الأفراد (لتصفح القسم) والأدمن، مخفي لمن هو أصلاً في المنشآت.
                         للأدمن: يفتح لوحة إدارة المنشآت (admin-enterprises) وليس السوق العام. */}
-                    {(profile as any).platform !== 'enterprises' && (
-                      <button onClick={() => { navigate(profile.role === 'admin' ? 'admin-enterprises' : 'enterprises'); setDropOpen(false) }}
+                    {profile.role === 'admin' && (
+                      <button onClick={() => { navigate('admin-enterprises'); setDropOpen(false) }}
                         className="w-full flex items-center gap-3 px-3 py-2 text-sm text-primary-500 hover:bg-primary-50 rounded-lg transition-colors font-medium">
-                        <Building2 size={15} /> {profile.role === 'admin' ? 'إدارة المنشآت' : 'المنشآت'}
+                        <Building2 size={15} /> إدارة المنشآت
                       </button>
                     )}
                     <button onClick={() => { navigate('notification-settings'); setDropOpen(false) }}
