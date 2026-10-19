@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Logo } from '../components/Logo'
-import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X, ShoppingBag, FileText, Camera, Search, Truck, Clock, Gift, PenLine, Handshake, Lock, Building2, ShieldCheck, Scale, Landmark, BadgeCheck, Cpu, Users2 } from 'lucide-react'
+import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X, ShoppingBag, FileText, Camera, Search, Truck, Clock, Gift, PenLine, Handshake, Lock, Building2, ShieldCheck } from 'lucide-react'
 import { useApp } from '../contexts/AppContext'
 import { useAuth } from '../contexts/AuthContext'
 import { goHome, getHomePage, goToUserHome, profilePlatform, isUserInPortal } from '../lib/homePage'
@@ -215,7 +215,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
 
 export function LandingPage() {
   const { navigate } = useApp()
-  const { user, profile } = useAuth()
+  const { user, profile, signOut } = useAuth()
 
   // عضوية بوابة الأفراد — حساب المنشآت هنا يُعامل كزائر (الأدمن استثناء)
   const inPortal = !!(user && profile && isUserInPortal(profile, 'individuals'))
@@ -250,6 +250,7 @@ export function LandingPage() {
   const [showNewTask, setShowNewTask] = useState(false)
   const [showBrowse, setShowBrowse] = useState(false)
   const [showAuthDirect, setShowAuthDirect] = useState(false)
+  const [portalNotice, setPortalNotice] = useState<null | 'individuals' | 'enterprises'>(null)
   const [authDirectMode, setAuthDirectMode] = useState<'login'|'register'>('login')
 
   // Contact form
@@ -305,6 +306,40 @@ export function LandingPage() {
     if (mode === 'enterprises') navigate('enterprises', { replace: true })
   }, [mode, navigate])
 
+  // فصل البوابات: الحساب المسجَّل ينتمي لبوابة واحدة (الأدمن استثناء).
+  // لو ضغط على بوابة ثانية نوضّح له بدل ما يرتدّ للصفحة الرئيسية بدون تفسير.
+  const crossPortal = (target: 'individuals' | 'enterprises') =>
+    !!(user && profile && profile.role !== 'admin' && profilePlatform(profile) !== target)
+  const openPortal = (target: 'individuals' | 'enterprises') => {
+    if (crossPortal(target)) { setPortalNotice(target); return }
+    chooseMode(target)
+  }
+  const switchAccountThenOpen = async () => {
+    const target = portalNotice
+    setPortalNotice(null)
+    await signOut()
+    if (target === 'enterprises') navigate('enterprises')
+    else chooseMode('individuals')
+  }
+  const portalNoticeEl = portalNotice && (
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-slate-950/60 p-4" onClick={() => setPortalNotice(null)} role="dialog" aria-modal="true" dir="rtl">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
+        <h3 className="font-bold text-slate-900 text-lg mb-2">
+          {portalNotice === 'enterprises' ? 'بوابة المنشآت منفصلة' : 'هذا حساب منشأة'}
+        </h3>
+        <p className="text-sm text-slate-600 leading-relaxed mb-5">
+          {portalNotice === 'enterprises'
+            ? 'حسابك الحالي حساب أفراد. لدخول بوابة المنشآت سجّل خروجك ثم ادخل أو سجّل بحساب منشأة.'
+            : 'حسابك الحالي حساب منشأة، وطلبات الأفراد تُرسل من حساب أفراد. سجّل خروجك ثم ادخل أو سجّل بحساب أفراد.'}
+        </p>
+        <div className="flex flex-col gap-2">
+          <button onClick={switchAccountThenOpen} className="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2.5 rounded-xl transition-colors">تسجيل الخروج والمتابعة</button>
+          <button onClick={() => setPortalNotice(null)} className="text-slate-500 hover:text-slate-900 text-sm py-2 transition-colors">البقاء في حسابي</button>
+        </div>
+      </div>
+    </div>
+  )
+
   // القياس: أول مشاهدة للبوابة (يُستدعى دائماً قبل أي return مبكر)
   useEffect(() => {
     trackEvent('landing_view', user?.id, { mode: mode ?? 'gateway' })
@@ -314,6 +349,7 @@ export function LandingPage() {
   const startFromGateway = (text: string) => {
     const t = text.trim()
     trackEvent('request_started', user?.id, { source: 'gateway', has_text: !!t, len: t.length })
+    if (crossPortal('individuals')) { setPortalNotice('individuals'); return }
     chooseMode('individuals')
     if (t) setTaskInput(t)
     setShowNewTask(true)
@@ -330,6 +366,7 @@ export function LandingPage() {
     ]
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900" dir="rtl">
+        {portalNoticeEl}
         {/* ===== Hero + بوابة الاختيار ===== */}
         <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 px-4 pt-14 pb-20 overflow-hidden">
           <div className="absolute inset-0 pointer-events-none opacity-60">
@@ -341,7 +378,7 @@ export function LandingPage() {
               {/* تبديل الجمهور: أفراد (الحالي) | منشآت (يفتح صفحة المنشآت) */}
               <nav aria-label="نوع الحساب" className="flex items-center bg-white/10 rounded-full p-1 flex-shrink-0">
                 <span className="bg-white text-slate-900 font-bold rounded-full px-3 sm:px-4 py-1.5">أفراد</span>
-                <button onClick={() => chooseMode('enterprises')} className="flex items-center gap-1.5 text-slate-200 hover:text-white rounded-full px-3 sm:px-4 py-1.5 transition-colors">
+                <button onClick={() => openPortal('enterprises')} className="flex items-center gap-1.5 text-slate-200 hover:text-white rounded-full px-3 sm:px-4 py-1.5 transition-colors">
                   <Building2 size={14} /> منشآت
                 </button>
               </nav>
@@ -420,7 +457,6 @@ export function LandingPage() {
 
             {/* روابط ثانوية: المنشآت + التحقق من المورد */}
             <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs sm:text-sm text-slate-400">
-              <button onClick={() => chooseMode('enterprises')} className="hover:text-white underline-offset-4 hover:underline transition-colors"><Building2 size={15} className="inline -mt-0.5 ml-1.5" />منشأة؟ خبراء عند الطلب للمنشآت</button>
               <button onClick={() => navigate('verify')} className="hover:text-white underline-offset-4 hover:underline transition-colors"><ShieldCheck size={15} className="inline -mt-0.5 ml-1.5" />تأكد من مورد قبل التعامل معه</button>
             </div>
           </div>
@@ -456,26 +492,6 @@ export function LandingPage() {
               ))}
             </div>
             <p className="text-center text-xs text-slate-400 mt-4">أمثلة توضيحية — ليست مهام منفَّذة</p>
-          </div>
-        </section>
-
-        {/* ===== أمرني للمنشآت (قسم ثانوي — محفوظ بالكامل) ===== */}
-        <section className="py-14 px-4 bg-slate-900">
-          <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8">
-            <div className="flex-1 text-center lg:text-right">
-              <p className="text-accent-400 text-xs font-bold mb-2">أمرني للمنشآت</p>
-              <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">خبراء معتمدون عند الطلب لمنشأتك</h2>
-              <p className="text-slate-400 text-sm leading-relaxed mb-5">حوكمة، توطين، قانوني، مالي وزكاة، جودة وآيزو، أمن سيبراني — اطلب خبيراً بدل ما توظف بدوام كامل.</p>
-              <button onClick={() => chooseMode('enterprises')} className="bg-white text-slate-900 font-bold text-sm px-6 py-2.5 rounded-xl hover:bg-slate-100 transition-colors">استكشف خدمات المنشآت</button>
-            </div>
-            <div className="grid grid-cols-3 gap-3 w-full lg:w-auto">
-              {[[Landmark, 'حوكمة'], [Users2, 'توطين'], [Scale, 'قانوني'], [FileText, 'مالي/زكاة'], [BadgeCheck, 'جودة/آيزو'], [Cpu, 'أمن سيبراني']].map(([I, l]: any) => (
-                <button key={l} onClick={() => chooseMode('enterprises')} className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-4 text-center transition-colors">
-                  <I size={22} strokeWidth={1.75} className="text-accent-400 mx-auto mb-2" />
-                  <p className="text-xs text-slate-200 font-medium">{l}</p>
-                </button>
-              ))}
-            </div>
           </div>
         </section>
 
@@ -531,9 +547,6 @@ export function LandingPage() {
               <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="bg-white text-primary-600 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
                 اكتب طلبك
               </button>
-              <button onClick={() => chooseMode('enterprises')} className="border-2 border-white/60 text-white font-medium px-6 py-3 rounded-xl hover:bg-white/10 transition-colors text-sm">
-                أمثّل منشأة
-              </button>
             </div>
           </div>
         </section>
@@ -544,7 +557,7 @@ export function LandingPage() {
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <div>
                 <p className="font-black text-xl text-white mb-1">آمرني</p>
-                <p className="text-slate-400 text-sm">منصة الخدمات للأفراد والمنشآت</p>
+                <p className="text-slate-400 text-sm">منصة الخدمات والمهام اليومية</p>
               </div>
               <div className="flex flex-wrap gap-4 text-sm text-slate-400">
                 <button onClick={() => { chooseMode('individuals'); setActiveTab('about') }} className="hover:text-white transition-colors">من نحن</button>
@@ -632,6 +645,7 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+      {portalNoticeEl}
       {/* Navbar */}
       <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/95 backdrop-blur border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -640,7 +654,7 @@ export function LandingPage() {
             <button onClick={() => setMode(null)} className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary-100 text-primary-600 border border-primary-200 hover:bg-primary-200 transition-colors">
               أفراد ↕
             </button>
-            <button onClick={() => chooseMode('enterprises')} className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-2.5 py-0.5 rounded-full text-slate-600 border border-slate-200 hover:bg-slate-100 transition-colors">
+            <button onClick={() => openPortal('enterprises')} className="hidden sm:flex items-center gap-1.5 text-xs font-medium px-2.5 py-0.5 rounded-full text-slate-600 border border-slate-200 hover:bg-slate-100 transition-colors">
               <Building2 size={12} /> منشآت
             </button>
           </div>
