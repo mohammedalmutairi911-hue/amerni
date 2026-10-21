@@ -23,7 +23,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
-  governance: 'الحوكمة والامتثال', saudization: 'نطاقات والسعودة',
+  governance: 'الحوكمة والامتثال', saudization: 'نطاقات والتوطين',
   legal: 'الاستشارات القانونية', finance: 'المالية والزكاة',
   quality: 'الجودة وISO', tech: 'التقنية والأمن السيبراني',
   marketing: 'التسويق والعلامة التجارية', procurement: 'المشتريات',

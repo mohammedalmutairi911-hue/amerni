@@ -3,6 +3,7 @@ import { Landmark, Users2, Scale, FileText, BadgeCheck, Cpu } from 'lucide-react
 
 export function EnterprisesTeaser({ onOpen }: { onOpen: () => void }) {
   return (
+        <>
         {/* ===== أمرني للمنشآت (قسم ثانوي — محفوظ بالكامل) ===== */}
         <section className="py-14 px-4 bg-slate-900">
           <div className="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8">
@@ -22,5 +23,6 @@ export function EnterprisesTeaser({ onOpen }: { onOpen: () => void }) {
             </div>
           </div>
         </section>
+      </>
   )
 }

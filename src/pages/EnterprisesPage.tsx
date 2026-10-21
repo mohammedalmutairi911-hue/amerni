@@ -28,7 +28,7 @@ const CATEGORY_GROUPS = [
     id: 'governance', label: 'الحوكمة والامتثال', icon: ShieldCheck, color: 'text-blue-500', bg: 'bg-blue-50',
     items: [
       { id: 'governance', label: 'الحوكمة والامتثال', desc: 'سياسات، هياكل تنظيمية، GRC' },
-      { id: 'saudization', label: 'نطاقات والسعودة', desc: 'رفع نسب التوطين، نطاقات المطوّر' },
+      { id: 'saudization', label: 'نطاقات والتوطين', desc: 'رفع نسب التوطين، نطاقات المطوّر' },
       { id: 'legal', label: 'الاستشارات القانونية', desc: 'عقود، نزاعات، قانون عمل' },
       { id: 'audit', label: 'التدقيق والمراجعة', desc: 'مراجعة داخلية، امتثال' },
     ]
@@ -76,7 +76,7 @@ const BUDGET_OPTIONS = ['أقل من ١٠,٠٠٠ ريال', '١٠,٠٠٠ – ٥�
 const COMPANY_SIZES = ['1-10', '11-50', '51-200', '201-500', '500+']
 
 const SUPPORT_SYSTEM = `أنت مساعد خدمة عملاء متخصص لمنصة "أمرني للمنشآت" السعودية — منصة B2B تربط الشركات بمزودي خدمات في 18 تخصصاً مقسمة في 5 مجموعات:
-١. الحوكمة والامتثال: الحوكمة، نطاقات والسعودة، استشارات قانونية، تدقيق ومراجعة
+١. الحوكمة والامتثال: الحوكمة، نطاقات والتوطين، استشارات قانونية، تدقيق ومراجعة
 ٢. المالية والأعمال: المالية والزكاة، تأمين، مشتريات، استراتيجية وتخطيط
 ٣. التقنية والرقمي: أمن سيبراني وتحول رقمي، تسويق رقمي، ترجمة، ESG واستدامة
 ٤. الموارد البشرية: تدريب وتطوير، HSE وسلامة، جودة وISO، علاقات حكومية
@@ -98,7 +98,7 @@ const DRAFT_KEY = 'amerni_enterprise_draft'
 // أمثلة متغيرة لصندوق البحث في الشركات
 const ENTERPRISE_EXAMPLES = [
   'أبي مستشار حوكمة لمنشأتي',
-  'أبحث عن خبير سعودة ونطاقات',
+  'أبحث عن خبير توطين ونطاقات',
   'أحتاج استشارة قانونية للعقود',
   'أبي شركة تدقيق مالي محاسبي',
   'أحتاج مستشار ISO 9001',
@@ -110,7 +110,7 @@ const ENTERPRISE_EXAMPLES = [
 // فئات شائعة سريعة للشركات
 const POPULAR_CATS = [
   { emoji: '🏛️', label: 'حوكمة', catId: 'governance' },
-  { emoji: '👥', label: 'سعودة', catId: 'saudization' },
+  { emoji: '👥', label: 'توطين', catId: 'saudization' },
   { emoji: '⚖️', label: 'قانوني', catId: 'legal' },
   { emoji: '💰', label: 'مالي', catId: 'finance' },
   { emoji: '🛡️', label: 'أمن سيبراني', catId: 'cybersecurity' },
@@ -260,7 +260,7 @@ export function EnterprisesPage() {
     document.title = 'أمرني للمنشآت — خدمات B2B للشركات السعودية'
     const meta = document.querySelector('meta[name="description"]')
     const prevDesc = meta?.getAttribute('content') || ''
-    meta?.setAttribute('content', 'منصة B2B سعودية تربط شركتك بمزودي خدمات معتمدين في ١٨ تخصصاً — حوكمة، سعودة، قانوني، مالي، جودة، تقنية والمزيد. مطابقة خلال ٢٤ ساعة.')
+    meta?.setAttribute('content', 'منصة B2B سعودية تربط شركتك بمزودي خدمات معتمدين في ١٨ تخصصاً — حوكمة، توطين، قانوني، مالي، جودة، تقنية والمزيد. مطابقة خلال ٢٤ ساعة.')
     return () => {
       document.title = prevTitle
       meta?.setAttribute('content', prevDesc)
