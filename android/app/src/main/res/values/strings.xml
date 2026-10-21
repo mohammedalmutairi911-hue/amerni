@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">أمرني</string>
+    <string name="title_activity_main">أمرني</string>
+    <string name="package_name">com.amerniksa.app</string>
+    <string name="custom_url_scheme">com.amerniksa.app</string>
+</resources>
