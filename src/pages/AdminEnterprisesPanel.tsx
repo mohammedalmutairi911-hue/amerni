@@ -19,8 +19,8 @@ export function AdminEnterprisesPanel() {
 
   useEffect(() => {
     Promise.all([
-      supabase.from('enterprise_leads').select('*').order('created_at', { ascending: false }),
-      supabase.from('enterprise_providers').select('*').order('created_at', { ascending: false }),
+      supabase.from('enterprise_leads').select('*').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('enterprise_providers').select('*').order('created_at', { ascending: false }).limit(1000),
       supabase.rpc('get_overdue_enterprise_leads').then(r => r, () => ({ data: [] as any[] })),
     ]).then(([l, p, o]) => {
       setLeads(l.data || [])

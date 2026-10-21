@@ -23,7 +23,7 @@ export function BrowseWorkers() {
   useEffect(() => { fetchWorkers() }, [])
 
   const fetchWorkers = async () => {
-    const { data } = await supabase.from('workers_public').select('*').order('rating', { ascending: false })
+    const { data } = await supabase.from('workers_public').select('*').order('rating', { ascending: false }).limit(200)
     setWorkers(data || [])
     setLoading(false)
   }

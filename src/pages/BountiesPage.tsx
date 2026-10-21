@@ -24,12 +24,22 @@ export function BountiesPage() {
 
   useEffect(() => { fetchTasks() }, [])
 
-  const fetchTasks = async () => {
+  const PAGE = 50
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+
+  // تحميل صفحة واحدة فقط من قاعدة البيانات (مرتّبة بفهرس status + created_at) بدل كل الطلبات
+  const fetchTasks = async (from = 0) => {
     const { data } = await supabase.from('tasks').select('*')
       .eq('status', 'open').order('created_at', { ascending: false })
-    setTasks(data || [])
+      .range(from, from + PAGE - 1)
+    const rows = data || []
+    setTasks(prev => (from === 0 ? rows : [...prev, ...rows]))
+    setHasMore(rows.length === PAGE)
     setLoading(false)
+    setLoadingMore(false)
   }
+  const loadMore = () => { setLoadingMore(true); fetchTasks(tasks.length) }
 
   const applyTask = async (task: Task) => {
     if (!user) { navigate('landing'); return }
@@ -122,6 +132,11 @@ export function BountiesPage() {
                 </div>
               </div>
             ))}
+            {hasMore && (
+              <button onClick={loadMore} disabled={loadingMore} className="w-full py-3 rounded-2xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50">
+                {loadingMore ? 'جارٍ التحميل…' : 'عرض المزيد'}
+              </button>
+            )}
           </div>
         )}
       </div>

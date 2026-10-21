@@ -108,6 +108,7 @@ export function UserDashboard() {
     const { data } = await supabase.from('tasks').select('*')
       .or(`client_id.eq.${user!.id},user_id.eq.${user!.id}`)
       .order('created_at', { ascending: false })
+      .limit(200)
     setTasks(data || [])
     setLoading(false)
   }

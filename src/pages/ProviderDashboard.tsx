@@ -86,7 +86,7 @@ export function ProviderDashboard() {
     const [provRes, leadsRes, openRes] = await Promise.all([
       supabase.from('enterprise_providers').select('*').eq('user_id', user!.id).maybeSingle(),
       supabase.from('enterprise_leads').select('*').eq('provider_id', user!.id).order('created_at', { ascending: false }),
-      supabase.from('enterprise_leads_marketplace').select('*').order('created_at', { ascending: false })
+      supabase.from('enterprise_leads_marketplace').select('*').order('created_at', { ascending: false }).limit(100)
     ])
     if (provRes.data) {
       setProviderData(provRes.data)

@@ -110,7 +110,7 @@ export function WorkerDashboard() {
   }
 
   const fetchMyTasks = async () => {
-    const { data } = await supabase.from('tasks').select('*').eq('worker_id', user!.id).order('created_at', { ascending: false })
+    const { data } = await supabase.from('tasks').select('*').eq('worker_id', user!.id).order('created_at', { ascending: false }).limit(200)
     setMyTasks(data || [])
   }
 

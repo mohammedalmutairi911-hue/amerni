@@ -2,6 +2,14 @@ import { useState, useEffect } from 'react'
 import { supabase, getAvatar } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
 import { adminAction, startImpersonation } from '../lib/adminActions'
+
+// صور الهوية في مخزن خاص (worker-docs): نولّد رابطاً مؤقتاً (دقيقة) للأدمن بدل رابط عام
+async function openWorkerDoc(storedUrl: string) {
+  const m = storedUrl.match(/worker-docs\/(.+?)(?:\?|$)/)
+  const path = m ? decodeURIComponent(m[1]) : storedUrl
+  const { data } = await supabase.storage.from('worker-docs').createSignedUrl(path, 60)
+  if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener')
+}
 import {
   Loader2, Search, X, Users, Building2, Shield, CheckCircle, Clock,
   Mail, BadgeCheck, FileText, Star, RefreshCw, History,
@@ -476,7 +484,7 @@ function AccountDetail({ accountId, base, detail, loading, onClose, onNavigate, 
                 <Row label="رقم الهوية" value={wp.id_number} />
                 <Row label="حالة الهوية" value={wp.id_verified ? 'موثّقة ✓' : 'غير موثّقة'} />
                 <Row label="مستوى الاعتماد" value={wp.verification_level} />
-                {wp.id_image_url && <a href={wp.id_image_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-xs text-primary-600 font-bold mt-1 hover:underline"><FileText size={13} /> فتح صورة الهوية</a>}
+                {wp.id_image_url && <button type="button" onClick={() => openWorkerDoc(wp.id_image_url)} className="inline-flex items-center gap-1.5 text-xs text-primary-600 font-bold mt-1 hover:underline"><FileText size={13} /> عرض صورة الهوية</button>}
               </>}
               {ep && <>
                 <Row label="السجل التجاري" value={ep.cr_number} />
