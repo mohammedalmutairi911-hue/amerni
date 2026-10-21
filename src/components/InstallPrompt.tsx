@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X, Download } from 'lucide-react'
+import { isNativeApp } from '../lib/platform'
 
 const DISMISS_KEY = 'pwa-dismissed-at'
 const REASK_DAYS = 7
@@ -17,6 +18,8 @@ export function InstallPrompt() {
   const [isIOS, setIsIOS] = useState(false)
 
   useEffect(() => {
+    // داخل التطبيق الأصلي لا نعرض دعوة التثبيت
+    if (isNativeApp()) return
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) return
     // Also check iOS Safari standalone flag

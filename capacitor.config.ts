@@ -8,7 +8,8 @@ const config: CapacitorConfig = {
   ios: { contentInset: 'always' },
   plugins: {
     SplashScreen: { launchShowDuration: 1200, backgroundColor: '#1E3A8A', showSpinner: false },
-    StatusBar: { style: 'DARK', backgroundColor: '#1E3A8A' },
+    StatusBar: { style: 'LIGHT' },
+    SystemBars: { insetsHandling: 'css', style: 'LIGHT' },
   },
 }
 

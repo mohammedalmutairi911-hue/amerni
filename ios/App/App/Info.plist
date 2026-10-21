@@ -51,11 +51,17 @@
 	<array>
 		<string>armv7</string>
 	</array>
+		<key>NSCameraUsageDescription</key>
+	<string>نحتاج الكاميرا لتصوير المستندات وإثباتات التنفيذ ورفعها في طلبك.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>نحتاج الوصول للصور لرفع المستندات وإثباتات التنفيذ.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>لحفظ الملفات والصور التي تنزّلها من أمرني.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { siteOrigin } from '../lib/platform'
 import { Star, MapPin, CheckCircle, MessageSquare, ArrowLeft } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useApp } from '../contexts/AppContext'
@@ -36,7 +37,7 @@ export function WorkerProfile({ workerId }: Props) {
     </div>
   )
 
-  const shareUrl = `${window.location.origin}?worker=${workerId}`
+  const shareUrl = `${siteOrigin()}?worker=${workerId}`
 
   return (
     <div className="min-h-screen bg-slate-50 pt-14">

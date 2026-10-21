@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { siteOrigin } from '../lib/platform'
 import { Copy, CheckCircle, Users, DollarSign, Share2, Gift, TrendingUp } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -11,7 +12,7 @@ export function ReferralPage() {
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({ total: 0, earned: 0, pending: 0 })
 
-  const referralLink = `${window.location.origin}?ref=${user?.id?.slice(0, 8)}`
+  const referralLink = `${siteOrigin()}?ref=${user?.id?.slice(0, 8)}`
 
   useEffect(() => {
     if (user) fetchReferrals()

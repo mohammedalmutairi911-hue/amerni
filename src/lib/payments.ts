@@ -6,6 +6,8 @@
 // فقط، ثم نحوّل المتصفح لصفحة Paymob unified checkout بالـ client_secret العام.
 // ══════════════════════════════════════════════════════════════════════════
 import { supabase } from './supabase'
+import { Browser } from '@capacitor/browser'
+import { isNativeApp } from './platform'
 
 export interface StartPaymentResult {
   ok: boolean
@@ -37,6 +39,16 @@ export async function startTaskPayment(taskId: string): Promise<StartPaymentResu
 
   const url = `${UNIFIED_CHECKOUT}?publicKey=${encodeURIComponent(data.public_key)}` +
     `&clientSecret=${encodeURIComponent(data.client_secret)}`
+  if (isNativeApp()) {
+    // داخل التطبيق: نفتح بوابة الدفع في متصفح داخلي (يحفظ جلسة الدخول في التطبيق)
+    // وعند إغلاقه نعيد تحميل التطبيق ليظهر وضع الدفع المحدَّث (الويب هوك يحدّثه من السيرفر).
+    await Browser.addListener('browserFinished', () => {
+      Browser.removeAllListeners()
+      window.location.reload()
+    })
+    await Browser.open({ url, presentationStyle: 'fullscreen' })
+    return { ok: true }
+  }
   window.location.href = url
   return { ok: true }
 }
