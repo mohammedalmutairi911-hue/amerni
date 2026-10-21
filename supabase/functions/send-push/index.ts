@@ -45,21 +45,33 @@ function urlFor(type: string | undefined): string {
   return map[type ?? ''] ?? '/'
 }
 
+// أمان: الدالة عامة (يستدعيها trigger قاعدة البيانات)، لذلك لا نثق بأي محتوى في الطلب.
+// نقبل فقط معرّف إشعار حقيقي أُنشئ قبل لحظات، ونقرأ المستخدم والنص من قاعدة البيانات،
+// ولا نرسل لنفس الإشعار أكثر من مرة.
+const MAX_AGE_MS = 2 * 60 * 1000
+const sentIds = new Map<string, number>()
+
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 })
-
   try {
     const payload = await req.json()
-    const record = payload.record ?? payload
-    const eventType = payload.type ?? 'INSERT'
-    const table = payload.table ?? 'notifications'
-
-    if (eventType !== 'INSERT' || table !== 'notifications') {
+    const id = payload?.record?.id
+    if (payload?.type !== 'INSERT' || payload?.table !== 'notifications' || typeof id !== 'string') {
       return new Response(JSON.stringify({ ignored: true }), { status: 200 })
     }
-    if (!record?.user_id) {
-      return new Response(JSON.stringify({ error: 'no user_id' }), { status: 400 })
+    const now = Date.now()
+    for (const [k, t] of sentIds) if (now - t > MAX_AGE_MS * 2) sentIds.delete(k)
+    if (sentIds.has(id)) return new Response(JSON.stringify({ ignored: 'duplicate' }), { status: 200 })
+
+    const { data: record } = await supabase
+      .from('notifications')
+      .select('id, user_id, title, body, type, created_at')
+      .eq('id', id)
+      .maybeSingle()
+    if (!record?.user_id || now - new Date(record.created_at).getTime() > MAX_AGE_MS) {
+      return new Response(JSON.stringify({ ignored: 'not_found_or_old' }), { status: 200 })
     }
+    sentIds.set(id, now)
 
     const { data: subs, error: subsErr } = await supabase
       .from('push_subscriptions')
@@ -97,10 +109,10 @@ Deno.serve(async (req: Request) => {
     const sent = results.filter((r: any) => r.status === 'fulfilled' && (r.value as any).ok).length
     return new Response(JSON.stringify({ sent, total: subs.length }), {
       status: 200,
-      headers: { 'content-type': 'application/json' }
+      headers: { 'content-type': 'application/json' },
     })
   } catch (e: any) {
     console.error('send-push error:', e)
-    return new Response(JSON.stringify({ error: e?.message ?? 'unknown' }), { status: 500 })
+    return new Response(JSON.stringify({ error: 'internal' }), { status: 500 })
   }
 })
