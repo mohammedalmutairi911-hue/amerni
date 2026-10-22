@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - '.github/workflows/mobile-build.yml'
       - 'android/**'
       - 'ios/**'
       - 'capacitor.config.ts'
