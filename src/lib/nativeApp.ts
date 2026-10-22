@@ -7,6 +7,17 @@ declare const __BUILD_ID__: string
 export function initNativeApp() {
   if (!isNativeApp()) return
 
+  // واجهة التطبيق: كلاس خاص + على التابلت نعرض تصميم الجوال (بدل تصميم الكمبيوتر)
+  document.documentElement.classList.add('native-app')
+  const fitViewport = () => {
+    const w = Math.min(window.screen.width, window.screen.height)
+    const vp = document.querySelector('meta[name="viewport"]')
+    if (vp) vp.setAttribute('content', w > 600
+      ? 'width=600, initial-scale=' + (w / 600).toFixed(3) + ', viewport-fit=cover'
+      : 'width=device-width, initial-scale=1, viewport-fit=cover')
+  }
+  fitViewport()
+
   // زر الرجوع في أندرويد: يرجع للصفحة السابقة، وعند الجذر يخرج من التطبيق
   CapApp.addListener('backButton', ({ canGoBack }) => {
     if (canGoBack) window.history.back()

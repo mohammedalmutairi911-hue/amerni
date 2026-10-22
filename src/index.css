@@ -199,3 +199,23 @@ button, a, [role="button"], input[type="button"], input[type="submit"] {
     min-width: 44px;
   }
 }
+
+
+/* ═══════════════ واجهة التطبيق الأصلي فقط (html.native-app) ═══════════════ */
+html.native-app, html.native-app body { overscroll-behavior: none; }
+html.native-app body {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+html.native-app input, html.native-app textarea, html.native-app [contenteditable="true"] {
+  -webkit-user-select: text; user-select: text;
+}
+/* الترويسة الثابتة تتجاوز شريط الحالة */
+html.native-app .pt-14 { padding-top: calc(3.5rem + env(safe-area-inset-top)); }
+/* مساحة فوق الشريط السفلي */
+html.native-tabbed body { padding-bottom: calc(4rem + env(safe-area-inset-bottom)); }
+/* ضغطة بشعور لمس */
+html.native-app button:active { opacity: .72; }
+@keyframes native-fade { from { opacity: 0 } to { opacity: 1 } }
+.native-page-enter { animation: native-fade .18s ease-out; }
+@keyframes native-sheet { from { transform: translateY(40px); opacity: 0 } to { transform: none; opacity: 1 } }
+.native-sheet-in { animation: native-sheet .22s ease-out; }

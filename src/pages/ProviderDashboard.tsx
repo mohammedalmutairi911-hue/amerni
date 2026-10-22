@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { isNativeApp } from '../lib/platform'
+import { NativeMoreButton } from '../components/native/NativeChrome'
 import { COMPANY } from '../lib/constants'
 import { Star, CheckCircle, Zap, Loader2, DollarSign, Home, List,
   User, LogOut, BarChart2, Briefcase, MessageSquare,
@@ -619,10 +621,14 @@ export function ProviderDashboard() {
             {badge > 0 && <span className="absolute top-0 right-2 w-4 h-4 bg-primary-500 text-white rounded-full text-[9px] flex items-center justify-center font-bold">{badge > 9 ? '9+' : badge}</span>}
           </button>
         ))}
+        {isNativeApp() ? (
+          <NativeMoreButton className="flex flex-col items-center gap-1 px-4 py-1 text-slate-400" />
+        ) : (
         <button onClick={async () => { await signOut(); navigate('landing') }} className="flex flex-col items-center gap-1 px-4 py-1 text-red-400">
           <LogOut size={20} />
           <span className="text-[10px] font-medium">خروج</span>
         </button>
+        )}
       </nav>
     </div>
   )

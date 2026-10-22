@@ -14,6 +14,9 @@ import { PushPrompt } from './components/PushPrompt'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ImpersonationBanner } from './components/ImpersonationBanner'
+import { isNativeApp } from './lib/platform'
+import { getHomePage } from './lib/homePage'
+import { NativeTabBar, NativeMoreSheet, NativeWelcome } from './components/native/NativeChrome'
 
 // Lazy-loaded pages — code splitting لتسريع التحميل الأول
 const AdminPanel = React.lazy(() => import('./pages/AdminPanel').then(m => ({ default: m.AdminPanel })))
@@ -92,6 +95,8 @@ export default function App() {
   const [workerApproved, setWorkerApproved] = useState<boolean | null>(null)
   const [workerExists, setWorkerExists] = useState<boolean | null>(null)
   const [checking, setChecking] = useState(false)
+  const native = isNativeApp()
+  const [guestBrowse, setGuestBrowse] = useState(() => { try { return sessionStorage.getItem('amerni_guest_browse') === '1' } catch { return false } })
 
   useEffect(() => {
     if (!user || !profile) { setWorkerApproved(null); setWorkerExists(null); return }
@@ -105,6 +110,13 @@ export default function App() {
         setTimeout(() => window.dispatchEvent(new CustomEvent('enterprises:open-my-requests')), 600)
         return
       }
+    }
+
+    // التطبيق: عند الفتح (مرة لكل جلسة) ادخل مباشرة على لوحة المستخدم بدل الصفحة التسويقية
+    if (native && page === 'landing') {
+      let done = false
+      try { done = sessionStorage.getItem('amerni_native_home') === '1'; sessionStorage.setItem('amerni_native_home', '1') } catch { /* ignore */ }
+      if (!done) { navigate(getHomePage(profile), { replace: true }); return }
     }
 
     // الأدمن: حساب واحد يتصفّح كل البوابات كمشرف.
@@ -149,7 +161,12 @@ export default function App() {
     // Verify — صفحة الدخول متاحة للزوار (تطلب تسجيل عند الإرسال)
     if (page === 'verify') return <><Navbar /><VerifyPage />{authOpen && <AuthModal />}</>
 
-    if (!user || !profile) return <><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
+    if (!user || !profile) {
+      if (native && page === 'landing' && !guestBrowse) {
+        return <><NativeWelcome onBrowse={() => { try { sessionStorage.setItem('amerni_guest_browse', '1') } catch { /* ignore */ } setGuestBrowse(true) }} />{authOpen && <AuthModal />}</>
+      }
+      return <><LandingPage />{authOpen && <AuthModal />}<InstallPrompt /></>
+    }
     if (page === 'landing') return <><LandingPage />{authOpen && <AuthModal />}</>
     if (page === 'provider-dashboard') return <><ProviderDashboard />{authOpen && <AuthModal />}</>
     if (page === 'support') return <><Navbar /><SupportPage /></>
@@ -210,5 +227,5 @@ export default function App() {
     return <><Navbar /><NotFoundPage /></>
   }
 
-  return <ErrorBoundary><ToastProvider><ImpersonationBanner /><React.Suspense fallback={<PageLoader />}>{renderContent()}{user && <PushPrompt />}</React.Suspense></ToastProvider></ErrorBoundary>
+  return <ErrorBoundary><ToastProvider><ImpersonationBanner /><React.Suspense fallback={<PageLoader />}>{native ? <div key={page} className="native-page-enter">{renderContent()}</div> : renderContent()}{native && <NativeTabBar />}{native && <NativeMoreSheet />}{user && <PushPrompt />}</React.Suspense></ToastProvider></ErrorBoundary>
 }

@@ -1,4 +1,6 @@
 import { Logo } from '../components/Logo'
+import { isNativeApp } from '../lib/platform'
+import { NativeMoreButton } from '../components/native/NativeChrome'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Star, Clock, CheckCircle, Zap, Loader2, MessageSquare, Upload, DollarSign, Home, List, Calendar, User, LogOut, MapPin, Copy, Wifi, WifiOff, BarChart2, Briefcase, TrendingUp, Plus, ChevronRight } from 'lucide-react'
@@ -935,6 +937,7 @@ export function WorkerDashboard() {
             )}
           </button>
         ))}
+        {isNativeApp() && <NativeMoreButton className="flex flex-col items-center justify-center px-2 py-1 text-slate-400 [&>span]:text-xs [&>span]:mt-0.5" />}
       </nav>
     </div>
   )

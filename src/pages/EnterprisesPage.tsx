@@ -1,4 +1,6 @@
 import { Logo } from '../components/Logo'
+import { isNativeApp } from '../lib/platform'
+import { NativeMoreButton } from '../components/native/NativeChrome'
 import { useState, useEffect, useRef } from 'react'
 import { EnterpriseChat } from '../components/chat/EnterpriseChat'
 import { ReviewBox, VerificationBadge, StarDisplay } from '../components/enterprise/ReviewBox'
@@ -1163,6 +1165,7 @@ export function EnterprisesPage() {
                   <LogOut size={20} />
                   <span className="text-[10px] font-medium">خروج</span>
                 </button>
+                {isNativeApp() && <NativeMoreButton className="flex flex-col items-center gap-1 px-4 py-1 text-slate-500" />}
               </nav>
             </div>
           )

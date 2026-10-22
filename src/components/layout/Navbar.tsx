@@ -5,6 +5,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
 import { getAvatar } from '../../lib/supabase'
 import { goHome, goToUserHome, isUserInPortal } from '../../lib/homePage'
+import { isNativeApp } from '../../lib/platform'
+import { NativeTopBar } from '../native/NativeChrome'
 
 export function Navbar() {
   const { user, profile, signOut } = useAuth()
@@ -30,6 +32,9 @@ export function Navbar() {
     const el = document.getElementById(id)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
+
+  // التطبيق الأصلي: ترويسة بشكل تطبيق بدل شريط الموقع
+  if (isNativeApp() && user && profile) return <NativeTopBar />
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 bg-slate-50/90 backdrop-blur border-b border-slate-200">

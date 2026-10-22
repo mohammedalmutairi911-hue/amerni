@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import { isNativeApp } from '../lib/platform'
+import { NativeMoreButton } from '../components/native/NativeChrome'
 import { Plus, CheckCircle, Clock, Loader2, Star, Home, List, Wallet, LogOut, Zap, ChevronRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -770,11 +772,15 @@ export function UserDashboard() {
             {badge > 0 && <span className="absolute top-0 right-2 w-4 h-4 bg-purple-500 text-white rounded-full text-[9px] flex items-center justify-center font-bold">{badge}</span>}
           </button>
         ))}
+        {isNativeApp() ? (
+          <NativeMoreButton className="flex flex-col items-center gap-1 px-4 py-1 text-slate-400 transition-all" />
+        ) : (
         <button onClick={() => setShowLogoutConfirm(true)}
           className="flex flex-col items-center gap-1 px-4 py-1 text-red-500 transition-all">
           <LogOut size={20} />
           <span className="text-[10px] font-medium">خروج</span>
         </button>
+        )}
       </nav>
 
       {/* Logout Confirmation Modal */}
