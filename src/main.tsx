@@ -12,6 +12,9 @@ import { AuthProvider } from './contexts/AuthContext'
 import { AppProvider } from './contexts/AppContext'
 
 import { ErrorBoundary } from './App'
+import { initNativeApp } from './lib/nativeApp'
+
+initNativeApp()
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
