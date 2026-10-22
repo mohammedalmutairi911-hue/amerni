@@ -675,7 +675,7 @@ export function AdminPanel() {
                             <p className="text-sm font-bold text-slate-800">{item.title}</p>
                             {item.statusLabel && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.statusColor}`}>{item.statusLabel}</span>}
                           </div>
-                          <p className="text-xs text-slate-400 truncate">{timeAgoAr(new Date(item.ts).toISOString())} • {item.name}</p>
+                          <p className="text-xs text-slate-400 truncate">{timeAgoAr(new Date(item.ts || 0).toISOString())} • {item.name}</p>
                         </div>
                       </button>
                     ))}
@@ -1800,7 +1800,7 @@ export function AdminPanel() {
                     </div>
                     <p className="text-xs text-slate-400 mt-0.5">{item.name}</p>
                   </div>
-                  <p className="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">{timeAgoAr(new Date(item.ts).toISOString())}</p>
+                  <p className="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">{timeAgoAr(new Date(item.ts || 0).toISOString())}</p>
                 </button>
               ))}
               {buildActivityFeed().length === 0 && (

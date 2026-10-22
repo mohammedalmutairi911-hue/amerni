@@ -163,6 +163,8 @@ export default function App() {
     if (page === 'worker-profile') return <><Navbar /><WorkerProfile workerId={(window as any).__workerProfileId || ''} /></>
 
     if (page === 'admin-enterprises') {
+      // لوحة إدارة المنشآت للأدمن فقط (البيانات محمية بالسيرفر أيضاً)
+      if (profile.role !== 'admin') return <><Navbar /><NotFoundPage /></>
       return <AdminEnterprisesPanel />
     }
     if (page === 'lead-detail') {
