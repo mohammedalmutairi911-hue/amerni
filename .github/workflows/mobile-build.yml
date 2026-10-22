@@ -14,6 +14,8 @@ on:
 jobs:
   android:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,6 +34,15 @@ jobs:
         with:
           name: amerni-android-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+      # رابط تنزيل مباشر لملف التجربة (يتحدّث مع كل بناء)
+      - name: Publish APK as a release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk amerni-android.apk
+          gh release delete android-latest --yes --cleanup-tag || true
+          gh release create android-latest amerni-android.apk --prerelease --title "أمرني — نسخة تجربة أندرويد" --notes "ملف APK للتجربة فقط. حمّله على جوال أندرويد وافتحه."
 
   ios:
     runs-on: macos-latest
