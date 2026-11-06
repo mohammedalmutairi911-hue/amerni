@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { COMPANY } from '../lib/constants'
 import { Logo } from '../components/Logo'
 import { Sparkles, Shield, CheckCircle, Zap, Users, Star, ArrowLeft, Bot, UserCheck, Loader2, Eye, EyeOff, Mail, Phone, MessageCircle, Info, Send, X, ShoppingBag, FileText, Camera, Search, Truck, Clock, Gift, PenLine, Handshake, Lock, Building2, ShieldCheck } from 'lucide-react'
@@ -136,6 +137,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
           </button>
         </div>
       )}
+      <GoogleSignInButton text={mode === 'login' ? 'signin_with' : 'signup_with'} fallback={
       <button onClick={signInWithGoogle}
         className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200">
         <svg width="18" height="18" viewBox="0 0 24 24">
@@ -146,6 +148,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
         </svg>
         {mode === 'login' ? 'دخول بـ Google' : 'تسجيل بـ Google'}
       </button>
+      } />
       <div className="flex items-center gap-2"><div className="flex-1 h-px bg-slate-100"/><span className="text-xs text-slate-400">أو</span><div className="flex-1 h-px bg-slate-100"/></div>
       {mode === 'register' && (
         <>

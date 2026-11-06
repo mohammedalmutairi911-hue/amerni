@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { ArrowLeft, ArrowRight, Sparkles, MapPin, DollarSign, Bot, CheckCircle, Loader2, Eye, EyeOff, Tag } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { filterContent } from '../lib/contentFilter'
@@ -362,6 +363,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
             </div>
 
             {/* Google Sign In - prominent at top */}
+            <GoogleSignInButton text={isNew ? "signup_with" : "signin_with"} fallback={
             <button onClick={signInWithGoogle}
               className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-semibold py-3.5 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200 shadow-sm">
               <svg width="20" height="20" viewBox="0 0 24 24">
@@ -372,6 +374,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
               </svg>
               تسجيل الدخول بـ Google
             </button>
+            } />
 
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-slate-100" />
