@@ -11,6 +11,7 @@ import { WorkerDashboard } from './pages/WorkerDashboard'
 import { WorkerRegister } from './pages/WorkerRegister'
 import { InstallPrompt } from './components/InstallPrompt'
 import { PushPrompt } from './components/PushPrompt'
+import { NotificationToast } from './components/ui/NotificationToast'
 import { PageLoader } from './components/PageLoader'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ImpersonationBanner } from './components/ImpersonationBanner'
@@ -227,5 +228,5 @@ export default function App() {
     return <><Navbar /><NotFoundPage /></>
   }
 
-  return <ErrorBoundary><ToastProvider><ImpersonationBanner /><React.Suspense fallback={<PageLoader />}>{native ? <div key={page} className="native-page-enter">{renderContent()}</div> : renderContent()}{native && <NativeTabBar />}{native && <NativeMoreSheet />}{user && <PushPrompt />}</React.Suspense></ToastProvider></ErrorBoundary>
+  return <ErrorBoundary><ToastProvider><ImpersonationBanner /><React.Suspense fallback={<PageLoader />}>{native ? <div key={page} className="native-page-enter">{renderContent()}</div> : renderContent()}{native && <NativeTabBar />}{native && <NativeMoreSheet />}{user && <PushPrompt />}{user && <NotificationToast />}</React.Suspense></ToastProvider></ErrorBoundary>
 }
