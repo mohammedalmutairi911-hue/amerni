@@ -429,10 +429,8 @@ export function WorkerDashboard() {
 
         {/* ── Top Header ── */}
         <header className="sticky top-14 z-30 bg-white border-b border-slate-200 px-5 py-3.5 flex items-center gap-4 shadow-sm">
-          {/* Mobile logo */}
-          <button onClick={() => goHome(navigate, profile)} className="lg:hidden flex items-center"><Logo size={26} /></button>
-          <div className="hidden lg:block flex-1">
-            <h2 className="font-black text-slate-800 text-lg">
+          <div className={`flex-1 min-w-0 ${tab === 'overview' ? 'hidden lg:block' : ''}`}>
+            <h2 className="font-black text-slate-800 text-lg truncate">
               {tab === 'overview' ? 'لوحة العامل' : tab === 'shifts' ? 'سوق الشفتات' : tab === 'my-tasks' ? 'الطلبات' : tab === 'analytics' ? 'التحليلات الاستباقية' : 'الإنجازات والالتزام'}
             </h2>
           </div>

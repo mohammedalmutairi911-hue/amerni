@@ -503,7 +503,7 @@ export function UserDashboard() {
 
         {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-slate-900 border-b border-slate-800 sticky top-14 z-30">
-          <button onClick={() => goHome(navigate, profile)} className="text-lg font-black text-amber-400">آمرني</button>
+          <span className="text-base font-black text-amber-400">لوحتي</span>
           <div className="flex items-center gap-2">
             <NotificationBell />
             <button onClick={() => setShowNew(true)} className="flex items-center gap-1.5 bg-amber-400 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
