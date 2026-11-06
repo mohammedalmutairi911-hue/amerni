@@ -47,6 +47,7 @@ export function EnterpriseChat({ leadId, senderRole }: Props) {
       lead_id: leadId, sender_id: user?.id, sender_role: senderRole, content: text
     })
     if (error) setInput(text)
+    else { try { void supabase.functions.invoke('notify-message', { body: { lead_id: leadId } }).catch(() => {}) } catch { /* ignore */ } }
     setSending(false)
   }
 
@@ -57,7 +58,7 @@ export function EnterpriseChat({ leadId, senderRole }: Props) {
   const formatTime = (d: string) => new Date(d).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
 
   return (
-    <div className="flex flex-col rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm" style={{ height: '520px' }} dir="rtl">
+    <div className="flex flex-col w-full min-w-0 max-w-full rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm" style={{ height: 'clamp(320px, calc(100dvh - 250px), 560px)' }} dir="rtl">
 
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-3.5 bg-slate-900 border-b border-slate-800">
