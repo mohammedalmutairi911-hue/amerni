@@ -855,7 +855,7 @@ export function EnterprisesPage() {
               </aside>
 
               {/* Main */}
-              <main className="flex-1 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-0 overflow-auto">
+              <main className="flex-1 min-w-0 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-0 overflow-auto">
 
                 {/* Mobile Header */}
                 <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800">

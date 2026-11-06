@@ -153,7 +153,7 @@ export function LeadDetailPage() {
       </aside>
 
       {/* ── Main ── */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen">
 
         {/* Header */}
         <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-3 sm:px-5 py-3 sm:py-3.5 flex items-center gap-2 sm:gap-3 shadow-sm">

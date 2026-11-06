@@ -490,7 +490,7 @@ export function UserDashboard() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 lg:mr-64 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <main className="flex-1 min-w-0 lg:mr-64 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
 
         {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-30">

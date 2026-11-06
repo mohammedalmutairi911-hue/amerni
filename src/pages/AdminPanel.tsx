@@ -521,7 +521,7 @@ export function AdminPanel() {
       )}
 
       {/* ── Main ── */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen overflow-x-hidden">
 
         {/* ── Top Header ── */}
         <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 flex items-center gap-3 sm:gap-4 shadow-sm sticky top-0 z-30">

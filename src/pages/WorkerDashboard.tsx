@@ -414,7 +414,7 @@ export function WorkerDashboard() {
       </aside>
 
       {/* ── Right Column ── */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen">
 
         {/* ── Top Header ── */}
         <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3.5 flex items-center gap-4 shadow-sm">
@@ -446,7 +446,7 @@ export function WorkerDashboard() {
         </header>
 
         {/* ── Content ── */}
-        <main className="flex-1 p-4 lg:p-6 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-6 overflow-auto">
+        <main className="flex-1 min-w-0 p-4 lg:p-6 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-6 overflow-auto">
           <div className="max-w-5xl mx-auto">
 
         {/* ══ OVERVIEW ══ */}
@@ -496,7 +496,7 @@ export function WorkerDashboard() {
                 {myTasks.slice(0,3).map(t => (
                   <div key={t.id} className="px-4 py-3 border-b border-slate-50 last:border-0 flex items-center justify-between">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${STATUS_COLOR[t.status]}`}>{STATUS_LABEL[t.status]}</span>
-                    <p className="text-sm font-medium text-slate-800 truncate max-w-[60%]">{t.title}</p>
+                    <p className="text-sm font-medium text-slate-800 truncate min-w-0 flex-1 text-right mr-3">{t.title}</p>
                   </div>
                 ))}
               </div>
