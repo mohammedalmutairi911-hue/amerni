@@ -351,10 +351,10 @@ export function WorkerDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] flex" dir="rtl">
+    <div className="min-h-screen bg-[#f8f9fa] flex pt-14" dir="rtl">
 
       {/* ── Sidebar Desktop ── */}
-      <aside className="hidden lg:flex flex-col h-screen sticky top-0 bg-white border-l border-slate-200 w-64 flex-shrink-0 shadow-sm z-40">
+      <aside className="hidden lg:flex flex-col h-[calc(100vh-3.5rem)] sticky top-14 bg-white border-l border-slate-200 w-64 flex-shrink-0 shadow-sm z-40">
         {/* Logo */}
         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
           <button onClick={() => goHome(navigate, profile)} className="flex items-center hover:opacity-80"><Logo size={28} /></button>
@@ -428,7 +428,7 @@ export function WorkerDashboard() {
       <div className="flex-1 min-w-0 flex flex-col min-h-screen">
 
         {/* ── Top Header ── */}
-        <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-5 py-3.5 flex items-center gap-4 shadow-sm">
+        <header className="sticky top-14 z-30 bg-white border-b border-slate-200 px-5 py-3.5 flex items-center gap-4 shadow-sm">
           {/* Mobile logo */}
           <button onClick={() => goHome(navigate, profile)} className="lg:hidden flex items-center"><Logo size={26} /></button>
           <div className="hidden lg:block flex-1">

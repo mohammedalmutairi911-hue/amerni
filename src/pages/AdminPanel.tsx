@@ -393,10 +393,10 @@ export function AdminPanel() {
   const navItem = (id: string) => NAV_ITEMS.find(n => n.id === id)
 
   return (
-    <div className="min-h-screen flex bg-[#F0F2F5]" dir="rtl">
+    <div className="min-h-screen flex bg-[#F0F2F5] pt-14" dir="rtl">
 
       {/* ── Sidebar ── */}
-      <aside className="hidden lg:flex flex-col h-screen sticky top-0 bg-white border-l border-slate-200 w-56 flex-shrink-0 shadow-sm">
+      <aside className="hidden lg:flex flex-col h-[calc(100vh-3.5rem)] sticky top-14 bg-white border-l border-slate-200 w-56 flex-shrink-0 shadow-sm">
         {/* Logo */}
         <div className="px-5 py-5 border-b border-slate-100">
           <button onClick={() => goHome(navigate)} className="flex items-center hover:opacity-80 transition-opacity">
@@ -525,7 +525,7 @@ export function AdminPanel() {
       <div className="flex-1 min-w-0 flex flex-col min-h-screen overflow-x-hidden">
 
         {/* ── Top Header ── */}
-        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 flex items-center gap-3 sm:gap-4 shadow-sm sticky top-0 z-30">
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 flex items-center gap-3 sm:gap-4 shadow-sm sticky top-14 z-30">
           <button onClick={() => setMobileNavOpen(true)} aria-label="فتح القائمة"
             className="lg:hidden flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50">
             <Menu size={20} />

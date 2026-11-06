@@ -207,8 +207,8 @@ export function UserDashboard() {
   // TASK DETAIL VIEW
   // ══════════════════════════════════
   if (selectedTask) return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      <div className="bg-white border-b border-slate-200 px-4 py-4 flex items-center justify-between sticky top-0 z-30">
+    <div className="min-h-screen bg-slate-50 font-sans pt-14">
+      <div className="bg-white border-b border-slate-200 px-4 py-4 flex items-center justify-between sticky top-14 z-30">
         <button onClick={closeTask} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium">
           ← رجوع
         </button>
@@ -453,10 +453,10 @@ export function UserDashboard() {
   // MAIN DASHBOARD
   // ══════════════════════════════════
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans" dir="rtl">
+    <div className="flex min-h-screen bg-slate-50 font-sans pt-14" dir="rtl">
 
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex flex-col h-screen fixed right-0 border-l border-slate-200 bg-slate-900 w-64 z-50">
+      <aside className="hidden lg:flex flex-col h-[calc(100vh-3.5rem)] top-14 fixed right-0 border-l border-slate-200 bg-slate-900 w-64 z-50">
         <div className="p-6 border-b border-slate-800 flex items-center justify-between">
           <button onClick={() => goHome(navigate, profile)} className="text-xl font-black text-amber-400 hover:opacity-80 transition-opacity">آمرني</button>
           <NotificationBell />
@@ -502,7 +502,7 @@ export function UserDashboard() {
       <main className="flex-1 min-w-0 lg:mr-64 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
 
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
+        <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-slate-900 border-b border-slate-800 sticky top-14 z-30">
           <button onClick={() => goHome(navigate, profile)} className="text-lg font-black text-amber-400">آمرني</button>
           <div className="flex items-center gap-2">
             <NotificationBell />
