@@ -21,7 +21,7 @@ export const COMPANY = {
   // العمولة
   commission: {
     individuals: '5%',
-    enterprises: '1%',
+    enterprises: '5%',
     deadlineHours: 72,
   },
 

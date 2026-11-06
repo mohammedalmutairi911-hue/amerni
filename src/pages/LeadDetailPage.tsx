@@ -221,7 +221,7 @@ export function LeadDetailPage() {
                       <input type="number" value={contractVal} onChange={e => setContractVal(e.target.value)}
                         placeholder="قيمة العقد (ريال)" inputMode="numeric"
                         className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
-                      <p className="text-xs text-slate-400">العمولة ١٪ من القيمة = {contractVal ? Math.round(parseFloat(contractVal)*0.01) : 0} ريال</p>
+                      <p className="text-xs text-slate-400">العمولة ٥٪ من القيمة = {contractVal ? Math.round(parseFloat(contractVal)*0.05) : 0} ريال</p>
                       <div className="flex gap-2">
                         <button onClick={closeLead} disabled={closing}
                           className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-xl text-sm disabled:opacity-50 flex items-center justify-center gap-1.5">

@@ -83,7 +83,7 @@ const SUPPORT_SYSTEM = `أنت مساعد خدمة عملاء متخصص لمن�
 ٣. التقنية والرقمي: أمن سيبراني وتحول رقمي، تسويق رقمي، ترجمة، ESG واستدامة
 ٤. الموارد البشرية: تدريب وتطوير، HSE وسلامة، جودة وISO، علاقات حكومية
 ٥. العمليات والمشاريع: إدارة مشاريع، عقارات ومرافق
-العمولة الحالية: ١٪ من قيمة العقد مؤقتاً — قادم نظام اشتراك شهري.
+العمولة الحالية: ٥٪ من قيمة العقد مؤقتاً — قادم نظام اشتراك شهري.
 الرد خلال ٢٤ ساعة. للتواصل: support@amerniksa.com`
 
 type Tab = 'home' | 'how' | 'features' | 'trust' | 'about' | 'contact' | 'support' | 'privacy' | 'terms' | 'my-requests' | 'provider-register'
@@ -511,7 +511,7 @@ export function EnterprisesPage() {
 
   const faqs = [
     { q: 'كيف يعمل النظام؟', a: 'أرسل طلبك، وفريقنا يراجعه ويوصلك بأفضل مزود خدمة معتمد خلال ٢٤ ساعة.' },
-    { q: 'كم تبلغ العمولة؟', a: 'العمولة الحالية ١٪ من قيمة العقد مؤقتاً، تُحوَّل خلال ٧٢ ساعة من التعاقد. قريباً نطلق نظام اشتراك شهري.' },
+    { q: 'كم تبلغ العمولة؟', a: 'العمولة الحالية ٥٪ من قيمة العقد مؤقتاً، تُحوَّل خلال ٧٢ ساعة من التعاقد. قريباً نطلق نظام اشتراك شهري.' },
     { q: 'هل يمكن تغيير المزود بعد المطابقة؟', a: 'نعم، إذا لم يناسبك المزود المقترح نعيد البحث مجاناً.' },
     { q: 'كيف أتتبع طلبي؟', a: 'سجّل دخول وافتح تبويب "طلباتي" لترى حالة طلباتك كاملة.' },
     { q: 'كيف أسجّل كمزود خدمة؟', a: 'افتح تبويب "سجّل كمزود" واملأ النموذج — سيراجع فريقنا طلبك ويتواصل معك.' },
@@ -738,7 +738,7 @@ export function EnterprisesPage() {
             <section className="py-16 px-4 bg-slate-50 border-y border-slate-200">
               <div className="max-w-5xl mx-auto">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center">
-                  {[{value:'18+',label:'تخصصاً توفره'},{value:'24س',label:'سرعة الاستجابة'},{value:'100%',label:'خبراء معتمدون'},{value:'1%',label:'عمولة تنافسية'}].map(({value,label}) => (
+                  {[{value:'18+',label:'تخصصاً توفره'},{value:'24س',label:'سرعة الاستجابة'},{value:'100%',label:'خبراء معتمدون'},{value:'5%',label:'عمولة تنافسية'}].map(({value,label}) => (
                     <div key={label}>
                       <p className="text-4xl sm:text-5xl font-black text-primary-700 mb-2">{value}</p>
                       <p className="text-sm text-slate-500 font-medium">{label}</p>
@@ -793,7 +793,7 @@ export function EnterprisesPage() {
               <div className="max-w-2xl mx-auto">
                 <h2 className="text-3xl sm:text-4xl font-black mb-3">جاهز لبدء التحوّل؟</h2>
                 <p className="text-slate-400 mb-2">انضم لمئات المنشآت التي تنمو على "أمرني" في إدارة نموها الاستراتيجي.</p>
-                <p className="text-slate-500 text-xs mb-8">أكثر من 18 تخصص متاحة • مزودون معتمدون • عمولة ١٪ مؤقتاً</p>
+                <p className="text-slate-500 text-xs mb-8">أكثر من 18 تخصص متاحة • مزودون معتمدون • عمولة ٥٪ مؤقتاً</p>
                 <button onClick={() => { setSelectedCat(null); setForm(user ? buildPrefilledForm() : (savedDraft || EMPTY_FORM)); setSuccess(false); setShowForm(true) }}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg">
                   ابدأ رحلة التحول الآن
@@ -1368,7 +1368,7 @@ export function EnterprisesPage() {
                       <br/>• الحفاظ على سرية بيانات الشركات التي تُطابق معها
                       <br/>• عدم استخدام البيانات لأي غرض خارج الخدمة المتفق عليها
                       <br/>• عدم التواصل مع الشركات خارج المنصة
-                      <br/>• دفع عمولة ١٪ من قيمة العقد المُبرم خلال ٧٢ ساعة
+                      <br/>• دفع عمولة ٥٪ من قيمة العقد المُبرم خلال ٧٢ ساعة
                     </p>
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input type="checkbox" checked={ndaAccepted} onChange={e => setNdaAccepted(e.target.checked)} className="w-4 h-4 rounded" />
@@ -1401,7 +1401,7 @@ export function EnterprisesPage() {
                 {[
                   { n:'١', icon: FileText, title:'أرسل طلبك', desc:'اختر التخصص واملأ تفاصيل احتياجك — يُحفظ مسودة تلقائياً' },
                   { n:'٢', icon: Users, title:'نوصّلك بالمناسب', desc:'فريقنا يراجع طلبك ويختار أفضل مزود معتمد خلال ٢٤ ساعة' },
-                  { n:'٣', icon: Zap, title:'تعاقد وعمولة رمزية', desc:'تتواصل مع المزود مباشرة — عمولة ١٪ مؤقتاً حتى إطلاق الاشتراك' },
+                  { n:'٣', icon: Zap, title:'تعاقد وعمولة رمزية', desc:'تتواصل مع المزود مباشرة — عمولة ٥٪ مؤقتاً حتى إطلاق الاشتراك' },
                 ].map(({ n, icon: Icon, title, desc }) => (
                   <div key={n} className="bg-white border border-slate-200 rounded-2xl p-7 hover:shadow-md transition-all">
                     <div className="text-5xl font-black text-slate-100 mb-4">{n}</div>
@@ -1515,7 +1515,7 @@ export function EnterprisesPage() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
                   <h3 className="text-xl font-bold text-slate-900 mb-5">قيمنا</h3>
                   <div className="grid grid-cols-2 gap-4">
-                    {[['🏢','مزودون معتمدون','تدقيق شامل قبل القبول'],['⚡','مطابقة سريعة','رد خلال ٢٤ ساعة'],['🤝','تعاقد مباشر','عمولة ١٪ مؤقتاً'],['🔒','سرية تامة','إقرار موقّع من المزود']].map(([e,t,d]) => (
+                    {[['🏢','مزودون معتمدون','تدقيق شامل قبل القبول'],['⚡','مطابقة سريعة','رد خلال ٢٤ ساعة'],['🤝','تعاقد مباشر','عمولة ٥٪ مؤقتاً'],['🔒','سرية تامة','إقرار موقّع من المزود']].map(([e,t,d]) => (
                       <div key={t} className="bg-slate-50 rounded-xl p-4">
                         <div className="text-2xl mb-2">{e}</div>
                         <p className="font-bold text-slate-900 text-sm">{t}</p>
@@ -1671,7 +1671,7 @@ export function EnterprisesPage() {
             <div className="space-y-4">
               {[
                 { t:'١. طبيعة المنصة', b:'أمرني للمنشآت وسيطة تربط الشركات بمزودي الخدمات. العلاقة التعاقدية تنشأ مباشرة بين الطرفين.' },
-                { t:'٢. العمولة الحالية ⭐', b:'العمولة الحالية ١٪ من قيمة العقد المُبرم، تُحوَّل لـ IBAN: ' + COMPANY.iban + ' (بنك البلاد) خلال ٧٢ ساعة من التعاقد. هذا النظام مؤقت حتى إطلاق نظام الاشتراك الشهري.' },
+                { t:'٢. العمولة الحالية ⭐', b:'العمولة الحالية ٥٪ من قيمة العقد المُبرم، تُحوَّل لـ IBAN: ' + COMPANY.iban + ' (بنك البلاد) خلال ٧٢ ساعة من التعاقد. هذا النظام مؤقت حتى إطلاق نظام الاشتراك الشهري.' },
                 { t:'٣. نظام الاشتراك المستقبلي', b:'تعمل أمرني على إطلاق نظام اشتراك شهري (Starter / Pro / Enterprise). سيتم إبلاغ جميع المستخدمين قبل التحول بـ ٣٠ يوماً.' },
                 { t:'٤. إقرار السرية', b:'كل مزود خدمة يوقع إقرار سرية ملزم قانونياً قبل الاطلاع على بيانات الشركة.' },
                 { t:'٥. التزامات مزود الخدمة', b:'يلتزم المزود بالسرية التامة، وتقديم بيانات صحيحة، ودفع العمولة المستحقة، والتعامل بمهنية مع الشركات.' },

@@ -297,7 +297,7 @@ export function ProviderDashboard() {
                 <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <p className="font-bold text-green-700">✅ لديك طلبات مطابقة!</p>
-                    <p className="text-xs text-green-600 mt-0.5">تذكر دفع عمولة ١٪ من قيمة العقد خلال ٧٢ ساعة من التوقيع</p>
+                    <p className="text-xs text-green-600 mt-0.5">تذكر دفع عمولة ٥٪ من قيمة العقد خلال ٧٢ ساعة من التوقيع</p>
                   </div>
                   <button onClick={() => setTab('leads')}
                     className="flex-shrink-0 bg-green-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-green-600 transition-colors">
@@ -362,7 +362,7 @@ export function ProviderDashboard() {
                   {/* Commission info */}
                   <div className="mt-4 bg-slate-900 rounded-2xl p-4 text-white">
                     <p className="text-xs text-slate-400 mb-1">نظام العمولة الحالي</p>
-                    <p className="text-2xl font-black text-primary-400">١٪</p>
+                    <p className="text-2xl font-black text-primary-400">٥٪</p>
                     <p className="text-xs text-slate-300 mt-1">من قيمة العقد خلال ٧٢ ساعة</p>
                     <p className="text-xs text-slate-400 mt-2">{COMPANY.iban}</p>
                   </div>
@@ -472,7 +472,7 @@ export function ProviderDashboard() {
                             </div>
                             <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                               <p className="text-xs text-amber-700 font-bold">⚠️ تذكير العمولة</p>
-                              <p className="text-xs text-amber-600 mt-0.5">بعد توقيع العقد، حوّل ١٪ من قيمته لـ IBAN: {COMPANY.iban} (بنك البلاد) خلال ٧٢ ساعة</p>
+                              <p className="text-xs text-amber-600 mt-0.5">بعد توقيع العقد، حوّل ٥٪ من قيمته لـ IBAN: {COMPANY.iban} (بنك البلاد) خلال ٧٢ ساعة</p>
                             </div>
                           </div>
                         )}
@@ -593,7 +593,7 @@ export function ProviderDashboard() {
                 <div className="bg-slate-900 rounded-2xl p-5 text-white">
                   <h4 className="font-bold text-primary-400 mb-3">نظام العمولة</h4>
                   <p className="text-sm text-slate-300 leading-relaxed">
-                    عمولة <span className="text-primary-400 font-black text-lg">١٪</span> من قيمة كل عقد تُبرمه مع شركة عبر أمرني — تُحوَّل خلال ٧٢ ساعة من التوقيع.
+                    عمولة <span className="text-primary-400 font-black text-lg">٥٪</span> من قيمة كل عقد تُبرمه مع شركة عبر أمرني — تُحوَّل خلال ٧٢ ساعة من التوقيع.
                   </p>
                   <div className="mt-3 bg-slate-800 rounded-xl p-3 font-mono text-xs text-slate-400">
                     {COMPANY.iban} • بنك البلاد
