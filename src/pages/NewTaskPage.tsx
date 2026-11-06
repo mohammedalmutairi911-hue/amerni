@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { GoogleSignInButton } from '../components/GoogleSignInButton'
 import { ArrowLeft, ArrowRight, Sparkles, MapPin, DollarSign, Bot, CheckCircle, Loader2, Eye, EyeOff, Tag } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -43,16 +43,35 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const [task, setTask] = useState({
-    title: initialTask,
-    description: '',
-    category: detectCategory(initialTask),
-    customCategory: '',
-    city: 'الرياض',
-    budget: '',
-    use_ai: false,
-    deadline: '',
+  // مسودة الطلب: تُحفظ تلقائياً أثناء الكتابة عشان ما يضيع شغل العميل لو سكّر أو راح يسجّل
+  const DRAFT_KEY = 'amerni_task_draft'
+  const [task, setTask] = useState(() => {
+    const base = {
+      title: initialTask,
+      description: '',
+      category: detectCategory(initialTask),
+      customCategory: '',
+      city: 'الرياض',
+      budget: '',
+      use_ai: false,
+      deadline: '',
+    }
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY)
+      if (!raw) return base
+      const d = JSON.parse(raw)
+      if (!d || typeof d !== 'object' || Date.now() - (d.ts || 0) > 7 * 864e5) return base
+      // لو جاء بنص جديد من الصفحة الرئيسية، النص الجديد يغلب المسودة
+      if (initialTask && d.title !== initialTask) return { ...d.task, ...base, city: d.task?.city || base.city }
+      return { ...base, ...d.task }
+    } catch { return base }
   })
+  useEffect(() => {
+    try {
+      if (!task.title.trim() && !task.description.trim()) { localStorage.removeItem(DRAFT_KEY); return }
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ ts: Date.now(), title: task.title, task }))
+    } catch { /* ignore */ }
+  }, [task])
   const [auth, setAuth] = useState({ name: '', phone: '', email: '', password: '' })
   const setT = (k: string, v: any) => setTask(t => ({ ...t, [k]: v }))
   const setA = (k: string, v: string) => setAuth(a => ({ ...a, [k]: v }))
@@ -122,6 +141,7 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     // Google Ads / GA4 - حدث تحويل: إرسال طلب خدمة
     try { (window as any).gtag?.('event', 'generate_lead', { category: finalCategory, city: task.city }) } catch {}
 
+    try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
     return true
   }
 
@@ -299,12 +319,19 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-slate-500 mb-2 font-medium flex items-center gap-1"><DollarSign size={11} className="text-primary-500" /> ميزانيتك</label>
+                <label className="block text-xs text-slate-500 mb-2 font-medium flex items-center gap-1"><DollarSign size={11} className="text-primary-500" /> ميزانيتك (اختياري)</label>
                 <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2.5 focus-within:border-primary-500 transition-colors">
-                  <input type="number" value={task.budget} onChange={e => setT('budget', e.target.value)}
+                  <input type="number" inputMode="numeric" value={task.budget} onChange={e => setT('budget', e.target.value)}
                     placeholder="80" className="flex-1 bg-transparent text-sm outline-none text-slate-900" />
                   <span className="text-slate-400 text-xs">ريال</span>
                 </div>
+                <div className="flex gap-1.5 mt-2 flex-wrap">
+                  {['30', '50', '100', '200'].map(v => (
+                    <button key={v} type="button" onClick={() => setT('budget', v)}
+                      className={`text-[11px] px-2.5 py-1 rounded-full border ${task.budget === v ? 'border-primary-500 bg-primary-500/10 text-primary-600' : 'border-slate-200 text-slate-400'}`}>{v}</button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1.5">الطلب اللي فيه سعر ينقبل أسرع</p>
               </div>
             </div>
 

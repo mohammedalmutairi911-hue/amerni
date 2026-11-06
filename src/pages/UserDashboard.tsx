@@ -276,15 +276,31 @@ export function UserDashboard() {
 
         {/* بانتظار العامل */}
         {selectedTask.status === 'open' && (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <Clock size={20} className="text-blue-500 animate-pulse flex-shrink-0" />
-              <div>
-                <p className="font-bold text-blue-700">جاري البحث عن مقدم خدمة</p>
-                <p className="text-xs text-blue-500 mt-0.5">عادةً خلال 5–15 دقيقة</p>
+          (() => {
+            const hrs = (Date.now() - new Date(selectedTask.created_at).getTime()) / 36e5
+            const waiting = hrs >= 2
+            return (
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <Clock size={20} className="text-blue-500 animate-pulse flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-blue-700">{waiting ? 'نتابع طلبك ندوّر لك على منفّذ مناسب' : 'جاري البحث عن مقدم خدمة'}</p>
+                    <p className="text-xs text-blue-500 mt-0.5">
+                      {waiting ? 'بعض الخدمات تاخذ وقت أطول لين يتوفر منفّذ مناسب، وفريق أمرني يتابع معك.' : 'نوصل طلبك للمنفّذين المناسبين الحين'}
+                    </p>
+                  </div>
+                </div>
+                {waiting && (
+                  <div className="space-y-2 text-xs text-slate-600 bg-white/70 rounded-xl p-3">
+                    <p className="font-bold text-slate-700">وش يسرّع القبول؟</p>
+                    {!(selectedTask.price_final || selectedTask.price_suggested) && <p>• حدد سعر مقترح، المنفّذ يقبل أسرع لما يعرف السعر.</p>}
+                    <p>• وضّح التفاصيل: المكان والوقت المطلوب بالضبط.</p>
+                    <button onClick={() => navigate('support')} className="mt-1 text-primary-600 font-bold">تكلّم مع الدعم ←</button>
+                  </div>
+                )}
               </div>
-            </div>
-          </div>
+            )
+          })()
         )}
 
         {/* جاري التنفيذ */}

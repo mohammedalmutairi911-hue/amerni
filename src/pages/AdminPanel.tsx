@@ -9,6 +9,7 @@ import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { Chat } from '../components/chat/Chat'
 import { AccountsCenter } from './AccountsCenter'
+import { StaleRequests } from '../components/admin/StaleRequests'
 
 type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises' | 'providers' | 'financial'
   | 'categories' | 'verifications' | 'notifications' | 'reports' | 'system-logs' | 'ai-monitoring' | 'activity'
@@ -571,6 +572,8 @@ export function AdminPanel() {
                 <p className="text-slate-400 text-sm mt-0.5">نظرة شاملة على أداء المنصة والعمليات الجارية</p>
               </div>
 
+              <StaleRequests tasks={tasks} workers={workers} users={users} />
+
               {/* KPI Row 1 — Workers */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
@@ -887,6 +890,7 @@ export function AdminPanel() {
         {/* Tasks */}
         {tab === 'tasks' && (
           <div className="space-y-3" dir="rtl">
+            <StaleRequests tasks={tasks} workers={workers} users={users} />
             {tasks.map(task => (
               <div key={task.id} className="bg-white border border-slate-200 rounded-xl p-4">
                 <div className="flex items-start justify-between gap-3">
