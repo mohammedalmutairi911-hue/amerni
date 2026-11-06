@@ -641,13 +641,14 @@ export function WorkerDashboard() {
                             className="text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg">💬</button>
                         )}
                       </div>
-                      <div className="flex-1 text-right">
+                      <button type="button" onClick={() => { setSelectedTask(t); setTab('chat'); try { window.scrollTo(0,0); document.querySelector('main')?.scrollTo(0,0) } catch {} }}
+                        className="flex-1 min-w-0 text-right active:bg-slate-50 rounded-lg">
                         <div className="flex items-center justify-end gap-2 mb-0.5">
                           <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${STATUS_COLOR[t.status]}`}>{STATUS_LABEL[t.status]}</span>
-                          <p className="font-bold text-slate-900 text-sm">{t.title}</p>
+                          <p className="font-bold text-slate-900 text-sm break-words text-right">{t.title}</p>
                         </div>
                         <p className="text-xs text-slate-400">{t.city} • {new Date(t.created_at).toLocaleDateString('ar-SA')}</p>
-                      </div>
+                      </button>
                     </div>
                   </div>
                 ))}
