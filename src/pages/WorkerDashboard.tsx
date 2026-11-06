@@ -42,7 +42,7 @@ export function WorkerDashboard() {
   const [proofNote, setProofNote] = useState('')
   const [priceOffer, setPriceOffer] = useState('')
   const [uploadingProof, setUploadingProof] = useState(false)
-  const [cityFilter, setCityFilter] = useState('smart')
+  const [cityFilter, setCityFilter] = useState('all')
 
   // مصدر الحقيقة الوحيد لأرقام لوحة العامل — نفس الطبقة المركزية
   const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)
@@ -312,7 +312,7 @@ export function WorkerDashboard() {
     { rank: 1, name: profile?.full_name || 'أنت', dept: workerProfile?.city || 'غير محدد', score: myRating > 0 ? `${myRating.toFixed(1)}⭐` : `${myCompleted} مكتمل`, me: true },
   ]
   // SHIFTS: تُبنى من الطلبات المتاحة الحقيقية
-  const SHIFTS = filteredFeed.slice(0, 6).map(t => ({
+  const SHIFTS = filteredFeed.slice(0, 30).map(t => ({
     name: (t as any).profiles?.full_name || 'عميل',
     role: t.category || 'خدمة',
     type: t.created_at && new Date(t.created_at).getHours() < 12 ? 'صباحي' : new Date(t.created_at).getHours() < 18 ? 'مسائي' : 'ليلي',
@@ -575,13 +575,21 @@ export function WorkerDashboard() {
                 className="bg-primary-700 text-white font-bold px-4 py-2 rounded-xl text-sm">الكل</button>
             </div>
 
+            {/* فلتر الطلبات المتاحة */}
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {[['all','كل الطلبات'],['city','مدينتي'],['smart','يناسبني']].map(([k,l]) => (
+                <button key={k} onClick={() => setCityFilter(k)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap border transition-colors ${cityFilter===k ? 'bg-primary-700 text-white border-primary-700' : 'bg-white border-slate-200 text-slate-600'}`}>{l}</button>
+              ))}
+            </div>
+
             {/* Available Tasks */}
             <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
               <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
                 <span className="text-xs text-primary-600 font-bold bg-primary-50 px-2 py-0.5 rounded-full">{filteredFeed.length} متاح</span>
                 <p className="font-bold text-slate-900 text-sm">الطلبات المتاحة</p>
               </div>
-              {filteredFeed.slice(0,5).map(task => (
+              {filteredFeed.slice(0,50).map(task => (
                 <div key={task.id} className="px-4 py-3 border-b border-slate-50 last:border-0">
                   <div className="flex items-start justify-between gap-3">
                     <button onClick={() => acceptTask(task)} disabled={accepting === task.id}
