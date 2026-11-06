@@ -141,6 +141,12 @@ export function NewTaskPage({ initialTask = '', onClose }: Props) {
     // Google Ads / GA4 - حدث تحويل: إرسال طلب خدمة
     try { (window as any).gtag?.('event', 'generate_lead', { category: finalCategory, city: task.city }) } catch {}
 
+    // تنبيه العمال (شاشة + إيميل) — بدون انتظار ولا يعطل النشر لو فشل
+    try {
+      const tid = (data as any)?.task_id
+      if (tid) void supabase.functions.invoke('notify-workers', { body: { task_id: tid } }).catch(() => {})
+    } catch { /* ignore */ }
+
     try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
     return true
   }
