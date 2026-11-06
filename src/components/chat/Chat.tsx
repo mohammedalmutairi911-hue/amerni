@@ -163,6 +163,9 @@ export function Chat({ taskId, taskTitle }: Props) {
       })
     }
 
+    // تنبيه الطرف الآخر (بدون انتظار، ولا يعطّل الإرسال لو فشل)
+    try { void supabase.functions.invoke('notify-message', { body: { task_id: taskId } }).catch(() => {}) } catch { /* ignore */ }
+
     setSending(false)
   }
 
