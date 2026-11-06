@@ -241,8 +241,8 @@ export function UserDashboard() {
                       <span className="text-slate-500">قيمة الخدمة</span>
                     </div>
                     <div className="flex justify-between text-xs text-slate-400">
-                      <span>{((selectedTask.price_final || selectedTask.price_suggested || 0) * 0.02).toFixed(2)} ر.س</span>
-                      <span>عمولة المنصة 2% (على العامل)</span>
+                      <span>{((selectedTask.price_final || selectedTask.price_suggested || 0) * 0.05).toFixed(2)} ر.س</span>
+                      <span>عمولة المنصة 5% (على العامل)</span>
                     </div>
                   </>
                 )}

@@ -307,7 +307,7 @@ export function WorkerRegister({ onSuccess }: Props) {
                   {agreedTerms && <span className="text-slate-900 text-xs font-bold">✓</span>}
                 </div>
                 <div className="text-xs text-slate-500 leading-relaxed">
-                  أوافق على <span className="text-primary-400 underline cursor-pointer">الشروط والأحكام</span> وأقرّ بأن المنصة غير مسؤولة عن أي نزاع ينشأ بين الطرفين، وأن عمولة 2% ستُخصم من كل طلب مكتمل، وأن بياناتي صحيحة وأتحمل المسؤولية الكاملة عن أي معلومات مزورة.
+                  أوافق على <span className="text-primary-400 underline cursor-pointer">الشروط والأحكام</span> وأقرّ بأن المنصة غير مسؤولة عن أي نزاع ينشأ بين الطرفين، وأن عمولة 5% ستُخصم من كل طلب مكتمل، وأن بياناتي صحيحة وأتحمل المسؤولية الكاملة عن أي معلومات مزورة.
                 </div>
               </div>
             </div>

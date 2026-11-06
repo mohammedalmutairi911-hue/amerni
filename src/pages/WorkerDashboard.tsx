@@ -37,8 +37,6 @@ export function WorkerDashboard() {
   const [loading, setLoading] = useState(true)
   const [accepting, setAccepting] = useState<string | null>(null)
   const [toggling, setToggling] = useState(false)
-  const [pendingTask, setPendingTask] = useState<Task | null>(null)
-  const [showCommission, setShowCommission] = useState(false)
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
   const [proofUrl, setProofUrl] = useState('')
   const [proofNote, setProofNote] = useState('')
@@ -125,18 +123,17 @@ export function WorkerDashboard() {
     return () => { supabase.removeChannel(ch) }
   }, [user?.id, workerProfile?.is_approved])
 
-  const acceptTask = (task: Task) => { setPendingTask(task); setShowCommission(true) }
+  const acceptTask = (task: Task) => { void confirmAcceptTask(task) }
 
-  const confirmAcceptTask = async () => {
-    if (!pendingTask) return
-    setAccepting(pendingTask.id); setShowCommission(false)
+  const confirmAcceptTask = async (task: Task) => {
+    setAccepting(task.id)
     const { error } = await supabase.rpc('accept_task', {
-      p_task_id: pendingTask.id,
-      p_worker_price: (pendingTask as any).price_suggested || null,
+      p_task_id: task.id,
+      p_worker_price: (task as any).price_suggested || null,
     })
-    if (error) { toast('خطأ في قبول الطلب: ' + error.message, 'error'); setAccepting(null); setPendingTask(null); return }
+    if (error) { toast('خطأ في قبول الطلب: ' + error.message, 'error'); setAccepting(null); return }
     await fetchFeedTasks(); await fetchMyTasks()
-    setAccepting(null); setPendingTask(null); setTab('my-tasks')
+    setAccepting(null); setTab('my-tasks')
   }
 
   const submitCompletion = async () => {
@@ -210,47 +207,6 @@ export function WorkerDashboard() {
     if (cityFilter === 'smart') return t.city === workerProfile?.city || workerProfile?.skills?.some((s: string) => s.trim() === t.category?.trim())
     return t.city === workerProfile?.city
   })
-
-  // Commission Modal
-  if (showCommission && pendingTask) return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/80 backdrop-blur-sm p-0 sm:p-4">
-      <div className="w-full max-w-sm bg-white border border-slate-200 rounded-t-2xl sm:rounded-2xl max-h-[85vh] flex flex-col shadow-xl">
-        <div className="p-5 pb-3 flex-shrink-0 border-b border-slate-100">
-          <h2 className="text-base font-bold text-slate-900 text-center mb-1">شروط قبول الطلب</h2>
-          <p className="text-slate-400 text-xs text-center">يرجى الموافقة قبل القبول</p>
-        </div>
-        <div className="overflow-y-auto flex-1 px-5 py-4 space-y-3">
-          <div className="bg-primary-50 border border-primary-200 rounded-xl p-3">
-            <p className="text-sm text-slate-900 font-bold">الطلب: {pendingTask.title}</p>
-            {(pendingTask as any).price_suggested && <p className="text-sm text-primary-500 mt-1">القيمة: {(pendingTask as any).price_suggested} ريال</p>}
-          </div>
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 leading-loose">
-            أتعهد بتحويل عمولة <span className="font-bold text-primary-500">2%</span> من قيمة الطلب إلى حساب المنصة خلال <span className="font-bold">٧٢ ساعة</span> من الإتمام.
-            <div className="mt-3 bg-white border border-slate-200 rounded-xl p-3 space-y-2 text-xs">
-              {[['البنك','بنك البلاد'],['المستفيد','مؤسسة حلول الغد'],['الآيبان',COMPANY.iban]].map(([k,v]) => (
-                <div key={k} className="flex justify-between border-b border-slate-100 pb-1.5 last:border-0">
-                  <span className="text-slate-400">{k}</span>
-                  <span className="text-slate-700 font-medium">{v}</span>
-                </div>
-              ))}
-            </div>
-            {(pendingTask as any).price_suggested && (
-              <div className="mt-2 bg-primary-50 border border-primary-200 rounded-lg px-3 py-2 flex justify-between">
-                <span className="text-slate-500">العمولة المستحقة</span>
-                <span className="text-primary-500 font-black">{((pendingTask as any).price_suggested * 0.02).toFixed(2)} ريال</span>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="flex gap-3 p-5 pt-3 border-t border-slate-100 flex-shrink-0">
-          <button onClick={() => { setShowCommission(false); setPendingTask(null) }}
-            className="flex-1 border border-slate-200 text-slate-600 py-3 rounded-xl text-sm hover:bg-slate-50 transition-colors">إلغاء</button>
-          <button onClick={confirmAcceptTask}
-            className="flex-1 bg-primary-500 text-white font-bold py-3 rounded-xl text-sm hover:bg-primary-700 transition-colors">أوافق وأقبل</button>
-        </div>
-      </div>
-    </div>
-  )
 
   // Completion Modal
   if (completingTask) return (
@@ -492,23 +448,6 @@ export function WorkerDashboard() {
         {/* ── Content ── */}
         <main className="flex-1 p-4 lg:p-6 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-6 overflow-auto">
           <div className="max-w-5xl mx-auto">
-
-        {/* Commission Modal */}
-        {showCommission && pendingTask && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/80 p-0">
-            <div className="w-full max-w-sm bg-white rounded-t-2xl p-5 shadow-xl max-h-[calc(100dvh-2rem)] overflow-y-auto">
-              <h2 className="text-base font-bold text-slate-900 text-center mb-3">شروط قبول الطلب</h2>
-              <div className="bg-primary-50 border border-primary-200 rounded-xl p-3 mb-3">
-                <p className="text-sm font-bold">{pendingTask.title}</p>
-              </div>
-              <p className="text-sm text-slate-600 mb-4">أتعهد بتحويل عمولة <b className="text-primary-600">2%</b> من قيمة الطلب خلال 72 ساعة.</p>
-              <div className="flex gap-3">
-                <button onClick={() => { setShowCommission(false); setPendingTask(null) }} className="flex-1 border border-slate-200 py-3 rounded-xl text-sm">إلغاء</button>
-                <button onClick={confirmAcceptTask} className="flex-1 bg-primary-700 text-white font-bold py-3 rounded-xl text-sm">أوافق وأقبل</button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ══ OVERVIEW ══ */}
         {(tab === 'overview' || !['shifts','my-tasks','analytics','achievements'].includes(tab)) && (
