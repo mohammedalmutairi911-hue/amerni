@@ -461,7 +461,7 @@ export function WorkerDashboard() {
             <div className="grid grid-cols-2 gap-3">
               {[
                 { label: 'طلبات مكتملة', value: wCounts.completed, icon: '✅', sub: `+${thisMonth} هذا الشهر` },
-                { label: 'إجمالي الأرباح', value: `${(totalEarnings - (centralStats?.commission_due ?? 0)).toLocaleString()} ر`, icon: '💰', sub: `صافي بعد عمولة ٢٪ (${(centralStats?.commission_due ?? 0).toLocaleString()} ر)` },
+                { label: 'إجمالي الأرباح', value: `${(totalEarnings - (centralStats?.commission_due ?? 0)).toLocaleString()} ر`, icon: '💰', sub: `صافي بعد عمولة ٥٪ (${(centralStats?.commission_due ?? 0).toLocaleString()} ر)` },
                 { label: 'تقييمي', value: `${Number(wCounts.ratingAvg).toFixed(1)} ⭐`, icon: '⭐', sub: `${wCounts.ratingsCount} تقييم` },
                 { label: 'طلبات نشطة', value: wCounts.active, icon: '🔄', sub: 'جارٍ تنفيذها' },
               ].map(({ label, value, icon, sub }) => (

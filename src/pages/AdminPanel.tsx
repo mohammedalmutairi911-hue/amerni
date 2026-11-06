@@ -1522,7 +1522,7 @@ export function AdminPanel() {
                 },
                 {
                   label: 'رسوم المنصة', value: (stats.revenue).toLocaleString('ar-SA'), unit: 'رس.',
-                  sub: 'عمولة ٢٪', iconBg: 'bg-slate-50', icon: '🏷️',
+                  sub: 'عمولة ٥٪', iconBg: 'bg-slate-50', icon: '🏷️',
                   badge: null
                 },
                 {
