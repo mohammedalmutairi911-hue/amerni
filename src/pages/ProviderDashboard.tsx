@@ -1,3 +1,4 @@
+import { usePersistedState } from '../lib/persist'
 import { useState, useEffect } from 'react'
 import { isNativeApp } from '../lib/platform'
 import { NativeMoreButton } from '../components/native/NativeChrome'
@@ -41,7 +42,7 @@ export function ProviderDashboard() {
   const { navigate } = useApp()
   const { toast } = useToast()
 
-  const [tab, setTab] = useState<'overview' | 'available' | 'leads' | 'profile'>('overview')
+  const [tab, setTab] = usePersistedState<'overview' | 'available' | 'leads' | 'profile'>('amerni_p_tab', 'overview', ['overview','available','leads','profile'])
   const [providerData, setProviderData] = useState<any>(null)
   const [matchedLeads, setMatchedLeads] = useState<any[]>([])
   const [availableLeads, setAvailableLeads] = useState<any[]>([])

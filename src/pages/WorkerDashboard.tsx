@@ -1,6 +1,7 @@
 import { Logo } from '../components/Logo'
 import { isNativeApp } from '../lib/platform'
 import { NativeMoreButton } from '../components/native/NativeChrome'
+import { usePersistedState, readSaved, writeSaved } from '../lib/persist'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Star, Clock, CheckCircle, Zap, Loader2, MessageSquare, Upload, DollarSign, Home, List, Calendar, User, LogOut, MapPin, Copy, Wifi, WifiOff, BarChart2, Briefcase, TrendingUp, Plus, ChevronRight } from 'lucide-react'
@@ -28,13 +29,22 @@ export function WorkerDashboard() {
   const { user, profile, signOut } = useAuth()
   const { navigate } = useApp()
   const { toast } = useToast()
-  const [tab, setTab] = useState<'overview' | 'shifts' | 'my-tasks' | 'chat' | 'analytics' | 'achievements'>('overview')
+  const [tab, setTab] = usePersistedState<'overview' | 'shifts' | 'my-tasks' | 'chat' | 'analytics' | 'achievements'>('amerni_w_tab', 'overview', ['overview','shifts','my-tasks','chat','analytics','achievements'])
   const [workerProfile, setWorkerProfile] = useState<WorkerProfile | null>(null)
   const [reviewCount, setReviewCount] = useState(0)
   const [feedTasks, setFeedTasks] = useState<Task[]>([])
   const [myTasks, setMyTasks] = useState<Task[]>([])
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [loading, setLoading] = useState(true)
+
+  // بعد تحديث الصفحة: أرجع لنفس الطلب المفتوح (تفاصيل + محادثة)
+  useEffect(() => { if (selectedTask) writeSaved('amerni_w_task', selectedTask.id); else if (tab !== 'chat') writeSaved('amerni_w_task', null) }, [selectedTask?.id, tab])
+  useEffect(() => {
+    if (tab !== 'chat' || selectedTask || loading) return
+    const id = readSaved('amerni_w_task')
+    const t = id ? myTasks.find(x => x.id === id) : null
+    if (t) setSelectedTask(t); else setTab('my-tasks')
+  }, [tab, loading, myTasks, selectedTask])
   const [accepting, setAccepting] = useState<string | null>(null)
   const [toggling, setToggling] = useState(false)
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
@@ -43,7 +53,7 @@ export function WorkerDashboard() {
   const [priceOffer, setPriceOffer] = useState('')
   const [uploadingProof, setUploadingProof] = useState(false)
   const [cityFilter, setCityFilter] = useState('all')
-  const [ordersView, setOrdersView] = useState<'mine' | 'all'>('mine')
+  const [ordersView, setOrdersView] = usePersistedState<'mine' | 'all'>('amerni_w_orders', 'mine', ['mine','all'])
 
   // مصدر الحقيقة الوحيد لأرقام لوحة العامل — نفس الطبقة المركزية
   const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)

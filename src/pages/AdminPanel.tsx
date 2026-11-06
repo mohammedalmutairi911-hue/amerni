@@ -1,4 +1,5 @@
 import { Logo } from '../components/Logo'
+import { usePersistedState } from '../lib/persist'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
 import { Users, Briefcase, Shield, CheckCircle, XCircle, Loader2, BarChart3, MessageSquare, RefreshCw, AlertTriangle, Eye, ShieldAlert, Building2, Mail, ChevronDown, Menu, X, Activity, UserCircle, Stethoscope } from 'lucide-react'
@@ -17,7 +18,7 @@ type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enter
 
 export function AdminPanel() {
   const { navigate } = useApp()
-  const [tab, setTab] = useState<Tab>('overview')
+  const [tab, setTab] = usePersistedState<Tab>('amerni_a_tab', 'overview', ['overview','workers','tasks','users','conversations','enterprises','providers','financial'])
   const [usersScope, setUsersScope] = useState<'all' | 'individuals' | 'enterprises'>('all')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [workers, setWorkers] = useState<WorkerProfile[]>([])

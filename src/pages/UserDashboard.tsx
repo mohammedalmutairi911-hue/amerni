@@ -1,3 +1,4 @@
+import { readSaved, writeSaved } from '../lib/persist'
 import { useState, useEffect, useRef } from 'react'
 import { isNativeApp } from '../lib/platform'
 import { NativeMoreButton } from '../components/native/NativeChrome'
@@ -52,6 +53,8 @@ export function UserDashboard() {
 
   // Task detail states
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  const selectedTaskRef = useRef<Task | null>(null)
+  selectedTaskRef.current = selectedTask
   const [workerName, setWorkerName] = useState('')
   const [confirmingPayment, setConfirmingPayment] = useState(false)
   const [rating, setRating] = useState(0)
@@ -113,9 +116,14 @@ export function UserDashboard() {
       .limit(200)
     setTasks(data || [])
     setLoading(false)
+    // بعد تحديث الصفحة: أعد فتح نفس الطلب
+    const savedId = readSaved('amerni_u_task')
+    const found = savedId ? (data || []).find((t: any) => t.id === savedId) : null
+    if (found && !selectedTaskRef.current) openTask(found as Task)
   }
 
   const openTask = async (task: Task) => {
+    writeSaved('amerni_u_task', task.id)
     setSelectedTask(task)
     setRatingDone(false)
     setRating(0)
@@ -136,6 +144,7 @@ export function UserDashboard() {
   }
 
   const closeTask = () => {
+    writeSaved('amerni_u_task', null)
     setSelectedTask(null)
     setShowReceipt(false)
     if (channelRef.current) {

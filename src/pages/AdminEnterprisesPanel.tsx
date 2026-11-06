@@ -1,4 +1,5 @@
 import { Logo } from '../components/Logo'
+import { usePersistedState } from '../lib/persist'
 import { useState, useEffect } from 'react'
 import { Building2, Users, Mail, CheckCircle, BarChart2, Clock, LogOut } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -10,7 +11,7 @@ type Tab = 'overview' | 'leads' | 'providers'
 
 export function AdminEnterprisesPanel() {
   const { navigate } = useApp()
-  const [tab, setTab] = useState<Tab>('overview')
+  const [tab, setTab] = usePersistedState<Tab>('amerni_ae_tab', 'overview', ['overview','leads','providers'])
   const [leads, setLeads] = useState<any[]>([])
   const [providers, setProviders] = useState<any[]>([])
   const [overdueLeads, setOverdueLeads] = useState<any[]>([])
