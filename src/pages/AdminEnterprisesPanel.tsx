@@ -163,7 +163,7 @@ export function AdminEnterprisesPanel() {
               <span className="text-amber-500 text-lg mt-0.5">💡</span>
               <div>
                 <p className="text-sm font-bold text-amber-800">نظام العمولة المؤقت</p>
-                <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">العمولة الحالية: <strong>١٪ من قيمة العقد</strong> — تُحوَّل لـ IBAN: {COMPANY.iban} (بنك البلاد)</p>
+                <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">العمولة الحالية: <strong>٥٪ من قيمة العقد</strong> — تُحوَّل لـ IBAN: {COMPANY.iban} (بنك البلاد)</p>
               </div>
             </div>
           </div>

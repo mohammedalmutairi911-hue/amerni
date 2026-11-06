@@ -1255,7 +1255,7 @@ export function AdminPanel() {
               <span className="text-amber-500 text-lg">💡</span>
               <div>
                 <p className="text-sm font-bold text-amber-800">نظام العمولة المؤقت</p>
-                <p className="text-xs text-amber-700 leading-relaxed mt-0.5">العمولة الحالية: <strong>١٪ من قيمة العقد</strong> تُحوَّل لـ IBAN: {COMPANY.iban} (بنك البلاد) — ساري حتى إطلاق نظام الاشتراك الشهري</p>
+                <p className="text-xs text-amber-700 leading-relaxed mt-0.5">العمولة الحالية: <strong>٥٪ من قيمة العقد</strong> تُحوَّل لـ IBAN: {COMPANY.iban} (بنك البلاد) — ساري حتى إطلاق نظام الاشتراك الشهري</p>
               </div>
             </div>
 
@@ -1282,7 +1282,7 @@ export function AdminPanel() {
                           value={lead.status}
                           onChange={e => {
                             updateLeadStatus(lead.id, e.target.value)
-                            if (e.target.value === 'matched') alert('تذكير: أبلغ مزود الخدمة بعمولة ١٪ من قيمة العقد المستحقة خلال ٧٢ ساعة — IBAN: ' + COMPANY.iban + '')
+                            if (e.target.value === 'matched') alert('تذكير: أبلغ مزود الخدمة بعمولة ٥٪ من قيمة العقد المستحقة خلال ٧٢ ساعة — IBAN: ' + COMPANY.iban + '')
                           }}
                           className={`text-xs px-2 py-0.5 rounded-full border font-medium cursor-pointer outline-none ${
                             lead.status === 'new' ? 'bg-blue-50 text-blue-600 border-blue-200' :
