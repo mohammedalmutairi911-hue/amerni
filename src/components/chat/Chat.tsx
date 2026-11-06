@@ -208,11 +208,11 @@ export function Chat({ taskId, taskTitle }: Props) {
   const isAudio = (content: string) => content.startsWith('🎤 ')
 
   return (
-    <div className="flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden h-[420px] sm:h-[520px] shadow-sm">
+    <div className="flex flex-col w-full min-w-0 max-w-full bg-white border border-slate-200 rounded-2xl overflow-hidden h-[calc(100dvh-250px)] min-h-[320px] max-h-[640px] sm:h-[520px] shadow-sm">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-        <div>
-          <p className="text-sm font-bold text-slate-900">{taskTitle}</p>
+      <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50 gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-slate-900 truncate">{taskTitle}</p>
           <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
             <Shield size={10} className="text-secondary-500" /> محادثة محمية — التواصل داخل المنصة فقط
           </div>
@@ -229,7 +229,7 @@ export function Chat({ taskId, taskTitle }: Props) {
 
           if (m.is_system) return (
             <div key={m.id} className="flex justify-center">
-              <span className="text-xs text-slate-500 bg-white border border-slate-200 rounded-full px-3 py-1 max-w-xs text-center shadow-sm">{m.content}</span>
+              <span className="text-xs text-slate-500 bg-white border border-slate-200 rounded-full px-3 py-1 max-w-[90%] text-center shadow-sm break-words">{m.content}</span>
             </div>
           )
 
@@ -322,7 +322,7 @@ export function Chat({ taskId, taskTitle }: Props) {
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
             placeholder="اكتب رسالة..."
             aria-label="اكتب رسالة"
-            className="flex-1 bg-transparent text-sm outline-none placeholder-slate-400 text-slate-900"
+            className="flex-1 min-w-0 bg-transparent text-base sm:text-sm outline-none placeholder-slate-400 text-slate-900"
           />
 
           <button onClick={send}

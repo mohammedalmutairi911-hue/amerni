@@ -219,3 +219,11 @@ html.native-app button:active { opacity: .72; }
 .native-page-enter { animation: native-fade .18s ease-out; }
 @keyframes native-sheet { from { transform: translateY(40px); opacity: 0 } to { transform: none; opacity: 1 } }
 .native-sheet-in { animation: native-sheet .22s ease-out; }
+
+/* iOS يكبّر الصفحة تلقائياً عند التركيز على حقل خطه أقل من 16px — نمنعه على أجهزة اللمس */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+  textarea,
+  select { font-size: 16px; }
+}
+html, body { max-width: 100%; overflow-x: hidden; }

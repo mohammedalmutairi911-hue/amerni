@@ -840,7 +840,7 @@ export function WorkerDashboard() {
           <div className="animate-fade-in">
             <div className="flex items-center gap-3 mb-4">
               <button onClick={() => setTab('my-tasks')} className="text-slate-500 hover:text-slate-800">←</button>
-              <h2 className="font-black text-primary-700">{selectedTask.title}</h2>
+              <h2 className="font-black text-primary-700 min-w-0 truncate">{selectedTask.title}</h2>
             </div>
             <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
           </div>
