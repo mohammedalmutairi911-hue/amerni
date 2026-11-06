@@ -450,7 +450,7 @@ export function WorkerDashboard() {
           <div className="max-w-5xl mx-auto">
 
         {/* ══ OVERVIEW ══ */}
-        {(tab === 'overview' || !['shifts','my-tasks','analytics','achievements'].includes(tab)) && (
+        {(tab === 'overview' || !['shifts','my-tasks','analytics','achievements','chat'].includes(tab)) && (
           <div className="space-y-5 animate-fade-in">
             <div>
               <h2 className="text-2xl font-black text-primary-700 mb-1">لوحة العامل</h2>
@@ -614,7 +614,7 @@ export function WorkerDashboard() {
                             className="text-xs bg-green-500 text-white font-bold px-3 py-1.5 rounded-lg">أنهِ</button>
                         )}
                         {t.status !== 'completed' && t.status !== 'cancelled' && (
-                          <button onClick={() => { setSelectedTask(t); setTab('chat') }}
+                          <button onClick={() => { setSelectedTask(t); setTab('chat'); try { window.scrollTo(0,0); document.querySelector('main')?.scrollTo(0,0) } catch {} }}
                             className="text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg">💬</button>
                         )}
                       </div>
@@ -840,9 +840,22 @@ export function WorkerDashboard() {
           <div className="animate-fade-in">
             <div className="flex items-center gap-3 mb-4">
               <button onClick={() => setTab('my-tasks')} className="text-slate-500 hover:text-slate-800">←</button>
-              <h2 className="font-black text-primary-700 min-w-0 truncate">{selectedTask.title}</h2>
+              <h2 className="font-black text-primary-700 min-w-0 break-words leading-snug">{selectedTask.title}</h2>
             </div>
-            <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
+            {/* تفاصيل الطلب */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm mb-3 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full border flex-shrink-0 ${STATUS_COLOR[selectedTask.status]}`}>{STATUS_LABEL[selectedTask.status]}</span>
+                <span className="text-xs text-slate-400 truncate">{(selectedTask as any).city || ''}{(selectedTask as any).category ? ' • ' + (selectedTask as any).category : ''}</span>
+              </div>
+              {(selectedTask as any).description && (
+                <p className="text-sm text-slate-600 leading-relaxed break-words">{(selectedTask as any).description}</p>
+              )}
+              {((selectedTask as any).price_final || (selectedTask as any).price_suggested) && (
+                <p className="text-sm font-black text-primary-700">{(selectedTask as any).price_final || (selectedTask as any).price_suggested} ريال</p>
+              )}
+            </div>
+            <Chat taskId={selectedTask.id} taskTitle="المحادثة مع العميل" />
           </div>
         )}
         {tab === 'chat' && !selectedTask && (
