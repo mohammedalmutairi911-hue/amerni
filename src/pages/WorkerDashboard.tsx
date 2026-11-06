@@ -43,6 +43,7 @@ export function WorkerDashboard() {
   const [priceOffer, setPriceOffer] = useState('')
   const [uploadingProof, setUploadingProof] = useState(false)
   const [cityFilter, setCityFilter] = useState('all')
+  const [ordersView, setOrdersView] = useState<'mine' | 'all'>('mine')
 
   // مصدر الحقيقة الوحيد لأرقام لوحة العامل — نفس الطبقة المركزية
   const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)
@@ -571,10 +572,19 @@ export function WorkerDashboard() {
                 <h2 className="text-2xl font-black text-primary-700 mb-1">طلباتي</h2>
                 <p className="text-slate-500 text-sm">الطلبات النشطة والمكتملة</p>
               </div>
-              <button onClick={() => setTab('overview')}
-                className="bg-primary-700 text-white font-bold px-4 py-2 rounded-xl text-sm">الكل</button>
             </div>
 
+            {/* تبديل: طلباتي / كل الطلبات */}
+            <div className="grid grid-cols-2 gap-1 bg-slate-100 rounded-xl p-1">
+              {([['mine','طلباتي الحالية', myTasks.length],['all','كل الطلبات', filteredFeed.length]] as const).map(([k,l,c]) => (
+                <button key={k} onClick={() => { setOrdersView(k); try { window.scrollTo(0,0) } catch {} }}
+                  className={`py-2 rounded-lg text-sm font-bold transition-colors ${ordersView===k ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500'}`}>
+                  {l} <span className="text-xs opacity-70">({c})</span>
+                </button>
+              ))}
+            </div>
+
+            {ordersView === 'all' && (<>
             {/* فلتر الطلبات المتاحة */}
             <div className="flex gap-2 overflow-x-auto pb-1">
               {[['all','كل الطلبات'],['city','مدينتي'],['smart','يناسبني']].map(([k,l]) => (
@@ -607,8 +617,13 @@ export function WorkerDashboard() {
               {filteredFeed.length === 0 && <p className="text-center text-slate-400 text-sm py-8">لا توجد طلبات متاحة الآن</p>}
             </div>
 
+            </>)}
+
             {/* My Active Tasks */}
-            {myTasks.length > 0 && (
+            {ordersView === 'mine' && myTasks.length === 0 && (
+              <p className="text-center text-slate-400 text-sm py-10">ما عندك طلبات حالياً — شوف «كل الطلبات» واقبل طلب</p>
+            )}
+            {ordersView === 'mine' && myTasks.length > 0 && (
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="px-4 py-3 border-b border-slate-100">
                   <p className="font-bold text-slate-900 text-sm">طلباتي الحالية</p>
