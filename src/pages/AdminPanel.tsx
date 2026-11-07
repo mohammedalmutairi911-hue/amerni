@@ -22,6 +22,7 @@ export function AdminPanel() {
   const [usersScope, setUsersScope] = useState<'all' | 'individuals' | 'enterprises'>('all')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [workers, setWorkers] = useState<WorkerProfile[]>([])
+  const [workerFilter, setWorkerFilter] = usePersistedState<'pending'|'approved'|'all'>('amerni_a_wfilter', 'pending', ['pending','approved','all'])
   const [tasks, setTasks] = useState<Task[]>([])
   const [users, setUsers] = useState<Profile[]>([])
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
@@ -785,10 +786,10 @@ export function AdminPanel() {
             {/* KPI */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'طلبات معلقة',    value: workers.filter(w=>!w.is_approved).length || 24,  sub: '+5 منذ يوم أمس',        icon: '📋', iconBg: 'bg-slate-50' },
-                { label: 'تمت الموافقة',   value: workers.filter(w=>w.is_approved).length || 142,  sub: 'هذا الشهر',             icon: '✅', iconBg: 'bg-green-50' },
-                { label: 'بانتظار معلومات', value: Math.floor(workers.length * 0.1) || 8,           sub: 'تتطلب إجراء سريع',      icon: '⚠️', iconBg: 'bg-amber-50' },
-                { label: 'طلبات مرفوضة',   value: Math.floor(workers.length * 0.08) || 12,         sub: 'بسبب عدم مطابقة المعايير', icon: '🚫', iconBg: 'bg-red-50' },
+                { label: 'طلبات معلقة',    value: workers.filter(w=>!w.is_approved).length,  sub: 'بانتظار المراجعة',  icon: '📋', iconBg: 'bg-slate-50' },
+                { label: 'عمال معتمدون',   value: workers.filter(w=>w.is_approved).length,   sub: 'نشطون على المنصة', icon: '✅', iconBg: 'bg-green-50' },
+                { label: 'إجمالي العمال',  value: workers.length,                            sub: 'كل المسجلين',       icon: '👥', iconBg: 'bg-primary-50' },
+                { label: 'معتمدون آخر ٣٠ يوم', value: workers.filter(w=>w.is_approved && (w as any).created_at && Date.now()-new Date((w as any).created_at).getTime() < 30*864e5).length, sub: 'انضموا حديثاً', icon: '🆕', iconBg: 'bg-amber-50' },
               ].map(({ label, value, sub, icon, iconBg }) => (
                 <div key={label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm card-hover">
                   <div className="flex items-start justify-between mb-3">
@@ -801,6 +802,15 @@ export function AdminPanel() {
               ))}
             </div>
 
+            <div className="flex gap-2 overflow-x-auto">
+              {([['pending','معلقة'],['approved','معتمدون'],['all','الكل']] as const).map(([k,l]) => (
+                <button key={k} onClick={() => setWorkerFilter(k)}
+                  className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap border ${workerFilter===k?'bg-primary-700 text-white border-primary-700':'bg-white text-slate-600 border-slate-200'}`}>
+                  {l} ({k==='pending'?workers.filter(w=>!w.is_approved).length:k==='approved'?workers.filter(w=>w.is_approved).length:workers.length})
+                </button>
+              ))}
+            </div>
+
             {/* Workers Grid */}
             {workers.length === 0 ? (
               <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-16 text-center">
@@ -810,7 +820,7 @@ export function AdminPanel() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {workers.map((w, i) => {
+                {workers.filter(w => workerFilter==='all' || (workerFilter==='approved') === !!w.is_approved).map((w, i) => {
                   const statusConf = w.is_approved
                     ? { label: 'موافق', color: 'bg-green-50 text-green-600 border-green-200' }
                     : { label: 'بانتظار المراجعة', color: 'bg-amber-50 text-amber-500 border-amber-200' }
@@ -860,19 +870,17 @@ export function AdminPanel() {
                       </div>
 
                       {/* Actions */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {w.is_approved ? (
                         <button onClick={() => rejectWorker(w.user_id)}
-                          className="border-2 border-red-200 text-red-500 font-bold py-2 rounded-xl text-xs hover:bg-red-50 transition-colors">
-                          رفض
+                          className="w-full border-2 border-red-200 text-red-500 font-bold py-2 rounded-xl text-xs hover:bg-red-50 transition-colors">
+                          إلغاء الاعتماد
                         </button>
-                        <button className="border-2 border-slate-200 text-slate-500 font-bold py-2 rounded-xl text-xs hover:bg-slate-50 transition-colors">
-                          توضيح
-                        </button>
+                      ) : (
                         <button onClick={() => approveWorker(w.user_id)}
-                          className="bg-primary-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-primary-800 transition-colors shadow-sm">
+                          className="w-full bg-primary-700 text-white font-bold py-2 rounded-xl text-xs hover:bg-primary-800 transition-colors shadow-sm">
                           قبول
                         </button>
-                      </div>
+                      )}
                     </div>
                   )
                 })}
