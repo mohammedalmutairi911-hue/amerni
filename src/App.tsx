@@ -163,6 +163,8 @@ export default function App() {
     if (page === 'verify') return <><Navbar /><VerifyPage />{authOpen && <AuthModal />}</>
 
     if (!user || !profile) {
+      // صفحة "سجّل كمزود خدمة" متاحة للزوار (قبل هذا كانت تعرض الصفحة الرئيسية فيضيع الزائر)
+      if (page === 'join' || page === 'earn') return <><Navbar /><JoinPage />{authOpen && <AuthModal />}</>
       if (native && page === 'landing' && !guestBrowse) {
         return <><NativeWelcome onBrowse={() => { try { sessionStorage.setItem('amerni_guest_browse', '1') } catch { /* ignore */ } setGuestBrowse(true) }} />{authOpen && <AuthModal />}</>
       }

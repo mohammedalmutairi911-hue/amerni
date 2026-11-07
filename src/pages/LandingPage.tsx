@@ -60,7 +60,7 @@ const SUPPORT_SYSTEM = `أنت مساعد خدمة عملاء لمنصة "أمر
 
 interface SupportMsg { role: 'user' | 'assistant'; content: string }
 
-function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSuccess: () => void }) {
+function DirectAuthForm({ mode, onSuccess, initialRole = null }: { mode: 'login'|'register'; onSuccess: () => void; initialRole?: 'client'|'worker'|null }) {
   const { signUp, signIn, signInWithGoogle } = useAuth()
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -70,7 +70,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
   const [error, setError] = useState('')
   const [resetSent, setResetSent] = useState(false)
   const [showReset, setShowReset] = useState(false)
-  const [role, setRole] = useState<'client'|'worker'>('client')
+  const [role, setRole] = useState<'client'|'worker'|null>(initialRole)
 
   const handleReset = async () => {
     if (!email) { setError('أدخل بريدك الإلكتروني'); return }
@@ -85,12 +85,13 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
   const handle = async () => {
     setError('')
     if (mode === 'register') {
+      if (!role) { setError('اختر نوع حسابك: عميل أو مقدم خدمة'); return }
       if (!name.trim()) { setError('أدخل اسمك'); return }
       if (!email.includes('@')) { setError('أدخل بريد إلكتروني صحيح'); return }
       if (password.length < 6) { setError('كلمة المرور 6 أحرف على الأقل'); return }
       setLoading(true)
       try {
-        const { error: err } = await signUp(email.trim(), password, name.trim(), role)
+        const { error: err } = await signUp(email.trim(), password, name.trim(), role || 'client')
         if (err) { setError(err.message || 'حدث خطأ'); setLoading(false); return }
         await new Promise(r => setTimeout(r, 1000))
         const { data: { session } } = await supabase.auth.getSession()
@@ -126,17 +127,24 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
   return (
     <div className="space-y-3">
       {mode === 'register' && (
-        <div className="flex gap-1 bg-white rounded-xl p-1 mb-1">
-          <button onClick={() => setRole('client')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'client' ? 'bg-primary-500 text-white' : 'text-slate-500 hover:text-slate-900'}`}>
-            🙋 أبي أطلب خدمة
-          </button>
-          <button onClick={() => setRole('worker')}
-            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${role === 'worker' ? 'bg-primary-500 text-white' : 'text-slate-500 hover:text-slate-900'}`}>
-            🔧 سجّل كمزود خدمة
-          </button>
+        <div>
+          <p className="text-sm font-bold text-slate-800 mb-2">اختر نوع حسابك</p>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { v: 'client', icon: '🛒', label: 'عميل', desc: 'أبي أطلب خدمة وينفذها لي أحد' },
+              { v: 'worker', icon: '💼', label: 'مقدم خدمة', desc: 'أبي أشتغل وأكسب من الطلبات' },
+            ].map(({ v, icon, label, desc }) => (
+              <button key={v} type="button" onClick={() => { setRole(v as any); setError('') }}
+                className={`text-center p-3 rounded-xl border-2 transition-all ${role === v ? 'border-primary-500 bg-primary-500/10 ring-2 ring-primary-500/20' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                <p className="text-2xl mb-1">{icon}</p>
+                <p className="text-sm font-black text-slate-900">{label}</p>
+                <p className="text-xs text-slate-500 mt-0.5 leading-snug">{desc}</p>
+              </button>
+            ))}
+          </div>
         </div>
       )}
+      {(mode === 'login' || role === 'client') && (
       <GoogleSignInButton text={mode === 'login' ? 'signin_with' : 'signup_with'} fallback={
       <button onClick={signInWithGoogle}
         className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200">
@@ -149,7 +157,8 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
         {mode === 'login' ? 'دخول بـ Google' : 'تسجيل بـ Google'}
       </button>
       } />
-      <div className="flex items-center gap-2"><div className="flex-1 h-px bg-slate-100"/><span className="text-xs text-slate-400">أو</span><div className="flex-1 h-px bg-slate-100"/></div>
+      )}
+      {(mode === 'login' || role === 'client') && <div className="flex items-center gap-2"><div className="flex-1 h-px bg-slate-100"/><span className="text-xs text-slate-400">أو</span><div className="flex-1 h-px bg-slate-100"/></div>}
       {mode === 'register' && (
         <>
           <input value={name} onChange={e => setName(e.target.value)} placeholder="الاسم الكامل"
@@ -158,7 +167,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
             <span className="bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-sm text-slate-500 flex-shrink-0">🇸🇦 +966</span>
             <input type="tel" value={phone} maxLength={10} onChange={e => setPhone(e.target.value.replace(/\D/g,'').slice(0,10))}
               placeholder="05XXXXXXXX"
-              className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500 transition-colors text-slate-900" />
+              className="flex-1 min-w-0 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500 transition-colors text-slate-900" />
           </div>
         </>
       )}
@@ -208,7 +217,7 @@ function DirectAuthForm({ mode, onSuccess }: { mode: 'login'|'register'; onSucce
           <button onClick={handle} disabled={loading}
             className="w-full bg-primary-500 text-white font-bold py-3 rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             {loading && <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />}
-            {mode === 'login' ? 'دخول' : 'إنشاء حساب'}
+            {mode === 'login' ? 'دخول' : role === 'worker' ? 'سجّل كمقدم خدمة' : role === 'client' ? 'سجّل كعميل' : 'إنشاء حساب'}
           </button>
         </>
       )}
@@ -255,6 +264,7 @@ export function LandingPage() {
   const [showAuthDirect, setShowAuthDirect] = useState(false)
   const [portalNotice, setPortalNotice] = useState<null | 'individuals' | 'enterprises'>(null)
   const [authDirectMode, setAuthDirectMode] = useState<'login'|'register'>('login')
+  const [authDirectRole, setAuthDirectRole] = useState<'client'|'worker'|null>(null)
 
   // Contact form
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' })
@@ -676,7 +686,7 @@ export function LandingPage() {
           ) : (
             <div className="flex items-center gap-2">
               <button onClick={() => { setAuthDirectMode('login'); setShowAuthDirect(true) }} className="text-slate-500 hover:text-slate-900 text-sm transition-colors">دخول</button>
-              <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">سجّل</button>
+              <button onClick={() => { setAuthDirectRole(null); setAuthDirectMode('register'); setShowAuthDirect(true) }} className="bg-primary-500 text-white font-bold px-4 py-1.5 rounded-lg text-sm hover:bg-primary-700 transition-colors">سجّل</button>
             </div>
           )}
         </div>
@@ -815,7 +825,7 @@ export function LandingPage() {
                 <h2 className="text-3xl font-black text-white mb-3">عندك وقت أو مهارة؟ اكسب منها</h2>
                 <p className="text-blue-100 mb-8">سجّل في دقيقة، واستقبل طلبات الناس في منطقتك — تنفّذ الي تقدر عليه وتحدد سعرك وتستلم فلوسك في محفظتك.</p>
                 <div className="flex flex-wrap justify-center gap-3">
-                  <button onClick={() => { setAuthDirectMode('register'); setShowAuthDirect(true) }}
+                  <button onClick={() => { setAuthDirectRole('worker'); setAuthDirectMode('register'); setShowAuthDirect(true) }}
                     className="bg-white text-primary-500 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
                     سجّل كمزود خدمة
                   </button>
@@ -1310,7 +1320,7 @@ export function LandingPage() {
           <div className="w-full max-w-sm bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-2xl max-h-[calc(100dvh-2rem)] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">{authDirectMode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب'}</h2>
-              <button onClick={() => setShowAuthDirect(false)} className="text-slate-400 hover:text-slate-900">✕</button>
+              <button onClick={() => { setShowAuthDirect(false); setAuthDirectRole(null) }} className="text-slate-400 hover:text-slate-900">✕</button>
             </div>
             <div className="flex gap-1 bg-white rounded-xl p-1 mb-5">
               {[{ v: 'login', l: 'دخول' }, { v: 'register', l: 'حساب جديد' }].map(({ v, l }) => (
@@ -1320,7 +1330,7 @@ export function LandingPage() {
                 </button>
               ))}
             </div>
-            <DirectAuthForm mode={authDirectMode} onSuccess={async () => {
+            <DirectAuthForm key={authDirectRole || 'none'} initialRole={authDirectRole} mode={authDirectMode} onSuccess={async () => {
               setShowAuthDirect(false)
               // نجيب البروفايل فريش لأن profile في closure قديم
               const { data: { user: cu } } = await supabase.auth.getUser()

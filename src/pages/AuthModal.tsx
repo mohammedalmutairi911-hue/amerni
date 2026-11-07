@@ -7,9 +7,9 @@ import { goHome, goToUserHome, getHomePage } from '../lib/homePage'
 
 export function AuthModal() {
   const { signIn, signUp } = useAuth()
-  const { authTab, authPlatform, authPrefill, closeAuth, navigate } = useApp()
+  const { authTab, authPlatform, authPrefill, authRole, closeAuth, navigate } = useApp()
   const [tab, setTab] = useState<'login' | 'signup'>(authTab)
-  const [role, setRole] = useState<'client' | 'worker'>('client')
+  const [role, setRole] = useState<'client' | 'worker' | null>(authRole)
   const [form, setForm] = useState({ name: authPrefill?.name || '', email: authPrefill?.email || '', password: '' })
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -23,6 +23,7 @@ export function AuthModal() {
     setError('')
     if (!form.email || !form.password) { setError('أكمل البيانات'); return }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) { setError('أدخل بريداً إلكترونياً صحيحاً'); return }
+    if (tab === 'signup' && !isEnterprise && !role) { setError('اختر نوع حسابك: عميل أو مقدم خدمة'); return }
     if (tab === 'signup' && !form.name.trim()) { setError('أدخل اسمك'); return }
     if (tab === 'signup' && form.password.length < 6) { setError('كلمة المرور 6 أحرف على الأقل'); return }
     setLoading(true)
@@ -40,7 +41,7 @@ export function AuthModal() {
       }
     } else {
       // في المنشآت الدور دائماً client (الشركة)، الفصل عبر platform
-      const signupRole = isEnterprise ? 'client' : role
+      const signupRole = isEnterprise ? 'client' : (role || 'client')
       const { error } = await signUp(form.email, form.password, form.name, signupRole, authPlatform)
       if (error) {
         // ترجمة أخطاء Supabase الشائعة للعربية بدل عرضها بالإنجليزية
@@ -73,7 +74,7 @@ export function AuthModal() {
       }
     } else {
       // signup — نبني بروفايل مؤقت من قيم النموذج ونمرره لـ goToUserHome
-      const signupRole = isEnterprise ? 'client' : role
+      const signupRole = isEnterprise ? 'client' : (role || 'client')
       const fakeProfile = { role: signupRole, platform: authPlatform } as any
       goToUserHome(navigate, fakeProfile)
       if (isEnterprise) {
@@ -111,21 +112,22 @@ export function AuthModal() {
                   className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary-500/50 transition-colors" />
               </div>
 
-              {/* Role selection — للأفراد فقط، المنشآت شركات */}
+              {/* اختيار نوع الحساب — للأفراد فقط، المنشآت شركات */}
               {!isEnterprise && (
               <div>
-                <label className="block text-xs text-slate-400 mb-2">أنا</label>
+                <label className="block text-sm font-bold text-slate-800 mb-2">اختر نوع حسابك</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { v: 'client', label: 'أطلب خدمة', desc: 'أريد شخص ينجز لي شيء' },
-                    { v: 'worker', label: 'أشتغل معكم', desc: 'أريد قبول طلبات وكسب' }
-                  ].map(({ v, label, desc }) => (
-                    <button key={v} onClick={() => setRole(v as any)}
-                      className={`text-right p-3 rounded-xl border transition-all ${
-                        role === v ? 'border-primary-500 bg-primary-500/10' : 'border-slate-200 hover:border-slate-300'
+                    { v: 'client', icon: '🛒', label: 'عميل', desc: 'أبي أطلب خدمة وينفذها لي أحد' },
+                    { v: 'worker', icon: '💼', label: 'مقدم خدمة', desc: 'أبي أشتغل وأكسب من الطلبات' }
+                  ].map(({ v, icon, label, desc }) => (
+                    <button key={v} type="button" onClick={() => { setRole(v as any); setError('') }}
+                      className={`text-center p-3 rounded-xl border-2 transition-all ${
+                        role === v ? 'border-primary-500 bg-primary-500/10 ring-2 ring-primary-500/20' : 'border-slate-200 hover:border-slate-300'
                       }`}>
-                      <p className="text-sm font-medium">{label}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">{desc}</p>
+                      <p className="text-2xl mb-1">{icon}</p>
+                      <p className="text-sm font-black text-slate-900">{label}</p>
+                      <p className="text-xs text-slate-500 mt-0.5 leading-snug">{desc}</p>
                     </button>
                   ))}
                 </div>
@@ -178,7 +180,7 @@ export function AuthModal() {
               <button onClick={submit} disabled={loading}
                 className="w-full bg-primary-500 text-white font-bold py-2.5 rounded-xl hover:bg-primary-400 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {loading && <Loader2 size={15} className="animate-spin" />}
-                {tab === 'login' ? 'دخول' : 'إنشاء حساب'}
+                {tab === 'login' ? 'دخول' : isEnterprise ? 'إنشاء حساب' : role === 'worker' ? 'سجّل كمقدم خدمة' : role === 'client' ? 'سجّل كعميل' : 'إنشاء حساب'}
               </button>
             </>
           )}

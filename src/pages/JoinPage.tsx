@@ -1,10 +1,12 @@
 import { useApp } from '../contexts/AppContext'
+import { useAuth } from '../contexts/AuthContext'
 
 export function JoinPage() {
   const { navigate, openAuth } = useApp()
+  const { user } = useAuth()
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4" dir="rtl">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 pt-20 pb-8" dir="rtl">
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
           <div className="w-16 h-16 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -31,11 +33,11 @@ export function JoinPage() {
           ))}
         </div>
 
-        <button onClick={() => { openAuth('signup'); navigate('landing') }}
+        <button onClick={() => { openAuth('signup', 'individuals', null, 'worker'); if (user) navigate('landing') }}
           className="w-full bg-primary-500 hover:bg-primary-400 text-white font-black py-4 rounded-2xl text-lg transition-colors mb-3">
           سجّل كمزود خدمة — مجاناً
         </button>
-        <button onClick={() => navigate('landing')}
+        <button onClick={() => { if (user) navigate('landing'); else openAuth('login') }}
           className="w-full text-slate-400 hover:text-slate-600 py-3 text-sm transition-colors">
           لديك حساب؟ سجّل دخول
         </button>

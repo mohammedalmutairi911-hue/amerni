@@ -38,7 +38,8 @@ interface AppCtx {
   authTab: 'login' | 'signup'
   authPlatform: 'individuals' | 'enterprises'
   authPrefill: { name?: string; email?: string } | null
-  openAuth: (tab?: 'login' | 'signup', platform?: 'individuals' | 'enterprises', prefill?: { name?: string; email?: string }) => void
+  authRole: 'client' | 'worker' | null
+  openAuth: (tab?: 'login' | 'signup', platform?: 'individuals' | 'enterprises', prefill?: { name?: string; email?: string } | null, role?: 'client' | 'worker' | null) => void
   closeAuth: () => void
 }
 
@@ -53,6 +54,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [authTab, setAuthTab] = useState<'login' | 'signup'>('login')
   const [authPlatform, setAuthPlatform] = useState<'individuals' | 'enterprises'>('individuals')
   const [authPrefill, setAuthPrefill] = useState<{ name?: string; email?: string } | null>(null)
+  const [authRole, setAuthRole] = useState<'client' | 'worker' | null>(null)
 
   // Sync page when browser back/forward buttons used
   useEffect(() => {
@@ -80,7 +82,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       authTab,
       authPlatform,
       authPrefill,
-      openAuth: (tab = 'login', platform = 'individuals', prefill = null) => { setAuthTab(tab); setAuthPlatform(platform); setAuthPrefill(prefill); setAuthOpen(true) },
+      authRole,
+      openAuth: (tab = 'login', platform = 'individuals', prefill = null, role = null) => { setAuthTab(tab); setAuthPlatform(platform); setAuthPrefill(prefill); setAuthRole(role); setAuthOpen(true) },
       closeAuth: () => setAuthOpen(false)
     }}>
       {children}
