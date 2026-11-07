@@ -171,7 +171,14 @@ export function AdminPanel() {
       } else if (u.role === 'client' && platform === 'enterprises') {
         items.push({ id: `u-${u.id}`, ts: new Date(u.created_at).getTime(), emoji: '🏢', bg: 'bg-blue-50', fg: 'text-blue-600', title: 'تسجيل منشأة جديدة', name: u.full_name || u.email, onClick: () => setTab('enterprises') })
       } else if (u.role === 'worker') {
-        items.push({ id: `u-${u.id}`, ts: new Date(u.created_at).getTime(), emoji: '👤', bg: 'bg-primary-50', fg: 'text-primary-600', title: 'تسجيل عامل جديد', name: u.full_name || u.email, statusLabel: workers.find(w => w.user_id === u.id)?.is_approved ? 'Approved' : 'Pending', statusColor: workers.find(w => w.user_id === u.id)?.is_approved ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700', onClick: () => setTab('workers') })
+        items.push({ id: `u-${u.id}`, ts: new Date(u.created_at).getTime(), emoji: '👤', bg: 'bg-primary-50', fg: 'text-primary-600', title: 'تسجيل عامل جديد', name: u.full_name || u.email, ...(() => {
+          // بدون صف في worker_profiles = سجّل كعامل لكن ما أكمل نموذج العامل (الجوال/الهوية/المهارات)
+          const wp = workers.find(w => w.user_id === u.id)
+          if (!wp) return { statusLabel: 'لم يكمل التسجيل', statusColor: 'bg-slate-100 text-slate-600' }
+          return wp.is_approved
+            ? { statusLabel: 'Approved', statusColor: 'bg-green-100 text-green-700' }
+            : { statusLabel: 'Pending', statusColor: 'bg-amber-100 text-amber-700' }
+        })(), onClick: () => setTab('workers') })
       } else {
         items.push({ id: `u-${u.id}`, ts: new Date(u.created_at).getTime(), emoji: '👤', bg: 'bg-primary-50', fg: 'text-primary-600', title: 'تسجيل فرد جديد', name: u.full_name || u.email, onClick: () => setTab('users') })
       }
@@ -810,6 +817,38 @@ export function AdminPanel() {
                 </button>
               ))}
             </div>
+
+            {/* سجّلوا كعمال ولم يكملوا نموذج العامل — لا يوجد ملف لاعتماده بعد */}
+            {(() => {
+              const wpIds = new Set(workers.map(w => w.user_id))
+              const incomplete = users.filter(u => u.role === 'worker' && !wpIds.has(u.id))
+              if (incomplete.length === 0) return null
+              return (
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                  <div className="mb-3">
+                    <h3 className="font-bold text-slate-900">لم يكملوا التسجيل ({incomplete.length})</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">أنشؤوا حساب عامل لكن ما أكملوا خطوات (الجوال، الهوية، المهارات، الجدول) — يظهر زر القبول بعد إكمالهم</p>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {incomplete.map(u => (
+                      <div key={u.id} className="flex items-center justify-between gap-3 py-3">
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-800 text-sm truncate">{u.full_name || u.email}</p>
+                          <p className="text-xs text-slate-400 truncate" dir="ltr">{u.email}</p>
+                          <p className="text-xs text-slate-400">{timeAgoAr(u.created_at)}</p>
+                        </div>
+                        {u.email && (
+                          <a href={`mailto:${u.email}?subject=${encodeURIComponent('أكمل تسجيلك كعامل في أمرني')}&body=${encodeURIComponent('هلا ' + (u.full_name || '') + '،\nباقي لك خطوات بسيطة عشان يكتمل تسجيلك كعامل في أمرني وتبدأ تستقبل الطلبات. ادخل على amerniksa.com وكمّل بياناتك.\nفريق أمرني')}`}
+                            className="flex-shrink-0 border border-slate-200 text-slate-600 font-bold px-3 py-1.5 rounded-xl text-xs hover:bg-slate-50">
+                            ✉️ تذكير
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Workers Grid */}
             {workers.length === 0 ? (
