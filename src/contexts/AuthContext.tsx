@@ -26,7 +26,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const fetchProfile = async (uid: string) => {
-    const { data } = await supabase.from('profiles').select('*').eq('id', uid).single()
+    let { data } = await supabase.from('profiles').select('*').eq('id', uid).single()
+    // تسجيل Google كمقدم خدمة: Google لا يمرّر الدور، فنرفع الحساب الجديد (فقط) إلى worker
+    // الشروط: اختار "مقدم خدمة" قبل Google خلال آخر 15 دقيقة + الحساب أُنشئ قبل أقل من 15 دقيقة + أفراد + ما زال client
+    try {
+      const raw = localStorage.getItem('amerni_pending_role')
+      if (raw && data) {
+        const pending = JSON.parse(raw) as { role: string; ts: number }
+        localStorage.removeItem('amerni_pending_role')
+        const fresh = Date.now() - pending.ts < 15 * 60 * 1000
+        const newAccount = Date.now() - new Date(data.created_at).getTime() < 15 * 60 * 1000
+        if (pending.role === 'worker' && fresh && newAccount && data.role === 'client' && (data as any).platform !== 'enterprises') {
+          const { error } = await supabase.from('profiles').update({ role: 'worker' }).eq('id', uid)
+          if (!error) data = { ...data, role: 'worker' } as any
+        }
+      }
+    } catch { /* soft-fail */ }
     if (data) setProfile(data)
   }
 

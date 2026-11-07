@@ -71,6 +71,13 @@ function DirectAuthForm({ mode, onSuccess, initialRole = null }: { mode: 'login'
   const [resetSent, setResetSent] = useState(false)
   const [showReset, setShowReset] = useState(false)
   const [role, setRole] = useState<'client'|'worker'|null>(initialRole)
+  // Google لا يمرّر الدور — نحفظ الاختيار ليطبّقه AuthContext على الحساب الجديد فقط
+  useEffect(() => {
+    try {
+      if (mode === 'register' && role === 'worker') localStorage.setItem('amerni_pending_role', JSON.stringify({ role: 'worker', ts: Date.now() }))
+      else localStorage.removeItem('amerni_pending_role')
+    } catch { /* ignore */ }
+  }, [mode, role])
 
   const handleReset = async () => {
     if (!email) { setError('أدخل بريدك الإلكتروني'); return }
@@ -144,7 +151,7 @@ function DirectAuthForm({ mode, onSuccess, initialRole = null }: { mode: 'login'
           </div>
         </div>
       )}
-      {(mode === 'login' || role === 'client') && (
+      {(mode === 'login' || !!role) && (
       <GoogleSignInButton text={mode === 'login' ? 'signin_with' : 'signup_with'} fallback={
       <button onClick={signInWithGoogle}
         className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200">
@@ -158,7 +165,7 @@ function DirectAuthForm({ mode, onSuccess, initialRole = null }: { mode: 'login'
       </button>
       } />
       )}
-      {(mode === 'login' || role === 'client') && <div className="flex items-center gap-2"><div className="flex-1 h-px bg-slate-100"/><span className="text-xs text-slate-400">أو</span><div className="flex-1 h-px bg-slate-100"/></div>}
+      {(mode === 'login' || !!role) && <div className="flex items-center gap-2"><div className="flex-1 h-px bg-slate-100"/><span className="text-xs text-slate-400">أو</span><div className="flex-1 h-px bg-slate-100"/></div>}
       {mode === 'register' && (
         <>
           <input value={name} onChange={e => setName(e.target.value)} placeholder="الاسم الكامل"
