@@ -431,7 +431,7 @@ export function WorkerDashboard() {
         <header className="sticky top-14 z-30 bg-white border-b border-slate-200 px-5 py-3.5 flex items-center gap-4 shadow-sm">
           <div className={`flex-1 min-w-0 ${tab === 'overview' ? 'hidden lg:block' : ''}`}>
             <h2 className="font-black text-slate-800 text-lg truncate">
-              {tab === 'overview' ? 'لوحة العامل' : tab === 'shifts' ? 'سوق الشفتات' : tab === 'my-tasks' ? 'الطلبات' : tab === 'analytics' ? 'التحليلات الاستباقية' : 'الإنجازات والالتزام'}
+              {tab === 'overview' ? 'لوحة العامل' : tab === 'shifts' ? 'سوق الشفتات' : tab === 'my-tasks' ? 'الطلبات' : tab === 'chat' ? 'المحادثة' : tab === 'analytics' ? 'التحليلات الاستباقية' : 'الإنجازات والالتزام'}
             </h2>
           </div>
           <div className="flex-1 lg:flex-none hidden lg:block">
