@@ -1,6 +1,6 @@
 import { Logo } from '../Logo'
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, LayoutDashboard, Shield, ChevronDown, Users, Building2, Bell } from 'lucide-react'
+import { LogOut, LayoutDashboard, Shield, ChevronDown, Users, Building2, Bell, ClipboardList } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
 import { getAvatar } from '../../lib/supabase'
@@ -88,6 +88,12 @@ export function Navbar() {
                       <button onClick={() => { navigate('browse'); setDropOpen(false) }}
                         className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                         <Users size={15} /> تصفح العمال
+                      </button>
+                    )}
+                    {profile.role === 'admin' && (
+                      <button onClick={() => { navigate('dashboard'); setDropOpen(false) }}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                        <ClipboardList size={15} /> طلباتي كعميل
                       </button>
                     )}
                     {profile.role === 'admin' && (

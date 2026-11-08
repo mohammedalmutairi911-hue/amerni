@@ -123,7 +123,8 @@ export default function App() {
     // الأدمن: حساب واحد يتصفّح كل البوابات كمشرف.
     // نمنعه فقط من الصفحات الشخصية التي تتطلّب سجل عميل/عامل لا يملكه.
     if (profile.role === 'admin') {
-      const personalOnlyPages = ['dashboard', 'worker', 'bounties', 'earn', 'referral', 'join']
+      // 'dashboard' مسموحة: الأدمن ممكن ينشئ طلبات ويحتاج يتابعها كعميل (موافقة السعر/الدفع/التأكيد)
+      const personalOnlyPages = ['worker', 'bounties', 'earn', 'referral', 'join']
       if (personalOnlyPages.includes(page)) { navigate('admin', { replace: true }); return }
     }
 
@@ -190,6 +191,9 @@ export default function App() {
     if (page === 'lead-detail') {
       return <LeadDetailPage />
     }
+
+    // طلبات الأدمن اللي أنشأها بنفسه — نفس لوحة العميل
+    if (page === 'dashboard' && profile.role === 'admin') return <><Navbar /><UserDashboard /></>
 
     // احتياطي الأدمن — يأتي بعد الصفحات المحدّدة أعلاه وإلا صارت غير قابلة للوصول
     if (profile.role === 'admin') {

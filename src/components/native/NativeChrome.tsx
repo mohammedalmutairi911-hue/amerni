@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react'
 import {
   ChevronRight, Home, Users, LifeBuoy, Menu, Briefcase, Shield, Building2, LayoutGrid,
-  Bell, Gift, Wallet, LogOut, X, UserPlus, LogIn, Sparkles,
+  Bell, Gift, Wallet, LogOut, X, UserPlus, LogIn, Sparkles, ClipboardList,
 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApp } from '../../contexts/AppContext'
@@ -176,6 +176,7 @@ export function NativeMoreSheet() {
     { icon: Briefcase, label: 'الفرص المتاحة', page: 'bounties', show: !isEnt && !isAdmin && isWorker },
     { icon: Sparkles, label: 'اكسب مع أمرني', page: 'earn', show: !isEnt && !isAdmin && !isWorker },
     { icon: Gift, label: 'دعوة صديق', page: 'referral', show: !isEnt && !isAdmin },
+    { icon: ClipboardList, label: 'طلباتي كعميل', page: 'dashboard', show: isAdmin },
     { icon: Shield, label: 'لوحة الإدارة', page: 'admin', show: isAdmin },
     { icon: Building2, label: 'إدارة المنشآت', page: 'admin-enterprises', show: isAdmin },
     { icon: Wallet, label: 'أمرني للتحقق', page: 'verify', show: !isEnt && !isAdmin },
