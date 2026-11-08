@@ -56,7 +56,7 @@ export function WorkerDashboard() {
   const [priceOffer, setPriceOffer] = useState('')
   const [uploadingProof, setUploadingProof] = useState(false)
   const [cityFilter, setCityFilter] = useState('all')
-  const [ordersView, setOrdersView] = usePersistedState<'mine' | 'all'>('amerni_w_orders', 'mine', ['mine','all'])
+  const [ordersView, setOrdersView] = usePersistedState<'mine' | 'all' | 'done'>('amerni_w_orders', 'mine', ['mine','all','done'])
 
   // مصدر الحقيقة الوحيد لأرقام لوحة العامل — نفس الطبقة المركزية
   const [centralStats, setCentralStats] = useState<Record<string, any> | null>(null)
@@ -127,6 +127,37 @@ export function WorkerDashboard() {
     const { data } = await supabase.from('tasks').select('*').eq('worker_id', user!.id).order('created_at', { ascending: false }).limit(200)
     setMyTasks(data || [])
   }
+
+  // تحديث تلقائي احتياطي: على الجوال اتصال الـ realtime ينقطع لما تروح الصفحة للخلفية
+  // وما يرجع — فنحدّث لما ترجع الصفحة للواجهة، وكل 20 ثانية وهي ظاهرة (استعلام على worker_id المفهرس).
+  useEffect(() => {
+    if (!user) return
+    const refresh = () => { if (document.visibilityState === 'visible') { fetchMyTasks(); fetchFeedTasks(); fetchStats() } }
+    const onVis = () => refresh()
+    document.addEventListener('visibilitychange', onVis)
+    window.addEventListener('focus', onVis)
+    window.addEventListener('online', onVis)
+    const iv = setInterval(refresh, 20000)
+    return () => {
+      document.removeEventListener('visibilitychange', onVis)
+      window.removeEventListener('focus', onVis)
+      window.removeEventListener('online', onVis)
+      clearInterval(iv)
+    }
+  }, [user?.id])
+
+  // الطلب المفتوح في المحادثة يتحدّث مع القائمة (الحالة/السعر/الدفع) بدون Refresh
+  useEffect(() => {
+    if (!selectedTask) return
+    const fresh = myTasks.find(t => t.id === selectedTask.id)
+    if (fresh && (fresh.status !== selectedTask.status
+      || (fresh as any).negotiation_status !== (selectedTask as any).negotiation_status
+      || (fresh as any).payment_status !== (selectedTask as any).payment_status
+      || (fresh as any).price_final !== (selectedTask as any).price_final)) setSelectedTask(fresh)
+  }, [myTasks])
+
+  const activeMine = myTasks.filter(t => t.status !== 'completed' && t.status !== 'cancelled')
+  const doneMine = myTasks.filter(t => t.status === 'completed' || t.status === 'cancelled')
 
   useEffect(() => {
     if (!user || !workerProfile?.is_approved) return
@@ -608,8 +639,8 @@ export function WorkerDashboard() {
             </div>
 
             {/* تبديل: طلباتي / كل الطلبات */}
-            <div className="grid grid-cols-2 gap-1 bg-slate-100 rounded-xl p-1">
-              {([['mine','طلباتي الحالية', myTasks.length],['all','كل الطلبات', filteredFeed.length]] as const).map(([k,l,c]) => (
+            <div className="grid grid-cols-3 gap-1 bg-slate-100 rounded-xl p-1">
+              {([['mine','الحالية', activeMine.length],['done','المكتملة', doneMine.length],['all','كل الطلبات', filteredFeed.length]] as const).map(([k,l,c]) => (
                 <button key={k} onClick={() => { setOrdersView(k); try { window.scrollTo(0,0) } catch {} }}
                   className={`py-2 rounded-lg text-sm font-bold transition-colors ${ordersView===k ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500'}`}>
                   {l} <span className="text-xs opacity-70">({c})</span>
@@ -653,15 +684,15 @@ export function WorkerDashboard() {
             </>)}
 
             {/* My Active Tasks */}
-            {ordersView === 'mine' && myTasks.length === 0 && (
+            {ordersView === 'mine' && activeMine.length === 0 && (
               <p className="text-center text-slate-400 text-sm py-10">ما عندك طلبات حالياً — شوف «كل الطلبات» واقبل طلب</p>
             )}
-            {ordersView === 'mine' && myTasks.length > 0 && (
+            {ordersView === 'mine' && activeMine.length > 0 && (
               <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="px-4 py-3 border-b border-slate-100">
                   <p className="font-bold text-slate-900 text-sm">طلباتي الحالية</p>
                 </div>
-                {myTasks.map(t => (
+                {activeMine.map(t => (
                   <div key={t.id} className="px-4 py-3 border-b border-slate-50 last:border-0">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex gap-2">
@@ -686,6 +717,34 @@ export function WorkerDashboard() {
                       </button>
                     </div>
                   </div>
+                ))}
+              </div>
+            )}
+
+            {/* الطلبات المكتملة */}
+            {ordersView === 'done' && doneMine.length === 0 && (
+              <p className="text-center text-slate-400 text-sm py-10">ما عندك طلبات مكتملة للحين</p>
+            )}
+            {ordersView === 'done' && doneMine.length > 0 && (
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                  <span className="text-xs text-green-700 font-bold bg-green-50 px-2 py-0.5 rounded-full">{doneMine.filter(t => t.status === 'completed').length} مكتمل</span>
+                  <p className="font-bold text-slate-900 text-sm">الطلبات المكتملة</p>
+                </div>
+                {doneMine.map(t => (
+                  <button key={t.id} type="button" onClick={() => { setSelectedTask(t); setTab('chat'); try { window.scrollTo(0,0); document.querySelector('main')?.scrollTo(0,0) } catch {} }}
+                    className="w-full px-4 py-3 border-b border-slate-50 last:border-0 text-right active:bg-slate-50 block">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="text-sm font-black text-green-700 whitespace-nowrap">{(t as any).price_final ? `${(t as any).price_final} ريال` : ''}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-end gap-2 mb-0.5">
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${STATUS_COLOR[t.status]}`}>{STATUS_LABEL[t.status]}</span>
+                          <p className="font-bold text-slate-900 text-sm break-words text-right">{t.title}</p>
+                        </div>
+                        <p className="text-xs text-slate-400">{t.city} • {new Date((t as any).completed_at || t.created_at).toLocaleDateString('ar-SA')}</p>
+                      </div>
+                    </div>
+                  </button>
                 ))}
               </div>
             )}
