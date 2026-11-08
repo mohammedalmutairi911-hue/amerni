@@ -9,6 +9,7 @@ import { goHome } from '../lib/homePage'
 import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { AdminTaskDetail } from '../components/admin/AdminTaskDetail'
+import { currentStage } from '../lib/taskStage'
 import { AccountsCenter } from './AccountsCenter'
 import { StaleRequests } from '../components/admin/StaleRequests'
 
@@ -952,9 +953,9 @@ export function AdminPanel() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLOR[task.status]}`}>
-                        {STATUS_LABEL[task.status]}
-                      </span>
+                      {(() => { const st = currentStage(task); return (
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${st.color}`}>{st.label}</span>
+                      ) })()}
                     </div>
                     <h3 className="font-medium text-sm">{task.title}</h3>
                     <p className="text-xs text-slate-400 mt-0.5">
@@ -999,7 +1000,7 @@ export function AdminPanel() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-bold text-slate-800 text-sm truncate">{t.title}</p>
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${STATUS_COLOR[t.status]}`}>{STATUS_LABEL[t.status]}</span>
+                    {(() => { const st = currentStage(t); return <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${st.color}`}>{st.label}</span> })()}
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5 truncate">{nameOf((t as any).client_id || t.user_id)} (عميل) ↔ {workerName(t.worker_id)} (عامل)</p>
                   <p className="text-xs text-slate-400 mt-0.5 truncate">

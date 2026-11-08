@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { X, Loader2, User, Wrench, MessageSquare } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Profile, Task, WorkerProfile } from '../../types'
+import { currentStage, stageTimeline } from '../../lib/taskStage'
 
 // تفاصيل طلب كاملة للأدمن: صاحب الطلب، العامل اللي قبله، الحالة والأسعار والدفع،
 // ونص المحادثة كامل مع اسم ودور كل مرسل. القراءة فقط — لا يرسل شيء باسم الأدمن.
@@ -11,10 +12,6 @@ interface Msg {
   is_system_message: boolean | null; is_filtered: boolean | null; created_at: string
 }
 
-const STATUS_AR: Record<string, string> = {
-  open: 'مفتوح — بانتظار عامل', waiting_for_worker: 'بانتظار عامل', in_progress: 'جاري التنفيذ',
-  completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع',
-}
 const PAY_AR: Record<string, string> = { unpaid: 'غير مدفوع', paid: 'مدفوع', held: 'محجوز (ضمان)', released: 'محوّل للعامل', refunded: 'مسترد' }
 
 const fmt = (iso?: string | null) => iso
@@ -61,15 +58,19 @@ export function AdminTaskDetail({ task, users, workers, onClose, onStatusChange 
     return { name: u?.full_name || 'مستخدم', role: u?.role === 'admin' ? 'الإدارة' : 'آخر', tone: 'other' as const }
   }
 
-  const price = t.final_price ?? t.price_final ?? null
+  // السعر المتفق عليه فقط بعد موافقة العميل على عرض المنفذ (price_final يتعبّى تلقائياً عند القبول فما يُعتمد عليه)
+  const price = t.negotiation_status === 'accepted' ? (t.price_final ?? t.worker_price_offer) : (t.final_price ?? null)
+  const stage = currentStage(t, loading ? undefined : msgs)
+  const timeline = stageTimeline(t, msgs)
+  const currentIdx = timeline.findIndex(x => !x.done)
   const rows: [string, any][] = [
-    ['الحالة', STATUS_AR[t.status] || t.status],
+    ['المرحلة الحالية', stage.label],
     ['الدفع', PAY_AR[t.payment_status] || t.payment_status || '—'],
     ['المدينة', t.city || t.location || '—'],
     ['التصنيف', t.category || '—'],
     ['سعر العميل المقترح', (t.client_price ?? t.price_suggested) != null ? `${t.client_price ?? t.price_suggested} ريال` : '—'],
     ['عرض العامل', t.worker_price_offer != null ? `${t.worker_price_offer} ريال` : '—'],
-    ['السعر النهائي', price != null ? `${price} ريال` : '—'],
+    ['السعر المتفق عليه', price != null ? `${price} ريال` : 'ما اتفقوا بعد'],
     ['الموعد', t.deadline || '—'],
     ['انطلب في', fmt(t.created_at)],
     ['انقبل في', t.worker_id ? fmt(t.accepted_at) : 'لم يُقبل بعد'],
@@ -113,11 +114,39 @@ export function AdminTaskDetail({ task, users, workers, onClose, onStatusChange 
               extra={workerProfile ? [workerProfile.city, workerProfile.is_approved ? 'معتمد' : 'غير معتمد', workerProfile.missed_tasks ? `انسحب منه ${workerProfile.missed_tasks} طلب لعدم التواصل` : ''].filter(Boolean).join(' · ') : undefined} />
           </div>
 
+          {/* مراحل الطلب */}
+          {!['cancelled', 'disputed'].includes(t.status) && (
+            <div className="bg-white border border-slate-200 rounded-xl p-4">
+              <p className="text-sm font-bold text-slate-700 mb-3">مراحل الطلب</p>
+              <ol className="space-y-0">
+                {timeline.map((st, i) => {
+                  const isCurrent = i === currentIdx
+                  return (
+                    <li key={st.key} className="flex gap-3">
+                      <div className="flex flex-col items-center">
+                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 ${st.done ? 'bg-green-500 text-white' : isCurrent ? 'bg-amber-400 text-white ring-4 ring-amber-100' : 'bg-slate-200 text-slate-400'}`}>
+                          {st.done ? '✓' : i + 1}
+                        </span>
+                        {i < timeline.length - 1 && <span className={`w-0.5 flex-1 min-h-[14px] ${st.done ? 'bg-green-300' : 'bg-slate-200'}`} />}
+                      </div>
+                      <div className="pb-3 min-w-0">
+                        <p className={`text-sm leading-5 ${st.done ? 'text-slate-800 font-bold' : isCurrent ? 'text-amber-700 font-bold' : 'text-slate-400'}`}>
+                          {st.label}{isCurrent && ' — هنا وقف'}
+                        </p>
+                        {st.done && st.at && <p className="text-[11px] text-slate-400">{fmt(st.at)}</p>}
+                      </div>
+                    </li>
+                  )
+                })}
+              </ol>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 bg-white border border-slate-200 rounded-xl p-4">
             {rows.map(([k, v]) => (
               <div key={k} className="min-w-0">
                 <p className="text-[11px] text-slate-400">{k}</p>
-                <p className="text-sm font-bold text-slate-800 truncate">{v}</p>
+                <p className="text-sm font-bold text-slate-800 break-words leading-snug">{v}</p>
               </div>
             ))}
           </div>
