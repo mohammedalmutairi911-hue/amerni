@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { X, Loader2, User, Wrench, MessageSquare } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Profile, Task, WorkerProfile } from '../../types'
+import { MessageBody, classify } from '../chat/MessageBody'
 import { currentStage, stageTimeline } from '../../lib/taskStage'
 
 // تفاصيل طلب كاملة للأدمن: صاحب الطلب، العامل اللي قبله، الحالة والأسعار والدفع،
@@ -192,7 +193,9 @@ export function AdminTaskDetail({ task, users, workers, onClose, onStatusChange 
                         <p className="text-xs font-bold text-slate-700 truncate">{s.name}{s.role && <span className="font-normal text-slate-400"> · {s.role}</span>}</p>
                         <p className="text-[11px] text-slate-400 flex-shrink-0">{fmt(m.created_at)}</p>
                       </div>
-                      <p className="text-sm text-slate-800 whitespace-pre-wrap break-words">{m.content}</p>
+                      {classify(m.content).kind === 'text'
+                        ? <p className="text-sm text-slate-800 whitespace-pre-wrap break-words">{m.content}</p>
+                        : <div className="mt-1 max-w-xs"><MessageBody content={m.content} compact /></div>}
                       {m.is_filtered && <p className="text-[11px] text-red-500 mt-0.5">محجوبة عن الطرف الآخر (فلتر التواصل الخارجي)</p>}
                     </div>
                   )

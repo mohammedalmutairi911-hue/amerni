@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { Send, Loader2, Shield, Image, Mic, MicOff, X } from 'lucide-react'
+import { Send, Loader2, Shield, Image, Mic, MicOff, X, Paperclip, MapPin } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { filterContent } from '../../lib/contentFilter'
 import { useAuth } from '../../contexts/AuthContext'
+import { MessageBody, MAPS_RE } from './MessageBody'
 
 const BLOCKED_PATTERNS = [
   /(\+966|00966|966)/,
@@ -47,6 +48,8 @@ export function Chat({ taskId, taskTitle }: Props) {
   const [audioURL, setAudioURL] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const docRef = useRef<HTMLInputElement>(null)
+  const [locating, setLocating] = useState(false)
   const mediaRef = useRef<MediaRecorder | null>(null)
   const timerRef = useRef<any>(null)
 
@@ -106,12 +109,58 @@ export function Chat({ taskId, taskTitle }: Props) {
     return data.publicUrl
   }
 
+  const flash = (msg: string, ms = 4000) => { setBlocked(msg); setTimeout(() => setBlocked(''), ms) }
+
+  const insertMsg = (content: string) => supabase.from('task_messages').insert({
+    task_id: taskId, sender_id: user!.id, content, is_system_message: false,
+  })
+  const notifyOther = () => {
+    try { void supabase.functions.invoke('notify-message', { body: { task_id: taskId } }).catch(() => {}) } catch { /* ignore */ }
+  }
+
+  // إرفاق ملف (PDF، وورد، إكسل…) — يُخزن في chat-media واسم الملف الأصلي بعد #
+  const onDocChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !user) return
+    if (file.type.startsWith('image/')) { setImageFile(file); setImagePreview(URL.createObjectURL(file)); return }
+    if (file.size > 10 * 1024 * 1024) { flash('الحجم الأقصى للملف 10 ميجا', 3000); return }
+    setSending(true)
+    const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin'
+    const path = `chat/${taskId}/${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from('chat-media').upload(path, file, { contentType: file.type || undefined })
+    if (error) { console.error('file upload error:', error); flash('فشل رفع الملف — حاول مجدداً'); setSending(false); return }
+    const { data } = supabase.storage.from('chat-media').getPublicUrl(path)
+    const { error: insErr } = await insertMsg(`${data.publicUrl}#${encodeURIComponent(file.name)}`)
+    if (insErr) flash('فشل إرسال الملف')
+    else notifyOther()
+    setSending(false)
+  }
+
+  // مشاركة الموقع الحالي كرابط قوقل ماب
+  const shareLocation = () => {
+    if (!user || locating) return
+    if (!navigator.geolocation) { flash('جهازك ما يدعم تحديد الموقع — الصق رابط قوقل ماب بدلاً منه'); return }
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const { latitude, longitude } = pos.coords
+      const { error } = await insertMsg(`https://www.google.com/maps?q=${latitude.toFixed(6)},${longitude.toFixed(6)}`)
+      if (error) flash('فشل إرسال الموقع')
+      else notifyOther()
+      setLocating(false)
+    }, () => {
+      flash('ما قدرنا نحدد موقعك — فعّل إذن الموقع، أو الصق رابط قوقل ماب في الرسالة', 5000)
+      setLocating(false)
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 })
+  }
+
   const send = async () => {
     if (!user || sending) return
     const text = input.trim()
 
     // فلتر المحتوى — نص فقط، الصور والصوت تمر مباشرة
-    if (text) {
+    // رابط قوقل ماب ملصوق لوحده يمر (فيه أرقام إحداثيات طويلة يمسكها فلتر الأرقام)
+    if (text && !MAPS_RE.test(text)) {
       const isBlocked = BLOCKED_PATTERNS.some(p => p.test(text))
       if (isBlocked) {
         setBlocked('لا يمكن مشاركة بيانات التواصل — التواصل داخل المنصة فقط')
@@ -172,8 +221,9 @@ export function Chat({ taskId, taskTitle }: Props) {
   // اختيار صورة
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
-    if (file.size > 5 * 1024 * 1024) { setBlocked('الحجم الأقصى للصورة 5 ميجا'); setTimeout(() => setBlocked(''), 3000); return }
+    if (file.size > 10 * 1024 * 1024) { setBlocked('الحجم الأقصى للصورة 10 ميجا'); setTimeout(() => setBlocked(''), 3000); return }
     setImageFile(file)
     setImagePreview(URL.createObjectURL(file))
   }
@@ -207,8 +257,6 @@ export function Chat({ taskId, taskTitle }: Props) {
 
   const formatTime = (s: number) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`
 
-  const isImage = (content: string) => /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(content) && !content.startsWith('🎤')
-  const isAudio = (content: string) => content.startsWith('🎤 ')
 
   return (
     <div className="flex flex-col w-full min-w-0 max-w-full bg-white border border-slate-200 rounded-2xl overflow-hidden h-[calc(100dvh-250px)] min-h-[320px] max-h-[640px] sm:h-[520px] shadow-sm">
@@ -239,21 +287,7 @@ export function Chat({ taskId, taskTitle }: Props) {
           return (
             <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
               <div className="max-w-[75%]">
-                {isImage(m.content) ? (
-                  <img src={m.content} alt="صورة" loading="lazy" className="rounded-2xl max-w-full max-h-48 object-cover border border-slate-200 shadow-sm" />
-                ) : isAudio(m.content) ? (
-                  <div className={`rounded-2xl px-3 py-2.5 ${isMe ? 'bg-primary-500' : 'bg-white border border-slate-200'}`}>
-                    <audio src={m.content.replace('🎤 ', '')} controls className="h-8 max-w-[200px]" />
-                  </div>
-                ) : (
-                  <div className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm ${
-                    isMe
-                      ? 'bg-primary-500 text-white'
-                      : 'bg-white border border-slate-200 text-slate-800'
-                  }`}>
-                    {m.content}
-                  </div>
-                )}
+                <MessageBody content={m.content} isMe={isMe} />
                 <p className={`text-[10px] mt-1 text-slate-400 ${isMe ? 'text-left' : 'text-right'}`}>
                   {new Date(m.created_at).toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' })}
                 </p>
@@ -309,6 +343,19 @@ export function Chat({ taskId, taskTitle }: Props) {
           <button onClick={() => fileRef.current?.click()} title="إرفاق صورة" aria-label="إرفاق صورة"
             className="text-slate-400 hover:text-primary-500 transition-colors flex-shrink-0">
             <Image size={18} />
+          </button>
+
+          {/* File attach */}
+          <input ref={docRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,image/*,application/pdf" onChange={onDocChange} className="hidden" />
+          <button onClick={() => docRef.current?.click()} disabled={sending} title="إرفاق ملف" aria-label="إرفاق ملف"
+            className="text-slate-400 hover:text-primary-500 transition-colors flex-shrink-0 disabled:opacity-40">
+            <Paperclip size={18} />
+          </button>
+
+          {/* Location */}
+          <button onClick={shareLocation} disabled={locating} title="مشاركة موقعي" aria-label="مشاركة موقعي"
+            className="text-slate-400 hover:text-primary-500 transition-colors flex-shrink-0 disabled:opacity-40">
+            {locating ? <Loader2 size={18} className="animate-spin" /> : <MapPin size={18} />}
           </button>
 
           {/* Voice recording */}

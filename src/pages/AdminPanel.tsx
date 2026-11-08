@@ -9,6 +9,7 @@ import { goHome } from '../lib/homePage'
 import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { AdminTaskDetail } from '../components/admin/AdminTaskDetail'
+import { previewText } from '../components/chat/MessageBody'
 import { currentStage } from '../lib/taskStage'
 import { AdminPayouts } from '../components/admin/AdminPayouts'
 import { AccountsCenter } from './AccountsCenter'
@@ -1010,7 +1011,7 @@ export function AdminPanel() {
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5 truncate">{nameOf((t as any).client_id || t.user_id)} (عميل) ↔ {workerName(t.worker_id)} (عامل)</p>
                   <p className="text-xs text-slate-400 mt-0.5 truncate">
-                    {last ? <>{last.is_system_message ? 'النظام' : (last.sender_id === t.worker_id ? workerName(t.worker_id) : nameOf(last.sender_id))}: {last.content} · {timeAgoAr(last.created_at)}</> : 'ما فيه رسائل'}
+                    {last ? <>{last.is_system_message ? 'النظام' : (last.sender_id === t.worker_id ? workerName(t.worker_id) : nameOf(last.sender_id))}: {previewText(last.content)} · {timeAgoAr(last.created_at)}</> : 'ما فيه رسائل'}
                   </p>
                 </div>
               </button>
