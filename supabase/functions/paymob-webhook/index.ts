@@ -41,7 +41,13 @@ Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405)
 
   const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
-  const hmacSecret = Deno.env.get('PAYMOB_HMAC_SECRET')
+  // HMAC: الخزنة (Vault) أولاً ثم متغير البيئة
+  let hmacSecret: string | undefined
+  try {
+    const { data } = await admin.rpc('paymob_vault_secret', { p_name: 'paymob_hmac_secret' })
+    if (typeof data === 'string' && data) hmacSecret = data
+  } catch { /* fallback below */ }
+  if (!hmacSecret) hmacSecret = Deno.env.get('PAYMOB_HMAC_SECRET') || undefined
 
   let payload: any
   try {

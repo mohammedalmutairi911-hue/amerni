@@ -23,6 +23,15 @@ function integrationIds(): number[] {
   return raw.split(',').map((s) => Number(s.trim())).filter((n) => Number.isFinite(n))
 }
 
+// يقرأ مفتاح Paymob من الخزنة، وإلا من متغير البيئة
+async function paymobKey(admin: any, vaultName: string, envName: string): Promise<string | undefined> {
+  try {
+    const { data } = await admin.rpc('paymob_vault_secret', { p_name: vaultName })
+    if (typeof data === 'string' && data) return data
+  } catch { /* fallback below */ }
+  return Deno.env.get(envName) || undefined
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405)
@@ -59,14 +68,16 @@ Deno.serve(async (req: Request) => {
         return json({
           transaction_id, special_reference, amount,
           client_secret: existing.paymob_order_id,
-          public_key: Deno.env.get('PAYMOB_PUBLIC_KEY') ?? '',
+          public_key: (await paymobKey(admin, 'paymob_public_key', 'PAYMOB_PUBLIC_KEY')) ?? '',
         })
       }
     }
 
     // 2) نادِ Paymob Intention API بمفتاح سرّي من بيئة السيرفر فقط
-    const secretKey = Deno.env.get('PAYMOB_SECRET_KEY')
-    const publicKey = Deno.env.get('PAYMOB_PUBLIC_KEY')
+    // المفاتيح: الخزنة (Vault) أولاً — مفاتيح Live مشفّرة ولا يقرأها إلا service_role —
+    // ثم متغيرات البيئة احتياطاً. ما فيه أي مفتاح مكتوب في الكود.
+    const secretKey = await paymobKey(admin, 'paymob_secret_key', 'PAYMOB_SECRET_KEY')
+    const publicKey = await paymobKey(admin, 'paymob_public_key', 'PAYMOB_PUBLIC_KEY')
     if (!secretKey || !publicKey) {
       return json({ error: 'بوابة الدفع غير مُهيّأة على الخادم (PAYMOB_SECRET_KEY/PAYMOB_PUBLIC_KEY)' }, 500)
     }
