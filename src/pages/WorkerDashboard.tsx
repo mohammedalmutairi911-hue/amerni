@@ -149,10 +149,26 @@ export function WorkerDashboard() {
     setAccepting(null); setTab('my-tasks')
   }
 
+  const openCompletion = (t: Task) => {
+    const known = (t as any).price_final || (t as any).price_suggested
+    setPriceOffer(known ? String(known) : '')
+    setCompletingTask(t)
+  }
+
   const submitCompletion = async () => {
     if (!completingTask) return
     if (!priceOffer || Number(priceOffer) <= 0) { toast('أضف السعر أولاً', 'warning'); return }
     setUploadingProof(true)
+
+    // الترتيب مهم: propose_price يشترط الحالة in_progress، فلازم يسبق
+    // submit_task_completion اللي يحوّل الحالة إلى pending_confirmation.
+    // (قبل كان العكس — فيفشل اقتراح السعر بصمت وما يطلع للعميل سعر ولا دفع)
+    const { error: priceErr } = await supabase.rpc('propose_price', {
+      p_task_id: completingTask.id,
+      p_price: Number(priceOffer),
+      p_note: proofNote || null,
+    })
+    if (priceErr) { toast('خطأ في إرسال السعر: ' + priceErr.message, 'error'); setUploadingProof(false); return }
 
     const { error } = await supabase.rpc('submit_task_completion', {
       p_task_id: completingTask.id,
@@ -161,13 +177,10 @@ export function WorkerDashboard() {
     })
     if (error) { toast('خطأ: ' + error.message, 'error'); setUploadingProof(false); return }
 
-    // اقتراح السعر
-    await supabase.rpc('propose_price', {
-      p_task_id: completingTask.id,
-      p_price: Number(priceOffer),
-      p_note: proofNote || null,
-    })
-
+    toast('✅ سلّمت الطلب — بانتظار موافقة العميل على السعر والدفع', 'success')
+    if (selectedTask?.id === completingTask.id) {
+      setSelectedTask(p => p ? { ...p, status: 'pending_confirmation', worker_price_offer: Number(priceOffer), negotiation_status: 'pending' } as any : null)
+    }
     await fetchMyTasks()
     setUploadingProof(false)
     setCompletingTask(null)
@@ -646,7 +659,7 @@ export function WorkerDashboard() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex gap-2">
                         {t.status === 'in_progress' && (
-                          <button onClick={() => setCompletingTask(t)}
+                          <button onClick={() => openCompletion(t)}
                             className="text-xs bg-green-500 text-white font-bold px-3 py-1.5 rounded-lg">أنهِ</button>
                         )}
                         {t.status !== 'completed' && t.status !== 'cancelled' && (
@@ -892,6 +905,17 @@ export function WorkerDashboard() {
                 <p className="text-sm font-black text-primary-700">{(selectedTask as any).price_final || (selectedTask as any).price_suggested} ريال</p>
               )}
             </div>
+            {selectedTask.status === 'in_progress' && (
+              <button onClick={() => openCompletion(selectedTask)}
+                className="w-full mb-3 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                ✅ أنهيت الطلب — سلّمه للعميل
+              </button>
+            )}
+            {selectedTask.status === 'pending_confirmation' && (
+              <div className="mb-3 bg-purple-50 border border-purple-200 rounded-xl p-3 text-sm text-purple-700">
+                سلّمت الطلب ✅ بانتظار العميل يوافق على السعر ويدفع ويأكّد الاستلام.
+              </div>
+            )}
             <Chat taskId={selectedTask.id} taskTitle="المحادثة مع العميل" />
           </div>
         )}

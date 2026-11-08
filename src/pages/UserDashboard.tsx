@@ -401,6 +401,12 @@ export function UserDashboard() {
           </div>
         )}
 
+        {selectedTask.status === 'in_progress' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-700 leading-relaxed">
+            ⚡ العامل يشتغل على طلبك. أول ما يسلّمه يطلع لك هنا السعر وزر الدفع وتأكيد الاستلام.
+          </div>
+        )}
+
         {/* نزاع */}
         {selectedTask.status === 'in_progress' && (
           <div className="bg-white border border-slate-200 rounded-xl p-4">
