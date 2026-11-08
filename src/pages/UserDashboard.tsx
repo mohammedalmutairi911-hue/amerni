@@ -6,6 +6,7 @@ import { Plus, CheckCircle, Clock, Loader2, Star, Home, List, Wallet, LogOut, Za
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
+import { WorkerWallet } from '../components/WorkerWallet'
 import { goHome } from '../lib/homePage'
 import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
@@ -660,7 +661,7 @@ export function UserDashboard() {
                 <div>
                   <span className="inline-block bg-amber-400 text-slate-900 font-black text-xs px-2.5 py-0.5 rounded-full mb-2">ادعُ صديق</span>
                   <h2 className="text-xl font-black text-white mb-1">شارك أمرني مع أصحابك</h2>
-                  <p className="text-white/70 text-sm">أرسل رابطك الخاص لأي أحد يحتاج خدمة</p>
+                  <p className="text-white/70 text-sm">أول طلبين لأي أحد يسجّل من رابطك — عمولة الموقع كاملة لك</p>
                 </div>
                 <button onClick={() => navigate('referral')} className="flex-shrink-0 bg-white text-slate-900 font-bold px-5 py-2.5 rounded-xl hover:bg-amber-400 transition-colors text-sm">
                   رابطي
@@ -752,10 +753,13 @@ export function UserDashboard() {
                 <p className="text-blue-100 text-xs mt-2">على {counts.completed} طلب مكتمل</p>
               </div>
 
+              {/* رصيد المحفظة (مكافآت الإحالة) + السحب */}
+              <div className="mb-5"><WorkerWallet /></div>
+
               {/* Referral */}
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-5">
                 <h3 className="font-bold text-slate-900 mb-1">🎁 ادعُ أصدقاءك</h3>
-                <p className="text-slate-500 text-sm mb-3">شارك رابط الدعوة واكسب مكافأة على كل طلب يكملونه</p>
+                <p className="text-slate-500 text-sm mb-3">أول طلبين يكملهم أي أحد يسجّل من رابطك — عمولة الموقع (5٪) كاملة تنضاف لمحفظتك</p>
                 <div className="flex gap-2">
                   <div className="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-slate-600 font-mono truncate">
                     amerniksa.com?ref={user?.id?.slice(0,8)}

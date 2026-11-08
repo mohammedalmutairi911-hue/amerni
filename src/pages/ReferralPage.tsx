@@ -32,13 +32,18 @@ export function ReferralPage() {
       const nameMap = new Map((names || []).map((n: any) => [n.id, n.full_name]))
       list.forEach((t: any) => { t.profiles = { full_name: nameMap.get(t.user_id || t.client_id) || null } })
     }
-    // النموذج الاقتصادي المُصحَّح: المكافأة = 30% من عمولة المنصة الفعلية (5%)
-    // وليس 5% من قيمة الطلب كما كان سابقاً — الصيغة القديمة كانت تجعل المنصة
-    // تخسر 3 نقاط مئوية صافية على كل طلب محال (تدفع أكثر مما تكسب أصلاً)
-    const PLATFORM_COMMISSION = 0.05
-    const REFERRAL_SHARE = 0.30
-    const earned = list.filter(t => t.status === 'completed').reduce((s: number, t: any) => s + ((t.price_final || t.price_suggested || 0) * PLATFORM_COMMISSION * REFERRAL_SHARE), 0)
-    const pending = list.filter(t => t.status === 'in_progress').reduce((s: number, t: any) => s + ((t.price_final || t.price_suggested || 0) * PLATFORM_COMMISSION * REFERRAL_SHARE), 0)
+    // المكافأة الفعلية من السيرفر: أول طلبين مكتملين لكل صديق → عمولة الموقع (5٪) كاملة لك
+    const { data: rc } = await supabase.from('referral_commissions')
+      .select('task_id, referred_id, commission').eq('referrer_id', user!.id)
+    const byTask = new Map((rc || []).map((x: any) => [x.task_id, Number(x.commission) || 0]))
+    list.forEach((t: any) => { t._reward = byTask.get(t.id) ?? null })
+    const earned = (rc || []).reduce((sum: number, x: any) => sum + (Number(x.commission) || 0), 0)
+    // المتوقع: طلبات جارية لأصدقاء ما خلصوا طلبينهم
+    const usedByFriend = new Map<string, number>()
+    ;(rc || []).forEach((x: any) => usedByFriend.set(x.referred_id, (usedByFriend.get(x.referred_id) || 0) + 1))
+    const pending = list.filter((t: any) => ['in_progress', 'pending_confirmation'].includes(t.status)
+      && (usedByFriend.get(t.client_id || t.user_id) || 0) < 2)
+      .reduce((sum: number, t: any) => sum + (t.price_final || 0) * 0.05, 0)
     
     setReferrals(list)
     setStats({ total: list.length, earned, pending })
@@ -71,7 +76,7 @@ export function ReferralPage() {
             <Gift size={28} className="text-primary-500" />
           </div>
           <h1 className="text-3xl font-black mb-2">نظام الإحالة</h1>
-          <p className="text-slate-400">شارك رابطك وأكسب <span className="text-primary-400 font-bold">30%</span> من عمولة المنصة على كل طلب يأتي عن طريقك</p>
+          <p className="text-slate-400">أي أحد يسجّل من رابطك — <span className="text-primary-400 font-bold">أول طلبين</span> يكملهم، عمولة الموقع كاملة (5٪) تنضاف لمحفظتك</p>
         </div>
 
         {/* Stats */}
@@ -117,8 +122,8 @@ export function ReferralPage() {
             {[
               { n: '١', text: 'شارك رابطك مع أصدقائك وعائلتك' },
               { n: '٢', text: 'لما يسجلون عن طريق رابطك وينشرون طلب' },
-              { n: '٣', text: 'لما الطلب يكتمل — تكسب 30% من عمولة المنصة تلقائياً' },
-              { n: '٤', text: 'ما في حد أقصى — كلما أحلت أكثر كسبت أكثر' },
+              { n: '٣', text: 'أول طلبين يكتملون له — عمولة الموقع (5٪ من قيمة الطلب) كاملة تنضاف لمحفظتك تلقائياً' },
+              { n: '٤', text: 'تقدر تسحب رصيدك من المحفظة — وما فيه حد لعدد الأصدقاء' },
             ].map(({ n, text }) => (
               <div key={n} className="flex items-center gap-3">
                 <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0 text-white text-xs font-black">{n}</div>
@@ -149,9 +154,9 @@ export function ReferralPage() {
               </div>
               <div className="text-left">
                 <p className="text-sm font-bold text-primary-400">
-                  {((r.price_final || r.price_suggested || 0) * 0.05 * 0.30).toFixed(2)} ر
+                  {r._reward != null ? `${Number(r._reward).toFixed(2)} ر` : '—'}
                 </p>
-                <p className="text-xs text-slate-400">{r.status === 'completed' ? '✅ مكتسب' : '⏳ معلق'}</p>
+                <p className="text-xs text-slate-400">{r._reward != null ? '✅ انضاف لمحفظتك' : r.status === 'completed' ? 'بعد أول طلبين' : r.status === 'cancelled' ? 'ملغي' : '⏳ لما يكتمل'}</p>
               </div>
             </div>
           ))}
