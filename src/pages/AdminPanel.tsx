@@ -10,16 +10,17 @@ import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
 import { AdminTaskDetail } from '../components/admin/AdminTaskDetail'
 import { currentStage } from '../lib/taskStage'
+import { AdminPayouts } from '../components/admin/AdminPayouts'
 import { AccountsCenter } from './AccountsCenter'
 import { StaleRequests } from '../components/admin/StaleRequests'
 
 type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enterprises' | 'providers' | 'financial'
   | 'categories' | 'verifications' | 'notifications' | 'reports' | 'system-logs' | 'ai-monitoring' | 'activity'
-  | 'accounts' | 'diagnostics'
+  | 'accounts' | 'diagnostics' | 'payouts'
 
 export function AdminPanel() {
   const { navigate } = useApp()
-  const [tab, setTab] = usePersistedState<Tab>('amerni_a_tab', 'overview', ['overview','workers','tasks','users','conversations','enterprises','providers','financial'])
+  const [tab, setTab] = usePersistedState<Tab>('amerni_a_tab', 'overview', ['overview','workers','tasks','users','conversations','enterprises','providers','financial','payouts'])
   const [usersScope, setUsersScope] = useState<'all' | 'individuals' | 'enterprises'>('all')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [workers, setWorkers] = useState<WorkerProfile[]>([])
@@ -27,6 +28,7 @@ export function AdminPanel() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [users, setUsers] = useState<Profile[]>([])
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  const [pendingPayouts, setPendingPayouts] = useState(0)
   // آخر رسائل المحادثات الحقيقية (لقسم آخر الأنشطة في صفحة المحادثات)
   const [recentMsgs, setRecentMsgs] = useState<{ id: string; task_id: string; sender_id: string | null; content: string; is_system_message: boolean | null; created_at: string }[]>([])
   const [loading, setLoading] = useState(true)
@@ -142,6 +144,9 @@ export function AdminPanel() {
       .select('id, task_id, sender_id, content, is_system_message, created_at')
       .order('created_at', { ascending: false }).limit(200)
     setRecentMsgs(rm || [])
+    // عدد طلبات السحب المعلّقة (لشارة القائمة) — على فهرس status
+    const { count: pc } = await supabase.from('withdrawal_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending')
+    setPendingPayouts(pc || 0)
   }
 
   const refresh = async () => { setRefreshing(true); await fetchAll(); setRefreshing(false) }
@@ -390,6 +395,7 @@ export function AdminPanel() {
     { id: 'conversations', icon: MessageSquare, label: 'المحادثات',     badge: stats.disputed },
     { id: 'providers',     icon: ShieldAlert,   label: 'مزودو الخدمة', badge: providers.filter(p=>!p.is_approved).length },
     { id: 'verifications', icon: CheckCircle,   label: 'التحقق والاعتماد', badge: stats.pending + providers.filter(p=>!p.is_approved).length },
+    { id: 'payouts',       icon: Briefcase,     label: 'تحويلات المنفذين', badge: pendingPayouts },
     { id: 'financial',     icon: Briefcase,     label: 'التقارير المالية', badge: 0 },
     { id: 'reports',       icon: BarChart3,     label: 'التقارير والتحليلات', badge: 0 },
     { id: 'categories',    icon: Building2,     label: 'الفئات والتصنيفات', badge: 0 },
@@ -402,7 +408,7 @@ export function AdminPanel() {
   // ── تجميع التبويبات في أقسام واضحة: لا خلط بين الأفراد والمنشآت ──
   const NAV_GROUPS: { title: string | null; ids: string[] }[] = [
     { title: null,            ids: ['overview', 'accounts', 'activity', 'reports'] },
-    { title: 'إدارة الأفراد',  ids: ['workers', 'tasks', 'users', 'conversations'] },
+    { title: 'إدارة الأفراد',  ids: ['workers', 'tasks', 'users', 'conversations', 'payouts'] },
     { title: 'إدارة المنشآت',  ids: ['enterprises', 'providers'] },
     { title: 'عام والنظام',    ids: ['verifications', 'financial', 'categories', 'notifications', 'system-logs', 'ai-monitoring', 'diagnostics'] },
   ]
@@ -1436,6 +1442,8 @@ export function AdminPanel() {
         </div>
 
         {/* ══ FINANCIAL ══ */}
+        {tab === 'payouts' && <AdminPayouts users={users} onCountChange={setPendingPayouts} />}
+
         {tab === 'financial' && (
           <div className="space-y-6 animate-fade-in" dir="rtl">
             {/* Header */}

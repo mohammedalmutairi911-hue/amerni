@@ -14,6 +14,7 @@ import { Task, WorkerProfile } from '../types'
 import { Chat } from '../components/chat/Chat'
 import { NotificationBell } from '../components/ui/NotificationBell'
 import { useToast } from '../components/Toast'
+import { WorkerWallet } from '../components/WorkerWallet'
 
 const STATUS_LABEL: Record<string, string> = { open: 'مفتوح', in_progress: 'جاري', pending_confirmation: 'بانتظار تأكيد العميل', completed: 'مكتمل', cancelled: 'ملغي', disputed: 'نزاع' }
 const STATUS_COLOR: Record<string, string> = {
@@ -483,6 +484,9 @@ export function WorkerDashboard() {
                 </div>
               ))}
             </div>
+
+            {/* المحفظة والسحب — التحويل كل يوم أحد */}
+            <WorkerWallet />
 
             {/* Status Toggle */}
             <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">

@@ -1,0 +1,6 @@
+-- 044 (طُبّق على الإنتاج 2026-11-08): سحب المنفذين يدوي أسبوعياً (كل أحد)
+-- withdrawal_request_create: تحقق IBAN سعودي (SA + 22 رقم) + اسم صاحب الحساب إلزامي + إشعار الأدمن
+-- admin_withdrawal_approve / reject: إشعار المنفذ (تم التحويل / رُفض ورجع المبلغ لرصيده)
+-- notify_all_admins: أنواع الأحداث الجديدة (withdrawal_request, task_released) توصل افتراضياً
+-- index: withdrawal_requests (status, requested_at)
+-- التعريفات الكاملة في قاعدة البيانات (migrations: withdrawals_weekly_manual, notify_all_admins_default_deliver, withdrawal_ledger_note_sunday)
