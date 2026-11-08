@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Bell, Check, Settings } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
@@ -18,6 +19,10 @@ export function NotificationBell() {
   const [notifs, setNotifs] = useState<Notif[]>([])
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  // موضع اللوحة يُحسب من مكان الجرس الفعلي ويُقيَّد داخل الشاشة — الجرس يكون يمين
+  // أو يسار حسب الصفحة، والتموضع الثابت (right-0) كان يطلّع اللوحة برّا الشاشة.
+  const [pos, setPos] = useState<{ top: number; left: number; width: number; maxH: number } | null>(null)
 
   const unread = notifs.filter(n => !n.read).length
 
@@ -45,7 +50,11 @@ export function NotificationBell() {
 
   // إغلاق عند النقر خارجاً — pointerdown يغطي اللمس والماوس بشكل موثوق
   useEffect(() => {
-    const handler = (e: Event) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    const handler = (e: Event) => {
+      const t = e.target as Node
+      if (ref.current?.contains(t) || panelRef.current?.contains(t)) return
+      setOpen(false)
+    }
     document.addEventListener('pointerdown', handler)
     return () => document.removeEventListener('pointerdown', handler)
   }, [])
@@ -57,6 +66,27 @@ export function NotificationBell() {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = prev }
+  }, [open])
+
+  useLayoutEffect(() => {
+    if (!open) { setPos(null); return }
+    const place = () => {
+      const btn = ref.current?.getBoundingClientRect()
+      if (!btn) return
+      const vw = window.innerWidth, vh = window.innerHeight, m = 12
+      const width = Math.min(320, vw - m * 2)
+      let left = vw <= 640
+        ? (vw - width) / 2
+        : (btn.left + btn.width / 2 < vw / 2 ? btn.left : btn.right - width)
+      left = Math.max(m, Math.min(left, vw - width - m))
+      const top = btn.bottom + 8
+      const maxH = Math.max(200, vh - top - m - (vw <= 1024 ? 80 : 0))
+      setPos({ top, left, width, maxH })
+    }
+    place()
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => { window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true) }
   }, [open])
 
   const markAllRead = async () => {
@@ -90,12 +120,10 @@ export function NotificationBell() {
         )}
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-40 sm:hidden" onClick={() => setOpen(false)} aria-hidden />
-      )}
-
-      {open && (
-        <div className="absolute right-0 mt-2 w-80 max-w-[90vw] bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden" dir="rtl">
+      {open && pos && createPortal(<>
+        <div className="fixed inset-0 z-[90] sm:hidden" onClick={() => setOpen(false)} aria-hidden />
+        <div ref={panelRef} style={{ top: pos.top, left: pos.left, width: pos.width }}
+          className="fixed bg-white border border-slate-200 rounded-2xl shadow-xl z-[100] overflow-hidden flex flex-col" dir="rtl">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
             <p className="font-bold text-slate-800 text-sm">الإشعارات</p>
             <div className="flex items-center gap-3">
@@ -111,7 +139,7 @@ export function NotificationBell() {
               </button>
             </div>
           </div>
-          <div className="max-h-96 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+          <div className="overflow-y-auto" style={{ maxHeight: Math.min(384, pos.maxH - 52) }}>
             {notifs.length === 0 ? (
               <p className="text-center text-slate-400 text-sm py-8">لا توجد إشعارات</p>
             ) : notifs.map(n => (
@@ -128,7 +156,7 @@ export function NotificationBell() {
             ))}
           </div>
         </div>
-      )}
+      </>, document.body)}
     </div>
   )
 }
