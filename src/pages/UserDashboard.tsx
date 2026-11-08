@@ -328,8 +328,8 @@ export function UserDashboard() {
           </div>
         )}
 
-        {/* التفاوض على السعر + تأكيد الاستلام */}
-        {selectedTask.status === 'pending_confirmation' && (
+        {/* التفاوض على السعر ثم الدفع — قبل التنفيذ */}
+        {selectedTask.status === 'in_progress' && (
           <div className="space-y-3">
             {/* عرض السعر المقترح */}
             {(selectedTask as any).worker_price_offer && (selectedTask as any).negotiation_status === 'pending' && (
@@ -357,7 +357,7 @@ export function UserDashboard() {
             )}
 
             {/* دفع عبر Paymob */}
-            {(selectedTask as any).negotiation_status === 'accepted' && (selectedTask.price_final || (selectedTask as any).worker_price_offer) && (
+            {(selectedTask as any).negotiation_status === 'accepted' && !['held', 'paid', 'released'].includes((selectedTask as any).payment_status) && (selectedTask.price_final || (selectedTask as any).worker_price_offer) && (
               <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5">
                 <p className="font-bold text-amber-700 mb-1">💳 ادفع مقابل الخدمة</p>
                 <p className="text-3xl font-black text-amber-600 my-2">
@@ -371,9 +371,15 @@ export function UserDashboard() {
                   className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl transition-all active:scale-95 mt-2"
                 />
                 <p className="text-xs text-amber-600 mt-2 text-center">🔒 دفع آمن عبر Paymob — مدى / فيزا / ماستركارد</p>
+                <p className="text-xs text-amber-700 mt-1 text-center">المبلغ ينحجز عندنا وما يوصل المنفذ إلا بعد ما تأكد استلام الخدمة</p>
               </div>
             )}
+          </div>
+        )}
 
+        {/* تأكيد الاستلام — بعد الدفع والتسليم */}
+        {selectedTask.status === 'pending_confirmation' && (
+          <div className="space-y-3">
             {/* تأكيد الاستلام */}
             <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5">
               <p className="font-bold text-purple-700 mb-1">المقدم أكمل الطلب</p>
@@ -403,7 +409,13 @@ export function UserDashboard() {
 
         {selectedTask.status === 'in_progress' && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-700 leading-relaxed">
-            ⚡ العامل يشتغل على طلبك. أول ما يسلّمه يطلع لك هنا السعر وزر الدفع وتأكيد الاستلام.
+            {['held', 'paid'].includes((selectedTask as any).payment_status)
+              ? '✅ دفعت والمبلغ محجوز بأمان — المنفذ يشتغل على طلبك الحين. أول ما يسلّم يطلع لك زر تأكيد الاستلام.'
+              : (selectedTask as any).negotiation_status === 'accepted'
+                ? '💳 وافقت على السعر — ادفع عشان يبدأ المنفذ التنفيذ.'
+                : (selectedTask as any).negotiation_status === 'pending'
+                  ? '💰 المنفذ اقترح سعر — وافق عليه أو ارفضه فوق.'
+                  : '💬 تواصل مع المنفذ في المحادثة واتفقوا على التفاصيل — بيرسل لك السعر هنا، وبعد ما توافق وتدفع يبدأ التنفيذ.'}
           </div>
         )}
 

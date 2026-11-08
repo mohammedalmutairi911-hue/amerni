@@ -49,6 +49,8 @@ export function WorkerDashboard() {
   const [accepting, setAccepting] = useState<string | null>(null)
   const [toggling, setToggling] = useState(false)
   const [completingTask, setCompletingTask] = useState<Task | null>(null)
+  // 'price' = اقتراح السعر (قبل الدفع) | 'deliver' = تسليم الإنجاز (بعد الدفع فقط)
+  const [completionMode, setCompletionMode] = useState<'price' | 'deliver'>('price')
   const [proofUrl, setProofUrl] = useState('')
   const [proofNote, setProofNote] = useState('')
   const [priceOffer, setPriceOffer] = useState('')
@@ -149,44 +151,47 @@ export function WorkerDashboard() {
     setAccepting(null); setTab('my-tasks')
   }
 
+  // مرحلة المنفذ في الطلب: عرض سعر → انتظار موافقة → انتظار دفع → تنفيذ وتسليم
+  const workerStep = (t: Task): 'offer' | 'wait_approval' | 'wait_payment' | 'deliver' | 'none' => {
+    const x = t as any
+    if (t.status !== 'in_progress') return 'none'
+    if (['held', 'paid'].includes(x.payment_status)) return 'deliver'
+    if (x.negotiation_status === 'accepted') return 'wait_payment'
+    if (x.negotiation_status === 'pending') return 'wait_approval'
+    return 'offer'
+  }
   const openCompletion = (t: Task) => {
-    const known = (t as any).price_final || (t as any).price_suggested
+    const step = workerStep(t)
+    setCompletionMode(step === 'deliver' ? 'deliver' : 'price')
+    const known = (t as any).worker_price_offer || (t as any).price_suggested
     setPriceOffer(known ? String(known) : '')
     setCompletingTask(t)
   }
 
+  const closeCompletion = () => { setCompletingTask(null); setProofUrl(''); setProofNote(''); setPriceOffer('') }
+
   const submitCompletion = async () => {
     if (!completingTask) return
-    if (!priceOffer || Number(priceOffer) <= 0) { toast('أضف السعر أولاً', 'warning'); return }
     setUploadingProof(true)
-
-    // الترتيب مهم: propose_price يشترط الحالة in_progress، فلازم يسبق
-    // submit_task_completion اللي يحوّل الحالة إلى pending_confirmation.
-    // (قبل كان العكس — فيفشل اقتراح السعر بصمت وما يطلع للعميل سعر ولا دفع)
-    const { error: priceErr } = await supabase.rpc('propose_price', {
-      p_task_id: completingTask.id,
-      p_price: Number(priceOffer),
-      p_note: proofNote || null,
-    })
-    if (priceErr) { toast('خطأ في إرسال السعر: ' + priceErr.message, 'error'); setUploadingProof(false); return }
-
-    const { error } = await supabase.rpc('submit_task_completion', {
-      p_task_id: completingTask.id,
-      p_completion_note: proofNote || 'تم الإنجاز',
-      p_completion_proof: proofUrl || null,
-    })
-    if (error) { toast('خطأ: ' + error.message, 'error'); setUploadingProof(false); return }
-
-    toast('✅ سلّمت الطلب — بانتظار موافقة العميل على السعر والدفع', 'success')
-    if (selectedTask?.id === completingTask.id) {
-      setSelectedTask(p => p ? { ...p, status: 'pending_confirmation', worker_price_offer: Number(priceOffer), negotiation_status: 'pending' } as any : null)
+    if (completionMode === 'price') {
+      if (!priceOffer || Number(priceOffer) <= 0) { toast('أضف السعر أولاً', 'warning'); setUploadingProof(false); return }
+      const { error } = await supabase.rpc('propose_price', { p_task_id: completingTask.id, p_price: Number(priceOffer), p_note: proofNote || null })
+      if (error) { toast('خطأ في إرسال السعر: ' + error.message, 'error'); setUploadingProof(false); return }
+      toast('✅ أرسلت السعر — أول ما يوافق العميل ويدفع، يوصلك إشعار وتبدأ التنفيذ', 'success')
+      if (selectedTask?.id === completingTask.id) setSelectedTask(p => p ? { ...p, worker_price_offer: Number(priceOffer), negotiation_status: 'pending' } as any : null)
+    } else {
+      const { error } = await supabase.rpc('submit_task_completion', {
+        p_task_id: completingTask.id,
+        p_completion_note: proofNote || 'تم الإنجاز',
+        p_completion_proof: proofUrl || null,
+      })
+      if (error) { toast('خطأ: ' + error.message, 'error'); setUploadingProof(false); return }
+      toast('✅ سلّمت الطلب — بانتظار تأكيد العميل، وبعدها يتحوّل المبلغ لمحفظتك', 'success')
+      if (selectedTask?.id === completingTask.id) setSelectedTask(p => p ? { ...p, status: 'pending_confirmation' } as any : null)
     }
     await fetchMyTasks()
     setUploadingProof(false)
-    setCompletingTask(null)
-    setProofUrl('')
-    setProofNote('')
-    setPriceOffer('')
+    closeCompletion()
   }
 
   const toggleOnline = async () => {
@@ -238,11 +243,13 @@ export function WorkerDashboard() {
   if (completingTask) return (
     <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4">
       <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-xl max-h-[calc(100dvh-2rem)] overflow-y-auto">
-        <h3 className="text-lg font-bold text-slate-900 mb-1">إنهاء الطلب وتسليمه</h3>
-        <p className="text-slate-500 text-sm mb-4">أضف السعر وملاحظة وارفع إثبات الإنجاز</p>
+        <h3 className="text-lg font-bold text-slate-900 mb-1">{completionMode === 'price' ? 'اقترح السعر' : 'سلّم الإنجاز'}</h3>
+        <p className="text-slate-500 text-sm mb-4">{completionMode === 'price'
+          ? 'اتفق مع العميل على السعر. بعد ما يوافق ويدفع، المبلغ ينحجز بأمان وتبدأ التنفيذ.'
+          : 'العميل دفع والمبلغ محجوز. ارفع إثبات الإنجاز، وبعد تأكيد العميل يتحوّل المبلغ لمحفظتك.'}</p>
 
-        {/* السعر - إلزامي */}
-        <div className="mb-3">
+        {/* السعر - إلزامي في مرحلة العرض */}
+        {completionMode === 'price' && <div className="mb-3">
           <label className="block text-xs font-semibold text-slate-700 mb-1.5">
             💰 السعر المقترح <span className="text-red-400">*</span>
           </label>
@@ -258,14 +265,14 @@ export function WorkerDashboard() {
           {completingTask.price_suggested && (
             <p className="text-xs text-slate-400 mt-1">سعر العميل المقترح: {completingTask.price_suggested} ريال</p>
           )}
-        </div>
+        </div>}
 
         <textarea value={proofNote} onChange={e => setProofNote(e.target.value)}
-          placeholder="ملاحظة للعميل — صف ما أنجزته..." rows={3}
+          placeholder={completionMode === 'price' ? 'ملاحظة على السعر (اختياري) — وش يشمل؟' : 'ملاحظة للعميل — صف ما أنجزته...'} rows={3}
           className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none resize-none mb-3 focus:border-primary-500 transition-colors" />
 
-        {/* File/Image upload */}
-        <div className="mb-4">
+        {/* File/Image upload — في التسليم فقط */}
+        {completionMode === 'deliver' && <div className="mb-4">
           <label className="block text-xs font-semibold text-slate-600 mb-2">إرفاق صورة أو ملف (اختياري)</label>
           <div className="flex gap-2">
             <label className="flex-1 flex items-center justify-center gap-2 bg-slate-50 border-2 border-dashed border-slate-300 hover:border-primary-500 rounded-xl py-3 cursor-pointer transition-colors">
@@ -310,15 +317,15 @@ export function WorkerDashboard() {
           {proofUrl && proofUrl.match(/\.(jpg|jpeg|png|gif|webp)/i) && (
             <img src={proofUrl} alt="إثبات الإنجاز" className="mt-2 w-full h-32 object-cover rounded-xl border border-slate-200" />
           )}
-        </div>
+        </div>}
 
         <div className="flex gap-3">
-          <button onClick={() => { setCompletingTask(null); setProofUrl(''); setProofNote(''); setPriceOffer('') }}
+          <button onClick={closeCompletion}
             className="flex-1 border border-slate-200 text-slate-600 py-3 rounded-xl text-sm hover:bg-slate-50">إلغاء</button>
-          <button onClick={submitCompletion} disabled={uploadingProof || !priceOffer || Number(priceOffer) <= 0}
+          <button onClick={submitCompletion} disabled={uploadingProof || (completionMode === 'price' && (!priceOffer || Number(priceOffer) <= 0))}
             className="flex-1 bg-secondary-500 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-secondary-600">
             {uploadingProof ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
-            أرسل للعميل
+            {completionMode === 'price' ? 'أرسل السعر للعميل' : 'سلّم للعميل'}
           </button>
         </div>
       </div>
@@ -658,10 +665,12 @@ export function WorkerDashboard() {
                   <div key={t.id} className="px-4 py-3 border-b border-slate-50 last:border-0">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex gap-2">
-                        {t.status === 'in_progress' && (
-                          <button onClick={() => openCompletion(t)}
-                            className="text-xs bg-green-500 text-white font-bold px-3 py-1.5 rounded-lg">أنهِ</button>
-                        )}
+                        {(() => { const st = workerStep(t); return <>
+                          {st === 'offer' && <button onClick={() => openCompletion(t)} className="text-xs bg-amber-500 text-white font-bold px-3 py-1.5 rounded-lg whitespace-nowrap">اقترح السعر</button>}
+                          {st === 'wait_approval' && <span className="text-[11px] bg-amber-50 text-amber-700 font-bold px-2.5 py-1.5 rounded-lg whitespace-nowrap">بانتظار موافقة العميل</span>}
+                          {st === 'wait_payment' && <span className="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1.5 rounded-lg whitespace-nowrap">بانتظار الدفع</span>}
+                          {st === 'deliver' && <button onClick={() => openCompletion(t)} className="text-xs bg-green-500 text-white font-bold px-3 py-1.5 rounded-lg whitespace-nowrap">مدفوع — سلّم</button>}
+                        </>})()}
                         {t.status !== 'completed' && t.status !== 'cancelled' && (
                           <button onClick={() => { setSelectedTask(t); setTab('chat'); try { window.scrollTo(0,0); document.querySelector('main')?.scrollTo(0,0) } catch {} }}
                             className="text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg">💬</button>
@@ -905,15 +914,33 @@ export function WorkerDashboard() {
                 <p className="text-sm font-black text-primary-700">{(selectedTask as any).price_final || (selectedTask as any).price_suggested} ريال</p>
               )}
             </div>
-            {selectedTask.status === 'in_progress' && (
-              <button onClick={() => openCompletion(selectedTask)}
-                className="w-full mb-3 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors">
-                ✅ أنهيت الطلب — سلّمه للعميل
-              </button>
-            )}
+            {(() => { const st = workerStep(selectedTask); return <>
+              {st === 'offer' && (
+                <button onClick={() => openCompletion(selectedTask)}
+                  className="w-full mb-3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                  💰 اقترح السعر على العميل
+                </button>
+              )}
+              {st === 'wait_approval' && (
+                <div className="mb-3 bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800">
+                  أرسلت سعر {(selectedTask as any).worker_price_offer} ريال — بانتظار موافقة العميل. لا تبدأ التنفيذ قبل الدفع.
+                </div>
+              )}
+              {st === 'wait_payment' && (
+                <div className="mb-3 bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-sm text-indigo-800">
+                  العميل وافق على {(selectedTask as any).price_final ?? (selectedTask as any).worker_price_offer} ريال — بانتظار الدفع. أول ما يدفع يوصلك إشعار وتبدأ التنفيذ.
+                </div>
+              )}
+              {st === 'deliver' && (
+                <button onClick={() => openCompletion(selectedTask)}
+                  className="w-full mb-3 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                  ✅ العميل دفع — نفّذ وسلّم الإنجاز
+                </button>
+              )}
+            </>})()}
             {selectedTask.status === 'pending_confirmation' && (
               <div className="mb-3 bg-purple-50 border border-purple-200 rounded-xl p-3 text-sm text-purple-700">
-                سلّمت الطلب ✅ بانتظار العميل يوافق على السعر ويدفع ويأكّد الاستلام.
+                سلّمت الطلب ✅ بانتظار العميل يأكّد الاستلام، وبعدها يتحوّل المبلغ لمحفظتك.
               </div>
             )}
             <Chat taskId={selectedTask.id} taskTitle="المحادثة مع العميل" />
