@@ -87,3 +87,41 @@ if ('serviceWorker' in navigator && !window.location.hostname.includes('localhos
     }
   })
 }
+
+// ── كشف النسخ الجديدة ────────────────────────────────────────
+// الصفحة المفتوحة تبقى على الكود القديم بعد أي نشر. نقارن ملف الـ JS الرئيسي
+// في index.html الحالي على السيرفر مع اللي شغال الآن: إذا تغيّر نحدّث تلقائياً
+// عند الرجوع للتبويب، أو نعرض شريط "تحديث" إذا المستخدم داخل الصفحة.
+;(() => {
+  if (window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1') return
+  const current = (document.querySelector('script[type="module"][src*="/assets/index-"]') as HTMLScriptElement | null)?.getAttribute('src')
+  if (!current) return
+  let pending = false
+  let banner: HTMLElement | null = null
+  const showBanner = () => {
+    if (banner) return
+    banner = document.createElement('button')
+    banner.setAttribute('dir', 'rtl')
+    banner.textContent = '🔄 فيه تحديث جديد — اضغط للتحديث'
+    banner.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom));z-index:200;background:#1e3a8a;color:#fff;font:700 13px inherit;font-family:inherit;padding:10px 16px;border-radius:999px;border:0;box-shadow:0 8px 24px rgba(0,0,0,.2)'
+    banner.onclick = () => window.location.reload()
+    document.body.appendChild(banner)
+  }
+  const check = async () => {
+    if (pending) return
+    try {
+      const res = await fetch('/?_v=' + Date.now(), { cache: 'no-store' })
+      if (!res.ok) return
+      const html = await res.text()
+      const m = html.match(/<script[^>]+type="module"[^>]+src="([^"]*\/assets\/index-[^"]+)"/) || html.match(/src="([^"]*\/assets\/index-[^"]+\.js)"/)
+      if (m && m[1] !== current) { pending = true; if (document.visibilityState === 'visible') showBanner() }
+    } catch { /* offline */ }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return
+    if (pending) { window.location.reload(); return }
+    check()
+  })
+  window.addEventListener('focus', check)
+  setInterval(check, 3 * 60 * 1000)
+})()

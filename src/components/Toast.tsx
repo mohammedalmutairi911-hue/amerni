@@ -15,7 +15,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const toast = useCallback((message: string, type: ToastType = 'info') => {
     const id = Date.now().toString()
     setToasts(p => [...p, { id, message, type }])
-    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 4000)
+    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), Math.max(4000, message.length * 70))
   }, [])
 
   const icons = { success: CheckCircle, error: AlertCircle, info: Info, warning: AlertCircle }

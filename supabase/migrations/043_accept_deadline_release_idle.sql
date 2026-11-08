@@ -1,0 +1,6 @@
+-- 043 (طُبّق على الإنتاج 2026-11-08):
+-- accepted_at/completed_at + trigger، مهلة ساعة للمنفذ بعد القبول، إعادة الطلب للعرض
+-- عبر pg_cron كل 5 دقائق (release_idle_tasks)، منع/إخفاء الطلب عن المنفذ المنسحب
+-- (released_workers + سياسة worker_see_tasks)، عدّاد missed_tasks، وتنبيهات المنفذ.
+-- التعريفات الكاملة كما طُبّقت موجودة في قاعدة البيانات (migrations:
+-- tasks_accepted_completed_at, release_idle_accepted_tasks, accept_deadline_warning_and_hide_released).

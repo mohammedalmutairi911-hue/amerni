@@ -21,8 +21,9 @@ const fmt = (iso?: string | null) => iso
   ? new Date(iso).toLocaleString('ar-SA', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })
   : '—'
 
-export function AdminTaskDetail({ task, users, workers, onClose }: {
+export function AdminTaskDetail({ task, users, workers, onClose, onStatusChange }: {
   task: Task; users: Profile[]; workers: WorkerProfile[]; onClose: () => void
+  onStatusChange?: (id: string, status: string) => void
 }) {
   const t = task as any
   const [msgs, setMsgs] = useState<Msg[]>([])
@@ -57,7 +58,7 @@ export function AdminTaskDetail({ task, users, workers, onClose }: {
     if (m.sender_id && m.sender_id === clientId) return { name: client?.full_name || 'العميل', role: 'العميل', tone: 'client' as const }
     if (m.sender_id && m.sender_id === t.worker_id) return { name: workerProfile?.full_name || workerUser?.full_name || 'العامل', role: 'العامل', tone: 'worker' as const }
     const u = users.find(x => x.id === m.sender_id) as any
-    return { name: u?.full_name || u?.email || 'مستخدم', role: u?.role === 'admin' ? 'الإدارة' : 'آخر', tone: 'other' as const }
+    return { name: u?.full_name || 'مستخدم', role: u?.role === 'admin' ? 'الإدارة' : 'آخر', tone: 'other' as const }
   }
 
   const price = t.final_price ?? t.price_final ?? null
@@ -70,17 +71,21 @@ export function AdminTaskDetail({ task, users, workers, onClose }: {
     ['عرض العامل', t.worker_price_offer != null ? `${t.worker_price_offer} ريال` : '—'],
     ['السعر النهائي', price != null ? `${price} ريال` : '—'],
     ['الموعد', t.deadline || '—'],
-    ['تاريخ الإنشاء', fmt(t.created_at)],
+    ['انطلب في', fmt(t.created_at)],
+    ['انقبل في', t.worker_id ? fmt(t.accepted_at) : 'لم يُقبل بعد'],
+    ['اكتمل في', t.completed_at ? fmt(t.completed_at) : '—'],
     ['آخر تحديث', fmt(t.updated_at)],
+    ...(t.status === 'in_progress' && t.accepted_at && !msgs.some(m => m.sender_id === t.worker_id && !m.is_system_message)
+      ? [['مهلة التواصل', `ينسحب ${fmt(new Date(new Date(t.accepted_at).getTime() + 3600000).toISOString())} إذا ما تواصل`] as [string, any]]
+      : []),
   ]
 
-  const Person = ({ icon: Icon, label, name, email, phone, extra }: any) => (
+  // بدون جوال أو إيميل — التواصل والاتفاق يبقى داخل المنصة فقط
+  const Person = ({ icon: Icon, label, name, extra }: any) => (
     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 min-w-0">
       <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1"><Icon size={12} /> {label}</div>
       {name ? <>
         <p className="font-bold text-slate-800 text-sm truncate">{name}</p>
-        {email && <p className="text-xs text-slate-500 truncate" dir="ltr">{email}</p>}
-        {phone && <a href={`tel:${phone}`} className="text-xs text-primary-600 font-bold" dir="ltr">{phone}</a>}
         {extra && <p className="text-xs text-slate-400 mt-0.5">{extra}</p>}
       </> : <p className="text-sm text-slate-400">لم يقبله أحد بعد</p>}
     </div>
@@ -103,10 +108,9 @@ export function AdminTaskDetail({ task, users, workers, onClose }: {
           {t.description && <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{t.description}</p>}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Person icon={User} label="صاحب الطلب (العميل)" name={client?.full_name || client?.email} email={client?.email} phone={client?.phone} />
-            <Person icon={Wrench} label="العامل اللي قبله" name={t.worker_id ? (workerProfile?.full_name || workerUser?.full_name || workerUser?.email || 'عامل') : null}
-              email={workerUser?.email} phone={workerProfile?.phone || workerUser?.phone}
-              extra={workerProfile ? [workerProfile.city, workerProfile.is_approved ? 'معتمد' : 'غير معتمد'].filter(Boolean).join(' · ') : undefined} />
+            <Person icon={User} label="صاحب الطلب (العميل)" name={client?.full_name || 'عميل'} />
+            <Person icon={Wrench} label="العامل اللي قبله" name={t.worker_id ? (workerProfile?.full_name || workerUser?.full_name || 'عامل') : null}
+              extra={workerProfile ? [workerProfile.city, workerProfile.is_approved ? 'معتمد' : 'غير معتمد', workerProfile.missed_tasks ? `انسحب منه ${workerProfile.missed_tasks} طلب لعدم التواصل` : ''].filter(Boolean).join(' · ') : undefined} />
           </div>
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 bg-white border border-slate-200 rounded-xl p-4">
@@ -117,6 +121,19 @@ export function AdminTaskDetail({ task, users, workers, onClose }: {
               </div>
             ))}
           </div>
+
+          {onStatusChange && (t.status === 'in_progress' || t.status === 'disputed') && (
+            <div className="flex gap-2">
+              {t.status === 'in_progress' && (
+                <button onClick={() => { if (confirm('تحويل الطلب لنزاع؟ استخدمه فقط إذا فيه خلاف بين العميل والعامل.')) onStatusChange(t.id, 'disputed') }}
+                  className="flex-1 border border-red-200 text-red-500 font-bold py-2 rounded-xl text-xs">فتح نزاع على الطلب</button>
+              )}
+              {t.status === 'disputed' && (
+                <button onClick={() => { if (confirm('إنهاء النزاع واعتبار الطلب مكتمل؟')) onStatusChange(t.id, 'completed') }}
+                  className="flex-1 bg-primary-700 text-white font-bold py-2 rounded-xl text-xs">حل النزاع (اعتبار الطلب مكتمل)</button>
+              )}
+            </div>
+          )}
 
           {(t.completion_note || t.completion_proof) && (
             <div className="bg-green-50 border border-green-200 rounded-xl p-4">

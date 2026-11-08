@@ -143,6 +143,7 @@ export function WorkerDashboard() {
       p_worker_price: (task as any).price_suggested || null,
     })
     if (error) { toast('خطأ في قبول الطلب: ' + error.message, 'error'); setAccepting(null); return }
+    toast('✅ قبلت الطلب — عندك ساعة تبدأ فيها التنفيذ وتتواصل مع العميل في المحادثة، وإلا يُعاد رفع الطلب لمنفذ ثاني. عدم الالتزام يؤثر على تقييمك.', 'success')
     await fetchFeedTasks(); await fetchMyTasks()
     setAccepting(null); setTab('my-tasks')
   }

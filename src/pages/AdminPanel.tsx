@@ -136,10 +136,10 @@ export function AdminPanel() {
     setOverdueLeads(oRes.data || [])
     setReviews(rRes.data || [])
     setLoading(false)
-    // آخر 8 رسائل فقط — على فهرس created_at
+    // آخر 200 رسالة — على فهرس created_at (لعرض آخر رسالة لكل محادثة)
     const { data: rm } = await supabase.from('task_messages')
       .select('id, task_id, sender_id, content, is_system_message, created_at')
-      .order('created_at', { ascending: false }).limit(8)
+      .order('created_at', { ascending: false }).limit(200)
     setRecentMsgs(rm || [])
   }
 
@@ -947,7 +947,8 @@ export function AdminPanel() {
           <div className="space-y-3" dir="rtl">
             <StaleRequests tasks={tasks} workers={workers} users={users} />
             {tasks.map(task => (
-              <div key={task.id} className="bg-white border border-slate-200 rounded-xl p-4">
+              <div key={task.id} onClick={() => setSelectedTask(task)} role="button"
+                className="bg-white border border-slate-200 rounded-xl p-4 cursor-pointer active:bg-slate-50 hover:border-primary-200 transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -961,27 +962,14 @@ export function AdminPanel() {
                       {task.price_suggested ? ` · ${task.price_suggested} ريال` : ''}
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
-                      العميل: <span className="font-bold">{(() => { const c = users.find(u => u.id === ((task as any).client_id || task.user_id)); return c?.full_name || c?.email || '—' })()}</span>
+                      العميل: <span className="font-bold">{(() => { const c = users.find(u => u.id === ((task as any).client_id || task.user_id)); return c?.full_name || '—' })()}</span>
                       {' · '}العامل: <span className="font-bold">{task.worker_id ? (workers.find(w => w.user_id === task.worker_id)?.full_name || users.find(u => u.id === task.worker_id)?.full_name || 'عامل') : 'لم يُقبل بعد'}</span>
                     </p>
                   </div>
                   <div className="flex gap-1.5 flex-shrink-0">
-                    <button onClick={() => setSelectedTask(task)}
-                      className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 text-slate-700 text-xs rounded-lg">
-                      <Eye size={11} /> التفاصيل والمحادثة
-                    </button>
-                    {task.status === 'disputed' && (
-                      <button onClick={() => updateTaskStatus(task.id, 'completed')}
-                        className="flex items-center gap-1 px-2.5 py-1.5 bg-secondary-500/10 border border-secondary-500/30 text-secondary-400 text-xs rounded-lg">
-                        <CheckCircle size={11} /> حل
-                      </button>
-                    )}
-                    {task.status === 'in_progress' && (
-                      <button onClick={() => updateTaskStatus(task.id, 'disputed')}
-                        className="flex items-center gap-1 px-2.5 py-1.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-lg">
-                        <AlertTriangle size={11} /> نزاع
-                      </button>
-                    )}
+                    <span className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 text-slate-700 text-xs rounded-lg">
+                      <Eye size={11} /> التفاصيل
+                    </span>
                   </div>
                 </div>
               </div>
@@ -990,166 +978,61 @@ export function AdminPanel() {
         )}
 
         {/* Conversations */}
-        {tab === 'conversations' && (
-          <div className="space-y-6 animate-fade-in" dir="rtl">
-            {/* Header */}
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-black text-slate-900">نظام حل النزاعات</h2>
-                <p className="text-slate-400 text-sm mt-0.5">إدارة ومتابعة الخلافات النشطة بين الشركات والموردين لضمان استمرارية العمل.</p>
-              </div>
-              <button className="flex items-center gap-2 bg-primary-600 text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-primary-700 transition-colors shadow-sm">
-                <span className="text-lg">+</span> فتح نزاع جديد
-              </button>
-            </div>
-
-            {/* KPI Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: 'إجمالي النزاعات',      value: stats.disputed,  icon: null },
-                { label: 'تمت التسوية (هذا الشهر)', value: stats.completed,  icon: '✓', iconColor: 'text-slate-400' },
-                { label: 'نزاعات مفتوحة',          value: tasks.filter(t=>t.status==='disputed').length, highlight: true, icon: '!' },
-                { label: 'تحت المراجعة',            value: tasks.filter(t=>t.status==='in_progress').length, icon: '—' },
-              ].map(({ label, value, growth, highlight, icon, iconColor }) => (
-                <div key={label} className={`bg-white border-2 rounded-2xl p-5 shadow-sm ${highlight ? 'border-red-300' : 'border-slate-200'}`}>
-                  <div className="flex items-center justify-between mb-3">
-                    {icon && <span className={`text-lg font-black ${highlight ? 'text-red-400' : iconColor || 'text-slate-400'}`}>{icon}</span>}
-                    {growth && <span className="text-xs text-green-500 font-bold flex items-center gap-0.5">↗ {growth}</span>}
-                    {!icon && !growth && <span/>}
+        {tab === 'conversations' && (() => {
+          // آخر رسالة لكل طلب — من آخر الرسائل المحمّلة (استعلام واحد على فهرس created_at)
+          const lastByTask = new Map<string, typeof recentMsgs[number]>()
+          recentMsgs.forEach(m => { if (!lastByTask.has(m.task_id)) lastByTask.set(m.task_id, m) })
+          const nameOf = (id?: string | null) => { const u = users.find(x => x.id === id); return u?.full_name || '—' }
+          const workerName = (id?: string | null) => workers.find(w => w.user_id === id)?.full_name || nameOf(id)
+          const disputed = tasks.filter(t => t.status === 'disputed')
+          const chats = tasks.filter(t => t.worker_id)
+            .sort((a, b) => {
+              const ta = new Date(lastByTask.get(a.id)?.created_at || (a as any).accepted_at || a.created_at).getTime()
+              const tb = new Date(lastByTask.get(b.id)?.created_at || (b as any).accepted_at || b.created_at).getTime()
+              return tb - ta
+            })
+          const Row = ({ t }: { t: Task }) => {
+            const last = lastByTask.get(t.id)
+            return (
+              <button onClick={() => setSelectedTask(t)} className="w-full text-right px-4 py-3.5 flex items-start gap-3 hover:bg-slate-50 active:bg-slate-50 transition-colors">
+                <div className="w-9 h-9 rounded-full bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0 mt-0.5"><MessageSquare size={16} /></div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-bold text-slate-800 text-sm truncate">{t.title}</p>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${STATUS_COLOR[t.status]}`}>{STATUS_LABEL[t.status]}</span>
                   </div>
-                  <p className={`text-4xl font-black ${highlight ? 'text-red-500' : 'text-slate-900'}`}>{value}</p>
-                  <p className="text-xs text-slate-400 mt-1">{label}</p>
+                  <p className="text-xs text-slate-500 mt-0.5 truncate">{nameOf((t as any).client_id || t.user_id)} (عميل) ↔ {workerName(t.worker_id)} (عامل)</p>
+                  <p className="text-xs text-slate-400 mt-0.5 truncate">
+                    {last ? <>{last.is_system_message ? 'النظام' : (last.sender_id === t.worker_id ? workerName(t.worker_id) : nameOf(last.sender_id))}: {last.content} · {timeAgoAr(last.created_at)}</> : 'ما فيه رسائل'}
+                  </p>
                 </div>
-              ))}
-            </div>
-
-            {/* Filters */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3">
-              <button className="w-9 h-9 border border-slate-200 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50 flex-shrink-0">
-                <AlertTriangle size={15} />
               </button>
-              <input type="date" className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-300" placeholder="mm/dd/yyyy" />
-              <select className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white min-w-[100px]">
-                <option>الكل</option>
-                <option>مفتوح</option>
-                <option>تحت المراجعة</option>
-                <option>تم الحل</option>
-              </select>
-              <input placeholder="رقم النزاع، اسم الشركة..." dir="rtl"
-                className="flex-1 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
+            )
+          }
+          return (
+          <div className="space-y-5 animate-fade-in" dir="rtl">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">المحادثات</h2>
+              <p className="text-slate-400 text-sm mt-0.5">كل طلب قبله عامل — اضغط عليه لتشوف التفاصيل والمحادثة كاملة</p>
             </div>
 
-            {/* Table */}
-            <div className="bg-white border border-slate-200 rounded-2xl overflow-x-auto shadow-sm">
-              <table className="w-full text-sm" dir="rtl">
-                <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50">
-                    {['رقم النزاع','الأطراف المعنية','السبب','التاريخ','الحالة','الإجراءات'].map(h => (
-                      <th key={h} className="px-5 py-3.5 text-right text-xs font-bold text-slate-400">{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {tasks.filter(t => t.status === 'disputed').slice(0,10).map((t, i) => (
-                    <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                      <td className="px-5 py-4 font-black text-slate-700">DIS-{t.id.slice(0,6).toUpperCase()}#</td>
-                      <td className="px-5 py-4">
-                        <p className="font-bold text-slate-800 text-sm">{t.title?.slice(0,16) || 'شركة —'}</p>
-                        <p className="text-xs text-slate-400">ضد: مورد الخدمة</p>
-                      </td>
-                      <td className="px-5 py-4 text-slate-600 text-sm max-w-[180px] truncate">{t.description?.slice(0,30) || 'خلاف في الخدمة'}</td>
-                      <td className="px-5 py-4 text-slate-400 whitespace-nowrap text-xs">
-                        {new Date(t.created_at).toLocaleDateString('ar-SA', { day:'numeric', month:'long', year:'numeric' })}
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full border bg-red-50 text-red-500 border-red-200">
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> مفتوح
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => setSelectedTask(t)}
-                            className="text-primary-500 hover:text-primary-700 transition-colors p-1.5 rounded-lg hover:bg-primary-50">
-                            <Eye size={16} />
-                          </button>
-                          <button onClick={() => updateTaskStatus(t.id, 'completed')}
-                            className="text-xs bg-primary-700 text-white font-bold px-3 py-1.5 rounded-lg hover:bg-primary-800 transition-colors">
-                            توسط
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {tasks.filter(t=>t.status==='disputed').length === 0 && (
-                    <tr><td colSpan={6} className="px-5 py-12 text-center text-slate-400 text-sm">
-                      <AlertTriangle size={28} className="mx-auto mb-2 opacity-30" />
-                      لا توجد نزاعات مفتوحة
-                    </td></tr>
-                  )}
-                </tbody>
-              </table>
-              {tasks.filter(t=>t.status==='disputed').length > 0 && (
-                <div className="px-5 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                  <div className="flex items-center gap-1">
-                    {[1,2,3].map(n => (
-                      <button key={n} className={`w-9 h-9 md:w-7 md:h-7 rounded-lg font-bold ${n===1?'bg-primary-600 text-white':'hover:bg-slate-100 text-slate-500'}`}>{n}</button>
-                    ))}
-                  </div>
-                  <span>عرض 1-{Math.min(10, tasks.filter(t=>t.status==='disputed').length)} من أصل {tasks.filter(t=>t.status==='disputed').length} نزاع</span>
-                </div>
-              )}
-            </div>
-
-            {/* Bottom: Performance + Activity */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-              {/* أداء فريق التسوية */}
-              <div className="md:col-span-4 bg-primary-700 rounded-2xl p-6 text-white">
-                <h3 className="text-lg font-black mb-1">أداء فريق التسوية</h3>
-                <p className="text-primary-200 text-sm mb-5">متوسط وقت حل النزاعات انخفض بنسبة 14% هذا الشهر.</p>
-                <p className="text-5xl font-black mb-1">48 <span className="text-2xl font-bold">ساعة</span></p>
-                <p className="text-primary-300 text-xs mb-3">الوقت المستهدف</p>
-                <div className="w-full bg-primary-600 rounded-full h-2 mb-2">
-                  <div className="bg-white h-2 rounded-full" style={{width: stats.completed > 0 ? Math.round((stats.completed / Math.max(tasks.length,1)) * 100) + '%' : '0%'}}/>
-                </div>
-                <p className="text-primary-200 text-xs mb-5">تم حل {stats.completed > 0 ? Math.round((stats.completed / Math.max(tasks.length,1)) * 100) : 0}% من الطلبات خلال الوقت المحدد.</p>
-                <button onClick={() => exportCSV('tasks')}
-                  className="w-full bg-white text-primary-700 font-bold py-2.5 rounded-xl text-sm hover:bg-primary-50 transition-colors">
-                  تحميل التقارير الشهرية
-                </button>
+            {disputed.length > 0 && (
+              <div className="bg-white border-2 border-red-200 rounded-2xl overflow-hidden">
+                <p className="px-4 py-3 border-b border-red-100 text-sm font-bold text-red-600">نزاعات مفتوحة ({disputed.length})</p>
+                <div className="divide-y divide-slate-100">{disputed.map(t => <Row key={t.id} t={t} />)}</div>
               </div>
+            )}
 
-              {/* آخر الأنشطة والوساطات */}
-              <div className="md:col-span-8 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                <div className="px-5 py-4 border-b border-slate-100">
-                  <h3 className="font-bold text-slate-900">آخر رسائل المحادثات</h3>
-                </div>
-                <div className="divide-y divide-slate-50">
-                  {recentMsgs.map(m => {
-                    const task = tasks.find(x => x.id === m.task_id)
-                    const sender = users.find(u => u.id === m.sender_id)
-                    const role = !task ? '' : m.sender_id === task.worker_id ? 'العامل' : (m.sender_id === ((task as any).client_id || task.user_id) ? 'العميل' : '')
-                    return (
-                      <button key={m.id} onClick={() => task && setSelectedTask(task)}
-                        className="w-full text-right px-5 py-4 flex items-start gap-4 hover:bg-slate-50 transition-colors">
-                        <div className="w-9 h-9 rounded-full bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <MessageSquare size={16} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-slate-400 truncate">{task?.title || 'طلب'}</p>
-                          <p className="text-sm text-slate-700 leading-relaxed line-clamp-2">
-                            <span className="font-bold">{m.is_system_message ? 'النظام' : (sender?.full_name || 'مستخدم')}{role && ` (${role})`}: </span>{m.content}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">{timeAgoAr(m.created_at)}</p>
-                        </div>
-                      </button>
-                    )
-                  })}
-                  {recentMsgs.length === 0 && <p className="px-5 py-8 text-center text-sm text-slate-400">لا توجد رسائل بعد</p>}
-                </div>
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              <p className="px-4 py-3 border-b border-slate-100 text-sm font-bold text-slate-700">المحادثات ({chats.length})</p>
+              <div className="divide-y divide-slate-100">
+                {chats.map(t => <Row key={t.id} t={t} />)}
+                {chats.length === 0 && <p className="px-4 py-10 text-center text-sm text-slate-400">ما فيه طلبات مقبولة للحين</p>}
               </div>
             </div>
           </div>
-        )}
+          )
+        })()}
 
         {/* Users */}
         {tab === 'users' && (
@@ -1911,7 +1794,8 @@ export function AdminPanel() {
 
       </div>
       {selectedTask && (
-        <AdminTaskDetail task={tasks.find(x => x.id === selectedTask.id) || selectedTask} users={users} workers={workers} onClose={() => setSelectedTask(null)} />
+        <AdminTaskDetail task={tasks.find(x => x.id === selectedTask.id) || selectedTask} users={users} workers={workers}
+          onClose={() => setSelectedTask(null)} onStatusChange={(id, st) => updateTaskStatus(id, st as any)} />
       )}
     </div>
   )
