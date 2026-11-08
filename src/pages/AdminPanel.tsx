@@ -8,7 +8,7 @@ import { useApp } from '../contexts/AppContext'
 import { goHome } from '../lib/homePage'
 import { Profile, Task, WorkerProfile } from '../types'
 import { getAvatar } from '../lib/supabase'
-import { Chat } from '../components/chat/Chat'
+import { AdminTaskDetail } from '../components/admin/AdminTaskDetail'
 import { AccountsCenter } from './AccountsCenter'
 import { StaleRequests } from '../components/admin/StaleRequests'
 
@@ -26,6 +26,8 @@ export function AdminPanel() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [users, setUsers] = useState<Profile[]>([])
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  // آخر رسائل المحادثات الحقيقية (لقسم آخر الأنشطة في صفحة المحادثات)
+  const [recentMsgs, setRecentMsgs] = useState<{ id: string; task_id: string; sender_id: string | null; content: string; is_system_message: boolean | null; created_at: string }[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
@@ -134,6 +136,11 @@ export function AdminPanel() {
     setOverdueLeads(oRes.data || [])
     setReviews(rRes.data || [])
     setLoading(false)
+    // آخر 8 رسائل فقط — على فهرس created_at
+    const { data: rm } = await supabase.from('task_messages')
+      .select('id, task_id, sender_id, content, is_system_message, created_at')
+      .order('created_at', { ascending: false }).limit(8)
+    setRecentMsgs(rm || [])
   }
 
   const refresh = async () => { setRefreshing(true); await fetchAll(); setRefreshing(false) }
@@ -953,11 +960,15 @@ export function AdminPanel() {
                       {task.city} · {new Date(task.created_at).toLocaleDateString('ar-SA')}
                       {task.price_suggested ? ` · ${task.price_suggested} ريال` : ''}
                     </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      العميل: <span className="font-bold">{(() => { const c = users.find(u => u.id === ((task as any).client_id || task.user_id)); return c?.full_name || c?.email || '—' })()}</span>
+                      {' · '}العامل: <span className="font-bold">{task.worker_id ? (workers.find(w => w.user_id === task.worker_id)?.full_name || users.find(u => u.id === task.worker_id)?.full_name || 'عامل') : 'لم يُقبل بعد'}</span>
+                    </p>
                   </div>
                   <div className="flex gap-1.5 flex-shrink-0">
-                    <button onClick={() => { setSelectedTask(task); setTab('conversations') }}
+                    <button onClick={() => setSelectedTask(task)}
                       className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 text-slate-700 text-xs rounded-lg">
-                      <Eye size={11} /> محادثة
+                      <Eye size={11} /> التفاصيل والمحادثة
                     </button>
                     {task.status === 'disputed' && (
                       <button onClick={() => updateTaskStatus(task.id, 'completed')}
@@ -1110,30 +1121,30 @@ export function AdminPanel() {
               {/* آخر الأنشطة والوساطات */}
               <div className="md:col-span-8 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="px-5 py-4 border-b border-slate-100">
-                  <h3 className="font-bold text-slate-900">آخر الأنشطة والوساطات</h3>
+                  <h3 className="font-bold text-slate-900">آخر رسائل المحادثات</h3>
                 </div>
                 <div className="divide-y divide-slate-50">
-                  {[
-                    { icon: MessageSquare, color: 'bg-primary-50 text-primary-500', text: 'تم تقديم حل مقترح للنزاع #DIS-8819 من قبل فريق الوساطة.', time: 'منذ 45 دقيقة' },
-                    { icon: AlertTriangle, color: 'bg-red-50 text-red-400', text: 'رسالة جديدة من شركة الأفق حول النزاع #DIS-8821.', time: 'منذ ساعتين' },
-                    { icon: CheckCircle, color: 'bg-green-50 text-green-500', text: 'تم حل النزاع #DIS-8790 بنجاح.', time: 'منذ 5 ساعات' },
-                  ].map(({ icon: Icon, color, text, time }, i) => (
-                    <div key={i} className="px-5 py-4 flex items-start gap-4 hover:bg-slate-50 transition-colors">
-                      <div className={`w-9 h-9 rounded-full ${color} flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                        <Icon size={16} />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-slate-700 leading-relaxed">{text}</p>
-                        <p className="text-xs text-slate-400 mt-1">{time}</p>
-                      </div>
-                    </div>
-                  ))}
-                  {selectedTask && (
-                    <div className="p-5">
-                      <p className="text-xs font-bold text-slate-500 mb-3">محادثة الطلب: {selectedTask.title}</p>
-                      <Chat taskId={selectedTask.id} taskTitle={selectedTask.title} />
-                    </div>
-                  )}
+                  {recentMsgs.map(m => {
+                    const task = tasks.find(x => x.id === m.task_id)
+                    const sender = users.find(u => u.id === m.sender_id)
+                    const role = !task ? '' : m.sender_id === task.worker_id ? 'العامل' : (m.sender_id === ((task as any).client_id || task.user_id) ? 'العميل' : '')
+                    return (
+                      <button key={m.id} onClick={() => task && setSelectedTask(task)}
+                        className="w-full text-right px-5 py-4 flex items-start gap-4 hover:bg-slate-50 transition-colors">
+                        <div className="w-9 h-9 rounded-full bg-primary-50 text-primary-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <MessageSquare size={16} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-slate-400 truncate">{task?.title || 'طلب'}</p>
+                          <p className="text-sm text-slate-700 leading-relaxed line-clamp-2">
+                            <span className="font-bold">{m.is_system_message ? 'النظام' : (sender?.full_name || 'مستخدم')}{role && ` (${role})`}: </span>{m.content}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">{timeAgoAr(m.created_at)}</p>
+                        </div>
+                      </button>
+                    )
+                  })}
+                  {recentMsgs.length === 0 && <p className="px-5 py-8 text-center text-sm text-slate-400">لا توجد رسائل بعد</p>}
                 </div>
               </div>
             </div>
@@ -1899,6 +1910,9 @@ export function AdminPanel() {
         )}
 
       </div>
+      {selectedTask && (
+        <AdminTaskDetail task={tasks.find(x => x.id === selectedTask.id) || selectedTask} users={users} workers={workers} onClose={() => setSelectedTask(null)} />
+      )}
     </div>
   )
 }
