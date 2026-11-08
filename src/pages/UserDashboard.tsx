@@ -655,15 +655,15 @@ export function UserDashboard() {
                 </div>
               </div>
 
-              {/* Promo */}
+              {/* دعوة صديق (بدل بانر الخصم القديم — ما كان فيه خصم فعلي) */}
               <div className="mt-5 rounded-2xl p-6 bg-gradient-to-l from-slate-900 to-primary-500 flex items-center justify-between gap-4">
                 <div>
-                  <span className="inline-block bg-amber-400 text-slate-900 font-black text-xs px-2.5 py-0.5 rounded-full mb-2">عرض خاص</span>
-                  <h2 className="text-xl font-black text-white mb-1">راحتك هي غايتنا</h2>
-                  <p className="text-white/70 text-sm">خصم ٢٠٪ على أول ٣ طلبات — كود: AMERNI20</p>
+                  <span className="inline-block bg-amber-400 text-slate-900 font-black text-xs px-2.5 py-0.5 rounded-full mb-2">ادعُ صديق</span>
+                  <h2 className="text-xl font-black text-white mb-1">شارك أمرني مع أصحابك</h2>
+                  <p className="text-white/70 text-sm">أرسل رابطك الخاص لأي أحد يحتاج خدمة</p>
                 </div>
-                <button onClick={() => setShowNew(true)} className="flex-shrink-0 bg-white text-slate-900 font-bold px-5 py-2.5 rounded-xl hover:bg-amber-400 transition-colors text-sm">
-                  استخدمه
+                <button onClick={() => navigate('referral')} className="flex-shrink-0 bg-white text-slate-900 font-bold px-5 py-2.5 rounded-xl hover:bg-amber-400 transition-colors text-sm">
+                  رابطي
                 </button>
               </div>
             </>
