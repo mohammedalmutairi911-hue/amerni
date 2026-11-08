@@ -714,7 +714,7 @@ export function AdminPanel() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
                     {[
-                      { label: 'إجمالي الإيرادات (عمولة 2%)', value: stats.revenue, unit: 'رس', color: 'text-slate-900' },
+                      { label: 'إجمالي الإيرادات (عمولة 5%)', value: stats.revenue, unit: 'رس', color: 'text-slate-900' },
                       { label: 'عمولة معلقة (طلبات بانتظار التأكيد)', value: stats.revenuePending, unit: 'رس', color: 'text-slate-900' },
                       { label: 'معدل النجاح',       value: tasks.length > 0 ? Math.round((stats.completed/tasks.length)*100) : 0, unit: '%', color: 'text-green-500' },
                     ].map(({ label, value, unit, color }) => (
@@ -1510,7 +1510,7 @@ export function AdminPanel() {
                   <div className="space-y-3 flex-1">
                     {[
                       { label: 'مدفوعات الموردين', value: (tasks.filter(t=>t.status==="completed").reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0)*0.98).toLocaleString("ar-SA") + " رس", color: 'bg-primary-700' },
-                      { label: 'عمولة المنصة',    value: (tasks.filter(t=>t.status==="completed").reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0)*0.02).toLocaleString("ar-SA") + " رس",  color: 'bg-slate-400' },
+                      { label: 'عمولة المنصة',    value: (tasks.filter(t=>t.status==="completed").reduce((s,t)=>s+(t.price_final||t.price_suggested||0),0)*0.05).toLocaleString("ar-SA") + " رس",  color: 'bg-slate-400' },
                       { label: 'مصاريف التشغيل', value: '٣,٤٠٠ رس',  color: 'bg-slate-200' },
                     ].map(({ label, value, color }) => (
                       <div key={label} className="flex items-center justify-between gap-3">

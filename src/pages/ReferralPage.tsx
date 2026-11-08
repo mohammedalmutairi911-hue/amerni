@@ -32,10 +32,10 @@ export function ReferralPage() {
       const nameMap = new Map((names || []).map((n: any) => [n.id, n.full_name]))
       list.forEach((t: any) => { t.profiles = { full_name: nameMap.get(t.user_id || t.client_id) || null } })
     }
-    // النموذج الاقتصادي المُصحَّح: المكافأة = 30% من عمولة المنصة الفعلية (2%)
+    // النموذج الاقتصادي المُصحَّح: المكافأة = 30% من عمولة المنصة الفعلية (5%)
     // وليس 5% من قيمة الطلب كما كان سابقاً — الصيغة القديمة كانت تجعل المنصة
     // تخسر 3 نقاط مئوية صافية على كل طلب محال (تدفع أكثر مما تكسب أصلاً)
-    const PLATFORM_COMMISSION = 0.02
+    const PLATFORM_COMMISSION = 0.05
     const REFERRAL_SHARE = 0.30
     const earned = list.filter(t => t.status === 'completed').reduce((s: number, t: any) => s + ((t.price_final || t.price_suggested || 0) * PLATFORM_COMMISSION * REFERRAL_SHARE), 0)
     const pending = list.filter(t => t.status === 'in_progress').reduce((s: number, t: any) => s + ((t.price_final || t.price_suggested || 0) * PLATFORM_COMMISSION * REFERRAL_SHARE), 0)
@@ -149,7 +149,7 @@ export function ReferralPage() {
               </div>
               <div className="text-left">
                 <p className="text-sm font-bold text-primary-400">
-                  {((r.price_final || r.price_suggested || 0) * 0.02 * 0.30).toFixed(2)} ر
+                  {((r.price_final || r.price_suggested || 0) * 0.05 * 0.30).toFixed(2)} ر
                 </p>
                 <p className="text-xs text-slate-400">{r.status === 'completed' ? '✅ مكتسب' : '⏳ معلق'}</p>
               </div>
