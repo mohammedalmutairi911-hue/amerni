@@ -20,6 +20,11 @@ const BLOCKED_PATTERNS = [
   /call\s*me|contact\s*me/i,
 ]
 
+// الأرقام العربية/الفارسية تتحول لأرقام عادية قبل الفحص (٠٥٥… = 055…)
+const toLatinDigits = (t: string) => t
+  .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660))
+  .replace(/[\u06F0-\u06F9]/g, d => String(d.charCodeAt(0) - 0x06F0))
+
 interface Msg {
   id: string
   sender_id: string
@@ -131,7 +136,9 @@ export function Chat({ taskId, taskTitle }: Props) {
     const { error } = await supabase.storage.from('chat-media').upload(path, file, { contentType: file.type || undefined })
     if (error) { console.error('file upload error:', error); flash('فشل رفع الملف — حاول مجدداً'); setSending(false); return }
     const { data } = supabase.storage.from('chat-media').getPublicUrl(path)
-    const { error: insErr } = await insertMsg(`${data.publicUrl}#${encodeURIComponent(file.name)}`)
+    // اسم الملف فيه رقم/إيميل؟ نرسل الملف بدون اسمه (السيرفر يسوي نفس الشي)
+    const nameHasContact = BLOCKED_PATTERNS.some(p => p.test(toLatinDigits(file.name)))
+    const { error: insErr } = await insertMsg(nameHasContact ? data.publicUrl : `${data.publicUrl}#${encodeURIComponent(file.name)}`)
     if (insErr) flash('فشل إرسال الملف')
     else notifyOther()
     setSending(false)
@@ -161,7 +168,7 @@ export function Chat({ taskId, taskTitle }: Props) {
     // فلتر المحتوى — نص فقط، الصور والصوت تمر مباشرة
     // رابط قوقل ماب ملصوق لوحده يمر (فيه أرقام إحداثيات طويلة يمسكها فلتر الأرقام)
     if (text && !MAPS_RE.test(text)) {
-      const isBlocked = BLOCKED_PATTERNS.some(p => p.test(text))
+      const isBlocked = BLOCKED_PATTERNS.some(p => p.test(toLatinDigits(text)))
       if (isBlocked) {
         setBlocked('لا يمكن مشاركة بيانات التواصل — التواصل داخل المنصة فقط')
         setTimeout(() => setBlocked(''), 4000)
