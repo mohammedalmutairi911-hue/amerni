@@ -4,7 +4,7 @@ import { Loader2, Wallet, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from './Toast'
-import { nextPayoutLabel, isValidSaIban, normalizeIban, maskIban } from '../lib/payouts'
+import { nextPayoutLabel, isValidSaIban, normalizeIban, maskIban, payoutDateFor, sundayLabel } from '../lib/payouts'
 
 // محفظة المنفذ: الرصيد المتاح، المحجوز بالضمان، وطلب سحب يُحوَّل يدوياً كل يوم أحد.
 
@@ -12,7 +12,7 @@ type W = { balance_available: number; balance_held: number; total_earned: number
 type Req = { id: string; amount: number; status: string; bank_iban: string; admin_note: string | null; requested_at: string; processed_at: string | null }
 
 const STATUS: Record<string, { label: string; cls: string }> = {
-  pending: { label: 'بانتظار تحويل الأحد', cls: 'bg-amber-50 text-amber-700' },
+  pending: { label: 'بانتظار التحويل', cls: 'bg-amber-50 text-amber-700' },
   paid: { label: 'تم التحويل', cls: 'bg-green-50 text-green-700' },
   rejected: { label: 'مرفوض — رجع لرصيدك', cls: 'bg-red-50 text-red-600' },
 }
@@ -102,7 +102,7 @@ export function WorkerWallet() {
 
       <div className="mt-3 bg-blue-50 border border-blue-100 rounded-xl px-3 py-2.5">
         <p className="text-xs text-blue-800 leading-relaxed">
-          🗓️ <span className="font-bold">التحويل لحسابك البنكي يتم مرة في الأسبوع، كل يوم أحد.</span> الطلبات اللي توصل لين نهاية يوم السبت تتحوّل يوم الأحد، وطلبك الجديد يتحوّل: <span className="font-bold">{nextPayoutLabel()}</span>.
+          🗓️ <span className="font-bold">التحويل لحسابك البنكي يتم مرة في الأسبوع، كل يوم أحد.</span> آخر موعد للطلب نهاية يوم الخميس — اللي يوصل بعدها يتحوّل الأحد اللي بعده. لو طلبت الآن يتحوّل: <span className="font-bold">{nextPayoutLabel()}</span>.
         </p>
       </div>
 
@@ -114,6 +114,7 @@ export function WorkerWallet() {
                 <p className="text-sm font-bold text-slate-800">{sar(r.amount)}</p>
                 <p className="text-[11px] text-slate-400" dir="ltr">{maskIban(r.bank_iban)}</p>
                 {r.status === 'rejected' && r.admin_note && <p className="text-[11px] text-red-500">السبب: {r.admin_note}</p>}
+                {r.status === 'pending' && <p className="text-[11px] text-amber-700">يتحوّل {sundayLabel(payoutDateFor(r.requested_at))}</p>}
               </div>
               <span className={`text-[11px] font-bold px-2 py-1 rounded-full flex-shrink-0 ${STATUS[r.status]?.cls || 'bg-slate-100 text-slate-600'}`}>
                 {STATUS[r.status]?.label || r.status}
@@ -152,7 +153,7 @@ export function WorkerWallet() {
               className="w-full bg-primary-700 text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2">
               {saving && <Loader2 size={16} className="animate-spin" />} أرسل طلب السحب
             </button>
-            <p className="text-[11px] text-slate-400 text-center">التحويلات تتم يدوياً كل يوم أحد. تأكد إن الحساب باسمك.</p>
+            <p className="text-[11px] text-slate-400 text-center">التحويلات كل يوم أحد، وآخر موعد للطلب نهاية الخميس. تأكد إن الحساب باسمك.</p>
           </div>
         </div>, document.body
       )}

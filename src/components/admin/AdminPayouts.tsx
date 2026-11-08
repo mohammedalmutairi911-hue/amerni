@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Loader2, Copy, Check } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Profile } from '../../types'
-import { nextPayoutLabel } from '../../lib/payouts'
+import { payoutDateFor, sundayLabel, upcomingTransferSunday } from '../../lib/payouts'
 
 // طلبات سحب المنفذين — تحويل يدوي من حساب المؤسسة كل يوم أحد، ثم "تم التحويل".
 
@@ -53,7 +53,11 @@ export function AdminPayouts({ users, onCountChange }: { users: Profile[]; onCou
     load()
   }
 
-  const total = pending.reduce((s, r) => s + Number(r.amount || 0), 0)
+  // الطلبات المستحقة في أقرب أحد (وصلت لين نهاية الخميس) والباقي للأحد اللي بعده
+  const thisSunday = upcomingTransferSunday().getTime()
+  const dueNow = pending.filter(r => payoutDateFor(r.requested_at).getTime() <= thisSunday)
+  const later = pending.filter(r => payoutDateFor(r.requested_at).getTime() > thisSunday)
+  const total = dueNow.reduce((s, r) => s + Number(r.amount || 0), 0)
 
   const CopyBtn = ({ k, text }: { k: string; text: string }) => (
     <button onClick={() => copy(k, text)} aria-label="نسخ" className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
@@ -65,18 +69,19 @@ export function AdminPayouts({ users, onCountChange }: { users: Profile[]; onCou
     <div className="space-y-5 animate-fade-in" dir="rtl">
       <div>
         <h2 className="text-2xl font-black text-slate-900">تحويلات المنفذين</h2>
-        <p className="text-slate-400 text-sm mt-0.5">كل يوم أحد: حوّل الطلبات المعلّقة (اللي وصلت لين نهاية السبت) من حساب المؤسسة، ثم اضغط "تم التحويل" لكل طلب</p>
+        <p className="text-slate-400 text-sm mt-0.5">كل يوم أحد حوّل طلبات "مستحقة هذا الأحد" (اللي وصلت لين نهاية الخميس) من حساب المؤسسة، ثم اضغط "تم التحويل" لكل طلب</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white border border-slate-200 rounded-2xl p-4">
-          <p className="text-xs text-slate-400">بانتظار التحويل</p>
+          <p className="text-xs text-slate-400">مستحق {sundayLabel(new Date(thisSunday))}</p>
           <p className="text-2xl font-black text-slate-900">{sar(total)}</p>
-          <p className="text-xs text-slate-400">{pending.length} طلب</p>
+          <p className="text-xs text-slate-400">{dueNow.length} طلب{later.length ? ` · ${later.length} للأحد اللي بعده` : ''}</p>
         </div>
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
-          <p className="text-xs text-blue-700">موعد التحويل القادم</p>
-          <p className="text-lg font-black text-blue-900">{nextPayoutLabel()}</p>
+          <p className="text-xs text-blue-700">آخر موعد للطلبات</p>
+          <p className="text-lg font-black text-blue-900">نهاية الخميس</p>
+          <p className="text-[11px] text-blue-700">بعدها تروح للأحد اللي بعده</p>
         </div>
       </div>
 
@@ -85,12 +90,16 @@ export function AdminPayouts({ users, onCountChange }: { users: Profile[]; onCou
         {loading ? <div className="py-8 flex justify-center"><Loader2 className="animate-spin text-slate-400" size={20} /></div>
           : pending.length === 0 ? <p className="px-4 py-10 text-center text-sm text-slate-400">ما فيه طلبات سحب</p>
           : <div className="divide-y divide-slate-100">
-            {pending.map(r => (
+            {[...dueNow, ...later].map(r => (
               <div key={r.id} className="p-4 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-bold text-slate-800 text-sm">{nameOf(r.user_id)}</p>
                     <p className="text-[11px] text-slate-400">طلب {fmt(r.requested_at)}</p>
+                    {(() => { const due = payoutDateFor(r.requested_at).getTime() <= thisSunday; return (
+                      <span className={`inline-block mt-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${due ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+                        {due ? 'مستحق هذا الأحد' : `يتحوّل ${sundayLabel(payoutDateFor(r.requested_at))}`}
+                      </span>) })()}
                   </div>
                   <p className="text-lg font-black text-slate-900 flex-shrink-0">{sar(r.amount)}</p>
                 </div>
