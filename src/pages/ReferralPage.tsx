@@ -32,19 +32,16 @@ export function ReferralPage() {
       const nameMap = new Map((names || []).map((n: any) => [n.id, n.full_name]))
       list.forEach((t: any) => { t.profiles = { full_name: nameMap.get(t.user_id || t.client_id) || null } })
     }
-    // المكافأة الفعلية من السيرفر: أول طلبين مكتملين لكل صديق → عمولة الموقع (5٪) كاملة لك
-    const { data: rc } = await supabase.from('referral_commissions')
-      .select('task_id, referred_id, commission').eq('referrer_id', user!.id)
-    const byTask = new Map((rc || []).map((x: any) => [x.task_id, Number(x.commission) || 0]))
-    list.forEach((t: any) => { t._reward = byTask.get(t.id) ?? null })
-    const earned = (rc || []).reduce((sum: number, x: any) => sum + (Number(x.commission) || 0), 0)
-    // المتوقع: طلبات جارية لأصدقاء ما خلصوا طلبينهم
-    const usedByFriend = new Map<string, number>()
-    ;(rc || []).forEach((x: any) => usedByFriend.set(x.referred_id, (usedByFriend.get(x.referred_id) || 0) + 1))
-    const pending = list.filter((t: any) => ['in_progress', 'pending_confirmation'].includes(t.status)
-      && (usedByFriend.get(t.client_id || t.user_id) || 0) < 2)
-      .reduce((sum: number, t: any) => sum + (t.price_final || 0) * 0.05, 0)
-    
+    // المكافأة = خصم: كل صديق يكمل أول طلب مدفوع → طلبين لك بدون عمولة الموقع
+    const [{ data: rc }, { data: rd }] = await Promise.all([
+      supabase.from('referral_commissions').select('referred_id').eq('referrer_id', user!.id),
+      supabase.from('referral_discounts').select('credits').eq('user_id', user!.id).maybeSingle(),
+    ])
+    const qualified = new Set((rc || []).map((x: any) => x.referred_id))
+    list.forEach((t: any) => { t._qualified = qualified.has(t.client_id || t.user_id) })
+    const earned = Number((rd as any)?.credits) || 0      // الرصيد الباقي (طلبات بدون عمولة)
+    const pending = qualified.size                        // عدد الأصدقاء اللي فعّلوا الخصم
+
     setReferrals(list)
     setStats({ total: list.length, earned, pending })
     setLoading(false)
@@ -76,15 +73,15 @@ export function ReferralPage() {
             <Gift size={28} className="text-primary-500" />
           </div>
           <h1 className="text-3xl font-black mb-2">نظام الإحالة</h1>
-          <p className="text-slate-400">أي أحد يسجّل من رابطك — <span className="text-primary-400 font-bold">أول طلبين</span> يكملهم، عمولة الموقع كاملة (5٪) تنضاف لمحفظتك</p>
+          <p className="text-slate-400">كل صديق يسجّل من رابطك ويكمل أول طلب له = <span className="text-primary-400 font-bold">طلبين لك بدون عمولة الموقع</span> (تدفع أقل 5٪)</p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
           {[
             { label: 'إجمالي الإحالات', value: stats.total, icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
-            { label: 'مكتسب', value: `${stats.earned.toFixed(1)} ر`, icon: DollarSign, color: 'text-secondary-400', bg: 'bg-secondary-500/10 border-secondary-500/20' },
-            { label: 'قيد التنفيذ', value: `${stats.pending.toFixed(1)} ر`, icon: TrendingUp, color: 'text-primary-400', bg: 'bg-primary-500/10 border-primary-500/20' },
+            { label: 'طلبات بدون عمولة باقية لك', value: stats.earned, icon: DollarSign, color: 'text-secondary-400', bg: 'bg-secondary-500/10 border-secondary-500/20' },
+            { label: 'أصدقاء فعّلوا الخصم', value: stats.pending, icon: TrendingUp, color: 'text-primary-400', bg: 'bg-primary-500/10 border-primary-500/20' },
           ].map(({ label, value, icon: Icon, color, bg }) => (
             <div key={label} className={`border rounded-2xl p-4 text-center ${bg}`}>
               <Icon size={18} className={`${color} mx-auto mb-2`} />
@@ -122,8 +119,8 @@ export function ReferralPage() {
             {[
               { n: '١', text: 'شارك رابطك مع أصدقائك وعائلتك' },
               { n: '٢', text: 'لما يسجلون عن طريق رابطك وينشرون طلب' },
-              { n: '٣', text: 'أول طلبين يكتملون له — عمولة الموقع (5٪ من قيمة الطلب) كاملة تنضاف لمحفظتك تلقائياً' },
-              { n: '٤', text: 'تقدر تسحب رصيدك من المحفظة — وما فيه حد لعدد الأصدقاء' },
+              { n: '٣', text: 'لما يكتمل أول طلب له — ياخذ حسابك طلبين بدون عمولة الموقع' },
+              { n: '٤', text: 'طلباتك الجاية تدفع فيها أقل 5٪ تلقائياً (اتفقت على 100؟ تدفع 95) — وكل صديق جديد = طلبين زيادة' },
             ].map(({ n, text }) => (
               <div key={n} className="flex items-center gap-3">
                 <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0 text-white text-xs font-black">{n}</div>
@@ -154,9 +151,9 @@ export function ReferralPage() {
               </div>
               <div className="text-left">
                 <p className="text-sm font-bold text-primary-400">
-                  {r._reward != null ? `${Number(r._reward).toFixed(2)} ر` : '—'}
+                  {r._qualified ? '🎁' : '—'}
                 </p>
-                <p className="text-xs text-slate-400">{r._reward != null ? '✅ انضاف لمحفظتك' : r.status === 'completed' ? 'بعد أول طلبين' : r.status === 'cancelled' ? 'ملغي' : '⏳ لما يكتمل'}</p>
+                <p className="text-xs text-slate-400">{r._qualified ? '✅ فعّل لك الخصم' : r.status === 'cancelled' ? 'ملغي' : '⏳ لما يكتمل'}</p>
               </div>
             </div>
           ))}

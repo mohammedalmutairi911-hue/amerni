@@ -6,7 +6,6 @@ import { Plus, CheckCircle, Clock, Loader2, Star, Home, List, Wallet, LogOut, Za
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
-import { WorkerWallet } from '../components/WorkerWallet'
 import { goHome } from '../lib/homePage'
 import { Task } from '../types'
 import { NewTaskPage } from './NewTaskPage'
@@ -58,6 +57,14 @@ export function UserDashboard() {
   selectedTaskRef.current = selectedTask
   const [workerName, setWorkerName] = useState('')
   const [confirmingPayment, setConfirmingPayment] = useState(false)
+  // رصيد خصم الإحالة: كل طلب عليه رصيد → يدفع العميل المبلغ ناقص عمولة الموقع 5٪ (السيرفر هو اللي يحسب)
+  const [refCredits, setRefCredits] = useState(0)
+  const fetchRefCredits = async () => {
+    if (!user) return
+    const { data } = await supabase.from('referral_discounts').select('credits').eq('user_id', user.id).maybeSingle()
+    setRefCredits(Number((data as any)?.credits) || 0)
+  }
+  useEffect(() => { fetchRefCredits() }, [user?.id, selectedTask?.id, (selectedTask as any)?.payment_status])
   const [rating, setRating] = useState(0)
   const [ratingDone, setRatingDone] = useState(false)
   const [showReceipt, setShowReceipt] = useState(false)
@@ -361,11 +368,21 @@ export function UserDashboard() {
             {(selectedTask as any).negotiation_status === 'accepted' && !['held', 'paid', 'released'].includes((selectedTask as any).payment_status) && (selectedTask.price_final || (selectedTask as any).worker_price_offer) && (
               <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5">
                 <p className="font-bold text-amber-700 mb-1">💳 ادفع مقابل الخدمة</p>
-                <p className="text-3xl font-black text-amber-600 my-2">
-                  {selectedTask.price_final || (selectedTask as any).worker_price_offer} ريال
-                </p>
+                {(() => {
+                  const base = Number(selectedTask.price_final || (selectedTask as any).worker_price_offer)
+                  const pay = refCredits > 0 ? Math.round((base - base * 0.05) * 100) / 100 : base
+                  return refCredits > 0 ? (
+                    <div className="my-2">
+                      <p className="text-sm text-slate-400 line-through">{base} ريال</p>
+                      <p className="text-3xl font-black text-amber-600">{pay} ريال</p>
+                      <p className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 rounded-lg px-2.5 py-1.5 mt-2">🎁 خصم الإحالة: بدون عمولة الموقع (5٪) — باقي لك {refCredits} {refCredits === 1 ? 'طلب' : 'طلبات'}</p>
+                    </div>
+                  ) : (
+                    <p className="text-3xl font-black text-amber-600 my-2">{base} ريال</p>
+                  )
+                })()}
                 <PaymobButton
-                  amount={Number(selectedTask.price_final || (selectedTask as any).worker_price_offer)}
+                  amount={(() => { const base = Number(selectedTask.price_final || (selectedTask as any).worker_price_offer); return refCredits > 0 ? Math.round((base - base * 0.05) * 100) / 100 : base })()}
                   taskId={selectedTask.id}
                   description={selectedTask.title}
                   label="ادفع الآن"
@@ -661,7 +678,7 @@ export function UserDashboard() {
                 <div>
                   <span className="inline-block bg-amber-400 text-slate-900 font-black text-xs px-2.5 py-0.5 rounded-full mb-2">ادعُ صديق</span>
                   <h2 className="text-xl font-black text-white mb-1">شارك أمرني مع أصحابك</h2>
-                  <p className="text-white/70 text-sm">أول طلبين لأي أحد يسجّل من رابطك — عمولة الموقع كاملة لك</p>
+                  <p className="text-white/70 text-sm">كل صديق يسجّل من رابطك = طلبين لك بدون عمولة الموقع</p>
                 </div>
                 <button onClick={() => navigate('referral')} className="flex-shrink-0 bg-white text-slate-900 font-bold px-5 py-2.5 rounded-xl hover:bg-amber-400 transition-colors text-sm">
                   رابطي
@@ -753,13 +770,10 @@ export function UserDashboard() {
                 <p className="text-blue-100 text-xs mt-2">على {counts.completed} طلب مكتمل</p>
               </div>
 
-              {/* رصيد المحفظة (مكافآت الإحالة) + السحب */}
-              <div className="mb-5"><WorkerWallet /></div>
-
               {/* Referral */}
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-5">
                 <h3 className="font-bold text-slate-900 mb-1">🎁 ادعُ أصدقاءك</h3>
-                <p className="text-slate-500 text-sm mb-3">أول طلبين يكملهم أي أحد يسجّل من رابطك — عمولة الموقع (5٪) كاملة تنضاف لمحفظتك</p>
+                <p className="text-slate-500 text-sm mb-3">كل صديق يسجّل من رابطك ويكمل أول طلب له — تاخذ طلبين بدون عمولة الموقع (تدفع أقل 5٪){refCredits > 0 ? ` · باقي لك ${refCredits}` : ''}</p>
                 <div className="flex gap-2">
                   <div className="flex-1 bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm text-slate-600 font-mono truncate">
                     amerniksa.com?ref={user?.id?.slice(0,8)}
