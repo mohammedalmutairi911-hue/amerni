@@ -155,7 +155,7 @@ export function GatewayLanding(p: Props) {
           </span>
           <h1 className="font-black leading-[1.2] text-[2.35rem] sm:text-6xl lg:text-7xl mb-6">
             استأجر شخص يخلّص شغلك<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-l from-sky-400 via-emerald-300 to-yellow-300">في ثوانٍ</span> بدون وجع رأس!
+            <span className="text-transparent bg-clip-text bg-gradient-to-l from-sky-400 via-emerald-300 to-yellow-300">وأنت مرتاح!</span>
           </h1>
           <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-9">
             اكتب أي طلب يخطر ببالك — حتى لو ما لقيت له تطبيق مخصص. يتولاه منفّذ معتمد من أمرني،
