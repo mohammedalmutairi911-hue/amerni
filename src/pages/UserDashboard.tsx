@@ -1,8 +1,11 @@
 import { readSaved, writeSaved } from '../lib/persist'
+import { useDarkApp } from '../lib/useDarkApp'
+import { AccountSwitch } from '../components/AccountSwitch'
+import { stageTimeline } from '../lib/taskStage'
 import { useState, useEffect, useRef } from 'react'
 import { isNativeApp } from '../lib/platform'
 import { NativeMoreButton } from '../components/native/NativeChrome'
-import { Plus, CheckCircle, Clock, Loader2, Star, Home, List, Wallet, LogOut, Zap, ChevronRight } from 'lucide-react'
+import { Plus, CheckCircle, Clock, Loader2, Star, Home, List, Wallet, LogOut, Zap, ChevronRight, Lock, Tag, Activity, ShieldCheck } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useApp } from '../contexts/AppContext'
@@ -43,6 +46,7 @@ const QUICK_SERVICES = [
 ]
 
 export function UserDashboard() {
+  useDarkApp()
   const { user, profile, signOut } = useAuth()
   const { navigate } = useApp()
   const { toast } = useToast()
@@ -227,6 +231,48 @@ export function UserDashboard() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+
+        {/* مراحل الطلب (التصميم الداكن) — نفس الترتيب الفعلي: نشر → عرض واتفاق → دفع محجوز وتنفيذ → تأكيد الاستلام */}
+        {!['cancelled', 'disputed'].includes(selectedTask.status) && (() => {
+          const tl = stageTimeline(selectedTask as any, [])
+          const done = (k: string) => tl.find(x => x.key === k)?.done
+          const steps = [
+            { t: 'نشر الطلب', d: done('posted') },
+            { t: 'العرض والاتفاق على السعر', d: done('agreed') },
+            { t: 'الدفع المحجوز والتنفيذ', d: done('delivered') },
+            { t: 'تأكيد الاستلام', d: done('completed') },
+          ]
+          const cur = steps.findIndex(x => !x.d)
+          return (
+            <div className="bg-white border border-slate-200 rounded-2xl p-4">
+              <ol className="grid grid-cols-4 gap-2">
+                {steps.map((st, i) => (
+                  <li key={st.t} className="flex flex-col items-center text-center gap-1.5">
+                    <span className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-black ${st.d ? 'bg-emerald-500 text-white' : i === cur ? 'bg-blue-600 text-white ring-4 ring-blue-500/20' : 'bg-slate-100 text-slate-400'}`}>
+                      {st.d ? '✓' : i + 1}
+                    </span>
+                    <span className={`text-[11px] leading-tight ${st.d ? 'text-slate-700' : i === cur ? 'text-blue-600 font-bold' : 'text-slate-400'}`}>{st.t}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )
+        })()}
+
+        {/* صندوق الأمان المالي */}
+        {['open', 'in_progress', 'pending_confirmation'].includes(selectedTask.status) && (
+          <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-start gap-3">
+            <span className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0"><Lock size={18} /></span>
+            <div className="text-sm">
+              <p className="font-bold text-slate-900">صندوق الأمان المالي</p>
+              <p className="text-slate-500 text-xs leading-relaxed mt-1">
+                {['held', 'paid'].includes((selectedTask as any).payment_status)
+                  ? `مبلغك (${(selectedTask as any).price_final} ر.س) محجوز عندنا، وما يتحوّل للمنفّذ إلا بعد ما تأكد استلام الخدمة.`
+                  : 'ما تدفع أي ريال قبل ما توافق على السعر. وبعد الدفع ينحجز المبلغ عندنا لين تأكد الاستلام.'}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* فاتورة — تظهر لما الطلب مكتمل */}
         {(showReceipt || selectedTask.status === 'completed') && (
@@ -494,12 +540,12 @@ export function UserDashboard() {
       {/* Sidebar Desktop */}
       <aside className="hidden lg:flex flex-col h-[calc(100vh-3.5rem)] top-14 fixed right-0 border-l border-slate-200 bg-slate-900 w-64 z-50">
         <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-          <button onClick={() => goHome(navigate, profile)} className="text-xl font-black text-amber-400 hover:opacity-80 transition-opacity">آمرني</button>
+          <button onClick={() => goHome(navigate, profile)} className="text-xl font-black text-white hover:opacity-80 transition-opacity">أمرني</button>
           <NotificationBell />
         </div>
 
         <div className="px-4 py-5 flex flex-col items-center border-b border-slate-800">
-          <div className="w-14 h-14 rounded-full bg-primary-500 flex items-center justify-center text-white font-black text-2xl mb-2 border-2 border-amber-400">
+          <div className="w-14 h-14 rounded-full bg-primary-500 flex items-center justify-center text-white font-black text-2xl mb-2 border-2 border-blue-400">
             {profile?.full_name?.[0] || '؟'}
           </div>
           <p className="text-white font-bold text-sm">{profile?.full_name || 'مستخدم'}</p>
@@ -514,18 +560,19 @@ export function UserDashboard() {
           ].map(({ id, icon: Icon, label, badge }) => (
             <button key={id} onClick={() => setActiveSection(id as any)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
-                activeSection === id ? 'bg-amber-400 text-slate-900' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                activeSection === id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}>
               <Icon size={17} />
               <span className="flex-1 text-right">{label}</span>
-              {badge > 0 && <span className={`text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold ${activeSection === id ? 'bg-slate-900 text-amber-400' : 'bg-slate-700 text-slate-300'}`}>{badge > 9 ? '9+' : badge}</span>}
+              {badge > 0 && <span className={`text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold ${activeSection === id ? 'bg-white text-blue-700' : 'bg-slate-700 text-slate-300'}`}>{badge > 9 ? '9+' : badge}</span>}
             </button>
           ))}
         </nav>
 
         <div className="p-4 border-t border-slate-800 space-y-2">
+          <AccountSwitch mode="client" />
           <button onClick={() => setShowNew(true)}
-            className="w-full bg-amber-400 text-slate-900 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-amber-500 transition-colors text-sm">
+            className="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-500 transition-colors text-sm">
             <Plus size={16} /> طلب خدمة جديدة
           </button>
           <button onClick={async () => { await signOut(); navigate('landing') }} className="w-full flex items-center justify-center gap-2 px-3 py-2 text-slate-500 hover:text-red-400 transition-colors text-sm">
@@ -539,10 +586,11 @@ export function UserDashboard() {
 
         {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-slate-900 border-b border-slate-800 sticky top-14 z-30">
-          <span className="text-base font-black text-amber-400">لوحتي</span>
+          <span className="text-base font-black text-white">لوحتي</span>
           <div className="flex items-center gap-2">
+            <AccountSwitch mode="client" compact />
             <NotificationBell />
-            <button onClick={() => setShowNew(true)} className="flex items-center gap-1.5 bg-amber-400 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
+            <button onClick={() => setShowNew(true)} className="flex items-center gap-1.5 bg-blue-600 text-white font-bold px-3 py-1.5 rounded-xl text-sm">
               <Plus size={14} /> طلب جديد
             </button>
           </div>
@@ -553,29 +601,56 @@ export function UserDashboard() {
           {/* DASHBOARD TAB */}
           {activeSection === 'dashboard' && (
             <>
-              {/* Welcome */}
-              <div className="mb-6">
-                <p className="text-slate-500 text-sm font-medium">مرحباً بك 👋</p>
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-0.5">{profile?.full_name?.split(' ')[0] || 'عزيزي العميل'}</h1>
-                <p className="text-slate-400 text-sm mt-1">تتبع طلباتك الحالية واكتشف الخدمات المتاحة</p>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                {[
-                  { label: 'إجمالي الطلبات', value: counts.total, color: 'text-slate-900', bg: 'bg-white' },
-                  { label: 'نشطة', value: counts.open + counts.inProgress + counts.pendingConfirmation, color: 'text-blue-600', bg: 'bg-blue-50' },
-                  { label: 'بانتظار تأكيدك', value: counts.pendingConfirmation, color: 'text-purple-600', bg: 'bg-purple-50' },
-                  { label: 'مكتملة', value: counts.completed, color: 'text-green-600', bg: 'bg-green-50' },
-                ].map(({ label, value, color, bg }) => (
-                  <div key={label} className={`${bg} border border-slate-200 rounded-2xl p-4 shadow-sm`}>
-                    {statsLoading && !centralStats
-                      ? <div className="h-9 w-12 bg-slate-200 rounded-lg animate-pulse" />
-                      : <div className={`text-3xl font-black ${color}`}>{value}</div>}
-                    <div className="text-xs text-slate-500 mt-1">{label}</div>
+              {/* ترحيب + المبلغ المحجوز + طلب جديد (التصميم الداكن) */}
+              {(() => {
+                const held = tasks.filter(t => ['held', 'paid'].includes((t as any).payment_status) && t.status !== 'completed')
+                  .reduce((s, t) => s + Number((t as any).price_final || 0), 0)
+                const offers = tasks.filter(t => t.status === 'in_progress' && (t as any).negotiation_status === 'pending').length
+                return (<>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+                    <div className="lg:col-span-2 relative overflow-hidden bg-gradient-to-l from-[#0D1424] to-[#121B30] border border-white/[0.08] rounded-3xl p-6">
+                      <p className="text-slate-400 text-sm">مرحباً بك 👋</p>
+                      <h1 className="text-3xl sm:text-4xl font-black text-white mt-1">أهلاً بك، <span className="text-blue-400">{profile?.full_name?.split(' ')[0] || 'عزيزي العميل'}</span></h1>
+                      <p className="text-slate-400 text-sm mt-2 max-w-md leading-relaxed">تابع طلباتك، راجع عروض الأسعار، وادفع بأمان. مبلغك محجوز عندنا لين تأكد الاستلام.</p>
+                      <div className="mt-5 inline-flex items-center gap-3 bg-white/[0.04] border border-white/10 rounded-2xl px-4 py-3">
+                        <span className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-300 flex items-center justify-center"><Lock size={18} /></span>
+                        <div>
+                          <p className="text-[11px] text-slate-400">مبالغ محجوزة بالضمان</p>
+                          <p className="text-xl font-black text-white">{held.toLocaleString('ar-SA')} <span className="text-xs text-slate-400 font-bold">ر.س</span></p>
+                        </div>
+                      </div>
+                    </div>
+                    <button onClick={() => setShowNew(true)}
+                      className="text-right bg-gradient-to-br from-blue-600 to-sky-500 rounded-3xl p-6 flex flex-col justify-between min-h-[160px] shadow-xl shadow-blue-600/20 hover:brightness-110 transition">
+                      <span className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center"><Plus size={24} className="text-white" /></span>
+                      <span>
+                        <span className="block text-xl font-black text-white">اطلب مهمة جديدة الآن</span>
+                        <span className="block text-sm text-blue-100 mt-1">اكتب طلبك بكلامك واستلم عرض سعر من منفّذ معتمد</span>
+                      </span>
+                    </button>
                   </div>
-                ))}
-              </div>
+
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                    {[
+                      { label: 'مهام جارية', sub: 'قيد التنفيذ الحين', value: counts.inProgress, icon: Activity, tone: 'text-sky-300 bg-sky-500/10' },
+                      { label: 'عروض أسعار بانتظار قرارك', sub: 'وافق أو ارفض', value: offers, icon: Tag, tone: 'text-amber-300 bg-amber-500/10' },
+                      { label: 'بانتظار تأكيد استلامك', sub: 'راجع الإنجاز وأكّد', value: counts.pendingConfirmation, icon: ShieldCheck, tone: 'text-violet-300 bg-violet-500/10' },
+                      { label: 'مهام مكتملة', sub: `من أصل ${counts.total} طلب`, value: counts.completed, icon: CheckCircle, tone: 'text-emerald-300 bg-emerald-500/10' },
+                    ].map(k => (
+                      <div key={k.label} className="bg-[#0D1424] border border-white/[0.07] rounded-2xl p-4">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-xs text-slate-400 leading-snug">{k.label}</p>
+                          <span className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${k.tone}`}><k.icon size={17} /></span>
+                        </div>
+                        {statsLoading && !centralStats
+                          ? <div className="h-9 w-12 bg-slate-200 rounded-lg animate-pulse mt-2" />
+                          : <p className="text-3xl font-black text-white mt-1">{String(k.value).padStart(2, '0')}</p>}
+                        <p className="text-[11px] text-slate-500 mt-1">{k.sub}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>)
+              })()}
 
               {/* Pending confirmation alert */}
               {tasks.filter(t => t.status === 'pending_confirmation').length > 0 && (

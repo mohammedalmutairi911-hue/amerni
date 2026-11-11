@@ -218,6 +218,10 @@ export default function App() {
               }} className="text-sm text-primary-500 border border-primary-200 px-5 py-2 rounded-xl hover:bg-primary-50 transition-colors">
                 {checking ? 'جاري التحقق...' : 'تحقق من الحالة'}
               </button>
+              <button onClick={() => navigate('dashboard')}
+                className="text-sm text-slate-500 border border-slate-200 px-5 py-2 rounded-xl hover:bg-slate-50 transition-colors">
+                استخدم حسابك كعميل لين تنقبل
+              </button>
               <button onClick={() => navigate('landing')}
                 className="text-sm text-slate-500 border border-slate-200 px-5 py-2 rounded-xl hover:bg-slate-50 transition-colors">
                 الصفحة الرئيسية
@@ -231,6 +235,10 @@ export default function App() {
     }
 
     if (page === 'dashboard') return <><Navbar /><UserDashboard />{authOpen && <AuthModal />}</>
+    // تبديل الحساب: العميل يقدر يصير منفّذ بنفس الحساب (التسجيل يحوّل الدور لمنفّذ، ويبقى يقدر يفتح لوحة العميل)
+    if (page === 'worker' && profile.role === 'client' && profile.platform !== 'enterprises') {
+      return <><Navbar /><WorkerRegister onSuccess={async () => { await refreshProfile(); setWorkerExists(true); setWorkerApproved(false) }} /></>
+    }
     return <><Navbar /><NotFoundPage /></>
   }
 

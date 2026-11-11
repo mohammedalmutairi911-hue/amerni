@@ -1,4 +1,5 @@
 import { Logo } from '../components/Logo'
+import { useDarkApp } from '../lib/useDarkApp'
 import { usePersistedState } from '../lib/persist'
 import { useState, useEffect } from 'react'
 import { COMPANY } from '../lib/constants'
@@ -20,6 +21,7 @@ type Tab = 'overview' | 'workers' | 'tasks' | 'users' | 'conversations' | 'enter
   | 'accounts' | 'diagnostics' | 'payouts'
 
 export function AdminPanel() {
+  useDarkApp()
   const { navigate } = useApp()
   const [tab, setTab] = usePersistedState<Tab>('amerni_a_tab', 'overview', ['overview','workers','tasks','users','conversations','enterprises','providers','financial','payouts'])
   const [usersScope, setUsersScope] = useState<'all' | 'individuals' | 'enterprises'>('all')
@@ -592,8 +594,8 @@ export function AdminPanel() {
           {tab === 'overview' && (
             <div className="space-y-6 animate-fade-in">
               <div>
-                <h2 className="text-2xl font-black text-slate-900">لوحة الإدارة</h2>
-                <p className="text-slate-400 text-sm mt-0.5">نظرة شاملة على أداء المنصة والعمليات الجارية</p>
+                <h2 className="text-3xl font-black text-slate-900">مركز العمليات والرقابة</h2>
+                <p className="text-slate-400 text-sm mt-0.5">إشراف على الطلبات والمنفّذين والمدفوعات المحجوزة وتحويلات المنفّذين</p>
               </div>
 
               <StaleRequests tasks={tasks} workers={workers} users={users} />

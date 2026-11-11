@@ -1,4 +1,6 @@
 import { Logo } from '../components/Logo'
+import { useDarkApp } from '../lib/useDarkApp'
+import { AccountSwitch } from '../components/AccountSwitch'
 import { isNativeApp } from '../lib/platform'
 import { NativeMoreButton } from '../components/native/NativeChrome'
 import { usePersistedState, readSaved, writeSaved } from '../lib/persist'
@@ -27,6 +29,7 @@ const STATUS_COLOR: Record<string, string> = {
 }
 
 export function WorkerDashboard() {
+  useDarkApp()
   const { user, profile, signOut } = useAuth()
   const { navigate } = useApp()
   const { toast } = useToast()
@@ -469,6 +472,7 @@ export function WorkerDashboard() {
 
         {/* Footer */}
         <div className="p-4 border-t border-slate-100 space-y-2">
+          <AccountSwitch mode="worker" />
           <button onClick={() => navigate('support')} className="w-full text-xs text-slate-400 hover:text-slate-600 py-1.5 transition-colors">مركز المساعدة</button>
           <button onClick={async () => { await signOut(); navigate('landing') }}
             className="w-full flex items-center justify-center gap-1.5 text-xs text-red-400 hover:text-red-600 py-1.5 transition-colors font-medium">
@@ -500,6 +504,7 @@ export function WorkerDashboard() {
               className={`hidden lg:flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl transition-all ${workerProfile?.is_online ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
               {toggling ? <Loader2 size={12} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={12} /> متاح الآن</> : <><WifiOff size={12} /> غير متاح</>}
             </button>
+            <div className="lg:hidden"><AccountSwitch mode="worker" compact /></div>
             <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-white font-black text-sm">
               {profile?.full_name?.[0] || '؟'}
             </div>
@@ -514,13 +519,29 @@ export function WorkerDashboard() {
         {/* ══ OVERVIEW ══ */}
         {(tab === 'overview' || !['shifts','my-tasks','analytics','achievements','chat'].includes(tab)) && (
           <div className="space-y-5 animate-fade-in">
-            <div>
-              <h2 className="text-2xl font-black text-primary-700 mb-1">لوحة العامل</h2>
-              <p className="text-slate-500 text-sm">مرحباً، {profile?.full_name?.split(' ')[0]} 👋 — إليك أداءك اليوم</p>
+            {/* ترحيب + الحالة (التصميم الداكن) */}
+            <div className="relative overflow-hidden bg-gradient-to-l from-[#0D1424] to-[#121B30] border border-white/[0.08] rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="flex items-center gap-4 min-w-0">
+                <span className="relative w-16 h-16 rounded-2xl bg-blue-500/15 text-blue-300 text-2xl font-black flex items-center justify-center flex-shrink-0">
+                  {profile?.full_name?.[0] || '؟'}
+                  <span className={`absolute -bottom-1 -left-1 w-4 h-4 rounded-full border-2 border-[#0D1424] ${workerProfile?.is_online ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="text-2xl sm:text-3xl font-black text-white">مرحباً يا بطل، {profile?.full_name?.split(' ')[0]}</h2>
+                  <p className="text-sm text-slate-400 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className={workerProfile?.is_online ? 'text-emerald-400' : 'text-slate-400'}>● {workerProfile?.is_online ? 'متاح لاستقبال الطلبات' : 'غير متاح الحين'}</span>
+                    <span className="text-amber-300">★ {Number(wCounts.ratingAvg).toFixed(1)} ({wCounts.ratingsCount} تقييم)</span>
+                  </p>
+                </div>
+              </div>
+              <button onClick={toggleOnline} disabled={toggling}
+                className={`self-start sm:self-center flex items-center gap-2 font-bold px-5 py-3 rounded-xl text-sm transition-all ${workerProfile?.is_online ? 'bg-emerald-500 text-white' : 'bg-white/5 text-slate-300 border border-white/10'}`}>
+                {toggling ? <Loader2 size={14} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={14} /> الاستقبال شغّال</> : <><WifiOff size={14} /> شغّل الاستقبال</>}
+              </button>
             </div>
 
             {/* KPI */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
                 { label: 'طلبات مكتملة', value: wCounts.completed, icon: '✅', sub: `+${thisMonth} هذا الشهر` },
                 { label: 'إجمالي الأرباح', value: `${(totalEarnings - (centralStats?.commission_due ?? 0)).toLocaleString()} ر`, icon: '💰', sub: `صافي بعد عمولة ٥٪ (${(centralStats?.commission_due ?? 0).toLocaleString()} ر)` },
@@ -538,18 +559,6 @@ export function WorkerDashboard() {
 
             {/* المحفظة والسحب — التحويل كل يوم أحد */}
             <WorkerWallet />
-
-            {/* Status Toggle */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-              <div>
-                <p className="font-bold text-slate-800">حالتك الآن</p>
-                <p className="text-xs text-slate-400 mt-0.5">{workerProfile?.is_online ? 'تظهر للعملاء في الفيد' : 'مخفي عن العملاء'}</p>
-              </div>
-              <button onClick={toggleOnline} disabled={toggling}
-                className={`flex items-center gap-2 font-bold px-5 py-2.5 rounded-xl text-sm transition-all ${workerProfile?.is_online ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
-                {toggling ? <Loader2 size={14} className="animate-spin" /> : workerProfile?.is_online ? <><Wifi size={14} /> متاح</> : <><WifiOff size={14} /> غير متاح</>}
-              </button>
-            </div>
 
             {/* Latest tasks */}
             {myTasks.slice(0,3).length > 0 && (
