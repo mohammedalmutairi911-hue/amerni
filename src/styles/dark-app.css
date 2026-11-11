@@ -325,3 +325,10 @@ body.amerni-dark{background-color:#070B16;color:#E8ECF4;color-scheme:dark}
 .amerni-dark .border-slate-50, .amerni-dark .border-gray-50 {border-color:rgba(255,255,255,.05)}
 .amerni-dark [style*="color: rgb(26, 42, 110)"] {color:#E8ECF4 !important}
 .amerni-dark [style*="color: rgb(74, 90, 138)"] {color:#94A3B8 !important}
+
+/* مكونات مصممة داكنة أصلاً داخل الصفحات الداكنة: ألوانها كما هي بدون تحويل */
+.amerni-dark .dark-native .text-slate-200{color:#E2E8F0}
+.amerni-dark .dark-native .text-slate-300{color:#CBD5E1}
+.amerni-dark .dark-native .text-slate-400{color:#94A3B8}
+.amerni-dark .dark-native .text-slate-500{color:#64748B}
+.amerni-dark .dark-native .text-blue-300{color:#93C5FD}

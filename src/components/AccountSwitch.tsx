@@ -21,7 +21,7 @@ export function AccountSwitch({ mode, compact = false }: { mode: 'client' | 'wor
   )
 
   return (
-    <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3.5">
+    <div className="dark-native bg-white/[0.03] border border-white/10 rounded-2xl p-3.5">
       <div className="flex items-center gap-3">
         <span className="w-10 h-10 rounded-full bg-blue-500/15 text-blue-300 font-black flex items-center justify-center flex-shrink-0">
           {profile.full_name?.[0] || '؟'}

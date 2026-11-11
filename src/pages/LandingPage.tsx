@@ -11,6 +11,7 @@ import { trackEvent } from '../lib/analytics'
 import { NewTaskPage } from './NewTaskPage'
 import { ServiceBrowsePage } from './ServiceBrowsePage'
 import { GatewayLanding } from '../components/landing/GatewayLanding'
+import { AboutDark, SupportDark } from '../components/landing/InfoPages'
 
 const EXAMPLES = [
   'أبي أحد يوصل طرد من العنوان',
@@ -264,6 +265,12 @@ export function LandingPage() {
     setModeRaw(m)
   }
   const [activeTab, setActiveTab] = useState<Tab>('home')
+  // بوابة الأفراد كلها بالتصميم الداكن (نفس سكن اللوحات) — المنشآت تبقى بشكلها
+  useEffect(() => {
+    if (mode === 'individuals') document.body.classList.add('amerni-dark')
+    else document.body.classList.remove('amerni-dark')
+    return () => document.body.classList.remove('amerni-dark')
+  }, [mode])
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
   const [taskInput, setTaskInput] = useState('')
@@ -420,8 +427,10 @@ export function LandingPage() {
     setContactLoading(false)
   }
 
-  const sendSupport = async () => {
-    const text = supportInput.trim()
+  const askSupport = (q: string) => sendSupportText(q)
+  const sendSupport = () => sendSupportText(supportInput)
+  const sendSupportText = async (raw: string) => {
+    const text = raw.trim()
     if (!text || supportLoading) return
     setSupportInput('')
     const newMsgs: SupportMsg[] = [...supportMsgs, { role: 'user', content: text }]
@@ -815,73 +824,7 @@ export function LandingPage() {
 
         {/* ABOUT */}
         {activeTab === 'about' && (
-          <section className="py-12 sm:py-20 px-4 bg-slate-50">
-            <div className="max-w-3xl mx-auto">
-              <div className="text-center mb-16">
-                <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center mx-auto mb-6">
-                  <span className="text-4xl font-black text-slate-900">آ</span>
-                </div>
-                <h2 className="text-2xl sm:text-4xl font-black text-slate-900 mb-4">من نحن</h2>
-                <p className="text-slate-500 text-lg leading-relaxed">منصة آمرني — منصة الخدمات والمهام اليومية</p>
-              </div>
-
-              <div className="space-y-6">
-                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-                  <h3 className="text-xl font-bold text-slate-900 mb-4">من نحن؟</h3>
-                  <p className="text-slate-500 leading-loose">
-                    نحن مؤسسة حلول الغد للخدمات الإلكترونية — نقدم منصة آمرني السعودية التي تربطك بمقدّمي خدمات موثوقين في المملكة لإنجاز مهامك وخدماتك اليومية بسرعة وأمان. بدأت الفكرة من حاجة حقيقية: كيف أجد شخصاً موثوقاً يساعدني في مهمة — من توصيل أو تسوّق أو تصوير أو مساعدة إدارية — دون خوف أو تعقيد؟
-                  </p>
-                </div>
-
-                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-                  <h3 className="text-xl font-bold text-slate-900 mb-4">رسالتنا</h3>
-                  <p className="text-slate-500 leading-loose">
-                    نؤمن أن كل شخص يستحق مساعدة سريعة وموثوقة. سواء كنت تحتاج توصيلاً، تصويراً، مساعدة إدارية، أو استشارة متخصصة — آمرني هنا لتوصيلك بمن يساعدك بسرعة وأمان. هدفنا بناء منظومة خدمات قائمة على الثقة، حيث يكسب مقدم الخدمة بشرف ويحصل العميل على أفضل جودة.
-                  </p>
-                </div>
-
-                <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-                  <h3 className="text-xl font-bold text-slate-900 mb-5">قيمنا</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { emoji: '🆔', title: 'محترفون معتمدون', desc: 'تُراجع بياناتهم قبل قبولهم في المنصة' },
-                      { emoji: '⚡', title: 'استجابة سريعة', desc: 'يصلك رد المحترف في دقائق' },
-                      { emoji: '💳', title: 'مدفوعات آمنة', desc: 'مدى وأبل باي — مضمون حتى الإنجاز' },
-                      { emoji: '⭐', title: 'جودة مضمونة', desc: 'تقييمات حقيقية من عملاء حقيقيين' },
-                    ].map(({ emoji, title, desc }) => (
-                      <div key={title} className="bg-slate-50 rounded-xl p-4">
-                        <div className="text-2xl mb-2">{emoji}</div>
-                        <p className="font-bold text-slate-900 text-sm">{title}</p>
-                        <p className="text-slate-500 text-xs mt-1">{desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-primary-500 rounded-2xl p-8 text-center">
-                  <p className="text-slate-900 text-xl font-black mb-2">"آمرني وإحنا ننجز"</p>
-                  <p className="text-blue-100 text-sm">أنت تطلب وإحنا نوصلك لمن ينجز</p>
-                </div>
-
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                  <h3 className="font-bold text-slate-900 mb-4">عن المؤسسة</h3>
-                  <div className="space-y-3 text-sm">
-                    {[
-                      ['اسم المؤسسة', 'مؤسسة حلول الغد للخدمات الإلكترونية'],
-                      ['البنك', 'بنك البلاد'],
-                      ['رقم الآيبان', COMPANY.iban],
-                      ['البريد الإلكتروني', COMPANY.email],
-                    ].map(([k, v]) => (
-                      <div key={k} className="flex justify-between items-center border-b border-slate-100 pb-3 last:border-0 last:pb-0">
-                        <span className="text-slate-900 font-medium">{v}</span>
-                        <span className="text-slate-400">{k}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+          <AboutDark onStart={() => setShowNewTask(true)} onJoin={() => navigate('join')} onContact={() => setActiveTab('contact')} />
         )}
 
         {/* CONTACT */}
@@ -946,96 +889,8 @@ export function LandingPage() {
 
         {/* SUPPORT */}
         {activeTab === 'support' && (
-          <section className="py-12 sm:py-20 px-4">
-            <div className="max-w-2xl mx-auto">
-              <div className="text-center mb-10">
-                <h2 className="text-2xl sm:text-4xl font-black mb-3">الدعم والمساعدة</h2>
-                <p className="text-slate-400">مساعد أمرني الذكي متاح ٢٤/٧ — اسأله أي شيء</p>
-              </div>
-
-              {/* FAQ quick */}
-              <div className="grid grid-cols-2 gap-2 mb-6">
-                {[
-                  'كيف أتابع طلبي؟', 'كيف أسجّل كمزود خدمة؟',
-                  'فيه مشكلة في طلب', 'كيف يتم الدفع؟'
-                ].map(q => (
-                  <button key={q} onClick={() => {
-                    setSupportMsgs(p => [...p, { role: 'user', content: q }])
-                    setSupportInput('')
-                    // Auto send
-                    const msgs: SupportMsg[] = [...supportMsgs, { role: 'user', content: q }]
-                    setSupportLoading(true)
-                    supabase.functions.invoke('support-chat', {
-                      body: { context: 'individuals', messages: msgs.map(m => ({ role: m.role, content: m.content })) }
-                    }).then(({ data }) => {
-                      setSupportMsgs(p => [...p, { role: 'assistant', content: data?.reply || 'عذراً، حدث خطأ.' }])
-                      setSupportLoading(false)
-                    }).catch(() => {
-                      setSupportMsgs(p => [...p, { role: 'assistant', content: 'عذراً، حدث خطأ مؤقت.' }])
-                      setSupportLoading(false)
-                    })
-                  }}
-                    className="text-right px-4 py-3 bg-white border border-slate-200 hover:border-primary-500/30 rounded-xl text-sm text-slate-500 hover:text-slate-900 transition-all">
-                    {q}
-                  </button>
-                ))}
-              </div>
-
-              {/* Chat */}
-              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                <div className="px-4 py-3 border-b border-slate-200 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
-                    <Bot size={16} className="text-primary-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">مساعد أمرني</p>
-                    <div className="flex items-center gap-1.5 text-xs text-secondary-400">
-                      <div className="w-1.5 h-1.5 rounded-full bg-secondary-500 animate-pulse" /> متاح الآن
-                    </div>
-                  </div>
-                </div>
-
-                <div className="h-80 overflow-y-auto px-4 py-3 space-y-3">
-                  {supportMsgs.map((m, i) => (
-                    <div key={i} className={`flex items-start gap-2.5 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${m.role === 'assistant' ? 'bg-primary-500/10 border border-primary-500/20' : 'bg-slate-100'}`}>
-                        {m.role === 'assistant' ? <Bot size={13} className="text-primary-500" /> : <span className="text-xs">أ</span>}
-                      </div>
-                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${m.role === 'user' ? 'bg-primary-500 text-white rounded-tr-sm' : 'bg-slate-100 text-slate-800 rounded-tl-sm'}`}>
-                        {m.content}
-                      </div>
-                    </div>
-                  ))}
-                  {supportLoading && (
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
-                        <Bot size={13} className="text-primary-500" />
-                      </div>
-                      <div className="bg-slate-100 rounded-2xl px-4 py-3 flex gap-1">
-                        {[0,1,2].map(i => <div key={i} className="w-2 h-2 rounded-full bg-zinc-500 animate-bounce" style={{ animationDelay: `${i*150}ms` }} />)}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="px-3 pb-3 border-t border-slate-200 pt-3">
-                  <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-2 focus-within:border-primary-500/40 transition-colors">
-                    <input value={supportInput} onChange={e => setSupportInput(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendSupport()}
-                      placeholder="اكتب سؤالك..." className="flex-1 bg-transparent text-sm outline-none placeholder-slate-400" />
-                    <button onClick={sendSupport} disabled={!supportInput.trim() || supportLoading}
-                      className="text-primary-500 hover:text-primary-500 disabled:opacity-30 transition-colors">
-                      {supportLoading ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 text-center text-sm text-slate-400">
-                للتواصل المباشر: <a href="mailto:${COMPANY.email}" className="text-primary-500 hover:underline">{COMPANY.email}</a>
-              </div>
-            </div>
-          </section>
+          <SupportDark msgs={supportMsgs} input={supportInput} loading={supportLoading} setInput={setSupportInput}
+            send={sendSupport} ask={askSupport} onContact={() => setActiveTab('contact')} />
         )}
       </div>
 
