@@ -1,0 +1,3 @@
+-- 052 (طُبّق على الإنتاج 2026-11-11): get_public_landing() — أرقام وآراء حقيقية للصفحة الرئيسية
+-- requests/completed/cities/workers + آخر ٦ تقييمات عامة (٤ نجوم فأكثر وتعليق ١٥ حرف فأكثر) بالاسم الأول والمدينة فقط
+-- index: ratings (is_public, created_at desc). execute: anon, authenticated

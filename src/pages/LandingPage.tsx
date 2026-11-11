@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase'
 import { trackEvent } from '../lib/analytics'
 import { NewTaskPage } from './NewTaskPage'
 import { ServiceBrowsePage } from './ServiceBrowsePage'
+import { GatewayLanding } from '../components/landing/GatewayLanding'
 
 const EXAMPLES = [
   'أبي أحد يوصل طرد من العنوان',
@@ -378,224 +379,23 @@ export function LandingPage() {
   // البوابة (نقطة الدخول الرسمية) — تُعرَض لكل زائر أو مستخدم مسجَّل ما لم يختر وجهة.
   // المستخدم المسجَّل يحتفظ بجلسته، ونعرض له اختصار "لوحتي" للانتقال لدشبورده صراحةً.
   if (!mode) {
-    const LANDING_FEATURES = [
-      { icon: UserCheck, title: 'محترفون معتمدون', desc: 'كل مزوّد خدمة يمر بفحص هوية وتدقيق قبل قبوله في المنصة.', color: 'text-primary-500', bg: 'bg-primary-50' },
-      { icon: Shield, title: 'دفع آمن ومضمون', desc: 'الطلب يكتمل فقط بعد تأكيدك استلام الخدمة — حقوقك محفوظة.', color: 'text-secondary-500', bg: 'bg-secondary-50' },
-      { icon: MessageCircle, title: 'محادثة محمية', desc: 'تواصل مباشر داخل المنصة بدون مشاركة أرقامك الشخصية.', color: 'text-accent-500', bg: 'bg-accent-50' },
-      { icon: Star, title: 'تقييم شفاف', desc: 'كل طلب ينتهي بتقييم حقيقي يبني سمعة مقدّم الخدمة.', color: 'text-blue-500', bg: 'bg-blue-50' },
-    ]
     return (
-      <div className="min-h-screen bg-slate-50 text-slate-900" dir="rtl">
+      <>
         {portalNoticeEl}
-        {/* ===== Hero + بوابة الاختيار ===== */}
-        <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-primary-900 px-4 pt-14 pb-20 overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none opacity-60">
-            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-primary-500/10 blur-3xl" />
-          </div>
-          {/* شريط علوي: روابط المنصة + الدخول */}
-          <div className="relative max-w-5xl mx-auto -mt-6 mb-8 flex items-center justify-between gap-3 text-xs sm:text-sm">
-            <div className="flex items-center gap-3 sm:gap-5 text-slate-300 overflow-x-auto scrollbar-hide whitespace-nowrap">
-              {/* تبديل الجمهور: أفراد (الحالي) | منشآت (يفتح صفحة المنشآت) */}
-              <nav aria-label="نوع الحساب" className="flex items-center bg-white/10 rounded-full p-1 flex-shrink-0">
-                <span className="bg-white text-slate-900 font-bold rounded-full px-3 sm:px-4 py-1.5">أفراد</span>
-                <button onClick={() => openPortal('enterprises')} className="flex items-center gap-1.5 text-slate-200 hover:text-white rounded-full px-3 sm:px-4 py-1.5 transition-colors">
-                  <Building2 size={14} /> منشآت
-                </button>
-              </nav>
-              <button onClick={() => { chooseMode('individuals'); setActiveTab('about') }} className="hover:text-white transition-colors">من نحن</button>
-              <button onClick={() => { chooseMode('individuals'); setActiveTab('privacy') }} className="hover:text-white transition-colors">الخصوصية</button>
-              <button onClick={() => { chooseMode('individuals'); setActiveTab('terms') }} className="hover:text-white transition-colors">الشروط</button>
-              <button onClick={() => { chooseMode('individuals'); setActiveTab('support') }} className="hover:text-white transition-colors">الدعم</button>
-              {profile?.role === 'admin' && <button onClick={() => navigate('admin')} className="text-primary-300 hover:text-white transition-colors">الإدارة</button>}
-            </div>
-            {user && profile ? (
-              <button onClick={() => goToUserHome(navigate, profile)} className="flex-shrink-0 bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-1.5 rounded-lg transition-colors">حسابي</button>
-            ) : (
-              <button onClick={() => { chooseMode('individuals'); setAuthDirectMode('login'); setShowAuthDirect(true) }} className="flex-shrink-0 bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-1.5 rounded-lg transition-colors">دخول</button>
-            )}
-          </div>
-          <div className="relative max-w-3xl mx-auto text-center">
-            <div className="bg-white inline-block rounded-3xl p-3.5 mb-5">
-              <Logo full size={72} />
-            </div>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4 leading-[1.15]">
-              استأجر شخص{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-400 to-accent-400">لتنفيذ مهامك!</span>
-            </h1>
-            <p className="text-slate-300 text-sm sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
-              اكتب أي طلب — حتى لو ما لقيت له منصة — ويتولاه شخص من أمرني. بدون تسجيل أولاً، وبدون ما تدور وتقارن.
-            </p>
-
-            {/* صندوق الطلب الواحد — الوعد الأساسي */}
-            <form
-              onSubmit={e => { e.preventDefault(); startFromGateway(taskInput) }}
-              className="max-w-xl mx-auto mb-3"
-            >
-              <div className="flex items-center gap-2 bg-white rounded-2xl p-2 shadow-2xl shadow-black/20 focus-within:ring-4 focus-within:ring-primary-400/40 transition-all">
-                <input
-                  value={taskInput} onChange={e => setTaskInput(e.target.value)}
-                  placeholder={visible ? EXAMPLES[idx] : ''}
-                  aria-label="اكتب طلبك"
-                  className="flex-1 min-w-0 bg-transparent text-slate-900 placeholder-slate-400 text-sm sm:text-base px-3 py-3 outline-none text-right"
-                />
-                <button type="submit"
-                  className="bg-primary-500 hover:bg-primary-700 text-white font-bold text-sm sm:text-base px-5 sm:px-7 py-3 rounded-xl transition-colors flex-shrink-0 flex items-center gap-1.5">
-                  اطلب <ArrowLeft size={16} />
-                </button>
-              </div>
-            </form>
-            <p className="text-primary-300 text-xs sm:text-sm mb-6 font-medium">{RESPONSE_PROMISE} · تتفاوض على السعر قبل ما تدفع</p>
-
-            <div className="flex flex-wrap justify-center gap-2 mb-10">
-              {REQUEST_IDEAS.slice(0, 5).map(r => (
-                <button key={r.text} onClick={() => startFromGateway(r.text)}
-                  className="bg-white/5 hover:bg-white/15 border border-white/10 hover:border-primary-400/50 text-slate-200 text-xs sm:text-sm px-3.5 py-2 rounded-full transition-all">
-                  <r.icon size={14} className="inline -mt-0.5 ml-1.5 text-primary-300" strokeWidth={1.75} />{r.text}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-4 text-xs text-slate-300 mb-6">
-              {['تواصل داخل المنصة', 'دفع محفوظ لين تأكيد الإنجاز', 'بياناتك محمية'].map(t => (
-                <div key={t} className="flex items-center gap-1.5">
-                  <CheckCircle size={11} className="text-primary-400" />
-                  <span>{t}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* اختصار "لوحتي" للمستخدم المسجَّل */}
-            {user && profile && (
-              <button
-                onClick={() => goToUserHome(navigate, profile)}
-                className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 px-4 py-2 rounded-full transition-all"
-              >
-                <span>الذهاب للوحتي</span>
-                <span aria-hidden>←</span>
-              </button>
-            )}
-
-            {/* روابط ثانوية: المنشآت + التحقق من المورد */}
-            <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs sm:text-sm text-slate-400">
-              <button onClick={() => navigate('verify')} className="hover:text-white underline-offset-4 hover:underline transition-colors"><ShieldCheck size={15} className="inline -mt-0.5 ml-1.5" />تأكد من مورد قبل التعامل معه</button>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== نقاط الوعد (بدون أرقام مصطنعة) ===== */}
-        <section className="py-8 px-4 bg-white border-b border-slate-100">
-          <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-            {[[PenLine, 'اكتب طلبك بكلامك'], [Handshake, 'تتفق على السعر أولاً'], [Lock, 'الدفع محفوظ لين تأكيد الإنجاز'], [MessageCircle, 'محادثة داخل المنصة']].map(([I, l]: any) => (
-              <div key={l}>
-                <div className="w-12 h-12 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center mx-auto mb-2"><I size={22} strokeWidth={1.75} /></div>
-                <div className="text-xs sm:text-sm text-slate-600 font-medium leading-snug">{l}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ===== أمثلة على ما يُطلب ===== */}
-        <section className="py-16 px-4 bg-slate-50">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-black text-slate-900 mb-2">وش تقدر تطلب؟</h2>
-              <p className="text-slate-500">أي شيء قانوني ينفَّذ على أرض الواقع — هذه أمثلة فقط، اكتب طلبك بكلامك</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {REQUEST_IDEAS.map(r => (
-                <button key={r.text} onClick={() => startFromGateway(r.text)}
-                  className="flex items-center gap-3 bg-white border border-slate-200 hover:border-primary-500 hover:bg-primary-50 rounded-2xl p-4 text-right transition-all group">
-                  <span className="w-10 h-10 rounded-xl bg-primary-50 group-hover:bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0 transition-colors"><r.icon size={20} strokeWidth={1.75} /></span>
-                  <span className="flex-1 text-sm text-slate-700 group-hover:text-primary-600 font-medium">{r.text}</span>
-                  <ArrowLeft size={16} className="text-slate-300 group-hover:text-primary-500 flex-shrink-0" />
-                </button>
-              ))}
-            </div>
-            <p className="text-center text-xs text-slate-400 mt-4">أمثلة توضيحية — ليست مهام منفَّذة</p>
-          </div>
-        </section>
-
-        {/* ===== المميزات ===== */}
-        <section className="py-16 px-4 bg-white">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-black text-slate-900 mb-2">لماذا آمرني؟</h2>
-              <p className="text-slate-500">لأنه يجمع لك كل خدمة تحتاجها في مكان واحد</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {LANDING_FEATURES.map(({ icon: Icon, title, desc, color, bg }) => (
-                <div key={title} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                  <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center mb-4`}>
-                    <Icon size={20} className={color} />
-                  </div>
-                  <h3 className="font-bold text-slate-900 mb-2 text-sm">{title}</h3>
-                  <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ===== طريقة العمل ===== */}
-        <section className="py-16 px-4 bg-slate-50">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-black text-slate-900 mb-2">كيف يعمل آمرني؟</h2>
-              <p className="text-slate-500">من الطلب للإنجاز في دقائق</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {STEPS.map(({ n, icon: Icon, title, desc }) => (
-                <div key={n} className="bg-white border border-slate-200 rounded-2xl p-7 hover:shadow-md transition-all">
-                  <div className="text-5xl font-black text-slate-100 mb-4">{n}</div>
-                  <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center mb-4">
-                    <Icon size={19} className="text-primary-500" />
-                  </div>
-                  <h3 className="font-bold text-slate-900 mb-2 text-lg">{title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ===== CTA ===== */}
-        <section className="py-16 px-4 bg-primary-600">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-black text-white mb-3">عندك طلب؟ اكتبه الحين</h2>
-            <p className="text-blue-100 mb-8">{RESPONSE_PROMISE} — وبدون تسجيل أولاً</p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }} className="bg-white text-primary-600 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-colors">
-                اكتب طلبك
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== Footer كامل ===== */}
-        <footer className="bg-slate-900 text-white py-10 px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div>
-                <p className="font-black text-xl text-white mb-1">آمرني</p>
-                <p className="text-slate-400 text-sm">منصة الخدمات والمهام اليومية</p>
-              </div>
-              <div className="flex flex-wrap gap-4 text-sm text-slate-400">
-                <button onClick={() => { chooseMode('individuals'); setActiveTab('about') }} className="hover:text-white transition-colors">من نحن</button>
-                <button onClick={() => { chooseMode('individuals'); setActiveTab('privacy') }} className="hover:text-white transition-colors">سياسة الخصوصية</button>
-                <button onClick={() => { chooseMode('individuals'); setActiveTab('terms') }} className="hover:text-white transition-colors">الشروط والأحكام</button>
-                {profile?.role === 'admin' && (
-                  <button onClick={() => navigate('admin')} className="text-primary-300 hover:text-white transition-colors">لوحة الإدارة</button>
-                )}
-                <button onClick={() => { chooseMode('individuals'); setActiveTab('support') }} className="hover:text-white transition-colors">الدعم الفني</button>
-                <button onClick={() => { chooseMode('individuals'); setActiveTab('contact') }} className="hover:text-white transition-colors">اتصل بنا</button>
-              </div>
-            </div>
-            <div className="border-t border-slate-800 mt-6 pt-6 text-center text-slate-500 text-xs">
-              © ٢٠٢٦ آمرني — جميع الحقوق محفوظة
-            </div>
-          </div>
-        </footer>
-      </div>
+        <GatewayLanding
+          isLoggedIn={!!(user && profile)}
+          isAdmin={profile?.role === 'admin'}
+          rotatingExample={visible ? 'مثال: ' + EXAMPLES[idx] : ''}
+          onStart={startFromGateway}
+          onLogin={() => { chooseMode('individuals'); setAuthDirectMode('login'); setShowAuthDirect(true) }}
+          onMyAccount={() => goToUserHome(navigate, profile)}
+          onEnterprises={() => openPortal('enterprises')}
+          onTab={(t) => { chooseMode('individuals'); setActiveTab(t) }}
+          onVerify={() => navigate('verify')}
+          onJoin={() => navigate('join')}
+          onAdmin={() => navigate('admin')}
+        />
+      </>
     )
   }
 
