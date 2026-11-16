@@ -1807,7 +1807,7 @@ export function AdminPanel() {
       </div>
       {selectedTask && (
         <AdminTaskDetail task={tasks.find(x => x.id === selectedTask.id) || selectedTask} users={users} workers={workers}
-          onClose={() => setSelectedTask(null)} onStatusChange={(id, st) => updateTaskStatus(id, st as any)} />
+          onClose={() => setSelectedTask(null)} onStatusChange={(id, st) => updateTaskStatus(id, st as any)} onReassigned={fetchAll} />
       )}
     </div>
   )

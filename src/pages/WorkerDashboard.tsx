@@ -1005,6 +1005,19 @@ export function WorkerDashboard() {
                   ✅ العميل دفع — نفّذ وسلّم الإنجاز
                 </button>
               )}
+              {(st === 'offer' || st === 'wait_approval' || st === 'wait_payment') && (
+                <button onClick={async () => {
+                  const reason = prompt('بتعتذر عن الطلب؟ يرجع متاح لمنفّذين ثانيين وما يظهر لك مرة ثانية.\nاكتب السبب (اختياري):', 'ما اتفقنا على السعر')
+                  if (reason === null) return
+                  const { error } = await supabase.rpc('task_unassign', { p_task_id: selectedTask.id, p_reason: reason })
+                  if (error) { toast(error.message, 'error'); return }
+                  toast('تم الاعتذار عن الطلب ورجع متاح لغيرك', 'success')
+                  setSelectedTask(null); fetchMyTasks()
+                }}
+                  className="w-full mb-3 border border-slate-200 text-slate-500 hover:bg-slate-50 font-bold py-2.5 rounded-xl text-sm">
+                  اعتذر عن الطلب
+                </button>
+              )}
             </>})()}
             {selectedTask.status === 'pending_confirmation' && (
               <div className="mb-3 bg-purple-50 border border-purple-200 rounded-xl p-3 text-sm text-purple-700">

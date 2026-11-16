@@ -382,6 +382,21 @@ export function UserDashboard() {
           </div>
         )}
 
+        {/* ما اتفقنا؟ — العميل يفك ارتباط المنفّذ قبل الدفع ويرجع الطلب للعرض */}
+        {selectedTask.status === 'in_progress' && selectedTask.worker_id && !['held', 'paid', 'released'].includes((selectedTask as any).payment_status) && (
+          <button onClick={async () => {
+            const reason = prompt('ما اتفقتوا؟ نرجع طلبك للعرض عشان يوصلك منفّذ ثاني، وهذا المنفّذ ما يشوفه مرة ثانية.\nاكتب السبب (اختياري):', '')
+            if (reason === null) return
+            const { error } = await supabase.rpc('task_unassign', { p_task_id: selectedTask.id, p_reason: reason })
+            if (error) { toast(error.message, 'error'); return }
+            toast('✅ رجع طلبك للعرض — بيوصلك منفّذ ثاني', 'success')
+            setSelectedTask(null); fetchTasks()
+          }}
+            className="w-full border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold py-2.5 rounded-xl text-sm">
+            ما اتفقنا؟ ابحث عن منفّذ آخر
+          </button>
+        )}
+
         {/* التفاوض على السعر ثم الدفع — قبل التنفيذ */}
         {selectedTask.status === 'in_progress' && (
           <div className="space-y-3">

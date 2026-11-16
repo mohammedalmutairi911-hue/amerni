@@ -19,13 +19,25 @@ const fmt = (iso?: string | null) => iso
   ? new Date(iso).toLocaleString('ar-SA', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })
   : '—'
 
-export function AdminTaskDetail({ task, users, workers, onClose, onStatusChange }: {
+export function AdminTaskDetail({ task, users, workers, onClose, onStatusChange, onReassigned }: {
   task: Task; users: Profile[]; workers: WorkerProfile[]; onClose: () => void
   onStatusChange?: (id: string, status: string) => void
+  onReassigned?: () => void
 }) {
   const t = task as any
   const [msgs, setMsgs] = useState<Msg[]>([])
   const [loading, setLoading] = useState(true)
+  const [newWorker, setNewWorker] = useState('')
+  const [reassigning, setReassigning] = useState(false)
+  const reassign = async (workerId: string | null) => {
+    const msg = workerId ? 'تحويل الطلب للمنفّذ المختار؟ يوصل إشعار للعميل والمنفّذين.' : 'إرجاع الطلب مفتوح لكل المنفّذين؟'
+    if (!confirm(msg)) return
+    setReassigning(true)
+    const { error } = await supabase.rpc('admin_reassign_task', { p_task_id: task.id, p_worker_id: workerId })
+    setReassigning(false)
+    if (error) { alert('ما تم: ' + error.message); return }
+    setNewWorker(''); onReassigned?.(); load()
+  }
 
   const clientId: string | undefined = t.client_id || t.user_id
   const client = users.find(u => u.id === clientId) as any
@@ -162,6 +174,32 @@ export function AdminTaskDetail({ task, users, workers, onClose, onStatusChange 
                 <button onClick={() => { if (confirm('إنهاء النزاع واعتبار الطلب مكتمل؟')) onStatusChange(t.id, 'completed') }}
                   className="flex-1 bg-primary-700 text-white font-bold py-2 rounded-xl text-xs">حل النزاع (اعتبار الطلب مكتمل)</button>
               )}
+            </div>
+          )}
+
+          {/* تغيير المنفّذ — للأدمن */}
+          {!['completed', 'cancelled'].includes(t.status) && (
+            <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+              <p className="text-sm font-bold text-slate-700">تغيير المنفّذ</p>
+              <div className="flex gap-2">
+                <select value={newWorker} onChange={e => setNewWorker(e.target.value)} aria-label="اختر منفّذ"
+                  className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm">
+                  <option value="">اختر منفّذ معتمد…</option>
+                  {workers.filter((w: any) => w.is_approved && w.user_id !== t.worker_id && w.user_id !== clientId)
+                    .map((w: any) => <option key={w.user_id} value={w.user_id}>{w.full_name || 'منفّذ'}{w.city ? ` — ${w.city}` : ''}</option>)}
+                </select>
+                <button onClick={() => newWorker && reassign(newWorker)} disabled={!newWorker || reassigning}
+                  className="bg-primary-700 disabled:opacity-40 text-white font-bold px-4 rounded-xl text-sm whitespace-nowrap">
+                  {reassigning ? <Loader2 size={14} className="animate-spin" /> : 'إسناد'}
+                </button>
+              </div>
+              {t.worker_id && !['held', 'paid'].includes(t.payment_status) && (
+                <button onClick={() => reassign(null)} disabled={reassigning}
+                  className="w-full border border-slate-200 text-slate-600 font-bold py-2 rounded-xl text-xs">
+                  إرجاع الطلب مفتوح لكل المنفّذين
+                </button>
+              )}
+              {['held', 'paid'].includes(t.payment_status) && <p className="text-[11px] text-slate-400">الطلب مدفوع: المنفّذ الجديد يكمل على السعر المتفق، والمبلغ المحجوز يتحوّل له بعد التأكيد.</p>}
             </div>
           )}
 
